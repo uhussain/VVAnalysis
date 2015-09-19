@@ -1,0 +1,13 @@
+{
+    "e" : [ 
+        "{object}Pt > 10",
+        "{object}AbsEta <  2.5",
+        "{object}CBIDMedium"
+    ],
+    "m" : [
+        "{object}Pt > 10",
+        "{object}AbsEta < 2.4",
+        "{object}PFIDTight",
+        "{object}RelPFIsoDBDefault < 0.12"
+    ]
+}
