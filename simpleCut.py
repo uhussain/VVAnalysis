@@ -44,15 +44,17 @@ def buildCutString(state, cuts_file):
             cut_string.append(cut.format(object_name=lep_name))
     return cut_string
 
-root_file = ROOT.TFile.Open(
-    "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-008E7FBF-9218-E511-81E0-001E675A5244.root")
+#root_file = ROOT.TFile.Open(
+#    "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-008E7FBF-9218-E511-81E0-001E675A5244.root")
+#file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-008E7FBF-9218-E511-81E0-001E675A5244.root"
+file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
 num = 0
 entry_map = {}
 for state in ["eee", "eem", "emm", "mmm"]:
     ROOT.gROOT.SetBatch(True)
-    tree = root_file.Get("%s/final/Ntuple" % state)
+    tree = ROOT.TChain("%s/final/Ntuple" % state)
     #tree = ROOT.TChain("%s/final/Ntuple" % state)
-    #tree.Add(file_name)
+    tree.Add(file_path)
     plotvar = "e1Pt" if "ee" in state else "m1Pt"
    
     selector = ROOT.TSelector.GetSelector("disambiguateFinalStates.C+") 
@@ -62,13 +64,10 @@ for state in ["eee", "eem", "emm", "mmm"]:
     cut_string = buildCutString(state, "Cuts/preselection.json")
     print tree.Draw(">>" + listname, cut_string.getString(), "entrylist")
     print cut_string.getString()
+    continue
     tlist = ROOT.gDirectory.FindObject(listname);
     tree.SetEntryList(tlist)
     
-    canvas = ROOT.TCanvas("canvas" + state, "canvas", 600, 800)
-    #hist = ROOT.TH1F("test" + state, "test", 100, 0, 100)
-    #tree.Process("disambiguateFinalStates.C+")
-    print "Number of entries after draw string is: %i" % tree.Draw("evt>>test" + state, "")
     print "Now calling selector"
     tree.Process(selector) #, "Mass")
     print "DONE"

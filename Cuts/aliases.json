@@ -1,0 +1,19 @@
+{
+    "State" :
+        "emm" :
+            "bestZCand_Mass" : "m1_m2_Mass",
+            "Zlep1_Pt" : "m1Pt > m2Pt ? m1Pt : m2Pt",
+            "Zlep1_Pt" : "m1Pt > m2Pt ? m2Pt : m1Pt",
+            "Wlep_Pt" : "ePt"
+        "eem" :
+            "bestZCand_Mass" : "e1_e2_Mass",
+            "Zlep1_Pt" : "e1Pt > e2Pt ? e1Pt : e2Pt",
+            "Zlep1_Pt" : "e1Pt > m2Pt ? e2Pt : e1Pt",
+            "Wlep_Pt" : "ePt"
+        "eee" {
+            "bestZis_e1_e2" : "(abs(e1_e2_Mass - 91.1876) < abs(e1_e3_Mass - 91.1876)) ? ((abs(e1_e2_Mass - 91.1876) < abs(e2_e3_Mass - 91.1876)) ? 1 : 0) : 0"
+            "bestZis_e1_e3" : "(abs(e1_e3_Mass - 91.1876) < abs(e1_e2_Mass - 91.1876)) ? ((abs(e1_e3_Mass - 91.1876) < abs(e2_e3_Mass - 91.1876)) ? 1 : 0) : 0"
+            "bestZCand_Mass" : "bestZis_e1_e2 ? e1_e2_Mass : (bestZis_e1_e3 ? e1_e3_Mass : e2_e3_Mass"
+            "Zlep1_Pt" : "bestZis_e1_e2 ? ((e1Pt > e2Pt) ? e1Pt : e2Pt) : (bestZis_e1_e3 ? e1_e3_Mass : e2_e3_Mass"
+
+

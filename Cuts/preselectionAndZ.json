@@ -15,15 +15,19 @@
     "State" : {
         "eee" : [
             "!(e1_e2_SS && e2_e3_SS && e1_e3_SS)",
+            "((!e1_e2_SS && e1_e2_Mass < 120 && e1_e2_Mass > 60 && e1Pt > 20) || (!e1_e3_SS && e1_e3_Mass < 120 && e1_e3_Mass > 60 && (e1Pt > 20 || e3Pt > 20)) || (!e2_e3_SS && e2_e3_Mass < 120 && e2_e3_Mass > 60 && (e2Pt > 20 || e3Pt > 20)))"
         ],
         "mmm" : [
             "!(m1_m2_SS && m2_m3_SS && m1_m3_SS)",
+            "((!m1_m2_SS && m1_m2_Mass < 120 && m1_m2_Mass > 60 && m1Pt > 20) || (!m1_m3_SS && m1_m3_Mass < 120 && m1_m3_Mass > 60 && m1Pt > 20) || (!m2_m3_SS && m2_m3_Mass < 120 && m2_m3_Mass > 60 && m2Pt > 20))"
         ],
         "eem" : [
             "!e1_e2_SS",
+            "(e1_e2_Mass < 120 && e1_e2_Mass > 60 && e1Pt > 20)"
         ],
         "emm" : [
             "!m1_m2_SS",
+            "(m1_m2_Mass < 120 && m1_m2_Mass > 60 && m1Pt > 20)"
         ]
     },
     "Event" : [
