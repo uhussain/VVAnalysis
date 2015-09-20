@@ -11,15 +11,15 @@ class CutString(object):
     def getString(self):
         return " && ".join(self.cuts)
 
-def readCuts(json_file_name):
-    object_cuts = {}
+def readJson(json_file_name):
+    json_info = {}
     with open(json_file_name) as json_file:
         try:
-            object_cuts = json.load(json_file)
+            json_info = json.load(json_file)
         except ValueError as err:
-            print "Error reading JSON file. The (likely unhelpful) error message was: "
+            print "Error reading JSON file. The error message was: "
             print(err)
-    return object_cuts
+    return json_info
 def getSelectedEntries(tree, entrylist):
     #tree.SetEntryList(entrylist)
     for i in xrange( tree.GetEntries() ):
@@ -29,9 +29,9 @@ def getSelectedEntries(tree, entrylist):
      #   n = entrylist.Next()
       #  tree.GetEntry(n)
        # yield tree
-def buildCutString(state, cuts_file):
+def buildCutString(state, cuts_json):
     cut_string = CutString()
-    preselection_cuts = readCuts(cuts_file)
+    preselection_cuts = readJson(cuts_json)
     cut_string.append(preselection_cuts["Event"])
     cut_string.append(preselection_cuts["State"][state])
     
@@ -43,6 +43,10 @@ def buildCutString(state, cuts_file):
         for cut in preselection_cuts["Object"][lep]:
             cut_string.append(cut.format(object_name=lep_name))
     return cut_string
+def setAliases(tree, state, aliases_json):
+    aliases = readJson(aliases_json)
+    for name, value in aliases["State"][state].iteritems():
+        tree.SetAlias(name, value)
 
 #root_file = ROOT.TFile.Open(
 #    "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-008E7FBF-9218-E511-81E0-001E675A5244.root")
@@ -61,7 +65,8 @@ for state in ["eee", "eem", "emm", "mmm"]:
     zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
     selector.setZCandidateBranchName(zcand_name)
     listname = "list" + state
-    cut_string = buildCutString(state, "Cuts/preselection.json")
+    cut_string = buildCutString(state, "Cuts/fullSelection.json")
+    setAliases(tree, state, "Cuts/aliases.json")
     print tree.Draw(">>" + listname, cut_string.getString(), "entrylist")
     print cut_string.getString()
     continue
