@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 import ROOT
 import json
+import argparse
+from collections import OrderedDict
+import time
+
 
 class CutString(object):
     def __init__(self):
@@ -31,6 +35,7 @@ def getSelectedEntries(tree, entrylist):
        # yield tree
 def buildCutString(state, cuts_json):
     cut_string = CutString()
+    print "cuts_json is %s" % cuts_json
     preselection_cuts = readJson(cuts_json)
     cut_string.append(preselection_cuts["Event"])
     cut_string.append(preselection_cuts["State"][state])
@@ -47,65 +52,53 @@ def setAliases(tree, state, aliases_json):
     aliases = readJson(aliases_json)
     for name, value in aliases["State"][state].iteritems():
         tree.SetAlias(name, value)
-
-#root_file = ROOT.TFile.Open(
-#    "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-008E7FBF-9218-E511-81E0-001E675A5244.root")
-#file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-008E7FBF-9218-E511-81E0-001E675A5244.root"
-file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
-num = 0
-entry_map = {}
-for state in ["eee", "eem", "emm", "mmm"]:
-    ROOT.gROOT.SetBatch(True)
-    tree = ROOT.TChain("%s/final/Ntuple" % state)
-    #tree = ROOT.TChain("%s/final/Ntuple" % state)
-    tree.Add(file_path)
-    plotvar = "e1Pt" if "ee" in state else "m1Pt"
-   
-    selector = ROOT.TSelector.GetSelector("disambiguateFinalStates.C+") 
-    zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
-    selector.setZCandidateBranchName(zcand_name)
-    listname = "list" + state
-    cut_string = buildCutString(state, "Cuts/fullSelection.json")
-    setAliases(tree, state, "Cuts/aliases.json")
-    print tree.Draw(">>" + listname, cut_string.getString(), "entrylist")
+def applySelection(tree, state, selection, selection_json):
+    print "______________________________________________________"
+    listname = '_'.join(["list", state, selection])
+    print selection_json
+    cut_string = buildCutString(state, str(selection_json))
+    num_passing = tree.Draw(">>" + listname, cut_string.getString(), "entrylist")
+    print "%i events passed the cut " % num_passing
     print cut_string.getString()
-    continue
     tlist = ROOT.gDirectory.FindObject(listname);
+    print tlist
     tree.SetEntryList(tlist)
-    
-    print "Now calling selector"
-    tree.Process(selector) #, "Mass")
-    print "DONE"
-    entryList = selector.GetOutputList().FindObject('bestCandidates')
-    tree.SetEntryList(entryList)
-    count = 0
-    print "With this loop count is %i " % count
-    entries = tree.Draw("evt", "")
-    hist = ROOT.gDirectory.FindObject("test" + state);
-    hist.Draw("hist")
-    #canvas.Print("test" + state + ".pdf")
-    print "Number of entries after selector is: %i" % entries
-    count = 0
-    #tree.SetAlias("ZCand_name", "e1_e2_Mass > e2_e3_Mass ? 'e1_e2' : 'e2_e3'")
-    tree.Draw("evt>>test" + state)
-    with open("selectedEvents_%s.out" % state, "w") as outfile:
-        #for entry in getSelectedEntries(tree, entryList):
-        for i in xrange(entryList.GetN()):    
-            tree.GetEntry(entryList.Next())
-            entry_name = ':'.join([str(i) for i in [tree.run, tree.lumi, tree.evt]])
-            outfile.write(entry_name)
-            outfile.write('\n')
-            if entry_name not in entry_map.keys():
-                entry_map[entry_name] = 1
-            else:
-                entry_map[entry_name] += 1    
-            #print "Count is %i" % count 
-            #print "Entry is %i" % entry_map[entry_name]
-            count += 1
-    with open("multiplicies_%s.out" % state, "w") as outfile:
-        for entry in entry_map:
-            outfile.write(str(entry_map[entry]))
-            outfile.write('\n')
-    print "Number of events looped over was: %i " % count
-    num += entries
-print num
+def applySelections(tree, state, selections):
+    print "______________________________________________________"
+    print "______________________________________________________"
+    start_time = time.time()
+    setAliases(tree, state, "Cuts/aliases.json")
+    for selection, json_file in selections.iteritems():
+        applySelection(tree, state, selection, json_file)
+        print "Run time was %s seconds" % ((time.time() - start_time))
+def getComLineArgs():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--selections", 
+                        type=lambda x: OrderedDict((i.strip(),  '')  for i in x.split(",")),
+                        required=True, help="List of selections you wish to make "
+                        "(as defined in Cuts/definitions.json), separated by commas")
+    args = vars(parser.parse_args())
+    definitions_json = readJson("Cuts/definitions.json")
+    for selection in args['selections']:
+        if selection not in definitions_json.keys():
+            raise ValueError("Cut name must correspond to a definition in " 
+                "Cuts/definitions.json")
+        args['selections'][selection] = definitions_json[selection]
+    print args
+    return args
+def main():
+    ROOT.gROOT.SetBatch(True)
+    #For testing on single file
+    #file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-008E7FBF-9218-E511-81E0-001E675A5244.root"
+    file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
+    try:
+        user_input = getComLineArgs()
+    except ValueError as err:
+        print(err)
+        exit(0)
+    for state in ["eee", "eem", "emm", "mmm"]:
+        tree = ROOT.TChain("%s/final/Ntuple" % state)
+        tree.Add(file_path)
+        cuts_table = applySelections(tree, state, user_input['selections'])
+if __name__ == "__main__":
+    main()

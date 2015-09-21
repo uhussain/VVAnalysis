@@ -1,0 +1,6 @@
+{
+    "preselection" : "Cuts/preselection.json",
+    "Wselection" : "Cuts/Wselection.json",
+    "Zselection" : "Cuts/Zselection.json",
+    "full" : "Cuts/fullSelection.json"
+}
