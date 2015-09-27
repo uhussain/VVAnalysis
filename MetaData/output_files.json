@@ -1,0 +1,12 @@
+{
+    "wz-powheg" : {
+        "cross_section" : 4.43,
+        "Source of cross section" : "POWHEG tarball",
+        "DAS Name" : "",
+        "file_paths" : {
+            "preselection" : "/data/kelong/WZAnalysisData/Preselection/{DATE}/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8.root",
+            "Zselection" : "/data/kelong/WZAnalysisData/Zselection/{DATE}/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8.root",
+            "Wselection" : "/data/kelong/WZAnalysisData/Wselection/{DATE}/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8.root"
+        }
+    }
+}

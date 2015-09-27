@@ -1,0 +1,12 @@
+{
+    "wz-powheg" : {
+        "cross_section" : 4.43,
+        "Source of cross section" : "POWHEG tarball",
+        "DAS Name" : "",
+        "file_paths" : {
+            "fsa" : "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*",
+            "preselection" : "/data/kelong/WZAnalysisData/Preselection/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
+        }
+    }
+}
+
