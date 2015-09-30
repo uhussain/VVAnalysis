@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import ROOT
-import argparse
 from collections import OrderedDict
 import os
 import sys
@@ -46,13 +45,11 @@ def setAliases(tree, state, aliases_json):
         tree.SetAlias(name, value)
 
 def applySelection(tree, state, selection, user_input):
-    #order = ["fsa", "preselection", "Zselection", "Wselection"] 
     setAliases(tree, state, "Cuts/aliases.json")
     cut_string = buildCutString(state, user_input['selections'][selection])
     
     print tree
     #tree.SetProof()
-    #num_passing = proof.DrawSelect(tree, ">>" + listname, cut_string.getString(), "entrylist")
     listname = '_'.join(["list", state, selection])
     num_passing = tree.Draw(">>" + listname, cut_string.getString(), "entrylist")
     print "%i events passed the cut " % num_passing
@@ -62,22 +59,6 @@ def applySelection(tree, state, selection, user_input):
     print tlist
     tree.SetEntryList(tlist)
         
-def getComLineArgs():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-a", "--save_all", action='store_true',
-                        required=False, help="Save output of step separately")
-    parser.add_argument("-s", "--selections", 
-                        type=lambda x: OrderedDict((i.strip(),  '')  for i in x.split(",")),
-                        required=True, help="List of selections you wish to make "
-                        "(as defined in Cuts/definitions.json), separated by commas")
-    args = vars(parser.parse_args())
-    definitions_json = UserInput.readJson("Cuts/definitions.json")
-    for selection in args['selections']:
-        if selection not in definitions_json.keys():
-            raise ValueError("Cut name must correspond to a definition in " 
-                "Cuts/definitions.json")
-        args['selections'][selection] = definitions_json[selection]
-    return args
 def createOutputFile(name, selection):
     output_files = UserInput.readJson("MetaData/output_files.json") 
     print output_files
@@ -96,6 +77,7 @@ def writeNtupleToFile(output_file, tree, state):
     ntuple_dir.cd()
     save_tree = tree.CloneTree()
     save_tree.Write()
+    output_file.Purge()
     print "Writing TREE!"
     ROOT.gROOT.cd()
     del save_tree
@@ -109,7 +91,7 @@ def main():
     #file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
     #proof = ROOT.gProof
     try:
-        user_input = getComLineArgs()
+        user_input = UserInput.getComLineArgs()
     except ValueError as err:
         print(err)
         exit(0)
@@ -117,6 +99,8 @@ def main():
 
     input_files = UserInput.readJson("MetaData/input_files.json")
     for name, input_info in input_files.iteritems(): 
+        if name in ["wz-powheg", "zz4l-powheg"]:
+            continue
         for selection in user_input['selections']:
             output_file = createOutputFile(name, selection)
             ROOT.gROOT.cd()

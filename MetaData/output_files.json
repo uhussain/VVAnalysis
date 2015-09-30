@@ -8,5 +8,21 @@
             "Zselection" : "/data/kelong/WZAnalysisData/Zselection/{DATE}/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8.root",
             "Wselection" : "/data/kelong/WZAnalysisData/Wselection/{DATE}/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8.root"
         }
+    },
+    "zz4l-powheg" : {
+        "cross_section" : 1.256,
+        "Source of cross section" : "POWHEG tarball",
+        "DAS Name" : "",
+        "file_paths" : {
+            "preselection" : "/data/kelong/WZAnalysisData/Preselection/{DATE}/ZZTo4L_13TeV_powheg_pythia8.root"
+        }
+    },
+    "DYm50-amcnlo" : {
+        "cross_section" : 6025,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "",
+        "file_paths" : {
+            "preselection" : "/data/kelong/WZAnalysisData/Preselection/{DATE}/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root"
+        }
     }
 }
