@@ -19,7 +19,7 @@
     },
     "DYm50-amcnlo" : {
         "cross_section" : 6025,
-        "Source of cross section" : "MCFM",
+        "Source of cross section" : "MCM",
         "DAS Name" : "",
         "file_paths" : {
             "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
