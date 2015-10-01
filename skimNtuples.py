@@ -3,7 +3,7 @@ import ROOT
 import argparse
 import os
 import sys
-from Utilities import ApplySelection
+from Utilities.python import ApplySelection
 
 def getComLineArgs():
     parser = argparse.ArgumentParser()
@@ -16,12 +16,13 @@ def getComLineArgs():
     parser.add_argument("-o", "--output_file_name", type=str,
                         required=True, help="Name of output file")
     return vars(parser.parse_args())
-def writeNtupleToFile(output_file, tree, state):
+def writeNtupleToFile(output_file, tree, state, cut_string):
     state_dir = output_file.mkdir(state)
     state_dir.cd()
     ntuple_dir = state_dir.mkdir("final")
     ntuple_dir.cd()
-    save_tree = tree.CloneTree()
+    save_tree = tree.CopyTree(cut_string)
+    print "save_tree has %i entries" % save_tree.GetEntries()
     save_tree.Write()
     # Remove AutoSaved trees
     output_file.Purge()
@@ -31,11 +32,7 @@ def skimNtuple(selection_json, filelist, output_file_name):
     current_path = os.getcwd()
     os.chdir(sys.path[0])
     ROOT.gROOT.SetBatch(True)
-    print "The selection json is %s" % selection_json
-    print "this list of files is %s" % filelist
-    print "The outputfile name is %s" % output_file_name
     #For testing on single file
-    file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-008E7FBF-9218-E511-81E0-001E675A5244.root"
     #file_path = "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
     output_file = ROOT.TFile(output_file_name, "RECREATE")
     ROOT.gROOT.cd()
@@ -43,11 +40,12 @@ def skimNtuple(selection_json, filelist, output_file_name):
         tree = ROOT.TChain("%s/final/Ntuple" % state)
         with open(filelist) as input_file:
             for file_path in input_file:
-                print file_path.strip()
-                #file_path += '/hdfs' if 'xrootd' not in file_path else ''
-                tree.Add(file_path.strip())
-        ApplySelection.applySelection(tree, state, selection_json)
-        writeNtupleToFile(output_file, tree, state)
+                file_path = ('/hdfs' if 'xrootd' not in file_path else '') + file_path.strip()
+                tree.Add(file_path)
+        print "Now the tree has %i entries" % tree.GetEntries()
+        #ApplySelection.applySelection(tree, state, selection_json)
+        cut_string = ApplySelection.buildCutString(state, selection_json).getString()
+        writeNtupleToFile(output_file, tree, state, cut_string)
     os.chdir(current_path)
 
 def main():

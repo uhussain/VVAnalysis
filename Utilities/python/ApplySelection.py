@@ -3,7 +3,7 @@ import ROOT
 from collections import OrderedDict
 import os
 import sys
-from Utilities import UserInput
+import UserInput
 import time
 
 class CutString(object):
@@ -47,3 +47,4 @@ def applySelection(tree, state, selection_json):
     tlist = ROOT.gDirectory.FindObject(listname);
     print tlist
     tree.SetEntryList(tlist)
+    print tree.GetEntries()
