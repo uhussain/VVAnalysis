@@ -2,7 +2,7 @@
     "wz3lnu-powheg" : {
         "cross_section" : 4.43,
         "Source of cross section" : "POWHEG tarball",
-        "DAS Name" : "",
+        "DAS Name" : "WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8",
         "file_paths" : {
             "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
         }
@@ -18,15 +18,63 @@
     "zz4l" : {
         "cross_section" : 1.256,
         "Source of cross section" : "POWHEG tarball",
-        "DAS Name" : "",
+        "DAS Name" : "ZZTo4L_13TeV_powheg_pythia8",
         "file_paths" : {
             "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/ZZTo4L_13TeV_powheg_pythia8/*"
+        }
+    },
+    "zz2l2q" : {
+        "cross_section" : 3.38,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*"
+        }
+    },
+    "ggZZ4e" : {
+        "cross_section" : 0.001586,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "GluGluToZZTo4e_BackgroundOnly_13TeV_MCFM",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo4e_BackgroundOnly_13TeV_MCFM/*"
+        }
+    },
+    "ggZZ4m" : {
+        "cross_section" : 0.001586,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "GluGluToZZTo4mu_BackgroundOnly_13TeV_MCFM",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo4mu_BackgroundOnly_13TeV_MCFM/*"
+        }
+    },
+    "ggZZ2e2mu" : {
+        "cross_section" : 0.003194,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "GluGluToZZTo2e2mu_BackgroundOnly_13TeV_MCFM",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo2e2mu_BackgroundOnly_13TeV_MCFM/*"
+        }
+    },
+    "ggZZ2e2tau" : {
+        "cross_section" : 0.003194,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "GluGluToZZTo2e2tau_BackgroundOnly_13TeV_MCFM",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo2e2tau_BackgroundOnly_13TeV_MCFM/*"
+        }
+    },
+    "ggZZ2mu2tau" : {
+        "cross_section" : 0.003194,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "GluGluToZZTo2mu2tau_BackgroundOnly_13TeV_MCFM",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo2mu2tau_BackgroundOnly_13TeV_MCFM/*"
         }
     },
     "DYm50" : {
         "cross_section" : 6025,
         "Source of cross section" : "MCM",
-        "DAS Name" : "",
+        "DAS Name" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
         "file_paths" : {
             "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
         }
@@ -37,6 +85,14 @@
         "DAS Name" : "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
         "file_paths" : {
             "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
+        }
+    },
+    "tt" : {
+        "cross_section" : 831.76,
+        "Source of cross section" : "https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO (top mass 172.5)",
+        "DAS Name" : "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
         }
     }
 }
