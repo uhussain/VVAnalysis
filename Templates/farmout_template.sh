@@ -11,7 +11,7 @@ tar \
     -o ${job_dir}/input_file_list.txt \
     -p ${input_files_path}
 popd
-chmod +x ${job_dir}/run_job.sh
+chmod +x ${job_dir}/skim.sh
 farmoutAnalysisJobs \
     --infer-cmssw-path \
     --fwklite \
@@ -22,4 +22,4 @@ farmoutAnalysisJobs \
     --assume-input-files-exist \
     --extra-inputs=${job_dir}/analysis_code.tar.gz \
     ${job_name} \
-    ${job_dir}/run_job.sh
+    ${job_dir}/skim.sh

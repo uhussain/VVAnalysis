@@ -11,14 +11,13 @@ import math
 
 def getComLineArgs():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--selection_json", type=str,
-                        required=True, help="Name of json file containing" 
-                        " cuts to make, e.g. Cuts/preselection.json")
-    parser.add_argument("-f", "--filelist", type=str,
+    parser.add_argument("-s", "--selection", type=str,
+                        required=True, help="Name of selection to make, "
+                        " as defined in Cuts/preselection.json")
+    parser.add_argument("-f", "--filelist", 
+                        type=lambda x : [i.strip() for i in x.split(',')],
                         required=True, help="List of input file names "
                         "to be processed (separated by commas)")
-    parser.add_argument("-o", "--output_file_name", type=str,
-                        required=True, help="Name of output file")
     return vars(parser.parse_args())
 
 def fillTemplatedFile(template_file_name, out_file_name, template_dict):
@@ -28,13 +27,14 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
     with open(out_file_name, "w") as outFile:
         outFile.write(result)
 def getJobName(sample_name, selection):
-    date = '{:%d-%m-%Y}'.format(datetime.date.today())
+    date = '{:%Y-%m-%d}'.format(datetime.date.today())
     return '-'.join([date, sample_name, selection])
 def getInputFilesPath(sample_name, selection):
     input_files = UserInput.readJson("MetaData/input_files.json")
     if sample_name not in input_files.keys():
-        raise ValueError("Input file must correspond to a definition in " 
-            "MetaData/input_files.json")
+        print input_files.keys()
+        raise ValueError("Invalid input file %s. Input file must correspond"
+               " to a definition in MetaData/input_files.json" % sample_name)
     return input_files[sample_name]['file_paths'][selection].rstrip("/*")
 def getCutsJsonName(selection):
     definitions_json = UserInput.readJson("Cuts/definitions.json")
@@ -47,23 +47,30 @@ def getFilesPerJob(path_to_files):
     file_list = glob.glob(path_to_files.rstrip("/*") + "/*")
     averagesize =sum([os.path.getsize(f) for f in file_list])/len(file_list)
     return int(math.ceil(100000000./averagesize))
+# The intention here was to make sure the output order isn't jumbled together,
+# as it is when subprocess outputs are written together. This is an admittedly
+# sloppy solution, however
 def callFarmout(output_dir, script_name):
-    with open('/'.join([output_dir, 'log.txt']), 'w') as log:
-        log.write('Condor submit info created with the command: %s\n' % ''.join(sys.argv[0]))
+    log_file_name = '/'.join([output_dir, 'log.txt'])
+    with open(log_file_name, 'w') as log:
+        log.write('Condor submit info created with the command: %s\n' % ''.join(sys.argv))
         log.write('Using WZAnalysis code by Kenneth Long (U. Wisconsin):\n')
         log.write('https://github.com/kdlong/WZAnalysis\n\n')
         log.write('The git hash of the commit used and the output of git diff is below\n') 
         log.write('-'*80 + '\n')
         log.write('-'*80 + '\n')
-    with open('/'.join([output_dir, 'log.txt']), 'a') as log:
+    with open(log_file_name, 'a') as log:
         subprocess.call(['git', 'log', '-1', '--format="%H"'], stdout=log)
         subprocess.call(['git', 'diff'], stdout=log)
-    with open('/'.join([output_dir, 'log.txt']), 'a') as log:
+    with open(log_file_name, 'a') as log:
         log.write('\n' +'-'*80 + '\n')
         log.write('-'*80 + '\n\n')
         log.write('The output of the generated farmout.sh script is below\n')
-    with open('/'.join([output_dir, 'log.txt']), 'a') as log:
-        subprocess.call(['bash', script_name], stdout=log, stderr=log)
+    with open(log_file_name, 'a') as log:
+        status = subprocess.call(['bash', script_name], stdout=log, stderr=log)
+    if status != 0:
+        print "Error in submitting files to condor. Check the log file: %s" % log_file_name
+    return status
 def farmoutNtupleSkim(sample_name, selection):
     job_name = getJobName(sample_name, selection)
     farmout_dict = {}
@@ -79,17 +86,21 @@ def farmoutNtupleSkim(sample_name, selection):
     fillTemplatedFile('/'.join([farmout_dict['base_dir'], 'Templates/farmout_template.sh']),
         script_name, farmout_dict)
     createRunJob(farmout_dict['base_dir'], farmout_dict['job_dir'], getCutsJsonName(selection))
-    callFarmout(farmout_dict['job_dir'], script_name)
+    status = callFarmout(farmout_dict['job_dir'], script_name)
+    if status == 0:
+        print "Submitted jobs for %s file set to condor." % sample_name
 def createRunJob(base_dir, job_dir, cuts_json):
     fill_dict = {'cuts_json' : cuts_json,
         'time' : datetime.datetime.now(),
         'command' : ' '.join(sys.argv)
     }
-    fillTemplatedFile('/'.join([base_dir, 'Templates/run_job_template.sh']),
-        '/'.join([job_dir, 'run_job.sh']), fill_dict)
+    fillTemplatedFile('/'.join([base_dir, 'Templates/skim_template.sh']),
+        '/'.join([job_dir, 'skim.sh']), fill_dict)
 def main():
     #for selection in selection_map.iteritems():
-    farmoutNtupleSkim('wz-powheg', 'preselection')
+    args = getComLineArgs()
+    for file_name in args['filelist']:
+        farmoutNtupleSkim(file_name, args['selection'])
 
 if __name__ == "__main__":
     main()

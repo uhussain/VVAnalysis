@@ -1,28 +1,42 @@
 {
-    "wz-powheg" : {
+    "wz3lnu-powheg" : {
         "cross_section" : 4.43,
         "Source of cross section" : "POWHEG tarball",
         "DAS Name" : "",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*",
-            "Zselection" : "/data/kelong/WZAnalysisData/Preselection/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*"
         }
     },
-    "zz4l-powheg" : {
+    "ww2l2nu" : {
+        "cross_section" : 10.48,
+        "Source of cross section" : "POWHEG tarball",
+        "DAS Name" : "WWTo2L2Nu_13TeV-powheg",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/WWTo2L2Nu_13TeV-powheg/*"
+        }
+    },
+    "zz4l" : {
         "cross_section" : 1.256,
         "Source of cross section" : "POWHEG tarball",
         "DAS Name" : "",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/ZZTo4L_13TeV_powheg_pythia8/*",
-            "Zselection" : "/data/kelong/WZAnalysisData/Preselection/2015-09-13-13TeV-WZ/ZZTo4L_13TeV_powheg_pythia8/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/ZZTo4L_13TeV_powheg_pythia8/*"
         }
     },
-    "DYm50-amcnlo" : {
+    "DYm50" : {
         "cross_section" : 6025,
         "Source of cross section" : "MCM",
         "DAS Name" : "",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-13-13TeV-WZ/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
+        }
+    },
+    "DYm10-50" : {
+        "cross_section" : 18610,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
         }
     }
 }
