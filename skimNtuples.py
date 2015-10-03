@@ -16,9 +16,11 @@ def getComLineArgs():
     parser.add_argument("-o", "--output_file_name", type=str,
                         required=True, help="Name of output file")
     return vars(parser.parse_args())
-def writeNtupleToFile(output_file, tree, state, cut_string):
+def writeNtupleToFile(output_file, metaTree, tree, state, cut_string):
     state_dir = output_file.mkdir(state)
     state_dir.cd()
+    save_mt = metaTree.CopyTree("")
+    save_mt.Write()
     ntuple_dir = state_dir.mkdir("final")
     ntuple_dir.cd()
     save_tree = tree.CopyTree(cut_string)
@@ -38,14 +40,16 @@ def skimNtuple(selection_json, filelist, output_file_name):
     ROOT.gROOT.cd()
     for state in ["eee", "eem", "emm", "mmm"]:
         tree = ROOT.TChain("%s/final/Ntuple" % state)
+        metaTree = ROOT.TChain("%s/metaInfo" % state)
         with open(filelist) as input_file:
             for file_path in input_file:
                 file_path = ('/hdfs' if 'xrootd' not in file_path else '') + file_path.strip()
                 tree.Add(file_path)
+                metaTree.Add(file_path)
         print "Now the tree has %i entries" % tree.GetEntries()
         #ApplySelection.applySelection(tree, state, selection_json)
         cut_string = ApplySelection.buildCutString(state, selection_json).getString()
-        writeNtupleToFile(output_file, tree, state, cut_string)
+        writeNtupleToFile(output_file, metaTree, tree, state, cut_string)
     os.chdir(current_path)
 
 def main():
