@@ -47,6 +47,14 @@
             "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo4mu_BackgroundOnly_13TeV_MCFM/*"
         }
     },
+    "ggZZ4t" : {
+        "cross_section" : 0.001586,
+        "Source of cross section" : "MCM",
+        "DAS Name" : "GluGluToZZTo4tau_BackgroundOnly_13TeV_MCFM",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo4tau_BackgroundOnly_13TeV_MCFM/*"
+        }
+    },
     "ggZZ2e2mu" : {
         "cross_section" : 0.003194,
         "Source of cross section" : "MCM",
@@ -93,6 +101,48 @@
         "DAS Name" : "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
         "file_paths" : {
             "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
+        }
+    },
+    "data_EE_2015C" : {
+        "cross_section" : 1,
+        "DAS Name" : "data_DoubleEG_Run2015C_23Sep2015_25ns",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_DoubleEG_Run2015C_23Sep2015_25ns/*"
+        }
+    },
+    "data_EE_2015D" : {
+        "cross_section" : 1,
+        "DAS Name" : "data_DoubleEG_Run2015D_PromptReco_25ns",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_DoubleEG_Run2015D_PromptReco_25ns/*"
+        }
+    },
+    "data_MM_2015C" : {
+        "cross_section" : 1,
+        "DAS Name" : "data_DoubleMuon_Run2015C_23Sep2015_25ns",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_DoubleMuon_Run2015C_23Sep2015_25ns/*"
+        }
+    },
+    "data_MM_2015D" : {
+        "cross_section" : 1,
+        "DAS Name" : "data_DoubleMuon_Run2015D_PromptReco_25ns",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_DoubleMuon_Run2015D_PromptReco_25ns/*"
+        }
+    },
+    "data_ME_2015C" : {
+        "cross_section" : 1,
+        "DAS Name" : "data_MuonEG_Run2015C_23Sep2015_25ns",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_MuonEG_Run2015C_23Sep2015_25ns/*"
+        }
+    },
+    "data_ME_2015D" : {
+        "cross_section" : 1,
+        "DAS Name" : "data_MuonEG_Run2015D_PromptReco_25ns",
+        "file_paths" : {
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_MuonEG_Run2015D_PromptReco_25ns/*"
         }
     }
 }
