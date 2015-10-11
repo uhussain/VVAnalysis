@@ -33,6 +33,7 @@ def buildCutString(state, cuts_json):
 def setAliases(tree, state, aliases_json):
     aliases = UserInput.readJson(aliases_json)
     for name, value in aliases["State"][state].iteritems():
+        print "Setting alias %s to %s" % (name, value)
         tree.SetAlias(name, value)
 
 def applySelection(tree, state, selection_json):

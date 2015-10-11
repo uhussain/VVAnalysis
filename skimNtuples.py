@@ -43,12 +43,13 @@ def skimNtuple(selection_json, filelist, output_file_name):
         metaTree = ROOT.TChain("%s/metaInfo" % state)
         with open(filelist) as input_file:
             for file_path in input_file:
-                file_path = ('/hdfs' if 'xrootd' not in file_path else '') + file_path.strip()
+                file_path = ('root://cmsxrootd.hep.wisc.edu/' if 'xrootd' not in file_path else '') + file_path.strip()
                 tree.Add(file_path)
                 metaTree.Add(file_path)
         print "Now the tree has %i entries" % tree.GetEntries()
         #ApplySelection.applySelection(tree, state, selection_json)
         cut_string = ApplySelection.buildCutString(state, selection_json).getString()
+        ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
         writeNtupleToFile(output_file, metaTree, tree, state, cut_string)
     os.chdir(current_path)
 
