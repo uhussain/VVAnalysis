@@ -20,11 +20,13 @@ def getComLineArgs():
     parser.add_argument("-p", "--file_path", type=str,
                         required=True, help="directory containing files")
     return vars(parser.parse_args())
-def main():
-    args = getComLineArgs()
-    with open(args['output_file'], "w") as file_list:
-        path_to_files = args['file_path'].rstrip("/*") + "/*"
+def makeFileList(output_file, file_path):
+    with open(output_file, "w") as file_list:
+        path_to_files = file_path.rstrip("/*") + "/*"
         for filename in glob.glob(path_to_files):
             file_list.write(filename.replace('/hdfs', '') + "\n")
+def main():
+    args = getComLineArgs()
+    makeFileList(args['output_file'], args['file_path'])
 if __name__ == "__main__":
     main()

@@ -7,6 +7,7 @@ import datetime
 import subprocess
 import glob
 from Utilities.python import UserInput
+from Utilities.python import ConfigureJobs
 import math
 
 def getComLineArgs():
@@ -19,34 +20,18 @@ def getComLineArgs():
                         required=True, help="List of input file names "
                         "to be processed (separated by commas)")
     return vars(parser.parse_args())
-
+# Choose files per job such that each job is ~100MB
+def getFilesPerJob(path_to_files):
+    print "file path is %s" % path_to_files
+    file_list = glob.glob(path_to_files.rstrip("/*") + "/*")
+    averagesize =sum([os.path.getsize(f) for f in file_list])/len(file_list)
+    return int(math.ceil(100000000./averagesize))
 def fillTemplatedFile(template_file_name, out_file_name, template_dict):
     with open(template_file_name, "r") as templateFile:
         source = string.Template(templateFile.read())
         result = source.substitute(template_dict)
     with open(out_file_name, "w") as outFile:
         outFile.write(result)
-def getJobName(sample_name, selection):
-    date = '{:%Y-%m-%d}'.format(datetime.date.today())
-    return '-'.join([date, sample_name, selection])
-def getInputFilesPath(sample_name, selection):
-    input_files = UserInput.readJson("MetaData/input_files.json")
-    if sample_name not in input_files.keys():
-        print input_files.keys()
-        raise ValueError("Invalid input file %s. Input file must correspond"
-               " to a definition in MetaData/input_files.json" % sample_name)
-    return input_files[sample_name]['file_paths'][selection].rstrip("/*")
-def getCutsJsonName(selection):
-    definitions_json = UserInput.readJson("Cuts/definitions.json")
-    if selection not in definitions_json.keys():
-        raise ValueError("Cut name must correspond to a definition in " 
-            "Cuts/definitions.json")
-    return definitions_json[selection]
-# Choose files per job such that each job is ~100MB
-def getFilesPerJob(path_to_files):
-    file_list = glob.glob(path_to_files.rstrip("/*") + "/*")
-    averagesize =sum([os.path.getsize(f) for f in file_list])/len(file_list)
-    return int(math.ceil(100000000./averagesize))
 # The intention here was to make sure the output order isn't jumbled together,
 # as it is when subprocess outputs are written together. This is an admittedly
 # sloppy solution, however
@@ -72,26 +57,34 @@ def callFarmout(output_dir, script_name):
         print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     return status
 def farmoutNtupleSkim(sample_name, selection):
-    job_name = getJobName(sample_name, selection)
+    job_name = ConfigureJobs.getJobName(sample_name, selection)
     farmout_dict = {}
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))# + '/../..' 
     farmout_dict['job_dir'] = '/data/kelong/%s' % job_name
-    farmout_dict['input_files_path'] = getInputFilesPath(sample_name, selection)
+    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(sample_name, selection)
     farmout_dict['files_per_job'] = getFilesPerJob(farmout_dict['input_files_path'])
     farmout_dict['job_name'] = job_name
     farmout_dict['time'] = datetime.datetime.now()
     farmout_dict['command'] = ' '.join(sys.argv)
     script_name = '/'.join([farmout_dict['job_dir'], 'farmout.sh'])
     os.mkdir(farmout_dict['job_dir'])
-    fillTemplatedFile('/'.join([farmout_dict['base_dir'], 'Templates/farmout_template.sh']),
-        script_name, farmout_dict)
-    createRunJob(farmout_dict['base_dir'], farmout_dict['job_dir'], getCutsJsonName(selection))
+    fillTemplatedFile('/'.join([farmout_dict['base_dir'], 
+        'Templates/farmout_template.sh']),
+        script_name, 
+        farmout_dict
+    )
+    createRunJob(farmout_dict['base_dir'], 
+        farmout_dict['job_dir'], 
+        ConfigureJobs.getCutsJsonName(selection),
+        ConfigureJobs.getTriggerName(farmout_dict['input_files_path'])
+    )
     status = callFarmout(farmout_dict['job_dir'], script_name)
     if status == 0:
         print "Submitted jobs for %s file set to condor." % sample_name
-def createRunJob(base_dir, job_dir, cuts_json):
+def createRunJob(base_dir, job_dir, cuts_json, trigger_name):
     fill_dict = {'cuts_json' : cuts_json,
         'time' : datetime.datetime.now(),
+        'trigger' : trigger_name,
         'command' : ' '.join(sys.argv)
     }
     fillTemplatedFile('/'.join([base_dir, 'Templates/skim_template.sh']),

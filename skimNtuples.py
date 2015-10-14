@@ -10,6 +10,9 @@ def getComLineArgs():
     parser.add_argument("-s", "--selection_json", type=str,
                         required=True, help="Name of json file containing" 
                         " cuts to make, e.g. Cuts/preselection.json")
+    parser.add_argument("-t", "--trigger", type=str, default="",
+                        choices=["DoubleEG", "DoubleMuon", "MuonEG"],
+                        help="Name of trigger to select in data")
     parser.add_argument("-f", "--filelist", type=str,
                         required=True, help="List of input file names "
                         "to be processed (separated by commas)")
@@ -30,7 +33,7 @@ def writeNtupleToFile(output_file, metaTree, tree, state, cut_string):
     output_file.Purge()
     ROOT.gROOT.cd()
     del save_tree
-def skimNtuple(selection_json, filelist, output_file_name):
+def skimNtuple(selection_json, trigger, filelist, output_file_name):
     current_path = os.getcwd()
     os.chdir(sys.path[0])
     ROOT.gROOT.SetBatch(True)
@@ -48,13 +51,14 @@ def skimNtuple(selection_json, filelist, output_file_name):
                 metaTree.Add(file_path)
         print "Now the tree has %i entries" % tree.GetEntries()
         #ApplySelection.applySelection(tree, state, selection_json)
-        cut_string = ApplySelection.buildCutString(state, selection_json).getString()
+        cut_string = ApplySelection.buildCutString(state, selection_json, trigger).getString()
+        print "Cut string is %s " % cut_string
         ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
         writeNtupleToFile(output_file, metaTree, tree, state, cut_string)
     os.chdir(current_path)
 
 def main():
     args = getComLineArgs()
-    skimNtuple(args['selection_json'], args['filelist'], args['output_file_name'])
+    skimNtuple(args['selection_json'], args['trigger'], args['filelist'], args['output_file_name'])
 if __name__ == "__main__":
     main()

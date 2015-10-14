@@ -4,7 +4,7 @@
         "Source of cross section" : "POWHEG tarball",
         "DAS Name" : "WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-03-wz3lnu-powheg-preselection-skim/*"
         }
     },
@@ -13,7 +13,7 @@
         "Source of cross section" : "POWHEG tarball",
         "DAS Name" : "WWTo2L2Nu_13TeV-powheg",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/WWTo2L2Nu_13TeV-powheg/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/WWTo2L2Nu_13TeV-powheg/*"
         }
     },
     "zz4l" : {
@@ -21,7 +21,7 @@
         "Source of cross section" : "POWHEG tarball",
         "DAS Name" : "ZZTo4L_13TeV_powheg_pythia8",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/ZZTo4L_13TeV_powheg_pythia8/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/ZZTo4L_13TeV_powheg_pythia8/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-03-zz4l-preselection-skim/*"
         }
     },
@@ -30,7 +30,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8/*"
         }
     },
     "ggZZ4e" : {
@@ -38,7 +38,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "GluGluToZZTo4e_BackgroundOnly_13TeV_MCFM",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo4e_BackgroundOnly_13TeV_MCFM/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/GluGluToZZTo4e_BackgroundOnly_13TeV_MCFM/*"
         }
     },
     "ggZZ4m" : {
@@ -46,7 +46,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "GluGluToZZTo4mu_BackgroundOnly_13TeV_MCFM",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo4mu_BackgroundOnly_13TeV_MCFM/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/GluGluToZZTo4mu_BackgroundOnly_13TeV_MCFM/*"
         }
     },
     "ggZZ4t" : {
@@ -54,7 +54,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "GluGluToZZTo4tau_BackgroundOnly_13TeV_MCFM",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo4tau_BackgroundOnly_13TeV_MCFM/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/GluGluToZZTo4tau_BackgroundOnly_13TeV_MCFM/*"
         }
     },
     "ggZZ2e2mu" : {
@@ -62,7 +62,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "GluGluToZZTo2e2mu_BackgroundOnly_13TeV_MCFM",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo2e2mu_BackgroundOnly_13TeV_MCFM/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/GluGluToZZTo2e2mu_BackgroundOnly_13TeV_MCFM/*"
         }
     },
     "ggZZ2e2tau" : {
@@ -70,7 +70,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "GluGluToZZTo2e2tau_BackgroundOnly_13TeV_MCFM",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo2e2tau_BackgroundOnly_13TeV_MCFM/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/GluGluToZZTo2e2tau_BackgroundOnly_13TeV_MCFM/*"
         }
     },
     "ggZZ2mu2tau" : {
@@ -78,7 +78,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "GluGluToZZTo2mu2tau_BackgroundOnly_13TeV_MCFM",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/GluGluToZZTo2mu2tau_BackgroundOnly_13TeV_MCFM/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/GluGluToZZTo2mu2tau_BackgroundOnly_13TeV_MCFM/*"
         }
     },
     "DYm50" : {
@@ -86,7 +86,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-03-DYm50-preselection-skim/*"
         }
     },
@@ -95,7 +95,7 @@
         "Source of cross section" : "MCM",
         "DAS Name" : "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
         }
     },
     "tt" : {
@@ -103,14 +103,14 @@
         "Source of cross section" : "https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO (top mass 172.5)",
         "DAS Name" : "TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/*"
         }
     },
     "data_EE_2015C" : {
         "cross_section" : 1,
         "DAS Name" : "data_DoubleEG_Run2015C_23Sep2015_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_DoubleEG_Run2015C_23Sep2015_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_DoubleEG_Run2015C_23Sep2015_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_EE_2015C-preselection-skim/*"
         }
     },
@@ -118,7 +118,7 @@
         "cross_section" : 1,
         "DAS Name" : "data_DoubleEG_Run2015D_PromptReco_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_DoubleEG_Run2015D_PromptReco_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_DoubleEG_Run2015D_PromptReco_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_EE_2015D-preselection-skim/*"
         }
     },
@@ -126,7 +126,7 @@
         "cross_section" : 1,
         "DAS Name" : "data_DoubleMuon_Run2015C_23Sep2015_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_DoubleMuon_Run2015C_23Sep2015_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_DoubleMuon_Run2015C_23Sep2015_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_MM_2015C-preselection-skim/*"
         }
     },
@@ -134,7 +134,7 @@
         "cross_section" : 1,
         "DAS Name" : "data_DoubleMuon_Run2015D_PromptReco_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_DoubleMuon_Run2015D_PromptReco_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_DoubleMuon_Run2015D_PromptReco_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_MM_2015D-preselection-skim/*"
         }
     },
@@ -142,7 +142,7 @@
         "cross_section" : 1,
         "DAS Name" : "data_MuonEG_Run2015C_23Sep2015_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_MuonEG_Run2015C_23Sep2015_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_MuonEG_Run2015C_23Sep2015_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_ME_2015C-preselection-skim/*"
         }
     },
@@ -150,7 +150,7 @@
         "cross_section" : 1,
         "DAS Name" : "data_MuonEG_Run2015D_PromptReco_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-09-28-13TeV-WZ/data_MuonEG_Run2015D_PromptReco_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_MuonEG_Run2015D_PromptReco_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_ME_2015D-preselection-skim/*"
         }
     }
