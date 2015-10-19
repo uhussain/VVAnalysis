@@ -114,11 +114,11 @@
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_EE_2015C-preselection-skim/*"
         }
     },
-    "data_EE_2015D" : {
+    "data_EE_2015D_dup" : {
         "cross_section" : 1,
-        "DAS Name" : "data_DoubleEG_Run2015D_PromptReco_25ns",
+        "DAS Name" : "data_DoubleEG_Run2015D_PromptReco-v3_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_DoubleEG_Run2015D_PromptReco_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_DoubleEG_Run2015D_PromptReco-v3_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_EE_2015D-preselection-skim/*"
         }
     },
@@ -130,11 +130,11 @@
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_MM_2015C-preselection-skim/*"
         }
     },
-    "data_MM_2015D" : {
+    "data_MM_2015D_dup" : {
         "cross_section" : 1,
-        "DAS Name" : "data_DoubleMuon_Run2015D_PromptReco_25ns",
+        "DAS Name" : "data_DoubleMuon_Run2015D_PromptReco-v3_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_DoubleMuon_Run2015D_PromptReco_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_DoubleMuon_Run2015D_PromptReco-v3_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_MM_2015D-preselection-skim/*"
         }
     },
@@ -146,11 +146,11 @@
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_ME_2015C-preselection-skim/*"
         }
     },
-    "data_ME_2015D" : {
+    "data_ME_2015D_dup" : {
         "cross_section" : 1,
-        "DAS Name" : "data_MuonEG_Run2015D_PromptReco_25ns",
+        "DAS Name" : "data_MuonEG_Run2015D_PromptReco-v3_25ns",
         "file_paths" : {
-            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_MuonEG_Run2015D_PromptReco_25ns/*",
+            "preselection" : "/hdfs/store/user/dntaylor/data/2015-10-12-13TeV-WZ/data_MuonEG_Run2015D_PromptReco-v3_25ns/*",
             "Zselection" : "/hdfs/store/user/kelong/2015-10-06-data_ME_2015D-preselection-skim/*"
         }
     }

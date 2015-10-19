@@ -28,13 +28,6 @@ def getCutsJsonName(selection):
         raise ValueError("Cut name must correspond to a definition in " 
             "Cuts/definitions.json")
     return definitions_json[selection]
-def getTriggerName(input_files_path):
-    trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG"]
-    if "data" in input_files_path:
-        for name in trigger_names:
-            if name in input_files_path:
-                return name
-    return ""
 def getComLineArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", "--save_all", action='store_true',

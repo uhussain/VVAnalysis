@@ -11,7 +11,7 @@ def getComLineArgs():
                         required=True, help="Name of json file containing" 
                         " cuts to make, e.g. Cuts/preselection.json")
     parser.add_argument("-t", "--trigger", type=str, default="",
-                        choices=["DoubleEG", "DoubleMuon", "MuonEG"],
+                        choices=["DoubleEG", "DoubleMuon", "MuonEG", ""],
                         help="Name of trigger to select in data")
     parser.add_argument("-f", "--filelist", type=str,
                         required=True, help="List of input file names "
