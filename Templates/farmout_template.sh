@@ -1,6 +1,8 @@
 #!/bin/bash
 # This script was created at ${time} with the command: 
 #     ${command}
+#
+# To resubmit failed jobs: ./farmout.sh --resubmit-failed-jobs
 pushd ${base_dir}
 tar \
     -zcvf ${job_dir}/analysis_code.tar.gz \
@@ -21,5 +23,6 @@ farmoutAnalysisJobs \
     --input-dir=root://cmsxrootd.hep.wisc.edu/ \
     --assume-input-files-exist \
     --extra-inputs=${job_dir}/analysis_code.tar.gz \
+    $$1 \
     ${job_name} \
     ${job_dir}/skim.sh

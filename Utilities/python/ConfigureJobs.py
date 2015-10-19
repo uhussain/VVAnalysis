@@ -4,6 +4,16 @@ import UserInput
 def getJobName(sample_name, selection):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
     return '-'.join([date, sample_name, selection])
+def getListOfFiles(filelist):
+        data_path = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo"
+        for name in filelist:
+            if "*" not in name:
+                yield name
+            else:
+                file_info = UserInput.readJson("/".join([data_path, "%s.json" % "data" if "data" in name else "montecarlo"]))
+                for file_name in file_info.keys():
+                    if name.strip("*") in file_name:
+                        yield file_name
 def getInputFilesPath(sample_name, selection):
     data_path = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo"
     selection_map = { "preselection" : "fsa",
