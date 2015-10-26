@@ -23,7 +23,7 @@ def getInputFilesPath(sample_name, selection):
     if selection not in selection_map.keys():
         raise ValueError("Invalid selection '%s'. Selection must correspond"
                " to a {selection}.json file" % sample_name)
-    input_files = UserInput.readJson("/".join([data_path, "wz_analysis", "%s.json" 
+    input_files = UserInput.readJson("/".join([data_path, "WZAnalysis", "%s.json" 
         % selection_map[selection]]))
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
