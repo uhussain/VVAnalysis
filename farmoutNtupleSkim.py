@@ -22,7 +22,6 @@ def getComLineArgs():
     return vars(parser.parse_args())
 # Choose files per job such that each job is ~100MB
 def getFilesPerJob(path_to_files):
-    print "file path is %s" % path_to_files
     file_list = glob.glob(path_to_files.rstrip("/*") + "/*")
     averagesize =sum([os.path.getsize(f) for f in file_list])/len(file_list)
     return int(math.ceil(100000000./averagesize))
@@ -58,8 +57,8 @@ def callFarmout(output_dir, script_name):
     return status
 def farmoutNtupleSkim(sample_name, selection):
     farmout_dict = {}
-    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(sample_name, selection)
-    job_name = ConfigureJobs.getJobName(sample_name, selection)
+    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(sample_name, selection, True)
+    job_name = ConfigureJobs.getJobName(sample_name, selection) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))# + '/../..' 
     farmout_dict['job_dir'] = '/data/kelong/%s' % job_name
     farmout_dict['files_per_job'] = getFilesPerJob(farmout_dict['input_files_path'])

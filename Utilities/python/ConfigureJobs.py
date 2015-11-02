@@ -1,20 +1,26 @@
 import datetime
 import UserInput
+import fnmatch
 
 def getJobName(sample_name, selection):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
     return '-'.join([date, sample_name, selection])
 def getListOfFiles(filelist):
-        data_path = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo"
-        for name in filelist:
-            if "*" not in name:
-                yield name
-            else:
-                file_info = UserInput.readJson("/".join([data_path, "%s.json" % "data" if "data" in name else "montecarlo"]))
-                for file_name in file_info.keys():
-                    if name.strip("*") in file_name:
-                        yield file_name
-def getInputFilesPath(sample_name, selection):
+    data_path = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo"
+    data_info = UserInput.readJson("/".join([data_path, "%s.json" % "data"]))
+    mc_info = UserInput.readJson("/".join([data_path, "%s.json" % "montecarlo"]))
+    valid_names = data_info.keys() + mc_info.keys()
+    names = []
+    for name in filelist:
+        if "*" in name:
+            names += fnmatch.filter(valid_names, name)
+        else:
+            if name not in valid_names:
+                print "%s is not a valid name" % name
+                continue
+            names += [name]
+    return names
+def getInputFilesPath(sample_name, selection, submit):
     data_path = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo"
     selection_map = { "preselection" : "fsa",
             "Zselection" : "preselection",
@@ -24,7 +30,7 @@ def getInputFilesPath(sample_name, selection):
         raise ValueError("Invalid selection '%s'. Selection must correspond"
                " to a {selection}.json file" % sample_name)
     input_files = UserInput.readJson("/".join([data_path, "WZAnalysis", "%s.json" 
-        % selection_map[selection]]))
+        % (selection_map[selection] if submit else selection)]))
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
                " to a definition in MetaData/input_files.json" % sample_name)

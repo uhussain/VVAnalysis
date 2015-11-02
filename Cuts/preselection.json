@@ -27,6 +27,7 @@
         ]
     },
     "Event" : [
-      "(eVetoTight + muVetoTight) == 0"
+        "(eVetoTight + muVetoTight) == 0",
+        "(singleESingleMuPass || doubleMuPass || doubleEPass || singleMuSingleEPass)"
     ]
 }

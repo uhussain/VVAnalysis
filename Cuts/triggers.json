@@ -1,5 +1,5 @@
 { 
     "DoubleMuon" : "doubleMuPass",
     "DoubleEG" : "doubleEPass && !doubleMuPass",
-    "MuonEG" : "singleESingleMuPass && !doubleMuPass && !doubleEPass"
+    "MuonEG" : "(singleESingleMuPass || singleMuSingleEPass) && !doubleMuPass && !doubleEPass"
 }

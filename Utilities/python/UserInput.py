@@ -28,6 +28,7 @@ def getCutsJsonName(selection):
         raise ValueError("Cut name must correspond to a definition in " 
             "Cuts/definitions.json")
     return definitions_json[selection]
+
 def getComLineArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", "--save_all", action='store_true',

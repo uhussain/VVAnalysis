@@ -21,6 +21,6 @@
     },
     "Event" : [
         "Wlep_Pt > 20",
-        "pfMetEt > 30"
+        "type1_pfMetEt > 30"
     ]
 }
