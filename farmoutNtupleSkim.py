@@ -55,12 +55,13 @@ def callFarmout(output_dir, script_name):
     if status != 0:
         print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     return status
-def farmoutNtupleSkim(sample_name, selection):
+def farmoutNtupleSkim(sample_name, path, selection):
     farmout_dict = {}
-    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(sample_name, selection, True)
+    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(sample_name, path, selection, True)
     job_name = ConfigureJobs.getJobName(sample_name, selection) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))# + '/../..' 
-    farmout_dict['job_dir'] = '/data/kelong/%s' % job_name
+    farmout_dict['job_dir'] = ('/data/kelong/%s' if "kelong" in path else "/nfs_scratch/kdlong/%s") \
+        % job_name
     farmout_dict['files_per_job'] = getFilesPerJob(farmout_dict['input_files_path'])
     farmout_dict['job_name'] = job_name
     farmout_dict['time'] = datetime.datetime.now()
@@ -91,8 +92,10 @@ def createRunJob(base_dir, job_dir, cuts_json, trigger_name):
 def main():
     #for selection in selection_map.iteritems():
     args = getComLineArgs()
-    for file_name in ConfigureJobs.getListOfFiles(args['filelist']):
-        farmoutNtupleSkim(file_name, args['selection'])
+    path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
+            "/afs/cern.ch/user/k/kelong/work"
+    for file_name in ConfigureJobs.getListOfFiles(args['filelist'], path):
+        farmoutNtupleSkim(file_name, path, args['selection'])
 
 if __name__ == "__main__":
     main()
