@@ -18,6 +18,5 @@
     "Event" : [
         "bestZCand_Mass > 60 && bestZCand_Mass < 120",
         "Zlep1_Pt > 20",
-        "Mass > 100"
     ]
 }

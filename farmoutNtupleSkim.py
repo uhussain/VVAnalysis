@@ -9,6 +9,7 @@ import glob
 from Utilities.python import UserInput
 from Utilities.python import ConfigureJobs
 import math
+import logging
 
 def getComLineArgs():
     parser = argparse.ArgumentParser()
@@ -95,7 +96,11 @@ def main():
     path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
             "/afs/cern.ch/user/k/kelong/work"
     for file_name in ConfigureJobs.getListOfFiles(args['filelist'], path):
-        farmoutNtupleSkim(file_name, path, args['selection'])
+        try:
+            farmoutNtupleSkim(file_name, path, args['selection'])
+        except (ValueError, OSError) as error:
+            logging.warning(error)
+            logging.warning("Skipping submissiong for %s" % file_name)
 
 if __name__ == "__main__":
     main()

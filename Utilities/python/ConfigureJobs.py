@@ -24,6 +24,7 @@ def getInputFilesPath(sample_name, manager_path, selection, submit):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     selection_map = { "preselection" : "fsa",
             "Zselection" : "preselection",
+            "Mass3l" : "Zselection",
             "Wselection" : "Zselection"
     }
     if selection not in selection_map.keys():
