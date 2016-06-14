@@ -1,0 +1,33 @@
+{
+    "Object" : {
+        "e" : [ 
+            "{object_name}Pt > 10",
+            "{object_name}AbsEta <  2.5",
+            "{object_name}CBIDMedium"
+        ],
+        "m" : [
+            "{object_name}Pt > 10",
+            "{object_name}AbsEta < 2.4",
+            "{object_name}PFIDTight",
+            "{object_name}RelPFIsoDBDefault < 0.12"
+        ]
+    },
+    "State" : {
+        "eee" : [
+            "!(e1_e2_SS && e2_e3_SS && e1_e3_SS)"
+        ],
+        "mmm" : [
+            "!(m1_m2_SS && m2_m3_SS && m1_m3_SS)"
+        ],
+        "eem" : [
+            "!e1_e2_SS"
+        ],
+        "emm" : [
+            "!m1_m2_SS"
+        ]
+    },
+    "Event" : [
+        "(eVetoTight + muVetoTight) == 0",
+        "(singleESingleMuPass || doubleMuPass || doubleEPass || singleMuSingleEPass)"
+    ]
+}

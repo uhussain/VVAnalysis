@@ -1,0 +1,8 @@
+{ 
+    "DoubleMuon" : "doubleMuPass",
+    "DoubleEG" : "doubleEPass && !doubleMuPass",
+    "MuonEG" : "(singleESingleMuPass || singleMuSingleEPass) && !doubleMuPass && !doubleEPass",
+    "SingleE" : "singleE23WPLoosePass",
+    "SingleMu" : "singleIsoMu20Pass",
+    "SingleTkMu" : "singleIsoTkMu20Pass"
+}

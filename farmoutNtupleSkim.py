@@ -37,7 +37,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
 def callFarmout(output_dir, script_name):
     log_file_name = '/'.join([output_dir, 'log.txt'])
     with open(log_file_name, 'w') as log:
-        log.write('Condor submit info created with the command: %s\n' % ''.join(sys.argv))
+        log.write('Condor submit info created with the command: %s\n' % ' '.join(sys.argv))
         log.write('Using WZAnalysis code by Kenneth Long (U. Wisconsin):\n')
         log.write('https://github.com/kdlong/WZAnalysis\n\n')
         log.write('The git hash of the commit used and the output of git diff is below\n') 
