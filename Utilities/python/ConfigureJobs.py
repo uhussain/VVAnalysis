@@ -5,8 +5,8 @@ import fnmatch
 def getJobName(sample_name, selection):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
     return '-'.join([date, sample_name, selection])
-def getListOfFiles(filelist):
-    data_path = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo"
+def getListOfFiles(filelist, manager_path):
+    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readJson("/".join([data_path, "%s.json" % "data"]))
     mc_info = UserInput.readJson("/".join([data_path, "%s.json" % "montecarlo"]))
     valid_names = data_info.keys() + mc_info.keys()
@@ -20,10 +20,11 @@ def getListOfFiles(filelist):
                 continue
             names += [name]
     return names
-def getInputFilesPath(sample_name, selection, submit):
-    data_path = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo"
+def getInputFilesPath(sample_name, manager_path, selection, submit):
+    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     selection_map = { "preselection" : "fsa",
             "Zselection" : "preselection",
+            "Mass3l" : "Zselection",
             "Wselection" : "Zselection"
     }
     if selection not in selection_map.keys():

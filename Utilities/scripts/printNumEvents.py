@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 import argparse
+import os
 from python import ConfigureJobs
 
 parser = argparse.ArgumentParser() 
@@ -10,12 +11,14 @@ parser.add_argument("-f", "--filelist",
                     "to be processed (separated by commas)")
 parser.add_argument("-s", "--selection", required=True)
 args = parser.parse_args()
-filelist = ConfigureJobs.getListOfFiles(args.filelist)
+path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
+        "/afs/cern.ch/user/k/kelong/work"
+filelist = ConfigureJobs.getListOfFiles(args.filelist, path)
 states = ["eee", "emm", "eem", "mmm"]
 totals = dict((i,0) for i in states)
 for name in filelist:
     if ".root" not in name:
-        file_path = ConfigureJobs.getInputFilesPath(name,
+        file_path = ConfigureJobs.getInputFilesPath(name, path,
             args.selection, False) + "/*"
     else:
         file_path = name

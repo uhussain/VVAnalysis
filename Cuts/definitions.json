@@ -2,5 +2,6 @@
     "preselection" : "Cuts/preselection.json",
     "Wselection" : "Cuts/Wselection.json",
     "Zselection" : "Cuts/Zselection.json",
+    "Mass3l" : "Cuts/Mass3l.json",
     "full" : "Cuts/fullSelection.json"
 }
