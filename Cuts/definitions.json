@@ -1,4 +1,5 @@
 {
+    "loosepreselection" : "Cuts/loosepreselection.json",
     "preselection" : "Cuts/preselection.json",
     "Wselection" : "Cuts/Wselection.json",
     "Zselection" : "Cuts/Zselection.json",

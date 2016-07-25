@@ -22,19 +22,22 @@ def getListOfFiles(filelist, manager_path):
     return names
 def getInputFilesPath(sample_name, manager_path, selection, submit):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
-    selection_map = { "preselection" : "fsa",
-            "Zselection" : "preselection",
-            "Mass3l" : "Zselection",
+    selection_map = { "fsa" : "fsa",
+            "loosepreselection" : "fsa",
+            "preselection" : "fsa",
+            "Mass3l" : "preselection",
+            "Zselection" : "Mass3l",
             "Wselection" : "Zselection"
     }
     if selection not in selection_map.keys():
         raise ValueError("Invalid selection '%s'. Selection must correspond"
                " to a {selection}.json file" % sample_name)
-    input_files = UserInput.readJson("/".join([data_path, "WZAnalysis", "%s.json" 
-        % (selection_map[selection] if submit else selection)]))
+    input_file_name = "/".join([data_path, "WZAnalysis", "%s.json" \
+        % (selection_map[selection] if submit else selection)])
+    input_files = UserInput.readJson(input_file_name)
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
-               " to a definition in MetaData/input_files.json" % sample_name)
+               " to a definition in %s" % (sample_name, input_file_name))
     return input_files[sample_name]['file_path'].rstrip("/*")
 def getCutsJsonName(selection):
     definitions_json = UserInput.readJson("Cuts/definitions.json")

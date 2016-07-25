@@ -16,6 +16,7 @@ path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
 filelist = ConfigureJobs.getListOfFiles(args.filelist, path)
 states = ["eee", "emm", "eem", "mmm"]
 totals = dict((i,0) for i in states)
+total = 0
 for name in filelist:
     if ".root" not in name:
         file_path = ConfigureJobs.getInputFilesPath(name, path,
@@ -30,7 +31,12 @@ for name in filelist:
         num_events = chain.GetEntries()
         print "Number of events in state %s is %i" % (state, num_events)
         totals[state] += num_events
+    print "Number of events in all states is %i" % total
 print ""
 print "Results for all files:"
+total = 0
 for state, count in totals.iteritems():
     print "Summed events for all files in %s state is %i" % (state, count)
+    total += count
+print "Summed events for all files in all states is %i" % total
+
