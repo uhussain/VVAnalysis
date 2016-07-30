@@ -2,14 +2,14 @@
     "Object" : {
         "e" : [ 
             "{object_name}Pt > 10",
-            "{object_name}AbsEta <  2.5",
-            "{object_name}CBIDMedium"
+            "abs({object_name}Eta) <  2.5",
+            "{object_name}IsCBVIDmedium"
         ],
         "m" : [
             "{object_name}Pt > 10",
-            "{object_name}AbsEta < 2.4",
-            "{object_name}PFIDTight",
-            "{object_name}RelPFIsoDBDefault < 0.12"
+            "abs({object_name}Eta) < 2.4",
+            "{object_name}IsMediumMuon",
+            "{object_name}RelPFIsoDBR04 < 0.12"
         ]
     },
     "State" : {
@@ -27,7 +27,5 @@
         ]
     },
     "Event" : [
-        "(eVetoTight + muVetoTight) == 0",
-        "(singleESingleMuPass || doubleMuPass || doubleEPass || singleMuSingleEPass)"
     ]
 }

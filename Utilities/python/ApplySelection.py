@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 from collections import OrderedDict
+from Utilities.python import ConfigureJobs
 import os
 import sys
 import UserInput
@@ -15,10 +16,11 @@ class CutString(object):
     def getString(self):
         return " && ".join(self.cuts)
 
-def buildCutString(state, cuts_json, trigger):
+def buildCutString(state, selection, analysis, trigger):
     cut_string = CutString()
-    print "cuts_json is %s" % cuts_json
-    cuts = UserInput.readJson(cuts_json)
+    selection_json = ConfigureJobs.getCutsJsonName(selection, analysis)
+    print "cuts_json is %s" % selection_json
+    cuts = UserInput.readJson(selection_json)
     cut_string.append(cuts["Event"])
     cut_string.append(cuts["State"][state])
     if trigger != "":
@@ -39,9 +41,9 @@ def setAliases(tree, state, aliases_json):
 def getTriggerCutString(trigger):
     triggers = UserInput.readJson("Cuts/triggers.json")
     return triggers[trigger]
-def applySelection(tree, state, selection_json, trigger):
+def applySelection(tree, state, selection, analysis, trigger):
     setAliases(tree, state, "Cuts/aliases.json")
-    cut_string = buildCutString(state, selection_json, trigger)
+    cut_string = buildCutString(state, analysis, selection, trigger)
     #tree.SetProof()
     listname = '_'.join(["list", state])
     num_passing = tree.Draw(">>" + listname, cut_string.getString(), "entrylist")

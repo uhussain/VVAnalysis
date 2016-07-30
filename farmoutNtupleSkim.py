@@ -16,6 +16,9 @@ def getComLineArgs():
     parser.add_argument("-s", "--selection", type=str,
                         required=True, help="Name of selection to make, "
                         " as defined in Cuts/preselection.json")
+    parser.add_argument("-a", "--analysis", type=str,
+                        required=True, help="Analysis name, used"
+                        " in selection the cut json")
     parser.add_argument("-f", "--filelist", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         required=True, help="List of input file names "
@@ -56,10 +59,10 @@ def callFarmout(output_dir, script_name):
     if status != 0:
         print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     return status
-def farmoutNtupleSkim(sample_name, path, selection):
+def farmoutNtupleSkim(sample_name, path, selection, analysis):
     farmout_dict = {}
-    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(sample_name, path, selection, True)
-    job_name = ConfigureJobs.getJobName(sample_name, selection) 
+    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(sample_name, path, selection, analysis)
+    job_name = ConfigureJobs.getJobName(sample_name, analysis, selection) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))# + '/../..' 
     farmout_dict['job_dir'] = ('/data/kelong/%s' if "kelong" in path else "/nfs_scratch/kdlong/%s") \
         % job_name
@@ -76,14 +79,16 @@ def farmoutNtupleSkim(sample_name, path, selection):
     )
     createRunJob(farmout_dict['base_dir'], 
         farmout_dict['job_dir'], 
-        ConfigureJobs.getCutsJsonName(selection),
+        selection,
+        analysis,
         ConfigureJobs.getTriggerName(farmout_dict['input_files_path'])
     )
     status = callFarmout(farmout_dict['job_dir'], script_name)
     if status == 0:
         print "Submitted jobs for %s file set to condor." % sample_name
-def createRunJob(base_dir, job_dir, cuts_json, trigger_name):
-    fill_dict = {'cuts_json' : cuts_json,
+def createRunJob(base_dir, job_dir, selection, analysis, trigger_name):
+    fill_dict = {'selection' : selection,
+        'analysis' : analysis,
         'time' : datetime.datetime.now(),
         'trigger' : trigger_name,
         'command' : ' '.join(sys.argv)
@@ -97,10 +102,10 @@ def main():
             "/afs/cern.ch/user/k/kelong/work"
     for file_name in ConfigureJobs.getListOfFiles(args['filelist'], path):
         try:
-            farmoutNtupleSkim(file_name, path, args['selection'])
+            farmoutNtupleSkim(file_name, path, args['selection'], args['analysis'])
         except (ValueError, OSError) as error:
             logging.warning(error)
-            logging.warning("Skipping submissiong for %s" % file_name)
+            logging.warning("Skipping submission for %s" % file_name)
 
 if __name__ == "__main__":
     main()

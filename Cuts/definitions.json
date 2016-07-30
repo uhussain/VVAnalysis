@@ -1,8 +1,16 @@
 {
-    "loosepreselection" : "Cuts/loosepreselection.json",
-    "preselection" : "Cuts/preselection.json",
-    "Wselection" : "Cuts/Wselection.json",
-    "Zselection" : "Cuts/Zselection.json",
-    "Mass3l" : "Cuts/Mass3l.json",
-    "full" : "Cuts/fullSelection.json"
+    "loosepreselection" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/loosepreselection.json"
+    },
+    "preselection" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/preselection.json"
+    }, 
+    "Wselection" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/Wselection.json"
+    },
+    "Zselection" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/Zselection.json"
+    },
+    "Mass3l" : "Cuts/WZxsec2016/Mass3l.json",
+    "full" : "Cuts/WZxsec2016/fullSelection.json"
 }
