@@ -47,19 +47,17 @@ def skimNtuple(selection, analysis, trigger, filelist, output_file_name):
     with open(filelist) as input_file:
         input_files = [('root://cmsxrootd.hep.wisc.edu/' + i.strip()) \
             if "store" in i[:6] else i.strip() for i in input_file.readlines()]
-    metaTree = ROOT.TChain("metaInfo")
+    metaTree = ROOT.TChain("metaInfo/metaInfo")
     for file_path in input_files:
         metaTree.Add(file_path)
     for state in ["eee", "eem", "emm", "mmm"]:
         tree = ROOT.TChain("%s/ntuple" % state)
         for file_path in input_files:
-            print file_path
             tree.Add(file_path)
-            print tree
-            print "Now the tree has %i entries" % tree.GetEntries()
-            cut_string = ApplySelection.buildCutString(state, selection, analysis, trigger).getString()
-            print "Cut string is %s " % cut_string
-            ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
+        print "Now the tree has %i entries" % tree.GetEntries()
+        cut_string = ApplySelection.buildCutString(state, selection, analysis, trigger).getString()
+        print "Cut string is %s " % cut_string
+        ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
         writeNtupleToFile(output_file, tree, state, cut_string)
     writeMetaTreeToFile(output_file, metaTree)
     os.chdir(current_path)

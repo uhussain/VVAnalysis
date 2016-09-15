@@ -27,5 +27,6 @@
         ]
     },
     "Event" : [
+      "(nMediumMuonICHEP + nCBVIDMediumElec) == 3" 
     ]
 }

@@ -26,7 +26,7 @@ def getInputFilesPath(sample_name, manager_path, selection, analysis):
             "loosepreselection" : "ntuples",
             "preselection" : "ntuples",
             "Mass3l" : "preselection",
-            "Zselection" : "Mass3l",
+            "Zselection" : "preselection",
             "Wselection" : "Zselection"
     }
     if selection not in selection_map.keys():
@@ -34,7 +34,6 @@ def getInputFilesPath(sample_name, manager_path, selection, analysis):
                "%s" % (selection, selection_map.keys()))
     input_file_name = "/".join([data_path, analysis, "%s.json" %
         selection_map[selection]])
-    print "input_file_name %s" % input_file_name
     input_files = UserInput.readJson(input_file_name)
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
@@ -49,10 +48,10 @@ def getCutsJsonName(selection, analysis):
         raise ValueError("Invalid analysis %s. Analysis name must "
             "correspond to a definition in Cuts/definitions.json" % analysis)
     return definitions_json[selection][analysis]
-def getTriggerName(input_files_path):
+def getTriggerName(sample_name, selection):
     trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG"]
-    if "data" in input_files_path:
+    if "data" in sample_name and selection is "preselection":
         for name in trigger_names:
-            if name in input_files_path:
+            if name in sample_name:
                 return "-t " + name
     return ""

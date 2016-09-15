@@ -24,11 +24,11 @@ def getComLineArgs():
                         required=True, help="List of input file names "
                         "to be processed (separated by commas)")
     return vars(parser.parse_args())
-# Choose files per job such that each job is ~100MB
+# Choose files per job such that each job is ~300MB
 def getFilesPerJob(path_to_files):
     file_list = glob.glob(path_to_files.rstrip("/*") + "/*")
-    averagesize =sum([os.path.getsize(f) for f in file_list])/len(file_list)
-    return int(math.ceil(100000000./averagesize))
+    averagesize =sum([os.path.getsize(f) for f in file_list[:50]])/min(len(file_list), 50)
+    return int(math.ceil(1000000000./averagesize))
 def fillTemplatedFile(template_file_name, out_file_name, template_dict):
     with open(template_file_name, "r") as templateFile:
         source = string.Template(templateFile.read())
@@ -81,7 +81,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis):
         farmout_dict['job_dir'], 
         selection,
         analysis,
-        ConfigureJobs.getTriggerName(farmout_dict['input_files_path'])
+        ConfigureJobs.getTriggerName(sample_name, selection)
     )
     status = callFarmout(farmout_dict['job_dir'], script_name)
     if status == 0:

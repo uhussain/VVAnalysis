@@ -24,7 +24,7 @@ def buildCutString(state, selection, analysis, trigger):
     cut_string.append(cuts["Event"])
     cut_string.append(cuts["State"][state])
     if trigger != "":
-        cut_string.append(getTriggerCutString(trigger))
+        cut_string.append(getTriggerCutString(trigger, analysis))
     counts = dict((lep, state.count(lep)) for lep in state)
     current = dict((lep, 0) for lep in state)
     for lep in state:
@@ -38,8 +38,8 @@ def setAliases(tree, state, aliases_json):
     for name, value in aliases["State"][state].iteritems():
         print "Setting alias %s to %s" % (name, value)
         tree.SetAlias(name, value)
-def getTriggerCutString(trigger):
-    triggers = UserInput.readJson("Cuts/triggers.json")
+def getTriggerCutString(trigger, analysis):
+    triggers = UserInput.readJson("Cuts/%s/triggers.json" % analysis)
     return triggers[trigger]
 def applySelection(tree, state, selection, analysis, trigger):
     setAliases(tree, state, "Cuts/aliases.json")
