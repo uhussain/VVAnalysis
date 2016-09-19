@@ -2,9 +2,11 @@ import datetime
 import UserInput
 import fnmatch
 
-def getJobName(sample_name, analysis, selection):
+def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
-    return '-'.join([date, sample_name, analysis, selection.replace("/", "_")])
+    selection_name = selection.split(",")[-1 ]
+    return '-'.join([date, sample_name, analysis, selection_name, 
+        "v%s" % version])
 def getListOfFiles(filelist, manager_path):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readJson("/".join([data_path, "%s.json" % "data"]))
@@ -29,11 +31,12 @@ def getInputFilesPath(sample_name, manager_path, selection, analysis):
             "Zselection" : "preselection",
             "Wselection" : "Zselection"
     }
-    if selection not in selection_map.keys():
+    first_selection = selection.split(",")[0].strip()
+    if first_selection not in selection_map.keys():
         raise ValueError("Invalid selection '%s'. Valid selections are:"
-               "%s" % (selection, selection_map.keys()))
+               "%s" % (first_selection, selection_map.keys()))
     input_file_name = "/".join([data_path, analysis, "%s.json" %
-        selection_map[selection]])
+        selection_map[first_selection]])
     input_files = UserInput.readJson(input_file_name)
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"

@@ -16,8 +16,8 @@
         ]
     },
     "Event" : [
-        "Mass > 100",
-        "bestZCand_Mass > 60 && bestZCand_Mass < 120",
-        "Zlep1_Pt > 20"
+        "Mass > 100.",
+        "bestZCand_Mass > 76.1876 && bestZCand_Mass < 106.1876",
+        "Zlep1_Pt > 20."
     ]
 }

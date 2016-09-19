@@ -3,30 +3,30 @@
         "e" : [ 
             "{object_name}Pt > 10",
             "abs({object_name}Eta) <  2.5",
-            "{object_name}IsCBVIDmedium"
+            "{object_name}IsCBVIDmedium > 0.5"
         ],
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsMediumMuon",
-            "{object_name}RelPFIsoDBR04 < 0.12"
+            "{object_name}IsMediumMuon > 0.5",
+            "{object_name}RelPFIsoDBR04 < 0.15"
         ]
     },
     "State" : {
         "eee" : [
-            "!(e1_e2_SS && e2_e3_SS && e1_e3_SS)"
+            "!(e1_e2_SS > 0.5 && e2_e3_SS > 0.5 && e1_e3_SS > 0.5)"
         ],
         "mmm" : [
-            "!(m1_m2_SS && m2_m3_SS && m1_m3_SS)"
+            "!(m1_m2_SS > 0.5 && m2_m3_SS > 0.5 && m1_m3_SS > 0.5)"
         ],
         "eem" : [
-            "!e1_e2_SS"
+            "e1_e2_SS < 0.5"
         ],
         "emm" : [
-            "!m1_m2_SS"
+            "m1_m2_SS < 0.5"
         ]
     },
     "Event" : [
-      "(nMediumMuonICHEP + nCBVIDMediumElec) == 3" 
+      "(nMediumMuonICHEP + nCBVIDMediumElec) > 2.5 && (nMediumMuonICHEP + nCBVIDMediumElec) < 3.5" 
     ]
 }

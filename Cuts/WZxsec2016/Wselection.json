@@ -20,7 +20,7 @@
         ]
     },
     "Event" : [
-        "Mass > 100",
+        "nJetCSVv2T < 0.5",
         "Wlep_Pt > 20",
         "type1_pfMETEt > 30"
     ]
