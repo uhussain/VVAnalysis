@@ -68,7 +68,12 @@ def callFarmout(output_dir, script_name):
     return status
 def farmoutNtupleSkim(sample_name, path, selection, analysis, version):
     farmout_dict = {}
-    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(sample_name, path, selection, analysis)
+    farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
+        sample_name, 
+        path, 
+        ConfigureJobs.getPreviousStep(selection, analysis), 
+        analysis
+    )
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
     submission_dir = ('/data/kelong/%s' if "kelong" in path else "/nfs_scratch/kdlong/%s") \
@@ -112,8 +117,7 @@ def main():
     args = getComLineArgs()
     path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
             "/afs/cern.ch/user/k/kelong/work"
-    if args['filelist'] == [""]:
-        print "Hey hey"
+    if args['filelist'] == ["WZxsec2016"]:
         args['filelist'] = json.load(
             open("/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo/WZxsec2016/ntuples.json")).keys()
     for file_name in ConfigureJobs.getListOfFiles(args['filelist'], path):

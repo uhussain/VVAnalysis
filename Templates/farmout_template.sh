@@ -3,6 +3,7 @@
 #     ${command}
 #
 # To resubmit failed jobs: ./farmout.sh --resubmit-failed-jobs
+DATE=`date +%Y-%m-%d`
 pushd ${base_dir}
 tar \
     -zcvf ${job_dir}/analysis_code.tar.gz \
@@ -17,6 +18,7 @@ chmod +x ${job_dir}/skim.sh
 farmoutAnalysisJobs \
     --infer-cmssw-path \
     --fwklite \
+    --output-dir=srm://cmssrm2.hep.wisc.edu:8443/srm/v2/server?SFN=/hdfs/store/user/$$USER/WZAnalysisJobs_$$DATE/${job_name} \
     --input-file-list=${job_dir}/input_file_list.txt \
     --submit-dir=${job_dir}/submit \
     --input-files-per-job=${files_per_job} \

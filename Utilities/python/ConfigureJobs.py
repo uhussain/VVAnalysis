@@ -22,21 +22,32 @@ def getListOfFiles(filelist, manager_path):
                 continue
             names += [name]
     return names
-def getInputFilesPath(sample_name, manager_path, selection, analysis):
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
-    selection_map = { "ntuples" : "ntuples",
-            "loosepreselection" : "ntuples",
-            "preselection" : "ntuples",
-            "Mass3l" : "preselection",
-            "Zselection" : "preselection",
-            "Wselection" : "Zselection"
-    }
+def getPreviousStep(selection, analysis):
+    if analysis == "WZxsec2016":
+        selection_map = { "ntuples" : "ntuples",
+                "loosepreselection" : "ntuples",
+                "preselection" : "ntuples",
+                "LepVetoAnd3lmass" : "preselection",
+                "Zselection" : "LepVetoAnd3lmass",
+                "Wselection" : "Zselection"
+        }
+    elif analysis == "WZDecemberAnalysis":
+        selection_map = { "ntuples" : "ntuples",
+                "loosepreselection" : "ntuples",
+                "preselection" : "ntuples",
+                "Mass3l" : "preselection",
+                "Zselection" : "preselection",
+                "Wselection" : "Zselection"
+        }
     first_selection = selection.split(",")[0].strip()
     if first_selection not in selection_map.keys():
         raise ValueError("Invalid selection '%s'. Valid selections are:"
                "%s" % (first_selection, selection_map.keys()))
+    return selection_map[first_selection]
+def getInputFilesPath(sample_name, manager_path, selection, analysis):
+    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
-        selection_map[first_selection]])
+        selection])
     input_files = UserInput.readJson(input_file_name)
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
@@ -53,7 +64,7 @@ def getCutsJsonName(selection, analysis):
     return definitions_json[selection][analysis]
 def getTriggerName(sample_name, selection):
     trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG"]
-    if "data" in sample_name and selection is "preselection":
+    if "data" in sample_name and "preselection" in selection:
         for name in trigger_names:
             if name in sample_name:
                 return "-t " + name
