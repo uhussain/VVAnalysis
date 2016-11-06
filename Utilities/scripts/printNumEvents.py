@@ -3,6 +3,7 @@ import ROOT
 import argparse
 import os
 from python import ConfigureJobs
+import datetime
 
 parser = argparse.ArgumentParser() 
 parser.add_argument("-f", "--filelist", 
@@ -10,6 +11,8 @@ parser.add_argument("-f", "--filelist",
                     required=True, help="List of input file names "
                     "to be processed (separated by commas)")
 parser.add_argument("-s", "--selection", required=True)
+parser.add_argument("-p", "--printEventNums", action='store_true')
+parser.add_argument("-d", "--checkDuplicates", action='store_true')
 parser.add_argument("-m", "--cut_string", required=False, type=str,
                     default="")
 parser.add_argument("-c", "--channels", required=False, type=str,
@@ -17,11 +20,15 @@ parser.add_argument("-c", "--channels", required=False, type=str,
 args = parser.parse_args()
 path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
         "/afs/cern.ch/user/k/kelong/work"
-filelist = ConfigureJobs.getListOfFiles(args.filelist, path)
+filelist = ConfigureJobs.getListOfFiles(args.filelist, path) if \
+    not any("root" in x for x in args.filelist) else args.filelist
 states = [x.strip() for x in args.channels.split(",")]
 totals = dict((i,0) for i in states)
 total = 0
+if args.checkDuplicates:
+    eventArray = []
 for name in filelist:
+    print name
     if ".root" not in name:
         file_path = ConfigureJobs.getInputFilesPath(name, path,
             args.selection, "WZxsec2016") + "/*"
@@ -37,6 +44,19 @@ for name in filelist:
             else chain
         num_events = cut_tree.GetEntries()
         print "Number of events in state %s is %i" % (state, num_events)
+        if args.printEventNums:
+            with open('WZEvents_{:%Y-%m-%d}_{selection}_{chan}.out'.format(datetime.date.today(), 
+                    selection=args.selection, chan=(state if args.channels != "" else ""))
+                    , "wa") as outfile:
+                outfile.write("# Made with cut: %s\n" % args.cut_string)
+                for row in cut_tree:
+                    eventId = '{0}:{1}:{2}'.format(row.run, row.lumi,row.evt)
+                    outfile.write(eventId+'\n')
+                    if args.checkDuplicates:
+                        if eventId in eventArray:
+                            print "Found a duplicate: %s" % eventId
+                        else:
+                            eventArray.append(eventId)
         totals[state] += num_events
     print "Number of events in all states is %i" % total
 print ""

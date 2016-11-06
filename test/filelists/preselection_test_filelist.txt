@@ -1,2 +1,1 @@
-/store/user/dntaylor/data/2015-09-28-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-0C4172B8-9218-E511-B9C9-001E675A58D9.root
-/store/user/dntaylor/data/2015-09-28-13TeV-WZ/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/make_ntuples_cfg-4226BF30-B218-E511-8072-001E67A400F0.root
+/data/kelong/DibosonAnalysisData/Preselection/2016-11-02-wz3lnu-powheg-WZxsec2016-preselection-v1/skim-ntuplize_cfg-086609CA-D81B-E611-BF6C-002590D9D896.root
