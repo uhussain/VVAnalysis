@@ -16,8 +16,6 @@
         ]
     },
     "Event" : [
-        "bestZCand_Mass > 76.1876 && bestZCand_Mass < 106.1876",
-        "Zlep1_Pt > 25.",
-        "Zlep2_Pt > 15."
+        "abs(nMediumMuonICHEP + nCBVIDMediumElec - 3) < 0.5"
     ]
 }

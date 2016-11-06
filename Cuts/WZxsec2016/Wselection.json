@@ -7,19 +7,19 @@
     },
     "State" : {
         "eee" : [
-            "e1_e3_DR > 0.1 && e2_e3_DR > 0.1",
+            "e1_e3_Mass > 4 && e2_e3_Mass > 4",
             "e3IsCBVIDtight"
         ],
         "mmm" : [
-            "m1_m3_DR > 0.1 && m2_m3_DR > 0.1",
+            "m1_m3_Mass > 4 && m2_m3_Mass > 4",
             "m3IsTightMuon"
         ],
         "eem" : [
-            "e1_m_DR > 0.1 && e2_m_DR > 0.1",
+            "e1_m_Mass > 4 && e2_m_Mass > 4",
             "mIsTightMuon"
         ],
         "emm" : [
-            "e_m1_DR > 0.1 && e_m2_DR > 0.1",
+            "e_m1_Mass > 4 && e_m2_Mass > 4",
             "eIsCBVIDtight"
         ]
     },

@@ -8,8 +8,11 @@
     "preselection" : {
         "WZxsec2016" : "Cuts/WZxsec2016/preselection.json"
     }, 
-    "LepVetoAnd3lmass" : {
-        "WZxsec2016" : "Cuts/WZxsec2016/LepVetoAnd3lmass.json"
+    "LepVeto" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/LepVeto.json"
+    },
+    "3lmass" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/3lmass.json"
     },
     "Wselection" : {
         "WZxsec2016" : "Cuts/WZxsec2016/Wselection.json"
