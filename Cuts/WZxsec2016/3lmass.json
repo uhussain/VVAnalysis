@@ -16,6 +16,6 @@
         ]
     },
     "Event" : [
-        "abs(nMediumMuonICHEP + nCBVIDMediumElec - 3) < 0.5"
+        "Mass > 100"
     ]
 }

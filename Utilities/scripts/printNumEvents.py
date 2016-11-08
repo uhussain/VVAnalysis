@@ -27,6 +27,7 @@ totals = dict((i,0) for i in states)
 total = 0
 if args.checkDuplicates:
     eventArray = []
+metaChain = ROOT.TChain("metaInfo/metaInfo")
 for name in filelist:
     print name
     if ".root" not in name:
@@ -36,6 +37,7 @@ for name in filelist:
         file_path = name
     print "Results for file %s" % name
     print "File path is %s" % file_path
+    metaChain.Add(file_path)
     for state in states:
         state = state.strip()
         chain = ROOT.TChain("%s/ntuple" % state)
@@ -58,6 +60,7 @@ for name in filelist:
                         else:
                             eventArray.append(eventId)
         totals[state] += num_events
+        total += num_events
     print "Number of events in all states is %i" % total
 print ""
 print "Results for all files:"
@@ -66,4 +69,7 @@ for state, count in totals.iteritems():
     print "Summed events for all files in %s state is %i" % (state, count)
     total += count
 print "Summed events for all files in all states is %i" % total
-
+total_processed = 0
+for row in metaChain:
+    total_processed += row.nevents
+print "A total of %i events were processed from the dataset" % total_processed

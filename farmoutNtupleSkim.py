@@ -68,13 +68,14 @@ def callFarmout(output_dir, script_name):
     return status
 def farmoutNtupleSkim(sample_name, path, selection, analysis, version):
     farmout_dict = {}
+    selection_name = selection.split(":")[0]
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
         sample_name, 
         path, 
-        ConfigureJobs.getPreviousStep(selection, analysis), 
+        ConfigureJobs.getPreviousStep(selection_name, analysis), 
         analysis
     )
-    job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
+    job_name = ConfigureJobs.getJobName(sample_name, analysis, selection_name, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
     submission_dir = ('/data/kelong/%s' if "kelong" in path else "/nfs_scratch/kdlong/%s") \
         % '{:%Y-%m-%d}_WZAnalysisJobs'.format(datetime.date.today())
@@ -98,7 +99,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version):
         farmout_dict['job_dir'], 
         selection,
         analysis,
-        ConfigureJobs.getTriggerName(sample_name, selection)
+        ConfigureJobs.getTriggerName(sample_name, selection_name)
     )
     status = callFarmout(farmout_dict['job_dir'], script_name)
     if status == 0:

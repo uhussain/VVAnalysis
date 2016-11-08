@@ -35,13 +35,15 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
   fCurrentRun = run;
   fCurrentEvt = evt;
   
-  if ( fCutFormula && fCutFormula->EvalInstance() > 0. )
-  {
+  // TODO Understand why this gives segfault for chains
+  // with multiple entries
+  //if ( fCutFormula && fCutFormula->EvalInstance() > 0. )
+  //{
     b_Mass->GetEntry(entry);
     Float_t discriminant = fabs(Mass-91.1876);
     fEntriesToCompare.push_back(entry);
     fEntryDiscriminants.push_back(discriminant);
-  }
+  //}
 
   if ( entry == fChain->GetEntries()-1 ) {
     findBestEntry();

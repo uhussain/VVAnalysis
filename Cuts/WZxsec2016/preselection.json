@@ -9,6 +9,8 @@
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
             "{object_name}IsMediumMuonICHEP > 0.5",
+            "({object_name}Pt > 20 ? {object_name}PVDXY < 0.02 : {object_name}PVDXY < 0.01)",
+            "{object_name}PVDZ < 0.1",
             "{object_name}RelPFIsoDBR04 < 0.15"
         ]
     },

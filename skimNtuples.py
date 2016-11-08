@@ -38,9 +38,9 @@ def getDeduplicatedTree(tree, state, cut_string):
     selector = ROOT.TSelector.GetSelector("Utilities/Selectors/disambiguateFinalStates.C+") 
     zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
     selector.setZCandidateBranchName(zcand_name)
-    tree.Process(selector, cut_string)
+    new_tree = tree.CopyTree(cut_string)
+    new_tree.Process(selector)#, cut_string)
     entryList = selector.GetOutputList().FindObject('bestCandidates')
-    new_tree = tree.CopyTree("")
     new_tree.SetEntryList(entryList)
     return new_tree
 def writeMetaTreeToFile(output_file, metaTree):
