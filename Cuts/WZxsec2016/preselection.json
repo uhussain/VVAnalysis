@@ -3,14 +3,12 @@
         "e" : [ 
             "{object_name}Pt > 10",
             "abs({object_name}Eta) <  2.5",
-            "{object_name}IsCBVIDmedium > 0.5"
+            "{object_name}IsCBVIDtight > 0.5"
         ],
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsMediumMuonICHEP > 0.5",
-            "({object_name}Pt > 20 ? {object_name}PVDXY < 0.02 : {object_name}PVDXY < 0.01)",
-            "{object_name}PVDZ < 0.1",
+            "{object_name}IsWZMediumMuonNoIso > 0.5",
             "{object_name}RelPFIsoDBR04 < 0.15"
         ]
     },
@@ -25,6 +23,6 @@
         ]
     },
     "Event" : [
-        "abs(nMediumMuonICHEP + nCBVIDMediumElec - 3) < 0.5"
+        "abs(nWZMediumMuon + nCBVIDTightElec - 3) < 0.5"
     ]
 }

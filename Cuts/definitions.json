@@ -11,6 +11,9 @@
     "LepVeto" : {
         "WZxsec2016" : "Cuts/WZxsec2016/LepVeto.json"
     },
+    "TightLeptons" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/TightLeptons.json"
+    },
     "3lmass" : {
         "WZxsec2016" : "Cuts/WZxsec2016/3lmass.json"
     },

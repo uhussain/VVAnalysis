@@ -1,3 +1,4 @@
 *.pyc
-*/*.pyc
+*.root
 Utilities/Selectors/disambiguateFinalStates_*
+ScaleFactors/*_C*

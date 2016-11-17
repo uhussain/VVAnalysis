@@ -67,9 +67,11 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name):
             tree.Add(file_path)
         print "Now the tree has %i entries" % tree.GetEntries()
         cuts = []
+        #Only add the trigger cut string once
+        trig = trigger if state == "eee" else ""
         for selection in selections.split(","):
             cut = selection.split(":")[0]
-            cuts.append(ApplySelection.buildCutString(state, cut, analysis, trigger).getString())
+            cuts.append(ApplySelection.buildCutString(state, cut, analysis, trig).getString())
         cut_string = " && ".join(cuts)
         print "Cut string is %s " % cut_string
         ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
