@@ -1,4 +1,5 @@
 import ROOT
+import argparse
 from array import array
 
 def addWeightsForState(original_file, state):
@@ -55,19 +56,14 @@ def addWeightsForState(original_file, state):
         for i, lep in enumerate(leps):
             pt = getattr(tree, "%sPt" % lep)
             absEta = abs(getattr(tree, "%sEta" % lep))
-            #print "pt ", pt
-            #print "abs(eta) ", absEta
             if "e" in lep:
                 lepTightId_weights[i][0] = ROOT.electronTightIdSF(absEta, pt)
                 lepMediumId_weights[i][0] = ROOT.electronMedIdSF(absEta, pt)
             else: 
                 lepTightId_weights[i][0] = ROOT.muonTightIdSF(absEta, pt)
                 lepMediumId_weights[i][0] = ROOT.muonMedIdSF(absEta, pt)
-            print "In the var ", lepTightId_weights[i][0]
-            print "For electrons ", ROOT.electronTightIdSF(absEta,pt)
-            print "For muons ", ROOT.muonTightIdSF(absEta,pt)
-            print "For muons iso", ROOT.muonTightIsoSF(absEta,pt)
             lepTightId_branches[i].Fill()
+            lepMediumId_branches[i].Fill()
         pileup_weight[0] = ROOT.pileupSF(tree.nvtx)
         pileup_branch.Fill()
         if state == "eem":
@@ -95,6 +91,10 @@ def addWeightsForState(original_file, state):
     original_file.cd(state)
     tree.Write("", ROOT.TObject.kOverwrite)
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--input_file", required=True)
+args = parser.parse_args()
+
 ROOT.gROOT.LoadMacro("../../ScaleFactors/ScaleFactor.C+")
 fScales = ROOT.TFile('../../ScaleFactors/scaleFactors.root')
 
@@ -112,8 +112,7 @@ muonMedIdSF.RegisterGlobalFunction(2) # 2D function
 electronTightIdSF.RegisterGlobalFunction(2) # 2D function
 electronMedIdSF.RegisterGlobalFunction(2) # 2D function
 
-file_name = "finalselection_temp.root"
-original_file = ROOT.TFile(file_name, "UPDATE")
+original_file = ROOT.TFile(args.input_file, "UPDATE")
 
 states = ['eee', 'eem', 'emm', 'mmm']
 for state in states:

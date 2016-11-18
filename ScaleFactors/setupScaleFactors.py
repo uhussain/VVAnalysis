@@ -53,12 +53,12 @@ electronGsfSF.Write()
 
 muonTightIdSF = ROOT.ScaleFactor("muonTightIdSF", "ICHEP Muon Tight WP ID SF, x=Eta")
 midFile = ROOT.TFile.Open('../data/MuonID_Z_RunBCD_prompt80X_7p65.root')
-muonTightIdSF.Set1DHist(float2double(midFile.Get('MC_NUM_TightIDandIPCut_DEN_genTracks_PAR_eta/eta_ratio')))
+muonTightIdSF.Set2DHist(float2double(midFile.Get('MC_NUM_TightIDandIPCut_DEN_genTracks_PAR_pt_spliteta_bin1/abseta_pt_ratio')))
 fScales.cd()
 muonTightIdSF.Write()
 
 muonMedIdSF = ROOT.ScaleFactor("muonMedIdSF", "ICHEP Muon Med WP ID SF, x=Eta")
-muonMedIdSF.Set1DHist(float2double(midFile.Get('MC_NUM_MediumID_DEN_genTracks_PAR_eta/eta_ratio')))
+muonMedIdSF.Set2DHist(float2double(midFile.Get('MC_NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1/abseta_pt_ratio')))
 fScales.cd()
 muonMedIdSF.Write()
 

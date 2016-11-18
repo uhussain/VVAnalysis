@@ -29,13 +29,17 @@ dummyTree.Scan('randVal : globalFunc(randVal)', '', '', 10)
 # Will need appropriate files in ../data/
 fScales = ROOT.TFile('scaleFactors.root')
 pu = fScales.Get('pileupSF')
-muon = fScales.Get('muonIsoSF')
+muonIso = fScales.Get('muonTightIsoSF')
+muonId = fScales.Get('muonTightIdSF')
 del fScales # Make sure we don't rely on file being open
 
-#pu.RegisterGlobalFunction()
-#print "pileupSF(3) = ", ROOT.pileupSF(3)
-#dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
+pu.RegisterGlobalFunction()
+print "pileupSF(3) = ", ROOT.pileupSF(3)
+dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
 
-muon.RegisterGlobalFunction(2) # 2D function
-print "muonIsoSF(1.1, 30) = ", ROOT.muonIsoSF(1.1, 30)
-dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonIsoSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+muonIso.RegisterGlobalFunction(2) # 2D function
+muonId.RegisterGlobalFunction(2) # 2D function
+print "muonTightIsoSF(1.1, 30) = ", ROOT.muonTightIsoSF(1.1, 30)
+print "muonTightIdSF(1.1, 30) = ", ROOT.muonTightIdSF(1.1, 30)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonTightIsoSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonTightIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
