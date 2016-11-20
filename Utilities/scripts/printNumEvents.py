@@ -16,7 +16,7 @@ parser.add_argument("-d", "--checkDuplicates", action='store_true')
 parser.add_argument("-m", "--cut_string", required=False, type=str,
                     default="")
 parser.add_argument("-c", "--channels", required=False, type=str,
-                    default="eee,mmm,eem,emm")
+                    default="eee,eem,emm,mmm")
 args = parser.parse_args()
 path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
         "/afs/cern.ch/user/k/kelong/work"

@@ -1,5 +1,7 @@
+#!/usr/bin/env python
 import ROOT
 import argparse
+import os
 from array import array
 
 def addWeightsForState(original_file, state):
@@ -95,8 +97,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--input_file", required=True)
 args = parser.parse_args()
 
-ROOT.gROOT.LoadMacro("../../ScaleFactors/ScaleFactor.C+")
-fScales = ROOT.TFile('../../ScaleFactors/scaleFactors.root')
+file_path = os.path.dirname(os.path.realpath(__file__))
+scalefac_path = "/".join([file_path, "../../ScaleFactors"])
+ROOT.gROOT.LoadMacro("/".join([scalefac_path, "ScaleFactor.C+"]))
+fScales = ROOT.TFile("/".join([scalefac_path, "scaleFactors.root"]))
 
 pileupSF = fScales.Get('pileupSF')
 muonTightIsoSF = fScales.Get('muonTightIsoSF')

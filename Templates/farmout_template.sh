@@ -9,6 +9,7 @@ tar \
     -zcvf ${job_dir}/analysis_code.tar.gz \
     Cuts/ \
     Utilities/ \
+    ScaleFactors \
     skimNtuples.py
 ./Utilities/scripts/makeInputFilesList.py \
     -o ${job_dir}/input_file_list.txt \
