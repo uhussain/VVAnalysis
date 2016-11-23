@@ -103,17 +103,19 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, addScaleF
         analysis,
         ConfigureJobs.getTriggerName(sample_name, selection_name),
         addScaleFacs,
+        "data" in sample_name,
     )
     status = callFarmout(farmout_dict['job_dir'], script_name)
     if status == 0:
         print "Submitted jobs for %s file set to condor." % sample_name
-def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleFacs):
+def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleFacs, isData):
     fill_dict = {'selection' : selection,
         'analysis' : analysis,
         'time' : datetime.datetime.now(),
         'trigger' : trigger_name,
         'command' : ' '.join(sys.argv),
         'addScaleFacs' : addScaleFacs,
+        'isData' : isData,
     }
     fillTemplatedFile('/'.join([base_dir, 'Templates/skim_template.sh']),
         '/'.join([job_dir, 'skim.sh']), fill_dict)

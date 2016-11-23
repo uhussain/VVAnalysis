@@ -35,7 +35,7 @@ def addWeightsForState(original_file, state):
         tree.SetBranchStatus("m3TightIsoSF", 1)
     else:
         print "That don't work :("
-        exit(0)
+        exit(1)
     pileup_weight = array('f', [0])
     pileup_branch = tree.Branch('pileupSF', pileup_weight, 'pileupSF/F') 
     tree.SetBranchStatus("pileupSF", 1)
@@ -45,7 +45,7 @@ def addWeightsForState(original_file, state):
     lepMediumId_weights = [array('f', [0]), array('f', [0]), array('f', [0])]
     lepMediumId_branches = []
     tree.SetBranchStatus("pileupSF", 1)
-    tree.SetBranchStatus("nvtx", 1)
+    tree.SetBranchStatus("nTruePU", 1)
     for i, lep in enumerate(leps):
         lepTightId_branches.append(tree.Branch('%sTightIDSF' % lep, lepTightId_weights[i], '%sTightIDSF/F' % lep)) 
         lepMediumId_branches.append(tree.Branch('%sMediumIDSF' % lep, lepMediumId_weights[i], '%sMediumIDSF/F' % lep)) 
@@ -66,7 +66,7 @@ def addWeightsForState(original_file, state):
                 lepMediumId_weights[i][0] = ROOT.muonMedIdSF(absEta, pt)
             lepTightId_branches[i].Fill()
             lepMediumId_branches[i].Fill()
-        pileup_weight[0] = ROOT.pileupSF(tree.nvtx)
+        pileup_weight[0] = ROOT.pileupSF(tree.nTruePU)
         pileup_branch.Fill()
         if state == "eem":
             mTightIso_weight[0] = ROOT.muonTightIsoSF(

@@ -5,6 +5,9 @@
     "preselectionNoVeto" : {
         "WZxsec2016" : "Cuts/WZxsec2016/preselectionNoVeto.json"
     }, 
+    "preselectionLooseVeto" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/preselectionLooseVeto.json"
+    }, 
     "preselection" : {
         "WZxsec2016" : "Cuts/WZxsec2016/preselection.json"
     }, 
