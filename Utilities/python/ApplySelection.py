@@ -13,6 +13,8 @@ class CutString(object):
     def append(self, append):
         if self.cuts != "" and append != "":
             self.cuts += append if isinstance(append, list) else [append]
+    def contains(self, cut):
+        return any(cut in x for x in self.cuts)
     def getString(self):
         return " && ".join(self.cuts)
 
@@ -23,7 +25,7 @@ def buildCutString(state, selection, analysis, trigger):
     cuts = UserInput.readJson(selection_json)
     cut_string.append(cuts["Event"])
     cut_string.append(cuts["State"][state])
-    if trigger != "":
+    if trigger != "" and not cut_string.contains(trigger):
         cut_string.append(getTriggerCutString(trigger, analysis))
     counts = dict((lep, state.count(lep)) for lep in state)
     current = dict((lep, 0) for lep in state)

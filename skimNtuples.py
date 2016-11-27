@@ -67,11 +67,9 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name):
             tree.Add(file_path)
         print "Now the tree has %i entries" % tree.GetEntries()
         cuts = []
-        #Only add the trigger cut string once
-        trig = trigger if state == "eee" else ""
         for selection in selections.split(","):
             cut = selection.split(":")[0]
-            cuts.append(ApplySelection.buildCutString(state, cut, analysis, trig).getString())
+            cuts.append(ApplySelection.buildCutString(state, cut, analysis, trigger).getString())
         cut_string = " && ".join(cuts)
         print "Cut string is %s " % cut_string
         ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
@@ -79,9 +77,9 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name):
             "deduplicate" in selections)
     writeMetaTreeToFile(output_file, metaTree)
     os.chdir(current_path)
-
 def main():
     args = getComLineArgs()
     skimNtuple(args['selections'], args['analysis'], args['trigger'], args['filelist'], args['output_file_name'])
+    exit(0)
 if __name__ == "__main__":
     main()
