@@ -11,8 +11,8 @@
     "preselection" : {
         "WZxsec2016" : "Cuts/WZxsec2016/preselection.json"
     }, 
-    "LepVeto" : {
-        "WZxsec2016" : "Cuts/WZxsec2016/LepVeto.json"
+    "LepTightVeto" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/LepTightVeto.json"
     },
     "TightLeptons" : {
         "WZxsec2016" : "Cuts/WZxsec2016/TightLeptons.json"

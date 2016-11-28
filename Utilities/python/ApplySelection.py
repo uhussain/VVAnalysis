@@ -21,7 +21,6 @@ class CutString(object):
 def buildCutString(state, selection, analysis, trigger):
     cut_string = CutString()
     selection_json = ConfigureJobs.getCutsJsonName(selection, analysis)
-    print "cuts_json is %s" % selection_json
     cuts = UserInput.readJson(selection_json)
     cut_string.append(cuts["Event"])
     cut_string.append(cuts["State"][state])
@@ -49,7 +48,6 @@ def applySelection(tree, state, selection, analysis, trigger):
     #tree.SetProof()
     listname = '_'.join(["list", state])
     num_passing = tree.Draw(">>" + listname, cut_string.getString(), "entrylist")
-    print "%i events passed the cut " % num_passing
     print cut_string.getString()
     #tlist = ROOT.gProof.GetOutputList().FindObject(listname) 
     tlist = ROOT.gDirectory.FindObject(listname);

@@ -4,6 +4,7 @@ import argparse
 import os
 import sys
 from Utilities.python import ApplySelection
+from Utilities.python.prettytable import PrettyTable
 
 def getComLineArgs():
     parser = argparse.ArgumentParser()
@@ -28,12 +29,11 @@ def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
     state_dir.cd()
     save_tree = tree.CopyTree(cut_string) if not deduplicate else \
         getDeduplicatedTree(tree, state, cut_string).CopyTree("")
-    print "save_tree has %i entries" % save_tree.GetEntries()
     save_tree.Write()
     # Remove AutoSaved trees
     output_file.Purge()
     ROOT.gROOT.cd()
-    del save_tree
+    return save_tree.GetEntries()
 def getDeduplicatedTree(tree, state, cut_string):
     selector = ROOT.TSelector.GetSelector("Utilities/Selectors/disambiguateFinalStates.C+") 
     zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
@@ -61,11 +61,12 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name):
     metaTree = ROOT.TChain("metaInfo/metaInfo")
     for file_path in input_files:
         metaTree.Add(file_path)
+    event_counts = {"initial" : {}, "selected" : {}}
     for state in ["eee", "eem", "emm", "mmm"]:
         tree = ROOT.TChain("%s/ntuple" % state)
         for file_path in input_files:
             tree.Add(file_path)
-        print "Now the tree has %i entries" % tree.GetEntries()
+        event_counts["initial"][state] = tree.GetEntries()
         cuts = []
         for selection in selections.split(","):
             cut = selection.split(":")[0]
@@ -73,9 +74,15 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name):
         cut_string = " && ".join(cuts)
         print "Cut string is %s " % cut_string
         ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
-        writeNtupleToFile(output_file, tree, state, cut_string,
+        event_counts["selected"][state] = writeNtupleToFile(output_file, tree, state, cut_string,
             "deduplicate" in selections)
     writeMetaTreeToFile(output_file, metaTree)
+    event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
+    for selection, events in event_counts.iteritems():
+        event_info.add_row([selection, events["eee"], events["eem"], events["emm"], events["mmm"]])
+    print "\nResults for selection: %s\n" % selections
+    print event_info.get_string()
+    
     os.chdir(current_path)
 def main():
     args = getComLineArgs()

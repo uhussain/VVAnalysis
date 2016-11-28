@@ -24,6 +24,6 @@
         ]
     },
     "Event" : [
-        "abs(nWZLooseMuon + nWWLooseElec - 3) < 0.5"
+        "abs(nWZMediumMuon + nWWLooseCBVIDMedElec - 3) < 0.5"
     ]
 }
