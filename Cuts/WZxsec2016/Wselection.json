@@ -8,24 +8,22 @@
     "State" : {
         "eee" : [
             "e1_e3_Mass > 4 && e2_e3_Mass > 4",
-            "e3IsCBVIDTight"
+            "e3IsCBVIDTight > 0.5"
         ],
         "mmm" : [
-            "m1_m3_Mass > 4 && m2_m3_Mass > 4",
-            "m3IsTightMuon"
+            "m1_m3_Mass > 4 && m2_m3_Mass > 4"
         ],
         "eem" : [
-            "e1_m_Mass > 4 && e2_m_Mass > 4",
-            "mIsTightMuon"
+            "e1_m_Mass > 4 && e2_m_Mass > 4"
         ],
         "emm" : [
             "e_m1_Mass > 4 && e_m2_Mass > 4",
-            "eIsCBVIDTight"
+            "eIsCBVIDTight > 0.5"
         ]
     },
     "Event" : [
-        "nJetCSVv2T < 0.5",
         "Wlep_Pt > 20",
+        "nJetCSVv2T < 0.5",
         "type1_pfMETEt > 30"
     ]
 }

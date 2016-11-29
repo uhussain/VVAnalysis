@@ -14,6 +14,9 @@
     "LepTightVeto" : {
         "WZxsec2016" : "Cuts/WZxsec2016/LepTightVeto.json"
     },
+    "TightElectrons" : {
+        "WZxsec2016" : "Cuts/WZxsec2016/TightElectrons.json"
+    },
     "TightLeptons" : {
         "WZxsec2016" : "Cuts/WZxsec2016/TightLeptons.json"
     },

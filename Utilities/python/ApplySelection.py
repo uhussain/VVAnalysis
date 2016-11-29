@@ -11,7 +11,7 @@ class CutString(object):
     def __init__(self):
         self.cuts = []
     def append(self, append):
-        if self.cuts != "" and append != "":
+        if self.cuts not in ["", None] and append not in ["", None]:
             self.cuts += append if isinstance(append, list) else [append]
     def contains(self, cut):
         return any(cut in x for x in self.cuts)
