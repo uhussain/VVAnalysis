@@ -22,11 +22,11 @@ def getComLineArgs():
     return vars(parser.parse_args())
 def makeFileList(output_file, file_path):
     with open(output_file, "w") as file_list:
-        path_to_files = file_path.rstrip("/*") + "/*"
-        for filename in glob.glob(path_to_files):
+        for filename in glob.glob(file_path):
             file_list.write(filename.replace('/hdfs', '') + "\n")
 def main():
     args = getComLineArgs()
+    print "YES I'M WORKING!"
     makeFileList(args['output_file'], args['file_path'])
 if __name__ == "__main__":
     main()

@@ -32,7 +32,7 @@ def getComLineArgs():
     return vars(parser.parse_args())
 # Choose files per job such that each job is ~300MB
 def getFilesPerJob(path_to_files):
-    file_list = glob.glob(path_to_files.rstrip("/*") + "/*")
+    file_list = glob.glob(path_to_files)
     if len(file_list) == 0:
         raise ValueError("Size of file list is zero for path: %s" % path_to_files)
     averagesize =sum([os.path.getsize(f) for f in file_list[:50]])/min(len(file_list), 50)

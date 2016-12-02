@@ -17,7 +17,7 @@ def getListOfFiles(filelist, manager_path):
         if "*" in name:
             names += fnmatch.filter(valid_names, name)
         else:
-            if name not in valid_names:
+            if name.split("__")[0] not in valid_names:
                 print "%s is not a valid name" % name
                 continue
             names += [name]
@@ -54,7 +54,7 @@ def getInputFilesPath(sample_name, manager_path, selection, analysis):
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
                " to a definition in %s" % (sample_name, input_file_name))
-    return input_files[sample_name]['file_path'].rstrip("/*")
+    return input_files[sample_name]['file_path']
 def getCutsJsonName(selection, analysis):
     definitions_json = UserInput.readJson("Cuts/definitions.json")
     if selection not in definitions_json.keys():
