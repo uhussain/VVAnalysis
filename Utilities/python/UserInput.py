@@ -1,8 +1,14 @@
 import json
+import glob
 import argparse
 import datetime
 from collections import OrderedDict
 
+def readAllJson(json_file_path):
+    json_info = {}
+    for json_file in glob.glob(json_file_path):
+        json_info.update(readJson(json_file))
+    return json_info
 def readJson(json_file_name):
     json_info = {}
     with open(json_file_name) as json_file:

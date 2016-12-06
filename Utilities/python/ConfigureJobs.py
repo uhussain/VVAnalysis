@@ -9,8 +9,8 @@ def getJobName(sample_name, analysis, selection, version):
         "v%s" % version])
 def getListOfFiles(filelist, manager_path):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
-    data_info = UserInput.readJson("/".join([data_path, "%s.json" % "data"]))
-    mc_info = UserInput.readJson("/".join([data_path, "%s.json" % "montecarlo"]))
+    data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
+    mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
