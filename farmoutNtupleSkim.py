@@ -27,8 +27,11 @@ def getComLineArgs():
                         type=lambda x : [i.strip() for i in x.split(',')],
                         required=True, help="List of input file names "
                         "to be processed (separated by commas)")
-    parser.add_argument("--addScaleFacs", action='store_true',
-                        help="Add lepton and pilup scale factors to ntuple")
+    parser.add_argument("--noScaleFacs", action='store_true',
+                        help="Don't add lepton and pilup scale factors to "
+                        "ntuple (by default they are added)")
+    parser.add_argument("-e", "--extraArgs", type=str, default='',
+                        help="Extra arguments to pass to skimNtuples script")
     return vars(parser.parse_args())
 # Choose files per job such that each job is ~300MB
 def getFilesPerJob(path_to_files):
@@ -68,7 +71,7 @@ def callFarmout(output_dir, script_name):
     if status != 0:
         print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     return status
-def farmoutNtupleSkim(sample_name, path, selection, analysis, version, addScaleFacs):
+def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFacs, extraArgs):
     farmout_dict = {}
     selection_name = selection.split(":")[0]
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
@@ -102,18 +105,20 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, addScaleF
         selection,
         analysis,
         ConfigureJobs.getTriggerName(sample_name, selection_name),
-        addScaleFacs and ("data" not in sample_name),
+        not noScaleFacs and ("data" not in sample_name),
+        extraArgs
     )
     status = callFarmout(farmout_dict['job_dir'], script_name)
     if status == 0:
         print "Submitted jobs for %s file set to condor." % sample_name
-def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleFacs):
+def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, noScaleFacs, extraArgs):
     fill_dict = {'selection' : selection,
         'analysis' : analysis,
         'time' : datetime.datetime.now(),
         'trigger' : trigger_name,
         'command' : ' '.join(sys.argv),
-        'addScaleFacs' : addScaleFacs,
+        'extraArgs' : extraArgs,
+        'addScaleFacs' : not noScaleFacs,
     }
     fillTemplatedFile('/'.join([base_dir, 'Templates/skim_template.sh']),
         '/'.join([job_dir, 'skim.sh']), fill_dict)
@@ -128,7 +133,7 @@ def main():
     for file_name in ConfigureJobs.getListOfFiles(args['filelist'], path):
         try:
             farmoutNtupleSkim(file_name, path, args['selection'], 
-                args['analysis'], args['version'], args['addScaleFacs'])
+                args['analysis'], args['version'], args['noScaleFacs'], args['extraArgs'])
         except (ValueError, OSError) as error:
             logging.warning(error)
             logging.warning("Skipping submission for %s" % file_name)

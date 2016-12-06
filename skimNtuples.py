@@ -23,6 +23,8 @@ def getComLineArgs():
                         " in selection the cut json")
     parser.add_argument("-o", "--output_file_name", type=str,
                         required=True, help="Name of output file")
+    parser.add_argument("-d", "--no_deduplicate", action='store_true',
+                        help="Don't remove duplicated events from ntuple")
     return vars(parser.parse_args())
 def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
     state_dir = output_file.mkdir(state)
@@ -49,7 +51,7 @@ def writeMetaTreeToFile(output_file, metaTree):
     meta_dir.cd()
     save_mt = metaTree.CopyTree("")
     save_mt.Write()
-def skimNtuple(selections, analysis, trigger, filelist, output_file_name):
+def skimNtuple(selections, analysis, trigger, filelist, output_file_name, deduplicate):
     current_path = os.getcwd()
     os.chdir(sys.path[0])
     ROOT.gROOT.SetBatch(True)
@@ -69,24 +71,30 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name):
         event_counts["initial"][state] = tree.GetEntries()
         cuts = ApplySelection.CutString()
         for selection in selections.split(","):
-            cut = selection.split(":")[0]
-            cuts.append(ApplySelection.buildCutString(state, cut, analysis, trigger).getString())
+            cuts.append(ApplySelection.buildCutString(state, 
+                selection, analysis, trigger).getString())
         cut_string = cuts.getString()
         print "Cut string is %s " % cut_string
         ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
         event_counts["selected"][state] = writeNtupleToFile(output_file, tree, state, cut_string,
-            "deduplicate" in selections)
+            deduplicate)
     writeMetaTreeToFile(output_file, metaTree)
     event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
     for selection, events in event_counts.iteritems():
         event_info.add_row([selection, events["eee"], events["eem"], events["emm"], events["mmm"]])
-    print "\nResults for selection: %s\n" % selections
+    print "\nResults for selection: %s" % selections
+    if deduplicate:
+        print "NOTE: Events deduplicated by choosing the ordering with m_l1_l2 " \
+            "closest to m_{Z}^{PDG} AFTER making full selection\n"
+    else:
+        print "NOTE: Events NOT deduplicated! Event may appear in multiple rows of ntuple!\n"
     print event_info.get_string()
     
     os.chdir(current_path)
 def main():
     args = getComLineArgs()
-    skimNtuple(args['selections'], args['analysis'], args['trigger'], args['filelist'], args['output_file_name'])
+    skimNtuple(args['selections'], args['analysis'], args['trigger'], args['filelist'], 
+        args['output_file_name'], not args['no_deduplicate'])
     exit(0)
 if __name__ == "__main__":
     main()
