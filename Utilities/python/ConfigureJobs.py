@@ -6,7 +6,7 @@ def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
     selection_name = selection.split(",")[-1 ]
     return '-'.join([date, sample_name, analysis, selection_name, 
-        "v%s" % version])
+        ("v%s" % version) if version.isdigit() else version])
 def getListOfFiles(filelist, manager_path):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
@@ -65,7 +65,7 @@ def getCutsJsonName(selection, analysis):
             "correspond to a definition in Cuts/definitions.json" % analysis)
     return definitions_json[selection][analysis]
 def getTriggerName(sample_name, selection):
-    trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG"]
+    trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG", "SingleMuon", "SingleElectron"]
     if "data" in sample_name and "preselection" in selection:
         for name in trigger_names:
             if name in sample_name:

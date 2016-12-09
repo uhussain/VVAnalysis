@@ -73,14 +73,13 @@ def callFarmout(output_dir, script_name):
     return status
 def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFacs, extraArgs):
     farmout_dict = {}
-    selection_name = selection.split(":")[0]
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
         sample_name, 
         path, 
-        ConfigureJobs.getPreviousStep(selection_name, analysis), 
+        ConfigureJobs.getPreviousStep(selection, analysis), 
         analysis
     )
-    job_name = ConfigureJobs.getJobName(sample_name, analysis, selection_name, version) 
+    job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
     submission_dir = ('/data/kelong/%s' if "kelong" in path else "/nfs_scratch/kdlong/%s") \
         % '{:%Y-%m-%d}_WZAnalysisJobs'.format(datetime.date.today())
@@ -104,21 +103,21 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFa
         farmout_dict['job_dir'],
         selection,
         analysis,
-        ConfigureJobs.getTriggerName(sample_name, selection_name),
+        ConfigureJobs.getTriggerName(sample_name, selection),
         not noScaleFacs and ("data" not in sample_name),
         extraArgs
     )
     status = callFarmout(farmout_dict['job_dir'], script_name)
     if status == 0:
         print "Submitted jobs for %s file set to condor." % sample_name
-def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, noScaleFacs, extraArgs):
+def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleFacs, extraArgs):
     fill_dict = {'selection' : selection,
         'analysis' : analysis,
         'time' : datetime.datetime.now(),
         'trigger' : trigger_name,
         'command' : ' '.join(sys.argv),
         'extraArgs' : extraArgs,
-        'addScaleFacs' : not noScaleFacs,
+        'addScaleFacs' : addScaleFacs,
     }
     fillTemplatedFile('/'.join([base_dir, 'Templates/skim_template.sh']),
         '/'.join([job_dir, 'skim.sh']), fill_dict)

@@ -32,7 +32,7 @@ for name in filelist:
     print name
     if ".root" not in name:
         file_path = ConfigureJobs.getInputFilesPath(name, path,
-            args.selection, "WZxsec2016") + "/*"
+            args.selection, "WZxsec2016")
     else:
         file_path = name
     print "Results for file %s" % name
@@ -42,9 +42,10 @@ for name in filelist:
         state = state.strip()
         chain = ROOT.TChain("%s/ntuple" % state)
         chain.Add(file_path)
-        cut_tree = chain.CopyTree(args.cut_string) if args.cut_string != "" \
-            else chain
-        num_events = cut_tree.GetEntries()
+        cut_tree = chain
+        #cut_tree = chain.CopyTree(args.cut_string) if args.cut_string != "" \
+        #    else chain
+        num_events = cut_tree.GetEntries(args.cut_string)
         print "Number of events in state %s is %i" % (state, num_events)
         if args.printEventNums:
             with open('WZEvents_{:%Y-%m-%d}_{selection}_{chan}.out'.format(datetime.date.today(), 

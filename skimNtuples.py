@@ -13,7 +13,8 @@ def getComLineArgs():
                         "separated by commas. They must be"
                         " mapped to a cuts json via Cuts/definitions.json")
     parser.add_argument("-t", "--trigger", type=str, default="",
-                        choices=["DoubleEG", "DoubleMuon", "MuonEG", ""],
+                        choices=["DoubleEG", "DoubleMuon", "MuonEG", 
+                            "SingleMuon", "SingleElectron", ""],
                         help="Name of trigger to select in data")
     parser.add_argument("-f", "--filelist", type=str,
                         required=True, help="List of input file names "
@@ -70,9 +71,8 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
             tree.Add(file_path)
         event_counts["initial"][state] = tree.GetEntries()
         cuts = ApplySelection.CutString()
-        for selection in selections.split(","):
-            cuts.append(ApplySelection.buildCutString(state, 
-                selection, analysis, trigger).getString())
+        cuts.append(ApplySelection.buildCutString(state, 
+            selections.split(","), analysis, trigger).getString())
         cut_string = cuts.getString()
         print "Cut string is %s " % cut_string
         ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
