@@ -56,14 +56,7 @@ def getInputFilesPath(sample_name, manager_path, selection, analysis):
                " to a definition in %s" % (sample_name, input_file_name))
     return input_files[sample_name]['file_path']
 def getCutsJsonName(selection, analysis):
-    definitions_json = UserInput.readJson("Cuts/definitions.json")
-    if selection not in definitions_json.keys():
-        raise ValueError("Invalid selection %s. Selection must correspond " 
-            "to a definition in Cuts/definitions.json" % selection)
-    if analysis not in definitions_json[selection]:
-        raise ValueError("Invalid analysis %s. Analysis name must "
-            "correspond to a definition in Cuts/definitions.json" % analysis)
-    return definitions_json[selection][analysis]
+    return "/".join(["Cuts", analysis, selection + ".json"]) 
 def getTriggerName(sample_name, selection):
     trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG", "SingleMuon", "SingleElectron"]
     if "data" in sample_name and "preselection" in selection:

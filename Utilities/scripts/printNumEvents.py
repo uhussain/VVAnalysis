@@ -12,6 +12,8 @@ parser.add_argument("-f", "--filelist",
                     "to be processed (separated by commas)")
 parser.add_argument("-s", "--selection", required=True)
 parser.add_argument("-p", "--printEventNums", action='store_true')
+parser.add_argument("-t", "--printTrigger", action='store_true')
+parser.add_argument("--printDetail", action='store_true')
 parser.add_argument("-d", "--checkDuplicates", action='store_true')
 parser.add_argument("-m", "--cut_string", required=False, type=str,
                     default="")
@@ -43,11 +45,11 @@ for name in filelist:
         chain = ROOT.TChain("%s/ntuple" % state)
         chain.Add(file_path)
         cut_tree = chain
-        #cut_tree = chain.CopyTree(args.cut_string) if args.cut_string != "" \
-        #    else chain
         num_events = cut_tree.GetEntries(args.cut_string)
         print "Number of events in state %s is %i" % (state, num_events)
         if args.printEventNums:
+            cut_tree = chain.CopyTree(args.cut_string) if args.cut_string != "" \
+                else chain
             with open('WZEvents_{:%Y-%m-%d}_{selection}_{chan}.out'.format(datetime.date.today(), 
                     selection=args.selection, chan=(state if args.channels != "" else ""))
                     , "wa") as outfile:
@@ -55,6 +57,20 @@ for name in filelist:
                 for row in cut_tree:
                     eventId = '{0}:{1}:{2}'.format(row.run, row.lumi,row.evt)
                     outfile.write(eventId+'\n')
+                    if args.printTrigger or args.printDetail:
+                        print "-"*20 + eventId + "_"*20
+                        if args.printTrigger:
+                            print "singleMu: ", row.singleMuPass
+                            print "singleIsoMu: ", row.singleIsoMuPass
+                            print "singleE: ", row.singleEPass
+                            print "doubleE: ", row.doubleEPass
+                            print "doubleMu: ", row.doubleMuPass
+                        if args.printDetail:
+                            if state == "emm":
+                                print "ePt :", row.ePt
+                                print "m1Pt :", row.m1Pt
+                                print "m2Pt :", row.m2Pt
+                                print "Zmass :", row.m1_m2_Mass
                     if args.checkDuplicates:
                         if eventId in eventArray:
                             print "Found a duplicate: %s" % eventId

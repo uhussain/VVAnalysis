@@ -26,7 +26,6 @@ def makeFileList(output_file, file_path):
             file_list.write(filename.replace('/hdfs', '') + "\n")
 def main():
     args = getComLineArgs()
-    print "YES I'M WORKING!"
     makeFileList(args['output_file'], args['file_path'])
 if __name__ == "__main__":
     main()
