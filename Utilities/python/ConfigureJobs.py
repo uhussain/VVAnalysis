@@ -43,8 +43,11 @@ def getPreviousStep(selection, analysis):
         }
     first_selection = selection.split(",")[0].strip()
     if first_selection not in selection_map.keys():
-        raise ValueError("Invalid selection '%s'. Valid selections are:"
-               "%s" % (first_selection, selection_map.keys()))
+        if "preselection" in first_selection:
+            first_selection = "preselection"
+        else:
+            raise ValueError("Invalid selection '%s'. Valid selections are:"
+                "%s" % (first_selection, selection_map.keys()))
     return selection_map[first_selection]
 def getInputFilesPath(sample_name, manager_path, selection, analysis):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
