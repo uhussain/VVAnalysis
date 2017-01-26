@@ -20,8 +20,10 @@ def getComLineArgs():
                         " to be created (containing list of files)")
     parser.add_argument("-p", "--file_path", type=str,
                         required=True, help="directory containing files")
+    parser.add_argument("-r", "--only_root_files", action='store_true',
+                        help="Only list .root files")
     return vars(parser.parse_args())
-def makeFileList(output_file, file_path):
+def makeFileList(output_file, file_path, only_root_files):
     p = subprocess.Popen(["hdfs", "dfs", "-ls", file_path.replace("/hdfs", "")],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
@@ -36,9 +38,11 @@ def makeFileList(output_file, file_path):
             files.append(split[1])
     with open(output_file, "w") as file_list:
         for file_name in files:
+            if only_root_files and ".root" not in file_name:
+                continue
             file_list.write("/"+file_name+"\n")
 def main():
     args = getComLineArgs()
-    makeFileList(args['output_file'], args['file_path'])
+    makeFileList(args['output_file'], args['file_path'], args['only_root_files'])
 if __name__ == "__main__":
     main()

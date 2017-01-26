@@ -13,7 +13,8 @@ tar \
     skimNtuples.py
 ./Utilities/scripts/makeInputFilesList.py \
     -o ${job_dir}/input_file_list.txt \
-    -p "${input_files_path}"
+    -p "${input_files_path}" \
+    --only_root_files
 popd
 chmod +x ${job_dir}/skim.sh
 farmoutAnalysisJobs \
