@@ -11,6 +11,7 @@
 
 import glob
 import argparse
+import subprocess
 
 def getComLineArgs():
     parser = argparse.ArgumentParser()
@@ -21,9 +22,21 @@ def getComLineArgs():
                         required=True, help="directory containing files")
     return vars(parser.parse_args())
 def makeFileList(output_file, file_path):
+    p = subprocess.Popen(["hdfs", "dfs", "-ls", file_path.replace("/hdfs", "")],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+    out,err = p.communicate()
+    files = []
+    for line in out.splitlines():
+        split = line.split("/", 1)
+        if len(split) != 2:
+            continue
+        else:
+            files.append(split[1])
     with open(output_file, "w") as file_list:
-        for filename in glob.glob(file_path):
-            file_list.write(filename.replace('/hdfs', '') + "\n")
+        for file_name in files:
+            file_list.write("/"+file_name+"\n")
 def main():
     args = getComLineArgs()
     makeFileList(args['output_file'], args['file_path'])

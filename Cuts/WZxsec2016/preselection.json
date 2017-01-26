@@ -27,6 +27,6 @@
     },
     "Event" : [
         "abs(nWZMediumMuon + nWWLooseCBVIDMedElec - 3) < 0.5",
-        "(singleEPass || singleMuPass || singleIsoMuPass || singleESingleMuPass || singleMuSingleEPass || doubleMuPass || doubleEPass)"
+        "(singleESingleMuPass || singleMuSingleEPass || doubleMuPass || doubleEPass)"
     ]
 }
