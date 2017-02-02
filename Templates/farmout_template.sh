@@ -5,20 +5,23 @@
 # To resubmit failed jobs: ./farmout.sh --resubmit-failed-jobs
 DATE=`date +%Y-%m-%d`
 pushd ${base_dir}
-tar \
-    -zcvf ${job_dir}/analysis_code.tar.gz \
-    Cuts/ \
-    Utilities/ \
-    ScaleFactors \
-    skimNtuples.py
+if [ ! -f ${job_dir}/analysis_code.tar.gz ]; then
+    tar \
+        -zcvf ${job_dir}/analysis_code.tar.gz \
+        Cuts/ \
+        Utilities/ \
+        ScaleFactors \
+        skimNtuples.py
+fi
+if [ ! -f ${job_dir}/input_file_list.txt ]; then
 ./Utilities/scripts/makeInputFilesList.py \
     -o ${job_dir}/input_file_list.txt \
     -p "${input_files_path}" \
     --only_root_files
+fi
 popd
 chmod +x ${job_dir}/skim.sh
 farmoutAnalysisJobs \
-    --infer-cmssw-path \
     --fwklite \
     --output-dir=srm://cmssrm2.hep.wisc.edu:8443/srm/v2/server?SFN=/hdfs/store/user/$$USER/WZAnalysisJobs_$$DATE/${job_name} \
     --input-file-list=${job_dir}/input_file_list.txt \
@@ -29,4 +32,5 @@ farmoutAnalysisJobs \
     --extra-inputs=${job_dir}/analysis_code.tar.gz \
     $$1 \
     ${job_name} \
+    /afs/cern.ch/work/k/kelong/CMSSW/CMSSW_8_0_23 \
     ${job_dir}/skim.sh
