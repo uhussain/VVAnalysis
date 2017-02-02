@@ -3,12 +3,12 @@
         "e" : [ 
             "{object_name}Pt > 10",
             "abs({object_name}Eta) <  2.5",
-            "{object_name}IsWWLoose > 0.5",
+            "{object_name}IsWWLoose > 0.5"
         ],
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsWZLooseMuon > 0.5",
+            "{object_name}IsWZLooseMuon > 0.5"
         ]
     },
     "State" : {
