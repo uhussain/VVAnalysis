@@ -24,23 +24,19 @@ def getComLineArgs():
                         help="Only list .root files")
     return vars(parser.parse_args())
 def makeFileList(output_file, file_path, only_root_files):
-    p = subprocess.Popen(["hdfs", "dfs", "-ls", file_path.replace("/hdfs", "")],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-    out,err = p.communicate()
+    out = subprocess.check_output(["hdfs", "dfs", "-ls", file_path.replace("/hdfs", "")])
     files = []
     for line in out.splitlines():
         split = line.split("/", 1)
         if len(split) != 2:
             continue
         else:
-            files.append(split[1])
+            files.append("/"+split[1])
     with open(output_file, "w") as file_list:
         for file_name in files:
             if only_root_files and ".root" not in file_name:
                 continue
-            file_list.write("/"+file_name+"\n")
+            file_list.write(file_name+"\n")
 def main():
     args = getComLineArgs()
     makeFileList(args['output_file'], args['file_path'], args['only_root_files'])
