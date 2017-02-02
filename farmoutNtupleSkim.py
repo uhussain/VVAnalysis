@@ -33,13 +33,14 @@ def getComLineArgs():
     parser.add_argument("-e", "--extraArgs", type=str, default='',
                         help="Extra arguments to pass to skimNtuples script")
     return vars(parser.parse_args())
-# Choose files per job such that each job is ~300MB
+
 def getFilesPerJob(path_to_files):
-    file_list = glob.glob(path_to_files)
-    if len(file_list) == 0:
+    file_type = "Local" if "store" not in path_to_files else "HDFS"
+    num, tot_size = getattr(ConfigureJobs, "getNumberAndSizeOf%sFiles" % file_type)(path_to_files)
+    if num == 0:
         raise ValueError("Size of file list is zero for path: %s" % path_to_files)
-    averagesize =sum([os.path.getsize(f) for f in file_list[:50]])/min(len(file_list), 50)
-    return int(math.ceil(1000000000./averagesize))
+    average_size = tot_size/num
+    return int(math.ceil(1000./average_size))
 def fillTemplatedFile(template_file_name, out_file_name, template_dict):
     with open(template_file_name, "r") as templateFile:
         source = string.Template(templateFile.read())

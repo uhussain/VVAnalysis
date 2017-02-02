@@ -1,12 +1,45 @@
 import datetime
 import UserInput
 import fnmatch
+import glob
+import subprocess
+import os
 
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
     selection_name = selection.split(",")[-1 ]
     return '-'.join([date, sample_name, analysis, selection_name, 
         ("v%s" % version) if version.isdigit() else version])
+def getNumberAndSizeOfLocalFiles(path_to_files):
+    file_list = glob.glob(path_to_files)
+    return (len(file_list), sum([os.path.getsize(f)/1000000 for f in file_list]))
+def getNumberAndSizeOfHDFSFiles(file_path):
+    p = subprocess.Popen(["hdfs", "dfs", "-ls", "-h", file_path.replace("/hdfs", "")],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+    out,err = p.communicate()
+    file_info = []
+    for line in out.splitlines():
+        split = line.split()
+        if len(split) != 8:
+            continue
+        file_info.append(float(split[4].rstrip("mkg")))
+    return (0,0) if len(file_info) == 0 else (len(file_info), sum(file_info))
+def getListOfHDFSFiles(file_path):
+    try:
+        out = subprocess.check_output(["hdfs", "dfs", "-ls", file_path.replace("/hdfs", "")])
+    except subprocess.CalledProcessError as error:
+        logging.warning(error)
+        return []
+    files = []
+    for line in out.splitlines():
+        split = line.split(" ", 1)
+        if len(split) != 2:
+            continue
+        elif "root" in split[1]:
+            files.append("/"+split[1])
+    return files
 def getListOfFiles(filelist, manager_path):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
@@ -30,8 +63,11 @@ def getPreviousStep(selection, analysis):
                 "preselectionLooseVeto" : "ntuples",
                 "preselectionNoVeto" : "ntuples",
                 "LepVetoAnd3lmass" : "preselection",
-                "Zselection" : "LepVetoAnd3lmass",
-                "Wselection" : "Zselection"
+                "3lmass" : "preselection",
+                "Zselection" : "3lmass",
+                "Wselection" : "Zselection",
+                "3lDYControl" : "Zselection",
+                "3lTTbarControl" : "3lmass",
         }
     elif analysis == "WZDecemberAnalysis":
         selection_map = { "ntuples" : "ntuples",
