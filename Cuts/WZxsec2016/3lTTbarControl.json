@@ -1,0 +1,32 @@
+{
+    "Object" : {
+        "e" : [ 
+        ],
+        "m" : [
+        ]
+    },
+    "State" : {
+        "eee" : [
+            "e1_e3_Mass > 4 && e2_e3_Mass > 4",
+            "e3IsCBVIDTight > 0.5"
+        ],
+        "mmm" : [
+            "m1_m3_Mass > 4 && m2_m3_Mass > 4"
+        ],
+        "eem" : [
+            "e1_m_Mass > 4 && e2_m_Mass > 4"
+        ],
+        "emm" : [
+            "e_m1_Mass > 4 && e_m2_Mass > 4",
+            "eIsCBVIDTight > 0.5"
+        ]
+    },
+    "Event" : [
+        "bestZCand_Mass < 86.1876 || bestZCand_Mass > 96.1876",
+        "Zlep1_Pt > 25.",
+        "Zlep2_Pt > 15."
+        "Wlep_Pt > 20",
+        "nJetCSVv2T > 0.5",
+        "type1_pfMETEt > 30"
+    ]
+}

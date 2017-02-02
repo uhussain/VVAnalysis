@@ -60,6 +60,7 @@ def getPreviousStep(selection, analysis):
         selection_map = { "ntuples" : "ntuples",
                 "loosepreselection" : "ntuples",
                 "preselection" : "ntuples",
+                "3LooseLeptons" : "ntuples",
                 "preselectionLooseVeto" : "ntuples",
                 "preselectionNoVeto" : "ntuples",
                 "LepVetoAnd3lmass" : "preselection",
