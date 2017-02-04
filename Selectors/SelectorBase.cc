@@ -7,7 +7,7 @@ void SelectorBase::Init(TTree *tree)
 {
     fReader.SetTree(tree);
 
-    const char* dataset = "test";
+    const char* dataset = name_;
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(dataset));
     if ( currentHistDir_ == nullptr ) {
         currentHistDir_ = new TList();

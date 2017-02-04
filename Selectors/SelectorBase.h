@@ -9,7 +9,6 @@
 #include <TDirectory.h>
 #include <TSelector.h>
 #include <TTreeReader.h>
-#include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
 #include <TH1D.h>
 #include <TParameter.h>
@@ -24,10 +23,12 @@ public :
 
   TTreeReader    fReader;  //!the tree reader
   TTree       *fChain = 0;  //!pointer to the analyzed TTree or TChain
+  const char* name_;
 
   TTreeReaderValue<Float_t> Mass = {fReader, "Mass"};
 
   SelectorBase(TTree * /*tree*/ =0) { }
+  SelectorBase(const char* name, TTree * /*tree*/ =0) : name_(name) { }
   virtual ~SelectorBase() { }
   virtual Int_t  Version() const { return 2; }
   virtual void   Begin(TTree *tree);

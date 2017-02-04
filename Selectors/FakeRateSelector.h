@@ -24,8 +24,12 @@
 
 class FakeRateSelector : public SelectorBase {
 public :
-    TH2D* passingTight_;
-    TH2D* passingLoose_;
+    TH2D* passingTight2D_;
+    TH1D* passingTight1DPt_;
+    TH1D* passingTight1DEta_;
+    TH2D* passingLoose2D_;
+    TH1D* passingLoose1DPt_;
+    TH1D* passingLoose1DEta_;
     // Readers to access the data (delete the ones you do not need).
 //    TTreeReaderValue<Float_t> Energy = {fReader, "Energy"};
 //    TTreeReaderValue<Float_t> Eta = {fReader, "Eta"};
@@ -290,8 +294,12 @@ public :
 //    TTreeReaderValue<Float_t> e2MediumIDSF = {fReader, "e2MediumIDSF"};
 //    TTreeReaderValue<Float_t> e3TightIDSF = {fReader, "e3TightIDSF"};
 //    TTreeReaderValue<Float_t> e3MediumIDSF = {fReader, "e3MediumIDSF"};
+    const char* channel_;
 
     FakeRateSelector(TTree * /*tree*/ =0) { }
+    FakeRateSelector(const char* name, TTree * /*tree*/ =0) : SelectorBase(name, 0) { }
+    FakeRateSelector(const char* name, const char* channel, TTree * /*tree*/ =0) : 
+        SelectorBase(name, 0), channel_(channel) { }
     virtual ~FakeRateSelector() { }
     virtual void   SlaveBegin(TTree *) override;
     virtual void   SetupNewDirectory() override;
