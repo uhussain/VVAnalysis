@@ -16,6 +16,7 @@
 #include <TTreeReaderValue.h>
 #include <TTreeReaderArray.h>
 #include <TH1.h>
+#include <TH2.h>
 
 // Headers needed by this particular selector
 #include <vector>
@@ -23,7 +24,8 @@
 
 class FakeRateSelector : public SelectorBase {
 public :
-    TH1D* fMassHist;
+    TH2D* passingTight_;
+    TH2D* passingLoose_;
     // Readers to access the data (delete the ones you do not need).
 //    TTreeReaderValue<Float_t> Energy = {fReader, "Energy"};
 //    TTreeReaderValue<Float_t> Eta = {fReader, "Eta"};
@@ -74,7 +76,7 @@ public :
 //    TTreeReaderValue<Int_t> PdgId = {fReader, "PdgId"};
 //    TTreeReaderValue<UInt_t> lumi = {fReader, "lumi"};
 //    TTreeReaderValue<UInt_t> nCBVIDLooseElec = {fReader, "nCBVIDLooseElec"};
-//    TTreeReaderValue<UInt_t> nCBVIDMediumElec = {fReader, "nCBVIDMediumElec"};
+    TTreeReaderValue<UInt_t> nCBVIDMediumElec = {fReader, "nCBVIDMediumElec"};
 //    TTreeReaderValue<UInt_t> nCBVIDTightElec = {fReader, "nCBVIDTightElec"};
 //    TTreeReaderValue<UInt_t> nJetCMVAv2L = {fReader, "nJetCMVAv2L"};
 //    TTreeReaderValue<UInt_t> nJetCMVAv2M = {fReader, "nJetCMVAv2M"};
@@ -93,8 +95,8 @@ public :
 //    TTreeReaderValue<UInt_t> nMediumMuonICHEP = {fReader, "nMediumMuonICHEP"};
 //    TTreeReaderValue<UInt_t> nTightMuon = {fReader, "nTightMuon"};
 //    TTreeReaderValue<UInt_t> nWWLooseCBVIDMedElec = {fReader, "nWWLooseCBVIDMedElec"};
-//    TTreeReaderValue<UInt_t> nWWLooseElec = {fReader, "nWWLooseElec"};
-//    TTreeReaderValue<UInt_t> nWZLooseMuon = {fReader, "nWZLooseMuon"};
+    TTreeReaderValue<UInt_t> nWWLooseElec = {fReader, "nWWLooseElec"};
+    TTreeReaderValue<UInt_t> nWZLooseMuon = {fReader, "nWZLooseMuon"};
 //    TTreeReaderValue<UInt_t> nWZMediumMuon = {fReader, "nWZMediumMuon"};
 //    TTreeReaderValue<UInt_t> nvtx = {fReader, "nvtx"};
 //    TTreeReaderValue<UInt_t> run = {fReader, "run"};
@@ -144,8 +146,8 @@ public :
 //    TTreeReaderValue<Float_t> e1PFNeutralIso = {fReader, "e1PFNeutralIso"};
 //    TTreeReaderValue<Float_t> e1PFPUIso = {fReader, "e1PFPUIso"};
 //    TTreeReaderValue<Float_t> e1PFPhotonIso = {fReader, "e1PFPhotonIso"};
-//    TTreeReaderValue<Float_t> e1PVDXY = {fReader, "e1PVDXY"};
-//    TTreeReaderValue<Float_t> e1PVDZ = {fReader, "e1PVDZ"};
+    TTreeReaderValue<Float_t> e1PVDXY = {fReader, "e1PVDXY"};
+    TTreeReaderValue<Float_t> e1PVDZ = {fReader, "e1PVDZ"};
 //    TTreeReaderValue<Float_t> e1Phi = {fReader, "e1Phi"};
 //    TTreeReaderValue<Float_t> e1Pt = {fReader, "e1Pt"};
 //    TTreeReaderValue<Float_t> e1RelPFIsoRho = {fReader, "e1RelPFIsoRho"};
@@ -160,8 +162,8 @@ public :
 //    TTreeReaderValue<Float_t> e1ZZIso = {fReader, "e1ZZIso"};
 //    TTreeReaderValue<Bool_t> e1IsCBVIDLoose = {fReader, "e1IsCBVIDLoose"};
 //    TTreeReaderValue<Bool_t> e1IsCBVIDMedium = {fReader, "e1IsCBVIDMedium"};
-//    TTreeReaderValue<Bool_t> e1IsCBVIDTight = {fReader, "e1IsCBVIDTight"};
-//    TTreeReaderValue<Bool_t> e1IsEB = {fReader, "e1IsEB"};
+    TTreeReaderValue<Bool_t> e1IsCBVIDTight = {fReader, "e1IsCBVIDTight"};
+    TTreeReaderValue<Bool_t> e1IsEB = {fReader, "e1IsEB"};
 //    TTreeReaderValue<Bool_t> e1IsGap = {fReader, "e1IsGap"};
 //    TTreeReaderValue<Bool_t> e1IsWWLoose = {fReader, "e1IsWWLoose"};
 //    TTreeReaderValue<Bool_t> e1ZZIsoPass = {fReader, "e1ZZIsoPass"};
@@ -191,8 +193,8 @@ public :
 //    TTreeReaderValue<Float_t> e2PFNeutralIso = {fReader, "e2PFNeutralIso"};
 //    TTreeReaderValue<Float_t> e2PFPUIso = {fReader, "e2PFPUIso"};
 //    TTreeReaderValue<Float_t> e2PFPhotonIso = {fReader, "e2PFPhotonIso"};
-//    TTreeReaderValue<Float_t> e2PVDXY = {fReader, "e2PVDXY"};
-//    TTreeReaderValue<Float_t> e2PVDZ = {fReader, "e2PVDZ"};
+    TTreeReaderValue<Float_t> e2PVDXY = {fReader, "e2PVDXY"};
+    TTreeReaderValue<Float_t> e2PVDZ = {fReader, "e2PVDZ"};
 //    TTreeReaderValue<Float_t> e2Phi = {fReader, "e2Phi"};
 //    TTreeReaderValue<Float_t> e2Pt = {fReader, "e2Pt"};
 //    TTreeReaderValue<Float_t> e2RelPFIsoRho = {fReader, "e2RelPFIsoRho"};
@@ -207,8 +209,8 @@ public :
 //    TTreeReaderValue<Float_t> e2ZZIso = {fReader, "e2ZZIso"};
 //    TTreeReaderValue<Bool_t> e2IsCBVIDLoose = {fReader, "e2IsCBVIDLoose"};
 //    TTreeReaderValue<Bool_t> e2IsCBVIDMedium = {fReader, "e2IsCBVIDMedium"};
-//    TTreeReaderValue<Bool_t> e2IsCBVIDTight = {fReader, "e2IsCBVIDTight"};
-//    TTreeReaderValue<Bool_t> e2IsEB = {fReader, "e2IsEB"};
+    TTreeReaderValue<Bool_t> e2IsCBVIDTight = {fReader, "e2IsCBVIDTight"};
+    TTreeReaderValue<Bool_t> e2IsEB = {fReader, "e2IsEB"};
 //    TTreeReaderValue<Bool_t> e2IsGap = {fReader, "e2IsGap"};
 //    TTreeReaderValue<Bool_t> e2IsWWLoose = {fReader, "e2IsWWLoose"};
 //    TTreeReaderValue<Bool_t> e2ZZIsoPass = {fReader, "e2ZZIsoPass"};
@@ -225,7 +227,7 @@ public :
 //    TTreeReaderValue<Float_t> e3EffScaleFactorError = {fReader, "e3EffScaleFactorError"};
 //    TTreeReaderValue<Float_t> e3EffectiveArea = {fReader, "e3EffectiveArea"};
 //    TTreeReaderValue<Float_t> e3Energy = {fReader, "e3Energy"};
-//    TTreeReaderValue<Float_t> e3Eta = {fReader, "e3Eta"};
+    TTreeReaderValue<Float_t> e3Eta = {fReader, "e3Eta"};
 //    TTreeReaderValue<Float_t> e3GenEta = {fReader, "e3GenEta"};
 //    TTreeReaderValue<Float_t> e3GenPhi = {fReader, "e3GenPhi"};
 //    TTreeReaderValue<Float_t> e3GenPt = {fReader, "e3GenPt"};
@@ -238,10 +240,10 @@ public :
 //    TTreeReaderValue<Float_t> e3PFNeutralIso = {fReader, "e3PFNeutralIso"};
 //    TTreeReaderValue<Float_t> e3PFPUIso = {fReader, "e3PFPUIso"};
 //    TTreeReaderValue<Float_t> e3PFPhotonIso = {fReader, "e3PFPhotonIso"};
-//    TTreeReaderValue<Float_t> e3PVDXY = {fReader, "e3PVDXY"};
-//    TTreeReaderValue<Float_t> e3PVDZ = {fReader, "e3PVDZ"};
+    TTreeReaderValue<Float_t> e3PVDXY = {fReader, "e3PVDXY"};
+    TTreeReaderValue<Float_t> e3PVDZ = {fReader, "e3PVDZ"};
 //    TTreeReaderValue<Float_t> e3Phi = {fReader, "e3Phi"};
-//    TTreeReaderValue<Float_t> e3Pt = {fReader, "e3Pt"};
+    TTreeReaderValue<Float_t> e3Pt = {fReader, "e3Pt"};
 //    TTreeReaderValue<Float_t> e3RelPFIsoRho = {fReader, "e3RelPFIsoRho"};
 //    TTreeReaderValue<Float_t> e3Rho = {fReader, "e3Rho"};
 //    TTreeReaderValue<Float_t> e3SCEnergy = {fReader, "e3SCEnergy"};
@@ -254,8 +256,8 @@ public :
 //    TTreeReaderValue<Float_t> e3ZZIso = {fReader, "e3ZZIso"};
 //    TTreeReaderValue<Bool_t> e3IsCBVIDLoose = {fReader, "e3IsCBVIDLoose"};
 //    TTreeReaderValue<Bool_t> e3IsCBVIDMedium = {fReader, "e3IsCBVIDMedium"};
-//    TTreeReaderValue<Bool_t> e3IsCBVIDTight = {fReader, "e3IsCBVIDTight"};
-//    TTreeReaderValue<Bool_t> e3IsEB = {fReader, "e3IsEB"};
+    TTreeReaderValue<Bool_t> e3IsCBVIDTight = {fReader, "e3IsCBVIDTight"};
+    TTreeReaderValue<Bool_t> e3IsEB = {fReader, "e3IsEB"};
 //    TTreeReaderValue<Bool_t> e3IsGap = {fReader, "e3IsGap"};
 //    TTreeReaderValue<Bool_t> e3IsWWLoose = {fReader, "e3IsWWLoose"};
 //    TTreeReaderValue<Bool_t> e3ZZIsoPass = {fReader, "e3ZZIsoPass"};
