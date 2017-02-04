@@ -23,8 +23,8 @@ chain = ROOT.TChain("eee/ntuple")
 for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_*Electron*"):
     print directory + "/*"
     print chain.Add(directory + "/*")
-ROOT.gROOT.LoadMacro("SelectorBase.cc+")
-ROOT.gROOT.LoadMacro("FakeRateSelector.C+")
+ROOT.gROOT.LoadMacro("Selectors/SelectorBase.cc+")
+ROOT.gROOT.LoadMacro("Selectors/FakeRateSelector.cc+")
 select = ROOT.FakeRateSelector()
 chain.Process(select)
 
