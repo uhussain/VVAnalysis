@@ -23,8 +23,6 @@
 
 class FakeRateSelector : public SelectorBase {
 public :
-    TTreeReader    fReader;  //!the tree reader
-    TTree       *fChain = 0;  //!pointer to the analyzed TTree or TChain
     TH1D* fMassHist;
     // Readers to access the data (delete the ones you do not need).
 //    TTreeReaderValue<Float_t> Energy = {fReader, "Energy"};
@@ -295,7 +293,6 @@ public :
     virtual ~FakeRateSelector() {}
     virtual Bool_t Process(Long64_t entry) override;
     virtual void   SetupNewDirectory() override;
-    virtual void   Init(TTree *tree);
 
     ClassDefOverride(FakeRateSelector,0);
 
