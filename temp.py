@@ -23,7 +23,6 @@ ROOT.gProof.Load("SelectorBase.cc+")
 #ROOT.gROOT.LoadMacro("SelectorBase.cc+")
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
-#for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_*Electron*"):
 for chan in ["eee", "eem", "emm", "mmm"]:
     selector_name = "FakeRateSelector"+chan.upper()
     #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
@@ -32,24 +31,22 @@ for chan in ["eee", "eem", "emm", "mmm"]:
 #selector_name = "SelectorBase"
 #ROOT.gProof.Load("%s.cc+" % selector_name)
 #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
-for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_SingleElectron_Run2016H-PromptReco-v3-WZxsec2016-3LooseLeptons-*"):
-    name = directory.split("/")[-1]
+selection = "WZxsec2016/3LooseLeptons"
+for dataset in ["data_MuonEG_Run2016H-PromptReco-v3"]:
     for chan in ["eee", "eem", "emm", "mmm"]:
-        chain = ROOT.TChain("%s/ntuple" % chan)
-        chain.Add(directory + "/*")
-        chain.SetProof()
+        proof_path = "_".join([dataset, "%s#/%s/ntuple" % (selection.replace("/", "_"), chan)])
         selector_name = "FakeRateSelector"+chan.upper()
-        select = getattr(ROOT, selector_name)(name)
+        select = getattr(ROOT, selector_name)(dataset)
         inputs = ROOT.TList()
         select.SetInputList(inputs)
-        tname = ROOT.TNamed("name", name)
+        tname = ROOT.TNamed("name", dataset) 
         inputs.Add(tname)
-        chain.Process(select)
+        ROOT.gProof.Process(proof_path, select, "")
         for item in select.GetOutputList():
             if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
                 continue
             writeOutputListItem(item, fOut)
-        filedir = fOut.Get(name)
+        filedir = fOut.Get(dataset)
         filedir.cd()
         passingLoose2D = filedir.Get("passingLoose2D_"+ chan)
         passingTight2D = filedir.Get("passingTight2D_"+ chan)
