@@ -20,22 +20,26 @@ def writeOutputListItem(item, directory):
 ROOT.TProof.Open("workers=2")
 ROOT.gProof.SetParameter("PROOF_UseTreeCache", 0)
 ROOT.gProof.Load("SelectorBase.cc+")
-#ROOT.gROOT.LoadMacro("Selectors/SelectorBase.cc+")
+#ROOT.gROOT.LoadMacro("SelectorBase.cc+")
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
 #for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_*Electron*"):
-for chan in ["eee", "eem", "emm", "mmm"]:
-    selector_name = "FakeRateSelector"+chan.upper()
-    #ROOT.gROOT.LoadMacro("Selectors/%s.cc+" % selector_name)
-    ROOT.gProof.Load("%s.cc+" % selector_name)
+#for chan in ["eee", "eem", "emm", "mmm"]:
+#    selector_name = "FakeRateSelector"+chan.upper()
+#    #ROOT.gROOT.LoadMacro("Selectors/%s.cc+" % selector_name)
+#    ROOT.gProof.Load("%s.cc+" % selector_name)
+#selector_name = "FakeRateSelector"
+selector_name = "SelectorBase"
+#ROOT.gProof.Load("%s.cc+" % selector_name)
+#ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
 for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_SingleElectron_Run2016H-PromptReco-v3-WZxsec2016-3LooseLeptons-*"):
     name = directory.split("/")[-1]
     for chan in ["eee", "eem", "emm", "mmm"]:
         chain = ROOT.TChain("%s/ntuple" % chan)
         chain.Add(directory + "/*")
         chain.SetProof()
-        selector_name = "FakeRateSelector"+chan.upper()
-        select = getattr(ROOT, "FakeRateSelector"+chan.upper())(name)
+        #selector_name = "FakeRateSelector"+chan.upper()
+        select = getattr(ROOT, selector_name)()
         chain.Process(select)
         for item in select.GetOutputList():
             writeOutputListItem(item, fOut)

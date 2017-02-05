@@ -27,7 +27,7 @@ public :
 
   TTreeReaderValue<Float_t> Mass = {fReader, "Mass"};
 
-  SelectorBase(TTree * /*tree*/ =0) { }
+  SelectorBase(TTree * /*tree*/ =0) : name_("Unnamed") { }
   SelectorBase(const char* name, TTree * /*tree*/ =0) : name_(name) { }
   virtual ~SelectorBase() { }
   virtual Int_t  Version() const { return 2; }

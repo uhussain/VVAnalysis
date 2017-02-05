@@ -1,12 +1,12 @@
 // Modified from Nick Smith, U. Wisconsin
 #include "SelectorBase.h"
+#include <iostream>
 
 ClassImp(SelectorBase)
 
 void SelectorBase::Init(TTree *tree)
 {
     fReader.SetTree(tree);
-
     const char* dataset = name_;
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(dataset));
     if ( currentHistDir_ == nullptr ) {
@@ -20,6 +20,7 @@ void SelectorBase::Init(TTree *tree)
             Abort(Form("SelectorBase: Size of allObjects has changed!: %lu to %lu", existingObjectPtrsSize, allObjects_.size()));
         }
     }
+    UpdateDirectory();
 }
 
 Bool_t SelectorBase::Notify()
