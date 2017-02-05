@@ -4,8 +4,10 @@ import glob
 
 def writeOutputListItem(item, directory):
     if item.ClassName() == "TList":
-        d = directory.mkdir(item.GetName())
-        ROOT.SetOwnership(d, False)
+        d = directory.Get(item.GetName())
+        if not d:
+            d = directory.mkdir(item.GetName())
+            ROOT.SetOwnership(d, False)
         for subItem in item:
             writeOutputListItem(subItem, d)
     elif hasattr(item, 'Write'):
@@ -16,36 +18,38 @@ def writeOutputListItem(item, directory):
         print repr(item)
 
 ROOT.gROOT.LoadMacro("Selectors/SelectorBase.cc+")
-ROOT.gROOT.LoadMacro("Selectors/FakeRateSelector.cc+")
-chain = ROOT.TChain("eee/ntuple")
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
-for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_*Electron*"):
-    chain.Add(directory + "/*")
+#for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_*Electron*"):
+for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_SingleElectron_Run2016H-PromptReco-v3-WZxsec2016-3LooseLeptons-*"):
     name = directory.split("/")[-1]
-    chan = "eee"
-    select = ROOT.FakeRateSelector(name, chan)
-    chain.Process(select)
-    for item in select.GetOutputList():
-        writeOutputListItem(item, fOut)
-    filedir = fOut.Get(name)
-    filedir.cd()
-    passingLoose2D = filedir.Get("passingLoose2D_"+ chan)
-    passingTight2D = filedir.Get("passingTight2D_"+ chan)
-    ratio2D = passingTight2D.Clone("ratio2D_"+chan)
-    ratio2D.Divide(passingLoose2D) 
-    ratio2D.Write()
-    passingLoose1DPt = filedir.Get("passingLoose1DPt_"+ chan)
-    passingTight1DPt = filedir.Get("passingTight1DPt_"+ chan)
-    ratio1DPt = passingTight1DPt.Clone("ratio1DPt_"+chan)
-    ratio1DPt.Divide(passingLoose1DPt) 
-    ratio1DPt.Write()
-    passingLoose1DEta = filedir.Get("passingLoose1DEta_"+ chan)
-    passingTight1DEta = filedir.Get("passingTight1DEta_"+ chan)
-    ratio1DEta = passingTight1DEta.Clone("ratio1DEta_"+chan)
-    ratio1DEta.Divide(passingLoose1DEta) 
-    ratio1DEta.Write()
-    fOut.cd()
+    for chan in ["eee", "eem", "emm", "mmm"]:
+        chain = ROOT.TChain("%s/ntuple" % chan)
+        chain.Add(directory + "/*")
+        selector_name = "FakeRateSelector"+chan.upper()
+        ROOT.gROOT.LoadMacro("Selectors/%s.cc+" % selector_name)
+        select = getattr(ROOT, "FakeRateSelector"+chan.upper())(name)
+        chain.Process(select)
+        for item in select.GetOutputList():
+            writeOutputListItem(item, fOut)
+        filedir = fOut.Get(name)
+        filedir.cd()
+        passingLoose2D = filedir.Get("passingLoose2D_"+ chan)
+        passingTight2D = filedir.Get("passingTight2D_"+ chan)
+        ratio2D = passingTight2D.Clone("ratio2D_"+chan)
+        ratio2D.Divide(passingLoose2D) 
+        ratio2D.Write()
+        passingLoose1DPt = filedir.Get("passingLoose1DPt_"+ chan)
+        passingTight1DPt = filedir.Get("passingTight1DPt_"+ chan)
+        ratio1DPt = passingTight1DPt.Clone("ratio1DPt_"+chan)
+        ratio1DPt.Divide(passingLoose1DPt) 
+        ratio1DPt.Write()
+        passingLoose1DEta = filedir.Get("passingLoose1DEta_"+ chan)
+        passingTight1DEta = filedir.Get("passingTight1DEta_"+ chan)
+        ratio1DEta = passingTight1DEta.Clone("ratio1DEta_"+chan)
+        ratio1DEta.Divide(passingLoose1DEta) 
+        ratio1DEta.Write()
+        fOut.cd()
 
 #testdir = fOut.Get(name)
 #print "Passing tight has %i entries" % passingTight.GetEntries()
