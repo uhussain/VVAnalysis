@@ -34,6 +34,9 @@ void SelectorBase::Begin(TTree * /*tree*/)
 
 void SelectorBase::SlaveBegin(TTree * /*tree*/)
 {
+    TNamed* name = (TNamed *) GetInputList()->FindObject("name");
+    if (name != nullptr)
+        name_ = name->GetTitle();
 }
 
 Bool_t SelectorBase::Process(Long64_t entry)

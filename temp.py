@@ -26,10 +26,10 @@ fOut = ROOT.TFile(tmpFileName, "recreate")
 #for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_*Electron*"):
 for chan in ["eee", "eem", "emm", "mmm"]:
     selector_name = "FakeRateSelector"+chan.upper()
-    #ROOT.gROOT.LoadMacro("Selectors/%s.cc+" % selector_name)
+    #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
     ROOT.gProof.Load("%s.cc+" % selector_name)
 #selector_name = "FakeRateSelector"
-selector_name = "SelectorBase"
+#selector_name = "SelectorBase"
 #ROOT.gProof.Load("%s.cc+" % selector_name)
 #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
 for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-data_SingleElectron_Run2016H-PromptReco-v3-WZxsec2016-3LooseLeptons-*"):
@@ -39,10 +39,15 @@ for directory in glob.glob("/data/kelong/DibosonAnalysisData/3LooseLeptons/2017-
         chain.Add(directory + "/*")
         chain.SetProof()
         selector_name = "FakeRateSelector"+chan.upper()
-        select = getattr(ROOT, selector_name)(name, 0)
+        select = getattr(ROOT, selector_name)(name)
+        inputs = ROOT.TList()
+        select.SetInputList(inputs)
+        tname = ROOT.TNamed("name", name)
+        inputs.Add(tname)
         chain.Process(select)
         for item in select.GetOutputList():
-            print item
+            if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
+                continue
             writeOutputListItem(item, fOut)
         filedir = fOut.Get(name)
         filedir.cd()
