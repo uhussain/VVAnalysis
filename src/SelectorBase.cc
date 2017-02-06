@@ -1,5 +1,5 @@
 // Modified from Nick Smith, U. Wisconsin
-#include "SelectorBase.h"
+#include "Analysis/WZAnalysis/interface/SelectorBase.h"
 #include <iostream>
 
 ClassImp(SelectorBase)

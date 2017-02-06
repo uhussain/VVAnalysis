@@ -1,9 +1,7 @@
-#define FakeRateSelectorEEM_cxx
-
-#include "FakeRateSelectorEEM.h"
+#include "Analysis/WZAnalysis/interface/FakeRateSelectorEEE.h"
 #include <TStyle.h>
 
-Bool_t FakeRateSelectorEEM::Process(Long64_t entry)
+Bool_t FakeRateSelectorEEE::Process(Long64_t entry)
 {
     if (! SelectorBase::Process(entry)) return false;
     if (std::abs(static_cast<int>(*nWWLooseElec + *nWZLooseMuon) - 3) > 0.1)
@@ -17,23 +15,25 @@ Bool_t FakeRateSelectorEEM::Process(Long64_t entry)
             ( *e2IsEB ? *e2PVDXY < 0.05 : *e2PVDXY < 0.1) &&
             ( *e2IsEB ? *e2PVDZ < 0.1 : *e2PVDZ < 0.2)))
         return false;
-    passingLoose2D_->Fill(*mPt, *mEta);
-    passingLoose1DPt_->Fill(*mPt);
-    passingLoose1DEta_->Fill(*mEta);
-    if (*mIsTightMuon && *mRelPFIsoDBR04 < 0.15) {
-        passingTight2D_->Fill(*mPt, *mEta);
-        passingTight1DPt_->Fill(*mPt);
-        passingTight1DEta_->Fill(*mEta);
+    passingLoose2D_->Fill(*e3Pt, *e3Eta);
+    passingLoose1DPt_->Fill(*e3Pt);
+    passingLoose1DEta_->Fill(*e3Eta);
+    if (*e3IsCBVIDTight &&
+        ( *e3IsEB ? *e3PVDXY < 0.05 : *e3PVDXY < 0.1) &&
+        ( *e3IsEB ? *e3PVDZ < 0.1 : *e3PVDZ < 0.2)) {
+        passingTight2D_->Fill(*e3Pt, *e3Eta);
+        passingTight1DPt_->Fill(*e3Pt);
+        passingTight1DEta_->Fill(*e3Eta);
     }
 
     return true;
 }
 
-void FakeRateSelectorEEM::SetupNewDirectory()
+void FakeRateSelectorEEE::SetupNewDirectory()
 {
     // Must call base class setup
     SelectorBase::SetupNewDirectory();
-    const std::string channel = "eem";
+    const std::string channel = "eee";
     AddObject<TH2D>(passingTight2D_, (std::string("passingTight2D_") + channel).c_str(), 
         "Tight leptons; p_{T} [GeV]; Eta", 8, 10, 50, 5, -2.5, 2.5);
     AddObject<TH1D>(passingTight1DPt_, (std::string("passingTight1DPt_") + channel).c_str(), 
@@ -47,4 +47,3 @@ void FakeRateSelectorEEM::SetupNewDirectory()
     AddObject<TH1D>(passingLoose1DEta_, (std::string("passingLoose1DEta_") + channel).c_str(), 
         "Loose leptons; #eta; Events", 5, -2.5, 2.5);
 }
-

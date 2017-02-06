@@ -20,7 +20,7 @@
 
 // Headers needed by this particular selector
 #include <vector>
-#include "SelectorBase.h"
+#include "Analysis/WZAnalysis/interface/SelectorBase.h"
 
 class FakeRateSelectorEEM : public SelectorBase {
 public :

@@ -5,8 +5,8 @@
 // found on file: /data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-wz3lnu-powheg-WZxsec2016-3LooseLeptons-v1/skim-ntuplize_1.root
 //////////////////////////////////////////////////////////
 
-#ifndef FakeRateSelectorEMM_h
-#define FakeRateSelectorEMM_h
+#ifndef FakeRateSelectorMMM_h
+#define FakeRateSelectorMMM_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -20,9 +20,9 @@
 
 // Headers needed by this particular selector
 #include <vector>
-#include "SelectorBase.h"
+#include "Analysis/WZAnalysis/interface/SelectorBase.h"
 
-class FakeRateSelectorEMM : public SelectorBase {
+class FakeRateSelectorMMM : public SelectorBase {
 public :
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
@@ -31,14 +31,8 @@ public :
     TH1D* passingLoose1DPt_;
     TH1D* passingLoose1DEta_;
     TTreeReaderValue<Float_t> type1_pfMETEt = {fReader, "type1_pfMETEt"};
-    TTreeReaderValue<UInt_t> nWWLooseElec = {fReader, "nWWLooseElec"};
     TTreeReaderValue<UInt_t> nWZLooseMuon = {fReader, "nWZLooseMuon"};
-    TTreeReaderValue<Float_t> ePVDXY = {fReader, "ePVDXY"};
-    TTreeReaderValue<Float_t> ePVDZ = {fReader, "ePVDZ"};
-    TTreeReaderValue<Bool_t> eIsCBVIDTight = {fReader, "eIsCBVIDTight"};
-    TTreeReaderValue<Bool_t> eIsEB = {fReader, "eIsEB"};
-    TTreeReaderValue<Float_t> ePt = {fReader, "ePt"};
-    TTreeReaderValue<Float_t> eEta = {fReader, "eEta"};
+    TTreeReaderValue<UInt_t> nWWLooseElec = {fReader, "nWWLooseElec"};
     TTreeReaderValue<Float_t> m1Pt = {fReader, "m1Pt"};
     TTreeReaderValue<Float_t> m1Eta = {fReader, "m1Eta"};
     TTreeReaderValue<Bool_t> m1IsTightMuon = {fReader, "m1IsTightMuon"};
@@ -47,17 +41,22 @@ public :
     TTreeReaderValue<Float_t> m2Eta = {fReader, "m2Eta"};
     TTreeReaderValue<Bool_t> m2IsTightMuon = {fReader, "m2IsTightMuon"};
     TTreeReaderValue<Float_t> m2RelPFIsoDBR04 = {fReader, "m2RelPFIsoDBR04"};
+    TTreeReaderValue<Float_t> m3Pt = {fReader, "m3Pt"};
+    TTreeReaderValue<Float_t> m3Eta = {fReader, "m3Eta"};
+    TTreeReaderValue<Bool_t> m3IsTightMuon = {fReader, "m3IsTightMuon"};
+    TTreeReaderValue<Float_t> m3RelPFIsoDBR04 = {fReader, "m3RelPFIsoDBR04"};
 
-    FakeRateSelectorEMM(TTree * /*tree*/ =0) { }
-    FakeRateSelectorEMM(const char* name, TTree * /*tree*/ =0) : SelectorBase(name, 0) { }
-    virtual ~FakeRateSelectorEMM() { }
+    FakeRateSelectorMMM(TTree * /*tree*/ =0) { }
+    FakeRateSelectorMMM(const char* name, TTree * /*tree*/ =0) : SelectorBase(name, 0) { }
+    virtual ~FakeRateSelectorMMM() { }
     virtual void   SetupNewDirectory() override;
     virtual Bool_t Process(Long64_t entry) override;
 
-    ClassDefOverride(FakeRateSelectorEMM,0);
+    ClassDefOverride(FakeRateSelectorMMM,0);
 
 };
 
 #endif
+
 
 
