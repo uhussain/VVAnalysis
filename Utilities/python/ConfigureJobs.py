@@ -52,7 +52,7 @@ def getListOfFiles(filelist, manager_path):
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
-        if "WZxsec2016" in name:
+        if name == "WZxsec2016":
             names += json.load(open("/afs/cern.ch/user/k/kelong/work/"
                 "AnalysisDatasetManager/FileInfo/WZxsec2016/ntuples.json")).keys()
         elif "*" in name:

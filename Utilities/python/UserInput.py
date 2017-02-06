@@ -31,7 +31,7 @@ def getDefaultParser():
                         " in selecting the cut json")
     parser.add_argument("-f", "--filenames", 
                         type=lambda x : [i.strip() for i in x.split(',')],
-                        required=True, help="List of input file names, "
+                        default=["WZxsec2016"], help="List of input file names, "
                         "as defined in AnalysisDatasetManager, separated "
                         "by commas")
     return parser

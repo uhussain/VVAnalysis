@@ -24,8 +24,8 @@ def getComLineArgs():
         action='store_true', help="Don't use proof")
     return vars(parser.parse_args())
 
+args = getComLineArgs()
 ROOT.TProof.Open("workers=12")
-ROOT.gProof.SetParameter("PROOF_UseTreeCache", 0)
 ROOT.gProof.Load("Selectors/SelectorBase.cc+")
 #ROOT.gROOT.LoadMacro("SelectorBase.cc+")
 tmpFileName = "temp.root" 
@@ -38,12 +38,11 @@ for chan in ["eee", "eem", "emm", "mmm"]:
 #selector_name = "SelectorBase"
 #ROOT.gProof.Load("%s.cc+" % selector_name)
 #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
-args = getComLineArgs()
 path = ConfigureJobs.getManagerPath()
 for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
     for chan in ["eee", "eem", "emm", "mmm"]:
-        proof_path = "_".join([dataset, args['analysis'], args['selection'],
-            "#%s/ntuple" % chan])
+        proof_path = "_".join([dataset, args['analysis'], 
+            args['selection']+("#/%s/ntuple" % chan)])
         selector_name = "FakeRateSelector"+chan.upper()
         select = getattr(ROOT, selector_name)(dataset)
         inputs = ROOT.TList()
@@ -56,9 +55,14 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
                 continue
             writeOutputListItem(item, fOut)
         filedir = fOut.Get(dataset)
+        if not filedir:
+            print "Failed to process dataset ", dataset
+            continue
         filedir.cd()
         passingLoose2D = filedir.Get("passingLoose2D_"+ chan)
         passingTight2D = filedir.Get("passingTight2D_"+ chan)
+        if not passingTight2D:
+            continue
         ratio2D = passingTight2D.Clone("ratio2D_"+chan)
         ratio2D.Divide(passingLoose2D) 
         ratio2D.Write()
