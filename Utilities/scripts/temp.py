@@ -25,31 +25,49 @@ def getComLineArgs():
     return vars(parser.parse_args())
 
 args = getComLineArgs()
-ROOT.TProof.Open("workers=12")
-ROOT.gProof.Load("Selectors/SelectorBase.cc+")
-#ROOT.gROOT.LoadMacro("SelectorBase.cc+")
+proof = 0
+if not args['withoutProof']:
+    ROOT.TProof.Open("workers=12")
+    ROOT.gProof.Load("Selectors/SelectorBase.cc+")
+    proof = ROOT.gProof
+else:
+    ROOT.gROOT.LoadMacro("./Selectors/SelectorBase.cc+")
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
 for chan in ["eee", "eem", "emm", "mmm"]:
     selector_name = "FakeRateSelector"+chan.upper()
-    #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
-    ROOT.gProof.Load("Selectors/%s.cc+" % selector_name)
+    if proof:
+        proof.Load("Selectors/%s.cc+" % selector_name)
+    else:
+        ROOT.gROOT.LoadMacro("./Selectors/%s.cc+" % selector_name)
 #selector_name = "FakeRateSelector"
 #selector_name = "SelectorBase"
-#ROOT.gProof.Load("%s.cc+" % selector_name)
+#proof.Load("%s.cc+" % selector_name)
 #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
 path = ConfigureJobs.getManagerPath()
 for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
     for chan in ["eee", "eem", "emm", "mmm"]:
-        proof_path = "_".join([dataset, args['analysis'], 
-            args['selection']+("#/%s/ntuple" % chan)])
         selector_name = "FakeRateSelector"+chan.upper()
         select = getattr(ROOT, selector_name)(dataset)
         inputs = ROOT.TList()
         select.SetInputList(inputs)
         tname = ROOT.TNamed("name", dataset) 
         inputs.Add(tname)
-        ROOT.gProof.Process(proof_path, select, "")
+        if proof:
+            proof_path = "_".join([dataset, args['analysis'], 
+                args['selection']+("#/%s/ntuple" % chan)])
+            proof.Process(proof_path, select, "")
+        else: 
+            chain = ROOT.TChain("%s/ntuple" % chan)
+            try:
+                file_path = ConfigureJobs.getInputFilesPath(dataset, 
+                    path, args['selection'], args['analysis'])
+            except ValueError as e:
+                print e
+                pass
+            chain.Add(file_path)
+            chain.Process(select)
+            continue
         for item in select.GetOutputList():
             if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
                 continue
