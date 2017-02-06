@@ -19,14 +19,14 @@ def writeOutputListItem(item, directory):
 
 ROOT.TProof.Open("workers=2")
 ROOT.gProof.SetParameter("PROOF_UseTreeCache", 0)
-ROOT.gProof.Load("SelectorBase.cc+")
+#ROOT.gProof.Load("SelectorBase.cc+")
 #ROOT.gROOT.LoadMacro("SelectorBase.cc+")
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
 for chan in ["eee", "eem", "emm", "mmm"]:
     selector_name = "FakeRateSelector"+chan.upper()
     #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
-    ROOT.gProof.Load("%s.cc+" % selector_name)
+    #ROOT.gProof.Load("%s.cc+" % selector_name)
 #selector_name = "FakeRateSelector"
 #selector_name = "SelectorBase"
 #ROOT.gProof.Load("%s.cc+" % selector_name)
