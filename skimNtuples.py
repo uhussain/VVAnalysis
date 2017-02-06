@@ -17,8 +17,8 @@ def getComLineArgs():
                             "SingleMuon", "SingleElectron", ""],
                         help="Name of trigger to select in data")
     parser.add_argument("-f", "--filelist", type=str,
-                        required=True, help="List of input file names "
-                        "to be processed (separated by commas)")
+                        required=True, help="Name of file containing "
+                        "list of inputs (one per line)")
     parser.add_argument("-a", "--analysis", type=str,
                         required=True, help="Analysis name, used"
                         " in selection the cut json")

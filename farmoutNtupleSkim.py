@@ -13,20 +13,7 @@ import math
 import logging
 
 def getComLineArgs():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--selection", type=str,
-                        required=True, help="Name of selection to make, "
-                        " as defined in Cuts/preselection.json")
-    parser.add_argument("-v", "--version", type=str,
-                        required=False, default="1",
-                        help="Version number, appended to name")
-    parser.add_argument("-a", "--analysis", type=str,
-                        required=True, help="Analysis name, used"
-                        " in selection the cut json")
-    parser.add_argument("-f", "--filelist", 
-                        type=lambda x : [i.strip() for i in x.split(',')],
-                        required=True, help="List of input file names "
-                        "to be processed (separated by commas)")
+    parser = UserInput.getDefaultParser()
     parser.add_argument("--noScaleFacs", action='store_true',
                         help="Don't add lepton and pilup scale factors to "
                         "ntuple (by default they are added)")
@@ -127,10 +114,7 @@ def main():
     args = getComLineArgs()
     path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
             "/afs/cern.ch/user/k/kelong/work"
-    if args['filelist'] == ["WZxsec2016"]:
-        args['filelist'] = json.load(
-            open("/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo/WZxsec2016/ntuples.json")).keys()
-    for file_name in ConfigureJobs.getListOfFiles(args['filelist'], path):
+    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path):
         try:
             farmoutNtupleSkim(file_name, path, args['selection'], 
                 args['analysis'], args['version'], args['noScaleFacs'], args['extraArgs'])

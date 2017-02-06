@@ -3,10 +3,6 @@
 #include "FakeRateSelectorEMM.h"
 #include <TStyle.h>
 
-void FakeRateSelectorEMM::SlaveBegin(TTree * /*tree*/)
-{
-}
-
 Bool_t FakeRateSelectorEMM::Process(Long64_t entry)
 {
     if (! SelectorBase::Process(entry)) return false;

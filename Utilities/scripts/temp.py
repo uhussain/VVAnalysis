@@ -1,6 +1,8 @@
-# coding: utf-8
 import ROOT
 import glob
+from python import UserInput
+from python import ConfigureJobs
+import os
 
 def writeOutputListItem(item, directory):
     if item.ClassName() == "TList":
@@ -16,25 +18,32 @@ def writeOutputListItem(item, directory):
     else:
         print "Couldn't write output item:"
         print repr(item)
+def getComLineArgs():
+    parser = UserInput.getDefaultParser()
+    parser.add_argument("--withoutProof", "-l", 
+        action='store_true', help="Don't use proof")
+    return vars(parser.parse_args())
 
-ROOT.TProof.Open("workers=2")
+ROOT.TProof.Open("workers=12")
 ROOT.gProof.SetParameter("PROOF_UseTreeCache", 0)
-ROOT.gProof.Load("SelectorBase.cc+")
+ROOT.gProof.Load("Selectors/SelectorBase.cc+")
 #ROOT.gROOT.LoadMacro("SelectorBase.cc+")
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
 for chan in ["eee", "eem", "emm", "mmm"]:
     selector_name = "FakeRateSelector"+chan.upper()
     #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
-    ROOT.gProof.Load("%s.cc+" % selector_name)
+    ROOT.gProof.Load("Selectors/%s.cc+" % selector_name)
 #selector_name = "FakeRateSelector"
 #selector_name = "SelectorBase"
 #ROOT.gProof.Load("%s.cc+" % selector_name)
 #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
-selection = "WZxsec2016/3LooseLeptons"
-for dataset in ["data_MuonEG_Run2016H-PromptReco-v3"]:
+args = getComLineArgs()
+path = ConfigureJobs.getManagerPath()
+for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
     for chan in ["eee", "eem", "emm", "mmm"]:
-        proof_path = "_".join([dataset, "%s#/%s/ntuple" % (selection.replace("/", "_"), chan)])
+        proof_path = "_".join([dataset, args['analysis'], args['selection'],
+            "#%s/ntuple" % chan])
         selector_name = "FakeRateSelector"+chan.upper()
         select = getattr(ROOT, selector_name)(dataset)
         inputs = ROOT.TList()

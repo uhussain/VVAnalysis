@@ -3,14 +3,6 @@
 #include "FakeRateSelectorMMM.h"
 #include <TStyle.h>
 
-void FakeRateSelectorMMM::SlaveBegin(TTree * /*tree*/)
-{
-     // The SlaveBegin() function is called after the Begin() function.
-     // When running with PROOF SlaveBegin() is called on each slave server.
-     // The tree argument is deprecated (on PROOF 0 is passed).
-
-}
-
 Bool_t FakeRateSelectorMMM::Process(Long64_t entry)
 {
     if (! SelectorBase::Process(entry)) return false;

@@ -4,7 +4,12 @@ import fnmatch
 import glob
 import subprocess
 import os
+import json
 
+def getManagerPath():
+    path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
+            "/afs/cern.ch/user/k/kelong/work"
+    return path
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
     selection_name = selection.split(",")[-1 ]
@@ -47,7 +52,10 @@ def getListOfFiles(filelist, manager_path):
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
-        if "*" in name:
+        if "WZxsec2016" in name:
+            names += json.load(open("/afs/cern.ch/user/k/kelong/work/"
+                "AnalysisDatasetManager/FileInfo/WZxsec2016/ntuples.json")).keys()
+        elif "*" in name:
             names += fnmatch.filter(valid_names, name)
         else:
             if name.split("__")[0] not in valid_names:

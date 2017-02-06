@@ -51,7 +51,6 @@ public :
     FakeRateSelectorEMM(TTree * /*tree*/ =0) { }
     FakeRateSelectorEMM(const char* name, TTree * /*tree*/ =0) : SelectorBase(name, 0) { }
     virtual ~FakeRateSelectorEMM() { }
-    virtual void   SlaveBegin(TTree *) override;
     virtual void   SetupNewDirectory() override;
     virtual Bool_t Process(Long64_t entry) override;
 

@@ -3,14 +3,6 @@
 #include "FakeRateSelectorEEE.h"
 #include <TStyle.h>
 
-void FakeRateSelectorEEE::SlaveBegin(TTree * /*tree*/)
-{
-     // The SlaveBegin() function is called after the Begin() function.
-     // When running with PROOF SlaveBegin() is called on each slave server.
-     // The tree argument is deprecated (on PROOF 0 is passed).
-
-}
-
 Bool_t FakeRateSelectorEEE::Process(Long64_t entry)
 {
     if (! SelectorBase::Process(entry)) return false;

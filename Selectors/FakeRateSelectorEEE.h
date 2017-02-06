@@ -53,12 +53,10 @@ public :
     FakeRateSelectorEEE(TTree * /*tree*/ =0) { }
     FakeRateSelectorEEE(const char* name, TTree * /*tree*/ =0) : SelectorBase(name, 0) { }
     virtual ~FakeRateSelectorEEE() { }
-    virtual void   SlaveBegin(TTree *) override;
     virtual void   SetupNewDirectory() override;
     virtual Bool_t Process(Long64_t entry) override;
 
     ClassDefOverride(FakeRateSelectorEEE,0);
-
 };
 
 #endif

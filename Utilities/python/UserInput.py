@@ -18,19 +18,20 @@ def readJson(json_file_name):
             print "Error reading JSON file %s. The error message was:" % json_file_name 
             print(err)
     return json_info
-def getComLineArgs():
+def getDefaultParser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-a", "--save_all", action='store_true',
-                        required=False, help="Save output of step separately")
-    parser.add_argument("-s", "--selections", 
-                        type=lambda x: OrderedDict((i.strip(),  '')  for i in x.split(",")),
-                        required=True, help="List of selections you wish to make "
-                        "(as defined in Cuts/definitions.json), separated by commas")
-    args = vars(parser.parse_args())
-    definitions_json = readJson("Cuts/definitions.json")
-    for selection in args['selections']:
-        if selection not in definitions_json.keys():
-            raise ValueError("Cut name must correspond to a definition in " 
-                "Cuts/definitions.json")
-        args['selections'][selection] = definitions_json[selection]
-    return args
+    parser.add_argument("-s", "--selection", type=str,
+                        required=True, help="Name of selection to make, "
+                        " as defined in Cuts/<analysis>/<selection>.json")
+    parser.add_argument("-v", "--version", type=str,
+                        required=False, default="1",
+                        help="Version number, appended to name")
+    parser.add_argument("-a", "--analysis", type=str,
+                        required=True, help="Analysis name, used"
+                        " in selecting the cut json")
+    parser.add_argument("-f", "--filenames", 
+                        type=lambda x : [i.strip() for i in x.split(',')],
+                        required=True, help="List of input file names, "
+                        "as defined in AnalysisDatasetManager, separated "
+                        "by commas")
+    return parser
