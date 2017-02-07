@@ -3,6 +3,7 @@ import ROOT
 import glob
 
 def writeOutputListItem(item, directory):
+    print item
     if item.ClassName() == "TList":
         d = directory.Get(item.GetName())
         if not d:
@@ -11,42 +12,54 @@ def writeOutputListItem(item, directory):
         for subItem in item:
             writeOutputListItem(subItem, d)
     elif hasattr(item, 'Write'):
+        print directory
         directory.cd()
         item.Write()
     else:
         print "Couldn't write output item:"
         print repr(item)
 
-ROOT.TProof.Open("workers=2")
-ROOT.gProof.SetParameter("PROOF_UseTreeCache", 0)
-#ROOT.gProof.Load("SelectorBase.cc+")
-#ROOT.gROOT.LoadMacro("SelectorBase.cc+")
+#ROOT.TProof.Open("workers=2")
+#ROOT.gProof.SetParameter("PROOF_UseTreeCache", 0)
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
-for chan in ["eee", "eem", "emm", "mmm"]:
-    selector_name = "FakeRateSelector"+chan.upper()
-    #ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
-    #ROOT.gProof.Load("%s.cc+" % selector_name)
-#selector_name = "FakeRateSelector"
-#selector_name = "SelectorBase"
-#ROOT.gProof.Load("%s.cc+" % selector_name)
-#ROOT.gROOT.LoadMacro("%s.cc+" % selector_name)
 selection = "WZxsec2016/3LooseLeptons"
-for dataset in ["data_MuonEG_Run2016H-PromptReco-v3"]:
-    for chan in ["eee", "eem", "emm", "mmm"]:
+for dataset in [
+    #"data_DoubleMuon_Run2016F-23Sep2016-v1" : {
+     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016F-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
+    #"data_DoubleMuon_Run2016G-23Sep2016-v1" : {
+     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016G-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
+    #"data_DoubleMuon_Run2016H-PromptReco-v2" : {
+     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016H-PromptReco-v2-WZxsec2016-DYControlFakeRate-v1/*",
+    #"data_DoubleMuon_Run2016H-PromptReco-v3" : {
+     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016H-PromptReco-v3-WZxsec2016-DYControlFakeRate-v1/*",
+    #"data_MuonEG_Run2016B-23Sep2016-v3" : {
+     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/*",
+    #"data_MuonEG_Run2016C-23Sep2016-v1" : {
+     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016C-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
+    #"data_MuonEG_Run2016D-23Sep2016-v1" : {
+]:
+    for chan in ["eee", ]:#"eem", "emm", "mmm"]:
         proof_path = "_".join([dataset, "%s#/%s/ntuple" % (selection.replace("/", "_"), chan)])
-        selector_name = "FakeRateSelector"+chan.upper()
-        select = getattr(ROOT, selector_name)(dataset)
+        #selector_name = "FakeRateSelector"+chan.upper()
+        selector_name = "SelectorBase"
+        select = getattr(ROOT, selector_name)()
         inputs = ROOT.TList()
         select.SetInputList(inputs)
-        tname = ROOT.TNamed("name", dataset) 
+        tname = ROOT.TNamed("name", dataset.split("/")[-2]) 
         inputs.Add(tname)
-        ROOT.gProof.Process(proof_path, select, "")
+        print select
+        chain = ROOT.TChain("%s/ntuple" % chan)
+        print chain.Add(dataset)
+        print chain.Process(select, "")
         for item in select.GetOutputList():
             if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
                 continue
             writeOutputListItem(item, fOut)
         filedir = fOut.Get(dataset)
+        if not filedir:
+            fOut.cd()
+            continue
         filedir.cd()
         passingLoose2D = filedir.Get("passingLoose2D_"+ chan)
         passingTight2D = filedir.Get("passingTight2D_"+ chan)
