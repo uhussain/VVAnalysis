@@ -42,38 +42,37 @@ void FakeRateSelectorEEM::Init(TTree *tree)
 
 void FakeRateSelectorEEM::SlaveBegin(TTree * /*tree*/)
 {
-    //const char* dataset = "Unnamed";
-    //if (GetInputList() != nullptr) {
-    //    TNamed* name = (TNamed *) GetInputList()->FindObject("name");
-    //    if (name != nullptr)
-    //        dataset = name->GetTitle();
-    //}
-    //const char* channel = "eee";
-    //const char* dataset = "test";
-    //passingTight2D_= new TH2D((std::string("passingTight2D_")+channel+"_"+dataset).c_str(),
-    //    "Tight leptons; p_{T} [GeV]; Eta", 8, 10, 50, 5, -2.5, 2.5);
-    ////passingTight2D_->SetDirectory(0);
-    ////fOutput->Add(passingTight2D_);
-    //passingTight1DPt_= new TH1D((std::string("passingTight1DPt_")+channel+"_"+dataset).c_str(),
-    //    "Tight leptons; p_{T} [GeV]", 8, 10, 50);
-    ////passingTight1DPt_->SetDirectory(0);
-    ////fOutput->Add(passingTight1DPt_);
-    //passingTight1DEta_ = new TH1D( (std::string("passingTight1DEta_")+channel+"_"+dataset).c_str(), 
-    //    "Tight leptons; #eta; Events", 5, -2.5, 2.5);
-    ////passingTight1DEta_->SetDirectory(0);
-    ////fOutput->Add(passingTight1DEta_);
-    //passingLoose2D_ = new TH2D((std::string("passingLoose2D_")+channel+"_"+dataset).c_str(), 
-    //    "Leptons passing tight failing loose; p_{T} [GeV]; Eta", 8, 10, 50, 5, -2.5, 2.5);
-    ////passingLoose2D_->SetDirectory(0);
-    ////fOutput->Add(passingLoose2D_);
-    //passingLoose1DPt_ = new TH1D((std::string("passingLoose1DPt_")+channel+"_"+dataset).c_str(), 
-    //    "Loose leptons; p_{T} [GeV]; Events", 8, 10, 50);
-    //passingLoose1DPt_->SetDirectory(0);
-    ////fOutput->Add(passingLoose1DPt_);
-    //passingLoose1DEta_ = new TH1D((std::string("passingLoose1DEta_")+channel+"_"+dataset).c_str(), 
-    //    "Loose leptons; #eta; Events", 5, -2.5, 2.5);
-    //passingLoose1DEta_->SetDirectory(0);
-    //fOutput->Add(passingLoose1DEta_);
+   // const char* dataset = "Unnamed";
+   // if (GetInputList() != nullptr) {
+   //     TNamed* name = (TNamed *) GetInputList()->FindObject("name");
+   //     if (name != nullptr)
+   //         dataset = name->GetTitle();
+   // }
+   // const char* channel = "eem";
+   // passingTight2D_= new TH2D((std::string("passingTight2D_")+channel+"_"+dataset).c_str(),
+   //     "Tight leptons; p_{T} [GeV]; Eta", 8, 10, 50, 5, -2.5, 2.5);
+   // passingTight2D_->SetDirectory(0);
+   // fOutput->Add(passingTight2D_);
+   // passingTight1DPt_= new TH1D((std::string("passingTight1DPt_")+channel+"_"+dataset).c_str(),
+   //     "Tight leptons; p_{T} [GeV]", 8, 10, 50);
+   // passingTight1DPt_->SetDirectory(0);
+   // fOutput->Add(passingTight1DPt_);
+   // passingTight1DEta_ = new TH1D( (std::string("passingTight1DEta_")+channel+"_"+dataset).c_str(), 
+   //     "Tight leptons; #eta; Events", 5, -2.5, 2.5);
+   // passingTight1DEta_->SetDirectory(0);
+   // fOutput->Add(passingTight1DEta_);
+   // passingLoose2D_ = new TH2D((std::string("passingLoose2D_")+channel+"_"+dataset).c_str(), 
+   //     "Leptons passing tight failing loose; p_{T} [GeV]; Eta", 8, 10, 50, 5, -2.5, 2.5);
+   // passingLoose2D_->SetDirectory(0);
+   // fOutput->Add(passingLoose2D_);
+   // passingLoose1DPt_ = new TH1D((std::string("passingLoose1DPt_")+channel+"_"+dataset).c_str(), 
+   //     "Loose leptons; p_{T} [GeV]; Events", 8, 10, 50);
+   // passingLoose1DPt_->SetDirectory(0);
+   // fOutput->Add(passingLoose1DPt_);
+   // passingLoose1DEta_ = new TH1D((std::string("passingLoose1DEta_")+channel+"_"+dataset).c_str(), 
+   //     "Loose leptons; #eta; Events", 5, -2.5, 2.5);
+   // passingLoose1DEta_->SetDirectory(0);
+   // fOutput->Add(passingLoose1DEta_);
 
     TString option = GetOption();
 
@@ -82,26 +81,26 @@ void FakeRateSelectorEEM::SlaveBegin(TTree * /*tree*/)
 Bool_t FakeRateSelectorEEM::Process(Long64_t entry)
 {
     fReader.SetEntry(entry);
-    //if (std::abs(static_cast<int>(*nWWLooseElec + *nWZLooseMuon) - 3) > 0.1)
-    //    return false;
+//    if (std::abs(static_cast<int>(*nWWLooseElec + *nWZLooseMuon) - 3) > 0.1)
+//        return false;
     if (*type1_pfMETEt > 30)
-        return false;
-    //if (!(*e1IsCBVIDTight &&
-    //        ( *e1IsEB ? *e1PVDXY < 0.05 : *e1PVDXY < 0.1) &&
-    //        ( *e1IsEB ? *e1PVDZ < 0.1 : *e1PVDZ < 0.2)) &&
-    //        (*e2IsCBVIDTight &&
-    //        ( *e2IsEB ? *e2PVDXY < 0.05 : *e2PVDXY < 0.1) &&
-    //        ( *e2IsEB ? *e2PVDZ < 0.1 : *e2PVDZ < 0.2)))
-    //    return false;
-    //passingLoose2D_->Fill(*mPt, *mEta);
-    //passingLoose1DPt_->Fill(*mPt);
-    //passingLoose1DEta_->Fill(*mEta);
-    //if (*mIsTightMuon && *mRelPFIsoDBR04 < 0.15) {
-    //    passingTight2D_->Fill(*mPt, *mEta);
-    //    passingTight1DPt_->Fill(*mPt);
-    //    passingTight1DEta_->Fill(*mEta);
-    //}
-
+        return true;
+//    if (!(*e1IsCBVIDTight &&
+//            ( *e1IsEB ? *e1PVDXY < 0.05 : *e1PVDXY < 0.1) &&
+//            ( *e1IsEB ? *e1PVDZ < 0.1 : *e1PVDZ < 0.2)) &&
+//            (*e2IsCBVIDTight &&
+//            ( *e2IsEB ? *e2PVDXY < 0.05 : *e2PVDXY < 0.1) &&
+//            ( *e2IsEB ? *e2PVDZ < 0.1 : *e2PVDZ < 0.2)))
+//        return false;
+//    passingLoose2D_->Fill(*mPt, *mEta);
+//    passingLoose1DPt_->Fill(*mPt);
+//    passingLoose1DEta_->Fill(*mEta);
+//    if (*mIsTightMuon && *mRelPFIsoDBR04 < 0.15) {
+//        passingTight2D_->Fill(*mPt, *mEta);
+//        passingTight1DPt_->Fill(*mPt);
+//        passingTight1DEta_->Fill(*mEta);
+//    }
+//
     return true;
 }
 

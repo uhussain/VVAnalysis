@@ -25,28 +25,28 @@ class FakeRateSelectorEEM : public TSelector {
 public :
     TTreeReader     fReader;  //!the tree reader
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
-    TList* histDir_;
-    TH2D* passingTight2D_;
-    TH1D* passingTight1DPt_;
-    TH1D* passingTight1DEta_;
-    TH2D* passingLoose2D_;
-    TH1D* passingLoose1DPt_;
-    TH1D* passingLoose1DEta_;
+    //TList* histDir_;
+    //TH2D* passingTight2D_;
+    //TH1D* passingTight1DPt_;
+    //TH1D* passingTight1DEta_;
+    //TH2D* passingLoose2D_;
+    //TH1D* passingLoose1DPt_;
+    //TH1D* passingLoose1DEta_;
     TTreeReaderValue<Float_t> type1_pfMETEt = {fReader, "type1_pfMETEt"};
-    TTreeReaderValue<UInt_t> nWWLooseElec = {fReader, "nWWLooseElec"};
-    TTreeReaderValue<UInt_t> nWZLooseMuon = {fReader, "nWZLooseMuon"};
-    TTreeReaderValue<Float_t> e1PVDXY = {fReader, "e1PVDXY"};
-    TTreeReaderValue<Float_t> e1PVDZ = {fReader, "e1PVDZ"};
-    TTreeReaderValue<Bool_t> e1IsCBVIDTight = {fReader, "e1IsCBVIDTight"};
-    TTreeReaderValue<Bool_t> e1IsEB = {fReader, "e1IsEB"};
-    TTreeReaderValue<Float_t> e2PVDXY = {fReader, "e2PVDXY"};
-    TTreeReaderValue<Float_t> e2PVDZ = {fReader, "e2PVDZ"};
-    TTreeReaderValue<Bool_t> e2IsCBVIDTight = {fReader, "e2IsCBVIDTight"};
-    TTreeReaderValue<Bool_t> e2IsEB = {fReader, "e2IsEB"};
-    TTreeReaderValue<Float_t> mPt = {fReader, "mPt"};
-    TTreeReaderValue<Float_t> mEta = {fReader, "mEta"};
-    TTreeReaderValue<Bool_t> mIsTightMuon = {fReader, "mIsTightMuon"};
-    TTreeReaderValue<Float_t> mRelPFIsoDBR04 = {fReader, "mRelPFIsoDBR04"};
+    //TTreeReaderValue<UInt_t> nWWLooseElec = {fReader, "nWWLooseElec"};
+    //TTreeReaderValue<UInt_t> nWZLooseMuon = {fReader, "nWZLooseMuon"};
+    //TTreeReaderValue<Float_t> e1PVDXY = {fReader, "e1PVDXY"};
+    //TTreeReaderValue<Float_t> e1PVDZ = {fReader, "e1PVDZ"};
+    //TTreeReaderValue<Bool_t> e1IsCBVIDTight = {fReader, "e1IsCBVIDTight"};
+    //TTreeReaderValue<Bool_t> e1IsEB = {fReader, "e1IsEB"};
+    //TTreeReaderValue<Float_t> e2PVDXY = {fReader, "e2PVDXY"};
+    //TTreeReaderValue<Float_t> e2PVDZ = {fReader, "e2PVDZ"};
+    //TTreeReaderValue<Bool_t> e2IsCBVIDTight = {fReader, "e2IsCBVIDTight"};
+    //TTreeReaderValue<Bool_t> e2IsEB = {fReader, "e2IsEB"};
+    //TTreeReaderValue<Float_t> mPt = {fReader, "mPt"};
+    //TTreeReaderValue<Float_t> mEta = {fReader, "mEta"};
+    //TTreeReaderValue<Bool_t> mIsTightMuon = {fReader, "mIsTightMuon"};
+    //TTreeReaderValue<Float_t> mRelPFIsoDBR04 = {fReader, "mRelPFIsoDBR04"};
 
    // Readers to access the data (delete the ones you do not need).
    FakeRateSelectorEEM(TTree * /*tree*/ =0) { }

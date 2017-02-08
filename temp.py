@@ -44,12 +44,12 @@ for chan in ["eem"]:#, "eem", "emm", "mmm"]:
     ]:
         proof_path = "_".join([dataset, "%s#/%s/ntuple" % (selection.replace("/", "_"), chan)])
         print chain.Add(dataset)
-    selector_name = "FakeRateSelector"+chan.upper()
+    selector_name = "FakeRate%sTest"%chan.upper()
     select = getattr(ROOT, selector_name)()
-    inputs = ROOT.TList()
-    select.SetInputList(inputs)
-    tname = ROOT.TNamed("name", "test") 
-    inputs.Add(tname)
+    #inputs = ROOT.TList()
+    #select.SetInputList(inputs)
+    #tname = ROOT.TNamed("name", "test") 
+    #inputs.Add(tname)
     print select
     print chain.Draw("Mass")
     print chain.Process(select, "")
