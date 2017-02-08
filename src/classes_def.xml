@@ -1,7 +1,6 @@
 <lcgdict>
   <class name="SelectorBase"/>
   <class name="FakeRateSelectorEEE"/>
-  <class name="FakeRateSelectorEEETest"/>
   <class name="FakeRateSelectorEEM"/>
   <class name="FakeRateSelectorEMM"/>
   <class name="FakeRateSelectorMMM"/>

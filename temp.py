@@ -25,43 +25,41 @@ def writeOutputListItem(item, directory):
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
 selection = "WZxsec2016/3LooseLeptons"
-for dataset in [
-    #"data_DoubleMuon_Run2016F-23Sep2016-v1" : {
-     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016F-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
-    #"data_DoubleMuon_Run2016G-23Sep2016-v1" : {
-     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016G-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
-    #"data_DoubleMuon_Run2016H-PromptReco-v2" : {
-     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016H-PromptReco-v2-WZxsec2016-DYControlFakeRate-v1/*",
-    #"data_DoubleMuon_Run2016H-PromptReco-v3" : {
-     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016H-PromptReco-v3-WZxsec2016-DYControlFakeRate-v1/*",
-    #"data_MuonEG_Run2016B-23Sep2016-v3" : {
-     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/*",
-    #"data_MuonEG_Run2016C-23Sep2016-v1" : {
-     "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016C-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
-    #"data_MuonEG_Run2016D-23Sep2016-v1" : {
-]:
-    for chan in ["eee"]:#, "eem", "emm", "mmm"]:
+for chan in ["eem"]:#, "eem", "emm", "mmm"]:
+    chain = ROOT.TChain("%s/ntuple" % chan)
+    for dataset in [
+        #"data_DoubleMuon_Run2016F-23Sep2016-v1" : {
+        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016F-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
+#        #"data_DoubleMuon_Run2016G-23Sep2016-v1" : {
+        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016G-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
+#        #"data_DoubleMuon_Run2016H-PromptReco-v2" : {
+        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016H-PromptReco-v2-WZxsec2016-DYControlFakeRate-v1/*",
+#        #"data_DoubleMuon_Run2016H-PromptReco-v3" : {
+        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016H-PromptReco-v3-WZxsec2016-DYControlFakeRate-v1/*",
+#        #"data_MuonEG_Run2016B-23Sep2016-v3" : {
+        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/*",
+        #"data_MuonEG_Run2016C-23Sep2016-v1" : {
+        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016C-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
+        #"data_MuonEG_Run2016D-23Sep2016-v1" : {
+    ]:
         proof_path = "_".join([dataset, "%s#/%s/ntuple" % (selection.replace("/", "_"), chan)])
-        selector_name = "FakeRateSelector"+chan.upper()+"Test"
-        #selector_name = "SelectorBase"
-        select = getattr(ROOT, selector_name)()
-        inputs = ROOT.TList()
-        select.SetInputList(inputs)
-        tname = ROOT.TNamed("name", dataset.split("/")[-2]) 
-        inputs.Add(tname)
-        print select
-        chain = ROOT.TChain("%s/ntuple" % chan)
         print chain.Add(dataset)
-        print chain.Process(select, "")
-        for item in select.GetOutputList():
-            if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
-                continue
-            writeOutputListItem(item, fOut)
-            print item
-        filedir = fOut.Get(dataset)
-        if not filedir:
-            fOut.cd()
+    selector_name = "FakeRateSelector"+chan.upper()
+    select = getattr(ROOT, selector_name)()
+    inputs = ROOT.TList()
+    select.SetInputList(inputs)
+    tname = ROOT.TNamed("name", "test") 
+    inputs.Add(tname)
+    print select
+    print chain.Draw("Mass")
+    print chain.Process(select, "")
+    for item in select.GetOutputList():
+        if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
             continue
+        writeOutputListItem(item, fOut)
+        print item
+    filedir = fOut.Get(dataset)
+    if filedir:
         filedir.cd()
         passingLoose2D = filedir.Get("passingLoose2D_"+ chan)
         passingTight2D = filedir.Get("passingTight2D_"+ chan)
@@ -79,7 +77,6 @@ for dataset in [
         ratio1DEta.Divide(passingLoose1DEta) 
         ratio1DEta.Write()
         fOut.cd()
-        del select
 
 #testdir = fOut.Get(name)
 #print "Passing tight has %i entries" % passingTight.GetEntries()

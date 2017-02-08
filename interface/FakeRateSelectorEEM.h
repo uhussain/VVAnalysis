@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Feb  3 11:12:05 2017 by ROOT version 6.06/01
+// Tue Feb  7 18:52:14 2017 by ROOT version 6.06/01
 // from TTree ntuple/ntuple
-// found on file: /data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-wz3lnu-powheg-WZxsec2016-3LooseLeptons-v1/skim-ntuplize_1.root
+// found on file: /data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_SingleMuon_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/skim-ntuplize_1.root
 //////////////////////////////////////////////////////////
 
 #ifndef FakeRateSelectorEEM_h
@@ -20,10 +20,12 @@
 
 // Headers needed by this particular selector
 #include <vector>
-#include "Analysis/WZAnalysis/interface/SelectorBase.h"
 
-class FakeRateSelectorEEM : public SelectorBase {
+class FakeRateSelectorEEM : public TSelector {
 public :
+    TTreeReader     fReader;  //!the tree reader
+    TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
+    TList* histDir_;
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
     TH1D* passingTight1DEta_;
@@ -35,8 +37,6 @@ public :
     TTreeReaderValue<UInt_t> nWZLooseMuon = {fReader, "nWZLooseMuon"};
     TTreeReaderValue<Float_t> e1PVDXY = {fReader, "e1PVDXY"};
     TTreeReaderValue<Float_t> e1PVDZ = {fReader, "e1PVDZ"};
-//    TTreeReaderValue<Bool_t> e1IsCBVIDLoose = {fReader, "e1IsCBVIDLoose"};
-//    TTreeReaderValue<Bool_t> e1IsCBVIDMedium = {fReader, "e1IsCBVIDMedium"};
     TTreeReaderValue<Bool_t> e1IsCBVIDTight = {fReader, "e1IsCBVIDTight"};
     TTreeReaderValue<Bool_t> e1IsEB = {fReader, "e1IsEB"};
     TTreeReaderValue<Float_t> e2PVDXY = {fReader, "e2PVDXY"};
@@ -48,15 +48,25 @@ public :
     TTreeReaderValue<Bool_t> mIsTightMuon = {fReader, "mIsTightMuon"};
     TTreeReaderValue<Float_t> mRelPFIsoDBR04 = {fReader, "mRelPFIsoDBR04"};
 
-    FakeRateSelectorEEM(TTree * /*tree*/ =0) { }
-    FakeRateSelectorEEM(const char* name, TTree * /*tree*/ =0) : SelectorBase(name, 0) { }
-    virtual ~FakeRateSelectorEEM() { }
-    virtual void   SetupNewDirectory() override;
-    virtual Bool_t Process(Long64_t entry) override;
+   // Readers to access the data (delete the ones you do not need).
+   FakeRateSelectorEEM(TTree * /*tree*/ =0) { }
+   virtual ~FakeRateSelectorEEM();
+   virtual Int_t   Version() const { return 2; }
+   virtual void    Begin(TTree *tree);
+   virtual void    SlaveBegin(TTree *tree);
+   virtual void    Init(TTree *tree);
+   virtual Bool_t  Notify();
+   virtual Bool_t  Process(Long64_t entry);
+   virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }
+   virtual void    SetOption(const char *option) { fOption = option; }
+   virtual void    SetObject(TObject *obj) { fObject = obj; }
+   virtual void    SetInputList(TList *input) { fInput = input; }
+   virtual TList  *GetOutputList() const { return fOutput; }
+   virtual void    SlaveTerminate();
+   virtual void    Terminate();
 
-    ClassDefOverride(FakeRateSelectorEEM,0);
+   ClassDef(FakeRateSelectorEEM,0);
 
 };
 
 #endif
-
