@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Feb  3 11:12:05 2017 by ROOT version 6.06/01
+// Tue Feb  7 18:52:14 2017 by ROOT version 6.06/01
 // from TTree ntuple/ntuple
-// found on file: /data/kelong/DibosonAnalysisData/3LooseLeptons/2017-02-03-wz3lnu-powheg-WZxsec2016-3LooseLeptons-v1/skim-ntuplize_1.root
+// found on file: /data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_SingleMuon_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/skim-ntuplize_1.root
 //////////////////////////////////////////////////////////
 
-#ifndef FakeRateSelectorEEE_h
-#define FakeRateSelectorEEE_h
+#ifndef FakeRateSelectorEEETest_h
+#define FakeRateSelectorEEETest_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -20,13 +20,14 @@
 
 // Headers needed by this particular selector
 #include <vector>
-//#include "Analysis/WZAnalysis/interface/SelectorBase.h"
 
-class FakeRateSelectorEEE : public TSelector {
+
+
+class FakeRateSelectorEEETest : public TSelector {
 public :
-  TTreeReader    fReader;  //!the tree reader
-  TTree       *fChain = 0;  //!pointer to the analyzed TTree or TChain
-  const char* name_;
+    TTreeReader     fReader;  //!the tree reader
+    TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
+    TList* histDir_;
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
     TH1D* passingTight1DEta_;
@@ -54,20 +55,25 @@ public :
     TTreeReaderValue<Bool_t> e3IsCBVIDTight = {fReader, "e3IsCBVIDTight"};
     TTreeReaderValue<Bool_t> e3IsEB = {fReader, "e3IsEB"};
 
-    FakeRateSelectorEEE(TTree * /*tree*/ =0) { }
-    FakeRateSelectorEEE(const char* name, TTree * /*tree*/ =0) : name_(name) { }
-    virtual ~FakeRateSelectorEEE() { }
-//    virtual void   SetupNewDirectory() override;
-    virtual Bool_t Process(Long64_t entry) override;
-    virtual void   Begin(TTree *tree) override;
-    virtual void   SlaveBegin(TTree *tree) override;
-    virtual void   Init(TTree *tree) override;
-    virtual Bool_t Notify() override;
-    virtual void   SlaveTerminate() override;
-    virtual void   Terminate() override;
+   // Readers to access the data (delete the ones you do not need).
+   FakeRateSelectorEEETest(TTree * /*tree*/ =0) { }
+   virtual ~FakeRateSelectorEEETest() { }
+   virtual Int_t   Version() const { return 2; }
+   virtual void    Begin(TTree *tree);
+   virtual void    SlaveBegin(TTree *tree);
+   virtual void    Init(TTree *tree);
+   virtual Bool_t  Notify();
+   virtual Bool_t  Process(Long64_t entry);
+   virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }
+   virtual void    SetOption(const char *option) { fOption = option; }
+   virtual void    SetObject(TObject *obj) { fObject = obj; }
+   virtual void    SetInputList(TList *input) { fInput = input; }
+   virtual TList  *GetOutputList() const { return fOutput; }
+   virtual void    SlaveTerminate();
+   virtual void    Terminate();
 
+   ClassDef(FakeRateSelectorEEETest,0);
 
-    ClassDefOverride(FakeRateSelectorEEE,0);
 };
 
 #endif

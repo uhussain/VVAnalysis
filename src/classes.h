@@ -1,4 +1,5 @@
 #include "Analysis/WZAnalysis/interface/FakeRateSelectorEEE.h"
+#include "Analysis/WZAnalysis/interface/FakeRateSelectorEEETest.h"
 #include "Analysis/WZAnalysis/interface/FakeRateSelectorEEM.h"
 #include "Analysis/WZAnalysis/interface/FakeRateSelectorEMM.h"
 #include "Analysis/WZAnalysis/interface/FakeRateSelectorMMM.h"
@@ -7,6 +8,7 @@ namespace{
   namespace{
     SelectorBase pSelectorBase;
     FakeRateSelectorEEE pFakeRateSelectorEEE;
+    FakeRateSelectorEEETest pFakeRateSelectorEEETest;
     FakeRateSelectorEEM pFakeRateSelectorEEM;
     FakeRateSelectorEMM pFakeRateSelectorEMM;
     FakeRateSelectorMMM pFakeRateSelectorMMM;
