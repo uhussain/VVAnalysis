@@ -5,6 +5,7 @@
  */
 #include "ScaleFactor.h"
 #include "TInterpreter.h"
+#include <iostream>
 
 ScaleFactor::~ScaleFactor()
 {
@@ -125,7 +126,7 @@ double ScaleFactor::Evaluate2D(double x, double y, Variation var) const
     return histCentral2D_->GetBinContent(bin) - histCentral2D_->GetBinError(bin);
   }
   // If here, we probably forgot to add the hist
-  return 1.;
+  return 10.;
 }
 
 void ScaleFactor::RegisterGlobalFunction(int dimension)
