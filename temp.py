@@ -25,7 +25,8 @@ def writeOutputListItem(item, directory):
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
 selection = "WZxsec2016/3LooseLeptons"
-for chan in ["eem"]:#, "eem", "emm", "mmm"]:
+selector_name = "FakeRateSelector"
+for chan in ["eee", "eem", "emm", "mmm"]:
     chain = ROOT.TChain("%s/ntuple" % chan)
     for dataset in [
         #"data_DoubleMuon_Run2016F-23Sep2016-v1" : {
@@ -44,7 +45,6 @@ for chan in ["eem"]:#, "eem", "emm", "mmm"]:
     ]:
         proof_path = "_".join([dataset, "%s#/%s/ntuple" % (selection.replace("/", "_"), chan)])
         print chain.Add(dataset)
-    selector_name = "FakeRate%sTest"%chan.upper()
     select = getattr(ROOT, selector_name)()
     inputs = ROOT.TList()
     select.SetInputList(inputs)
