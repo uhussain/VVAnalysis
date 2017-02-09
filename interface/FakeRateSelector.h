@@ -129,6 +129,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e3IsEB", &e3IsEB, &b_e3IsEB);
         fChain->SetBranchAddress("e1PVDXY", &e1PVDXY, &b_e1PVDXY);
         fChain->SetBranchAddress("e2PVDXY", &e2PVDXY, &b_e2PVDXY);
+        fChain->SetBranchAddress("e3PVDXY", &e3PVDXY, &b_e3PVDXY);
         fChain->SetBranchAddress("e1PVDZ", &e1PVDZ, &b_e1PVDZ);
         fChain->SetBranchAddress("e2PVDZ", &e2PVDZ, &b_e2PVDZ);
         fChain->SetBranchAddress("e3PVDZ", &e3PVDZ, &b_e3PVDZ);
@@ -152,18 +153,22 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
     }
     else if (channel_ == "emm") { 
-        fChain->SetBranchAddress("m1IsTightMuon", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
-        fChain->SetBranchAddress("m2IsTightMuon", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
+        fChain->SetBranchAddress("eIsCBVIDTight", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("eIsEB", &e3IsEB, &b_e3IsEB);
+        fChain->SetBranchAddress("ePVDXY", &e3PVDXY, &b_e3PVDXY);
+        fChain->SetBranchAddress("ePVDZ", &e3PVDZ, &b_e3PVDZ);
+        fChain->SetBranchAddress("m1IsTightMuon", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
+        fChain->SetBranchAddress("m2IsTightMuon", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
         fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
     }
     else if (channel_ == "mmm") { 
-        fChain->SetBranchAddress("m1IsTightMuon", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
-        fChain->SetBranchAddress("m2IsTightMuon", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
+        fChain->SetBranchAddress("m1IsTightMuon", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
+        fChain->SetBranchAddress("m2IsTightMuon", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
         fChain->SetBranchAddress("m3IsTightMuon", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m3RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
         fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);

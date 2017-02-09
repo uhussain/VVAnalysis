@@ -28,6 +28,7 @@ selection = "WZxsec2016/3LooseLeptons"
 selector_name = "FakeRateSelector"
 for chan in ["eee", "eem", "emm", "mmm"]:
     chain = ROOT.TChain("%s/ntuple" % chan)
+    print "Channel is", chan
     for dataset in [
         #"data_DoubleMuon_Run2016F-23Sep2016-v1" : {
         "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016F-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
