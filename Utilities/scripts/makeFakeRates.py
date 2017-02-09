@@ -1,8 +1,9 @@
 # coding: utf-8
 import ROOT
 import glob
-from Utilities.python import UserInput
-from Utilities.python import ConfigureJobs
+import datetime
+from python import UserInput
+from python import ConfigureJobs
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
@@ -30,12 +31,12 @@ proof = 0
 if args['proof']:
     ROOT.TProof.Open("workers=12")
     proof = ROOT.gProof
-tmpFileName = "%s.root" % args['selection']
+today = datetime.date.today().strftime("%d%b%Y")
+tmpFileName = "fakeRate%s-%s.root" % (today, args['selection'])
 fOut = ROOT.TFile(tmpFileName, "recreate")
 selector_name = "FakeRateSelector"
 path = ConfigureJobs.getManagerPath()
 for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
-    print dataset
     for chan in ["eee", "eem", "emm", "mmm"]:
         select = getattr(ROOT, selector_name)()
         inputs = ROOT.TList()
