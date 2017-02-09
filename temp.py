@@ -30,9 +30,8 @@ proof = 0
 if args['proof']:
     ROOT.TProof.Open("workers=12")
     proof = ROOT.gProof
-tmpFileName = "temp.root" 
+tmpFileName = "%s.root" % args['selection']
 fOut = ROOT.TFile(tmpFileName, "recreate")
-selection = "WZxsec2016/3LooseLeptons"
 selector_name = "FakeRateSelector"
 path = ConfigureJobs.getManagerPath()
 for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
