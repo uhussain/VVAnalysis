@@ -11,7 +11,7 @@ def writeOutputListItem(item, directory):
             ROOT.SetOwnership(d, False)
         for subItem in item:
             writeOutputListItem(subItem, d)
-            print subItem
+            print "Subitem", subItem
     elif hasattr(item, 'Write'):
         print directory
         directory.cd()
@@ -46,12 +46,14 @@ for chan in ["eem"]:#, "eem", "emm", "mmm"]:
         print chain.Add(dataset)
     selector_name = "FakeRate%sTest"%chan.upper()
     select = getattr(ROOT, selector_name)()
-    #inputs = ROOT.TList()
-    #select.SetInputList(inputs)
-    #tname = ROOT.TNamed("name", "test") 
-    #inputs.Add(tname)
+    inputs = ROOT.TList()
+    select.SetInputList(inputs)
+    tname = ROOT.TNamed("name", "name") 
+    tname.SetName(dataset.split("/")[-2])
+    tchan = ROOT.TNamed("channel", chan)
+    inputs.Add(tname)
+    inputs.Add(tchan)
     print select
-    print chain.Draw("Mass")
     print chain.Process(select, "")
     for item in select.GetOutputList():
         if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
@@ -74,7 +76,7 @@ for chan in ["eem"]:#, "eem", "emm", "mmm"]:
         passingLoose1DEta = filedir.Get("passingLoose1DEta_"+ chan)
         passingTight1DEta = filedir.Get("passingTight1DEta_"+ chan)
         ratio1DEta = passingTight1DEta.Clone("ratio1DEta_"+chan)
-        ratio1DEta.Divide(passingLoose1DEta) 
+        ratio1DEta.Divide(passingLoose1DEta)
         ratio1DEta.Write()
         fOut.cd()
 
