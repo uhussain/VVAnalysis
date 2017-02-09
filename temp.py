@@ -1,6 +1,14 @@
 # coding: utf-8
 import ROOT
 import glob
+from Utilities.python import UserInput
+from Utilities.python import ConfigureJobs
+
+def getComLineArgs():
+    parser = UserInput.getDefaultParser()
+    parser.add_argument("--withoutProof", "-l", 
+        action='store_true', help="Don't use proof")
+    return vars(parser.parse_args())
 
 def writeOutputListItem(item, directory):
     print item
@@ -19,66 +27,46 @@ def writeOutputListItem(item, directory):
     else:
         print "Couldn't write output item:"
         print repr(item)
-
-#ROOT.TProof.Open("workers=2")
-#ROOT.gProof.SetParameter("PROOF_UseTreeCache", 0)
+args = getComLineArgs()
+proof = 0
+if not args['withoutProof']:
+    ROOT.TProof.Open("workers=12")
+    proof = ROOT.gProof
 tmpFileName = "temp.root" 
 fOut = ROOT.TFile(tmpFileName, "recreate")
 selection = "WZxsec2016/3LooseLeptons"
 selector_name = "FakeRateSelector"
-for chan in ["eee", "eem", "emm", "mmm"]:
-    chain = ROOT.TChain("%s/ntuple" % chan)
-    print "Channel is", chan
-    for dataset in [
-        #"data_DoubleMuon_Run2016F-23Sep2016-v1" : {
-        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016F-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
-#        #"data_DoubleMuon_Run2016G-23Sep2016-v1" : {
-        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016G-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
-#        #"data_DoubleMuon_Run2016H-PromptReco-v2" : {
-        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016H-PromptReco-v2-WZxsec2016-DYControlFakeRate-v1/*",
-#        #"data_DoubleMuon_Run2016H-PromptReco-v3" : {
-        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_DoubleMuon_Run2016H-PromptReco-v3-WZxsec2016-DYControlFakeRate-v1/*",
-#        #"data_MuonEG_Run2016B-23Sep2016-v3" : {
-        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/*",
-        #"data_MuonEG_Run2016C-23Sep2016-v1" : {
-        "/data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016C-23Sep2016-v1-WZxsec2016-DYControlFakeRate-v1/*",
-        #"data_MuonEG_Run2016D-23Sep2016-v1" : {
-    ]:
-        proof_path = "_".join([dataset, "%s#/%s/ntuple" % (selection.replace("/", "_"), chan)])
-        print chain.Add(dataset)
-    select = getattr(ROOT, selector_name)()
-    inputs = ROOT.TList()
-    select.SetInputList(inputs)
-    tname = ROOT.TNamed("name", dataset.split("/")[-2])
-    tchan = ROOT.TNamed("channel", chan)
-    inputs.Add(tname)
-    inputs.Add(tchan)
-    print select
-    print chain.Process(select, "")
+path = ConfigureJobs.getManagerPath()
+for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
+    print dataset
+    for chan in ["eee", "eem", "emm", "mmm"]:
+        select = getattr(ROOT, selector_name)()
+        inputs = ROOT.TList()
+        select.SetInputList(inputs)
+        tchan = ROOT.TNamed("channel", chan)
+        inputs.Add(tchan)
+        if proof:
+            proof_path = "_".join([dataset, args['analysis'], 
+                args['selection']+("#/%s/ntuple" % chan)])
+            tname = ROOT.TNamed("name", dataset)
+            inputs.Add(tname)
+            proof.Process(proof_path, select, "")
+        else: 
+            chain = ROOT.TChain("%s/ntuple" % chan)
+            try:
+                file_path = ConfigureJobs.getInputFilesPath(dataset, 
+                    path, args['selection'], args['analysis'])
+                tname = ROOT.TNamed("name", file_path.split("/")[-2])
+                inputs.Add(tname)
+                chain.Add(file_path)
+                chain.Process(select, "")
+            except ValueError as e:
+                print e
+                continue
     for item in select.GetOutputList():
         if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
             continue
         writeOutputListItem(item, fOut)
-        print item
-    filedir = fOut.Get(dataset)
-    if filedir:
-        filedir.cd()
-        passingLoose2D = filedir.Get("passingLoose2D_"+ chan)
-        passingTight2D = filedir.Get("passingTight2D_"+ chan)
-        ratio2D = passingTight2D.Clone("ratio2D_"+chan)
-        ratio2D.Divide(passingLoose2D) 
-        ratio2D.Write()
-        passingLoose1DPt = filedir.Get("passingLoose1DPt_"+ chan)
-        passingTight1DPt = filedir.Get("passingTight1DPt_"+ chan)
-        ratio1DPt = passingTight1DPt.Clone("ratio1DPt_"+chan)
-        ratio1DPt.Divide(passingLoose1DPt) 
-        ratio1DPt.Write()
-        passingLoose1DEta = filedir.Get("passingLoose1DEta_"+ chan)
-        passingTight1DEta = filedir.Get("passingTight1DEta_"+ chan)
-        ratio1DEta = passingTight1DEta.Clone("ratio1DEta_"+chan)
-        ratio1DEta.Divide(passingLoose1DEta)
-        ratio1DEta.Write()
-        fOut.cd()
 
 #testdir = fOut.Get(name)
 #print "Passing tight has %i entries" % passingTight.GetEntries()
