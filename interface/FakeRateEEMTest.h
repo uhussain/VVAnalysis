@@ -23,6 +23,9 @@
 class FakeRateEEMTest : public TSelector {
 public :
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
+    const char* name_ = "Unnamed";
+    const char* channel_ = "eee";
+    
     TList* histDir_;
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
@@ -30,6 +33,10 @@ public :
     TH2D* passingLoose2D_;
     TH1D* passingLoose1DPt_;
     TH1D* passingLoose1DEta_;
+    TH2D* ratio2D_;
+    TH1D* ratio1DPt_;
+    TH1D* ratio1DEta_;
+
     Float_t type1_pfMETEt;
     UInt_t nWWLooseElec;
     UInt_t nWZLooseMuon;
