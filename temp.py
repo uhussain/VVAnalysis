@@ -6,12 +6,11 @@ from Utilities.python import ConfigureJobs
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
-    parser.add_argument("--withoutProof", "-l", 
+    parser.add_argument("--proof", "-p", 
         action='store_true', help="Don't use proof")
     return vars(parser.parse_args())
 
 def writeOutputListItem(item, directory):
-    print item
     if item.ClassName() == "TList":
         d = directory.Get(item.GetName())
         if not d:
@@ -19,17 +18,16 @@ def writeOutputListItem(item, directory):
             ROOT.SetOwnership(d, False)
         for subItem in item:
             writeOutputListItem(subItem, d)
-            print "Subitem", subItem
     elif hasattr(item, 'Write'):
-        print directory
         directory.cd()
         item.Write()
     else:
         print "Couldn't write output item:"
         print repr(item)
+    directory.cd()
 args = getComLineArgs()
 proof = 0
-if not args['withoutProof']:
+if args['proof']:
     ROOT.TProof.Open("workers=12")
     proof = ROOT.gProof
 tmpFileName = "temp.root" 
@@ -44,48 +42,65 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
         inputs = ROOT.TList()
         select.SetInputList(inputs)
         tchan = ROOT.TNamed("channel", chan)
+        tname = ROOT.TNamed("name", dataset)
+        inputs.Add(tname)
         inputs.Add(tchan)
         if proof:
             proof_path = "_".join([dataset, args['analysis'], 
                 args['selection']+("#/%s/ntuple" % chan)])
-            tname = ROOT.TNamed("name", dataset)
-            inputs.Add(tname)
             proof.Process(proof_path, select, "")
         else: 
             chain = ROOT.TChain("%s/ntuple" % chan)
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     path, args['selection'], args['analysis'])
-                tname = ROOT.TNamed("name", file_path.split("/")[-2])
-                inputs.Add(tname)
                 chain.Add(file_path)
                 chain.Process(select, "")
             except ValueError as e:
                 print e
                 continue
-    for item in select.GetOutputList():
-        if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
-            continue
-        writeOutputListItem(item, fOut)
+        for item in select.GetOutputList():
+            if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
+                continue
+            writeOutputListItem(item, fOut)
 
-#testdir = fOut.Get(name)
-#print "Passing tight has %i entries" % passingTight.GetEntries()
-#print "Failing tight has %i entries" % passingLoose.GetEntries()
-#canvas = ROOT.TCanvas("canvas")
-#ratio = passingTight.Clone()
-#ratio.Divide(passingLoose)
-#ratio.Draw("colz")
-#canvas.Print("~/www/WZFakeRate/2Dratio.pdf")
-#passingTight_ptonly = passingTight.ProjectionX("passingTight_pt")
-#passingTight_ptonly.SetBinContent(10, passingTight_ptonly.GetBinContent(11))
-#passingLoose_ptonly = passingLoose.ProjectionX("passingLoose_pt")
-#passingLoose_ptonly.SetBinContent(10, passingLoose_ptonly.GetBinContent(11))
-#pt_ratio = passingTight_ptonly.Clone()
-#pt_ratio.Divide(passingLoose_ptonly)
-#passingTight_ptonly.Draw("hist")
-#canvas.Print("~/www/WZFakeRate/1Dpt_passingTight.pdf")
-#passingLoose_ptonly.Draw("hist")
-#canvas.Print("~/www/WZFakeRate/1Dpt_passingLoose.pdf")
-#pt_ratio.Draw("hist")
-#canvas.Print("~/www/WZFakeRate/1Dpt_ratio.pdf")
-
+alldata = ROOT.TList()
+alldata.SetName("AllData")
+hists = [x+"_"+y for x in ["passingLoose1DPt", "passingLoose1DEta", "passingLoose2D",
+            "passingTight1DPt", "passingTight1DEta", "passingTight2D",] \
+    for y in ["eee", "eem", "emm", "mmm"]]
+for directory in fOut.GetListOfKeys():
+    if "data" in directory.GetName():
+        for histname in hists:
+            hist = fOut.Get("/".join([directory.GetName(), histname]))
+            if hist:
+                sumhist = alldata.FindObject(hist.GetName())
+            else:
+                raise RuntimeError("hist %s was not produced for "
+                    "dataset %s!" % (histname, directory.GetName()))
+            if not sumhist:
+                sumhist = hist.Clone()
+                alldata.Add(sumhist)
+            else:
+                sumhist.Add(hist)
+for hist_name in ["passingLoose1DPt", "passingLoose1DEta", "passingLoose2D", 
+        "passingTight1DPt", "passingTight1DEta", "passingTight2D"]:
+    etot = alldata.FindObject(hist_name+"_eee")
+    etot.SetName(hist_name+"_allE")
+    etot.Add(alldata.FindObject(hist_name+"_emm"))
+    alldata.Add(etot)
+    mtot = alldata.FindObject(hist_name+"_mmm")
+    mtot.SetName(hist_name+"_allMu")
+    mtot.Add(alldata.FindObject(hist_name+"_eem"))
+    alldata.Add(mtot)
+ratios = []
+for hist in alldata:
+    if "Tight" not in hist.GetName():
+        continue
+    ratio = hist.Clone()
+    ratio.SetName(hist.GetName().replace("passingTight", "ratio"))
+    ratio.Divide(alldata.FindObject(hist.GetName().replace("Tight", "Loose")))
+    ratios.append(ratio)
+for ratio in ratios:
+    alldata.Add(ratio) 
+writeOutputListItem(alldata, fOut)
