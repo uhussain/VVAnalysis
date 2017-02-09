@@ -40,7 +40,7 @@ def getFilesPerJob(path_to_files):
     if num == 0:
         raise ValueError("Size of file list is zero for path: %s" % path_to_files)
     average_size = tot_size/num
-    return int(math.ceil(300./average_size))
+    return int(math.ceil(200./average_size))
 def fillTemplatedFile(template_file_name, out_file_name, template_dict):
     with open(template_file_name, "r") as templateFile:
         source = string.Template(templateFile.read())

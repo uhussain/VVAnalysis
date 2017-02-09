@@ -8,7 +8,9 @@
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsWZLooseMuon > 0.5"
+            "{object_name}IsWZLooseMuonNoIso > 0.5",
+            "{object_name}RelPFIsoDBR04 < 0.25"
+
         ]
     },
     "State" : {
@@ -25,4 +27,3 @@
         "(singleMuPass || singleIsoMuPass || singleEPass || singleESingleMuPass || singleMuSingleEPass || doubleMuPass || doubleEPass)"
     ]
 }
-
