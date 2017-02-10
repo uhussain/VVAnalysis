@@ -1,4 +1,4 @@
-# coding: utf-8
+#!/usr/bin/env python
 import ROOT
 import glob
 import datetime
@@ -85,11 +85,11 @@ for directory in fOut.GetListOfKeys():
                 sumhist.Add(hist)
 for hist_name in ["passingLoose1DPt", "passingLoose1DEta", "passingLoose2D", 
         "passingTight1DPt", "passingTight1DEta", "passingTight2D"]:
-    etot = alldata.FindObject(hist_name+"_eee")
+    etot = alldata.FindObject(hist_name+"_eee").Clone()
     etot.SetName(hist_name+"_allE")
     etot.Add(alldata.FindObject(hist_name+"_emm"))
     alldata.Add(etot)
-    mtot = alldata.FindObject(hist_name+"_mmm")
+    mtot = alldata.FindObject(hist_name+"_mmm").Clone()
     mtot.SetName(hist_name+"_allMu")
     mtot.Add(alldata.FindObject(hist_name+"_eem"))
     alldata.Add(mtot)
