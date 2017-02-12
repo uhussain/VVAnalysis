@@ -137,6 +137,7 @@ void MakeBackgroundEstimate::Init(TTree *tree)
     if (name_.find("data") == std::string::npos){
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     }
+    fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);

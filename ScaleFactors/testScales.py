@@ -27,7 +27,7 @@ dummyTree.Scan('randVal : globalFunc(randVal)', '', '', 10)
 
 # Generate with setupScaleFactors.py
 # Will need appropriate files in ../data/
-fScales = ROOT.TFile('scaleFactors.root')
+fScales = ROOT.TFile('../data/scaleFactors.root')
 pu = fScales.Get('pileupSF')
 muonIso = fScales.Get('muonTightIsoSF')
 muonId = fScales.Get('muonTightIdSF')
@@ -37,9 +37,9 @@ eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
 eCBMedFakeRate = fScales.Get("eCBMedFakeRate")
 del fScales # Make sure we don't rely on file being open
 
-pu.RegisterGlobalFunction()
-print "pileupSF(3) = ", ROOT.pileupSF(3)
-dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
+#pu.RegisterGlobalFunction()
+#print "pileupSF(3) = ", ROOT.pileupSF(3)
+#dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
 
 muonIso.RegisterGlobalFunction(2) # 2D function
 muonId.RegisterGlobalFunction(2) # 2D function
