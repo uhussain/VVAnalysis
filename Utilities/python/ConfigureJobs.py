@@ -53,10 +53,15 @@ def getListOfFiles(filelist, manager_path):
     names = []
     for name in filelist:
         if "WZxsec2016" in name:
-            names += json.load(open("/afs/cern.ch/user/k/kelong/work/"
+            allnames = json.load(open("/afs/cern.ch/user/k/kelong/work/"
                 "AnalysisDatasetManager/FileInfo/WZxsec2016/ntuples.json")).keys()
             if "nodata" in name:
-                names = [x for x in names if "data" not in x]
+                nodata = [x for x in allnames if "data" not in x]
+                names += nodata
+            elif "data" in name:
+                names += [x for x in allnames if "data" in x]
+            else:
+                names += allnames
         elif "*" in name:
             names += fnmatch.filter(valid_names, name)
         else:
@@ -65,6 +70,17 @@ def getListOfFiles(filelist, manager_path):
                 continue
             names += [name]
     return names
+def getListOfFilesWithXSec(filelist, manager_path):
+    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    files = getListOfFiles(filelist, manager_path)
+    mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
+    info = {}
+    for file_name in files:
+        if "data" in file_name:
+            info.update({file_name : 1})
+        else:
+            info.update({file_name : mc_info[file_name]["cross_section"]})
+    return info
 def getPreviousStep(selection, analysis):
     if analysis == "WZxsec2016":
         selection_map = { "ntuples" : "ntuples",

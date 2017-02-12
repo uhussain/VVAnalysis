@@ -15,6 +15,7 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <exception>
+#include <iostream>
 
 // Headers needed by this particular selector
 #include <vector>
@@ -36,6 +37,7 @@ public :
     TH1D* ratio1DPt_;
     TH1D* ratio1DEta_;
 
+    Float_t genWeight;
     Float_t type1_pfMETEt;
     UInt_t nWWLooseElec;
     UInt_t nWZLooseMuon;
@@ -57,6 +59,7 @@ public :
     Float_t l3Eta;
     Float_t l3Pt;
     
+    TBranch* b_genWeight;
     TBranch* b_type1_pfMETEt;
     TBranch* b_nWWLooseElec;
     TBranch* b_nWZLooseMuon;
@@ -97,7 +100,7 @@ public :
 
     ClassDef(FakeRateSelector,0);
 private:
-    const char* name_ = "Unnamed";
+    std::string name_ = "Unnamed";
     std::string channel_ = "undefined";
     bool tightZLeptons();
     bool lepton3IsTight();
@@ -116,6 +119,9 @@ void FakeRateSelector::Init(TTree *tree)
     // (once per file to be processed).
     if (!tree) return;
     fChain = tree;
+    if (name_.find("data") == std::string::npos){
+        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+    }
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
