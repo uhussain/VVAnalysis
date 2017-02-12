@@ -10,8 +10,6 @@ import ROOT
 ROOT.gROOT.SetBatch(True)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-ROOT.gROOT.LoadMacro("ScaleFactor.C+")
-
 def float2double(hist):
     if hist.ClassName() == 'TH1F':
         new = ROOT.TH1D()
