@@ -3,14 +3,14 @@
         "e" : [ 
             "{object_name}Pt > 10",
             "abs({object_name}Eta) <  2.5",
-            "{object_name}IsWWLoose > 0.5"
+            "{object_name}IsWWLoose > 0.5",
+            "({object_name}IsEB ? {object_name}PVDXY < 0.05 : {object_name}PVDXY < 0.1)",
+            "({object_name}IsEB ? {object_name}PVDZ < 0.1 : {object_name}PVDZ < 0.2)"
         ],
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsWZLooseMuonNoIso > 0.5",
-            "{object_name}RelPFIsoDBR04 < 0.25"
-
+            "{object_name}IsWZMediumMuonNoIso > 0.5"
         ]
     },
     "State" : {

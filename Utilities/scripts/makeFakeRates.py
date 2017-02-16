@@ -13,6 +13,25 @@ def getComLineArgs():
         default=36.87, help="luminosity value (in fb-1)")
     return vars(parser.parse_args())
 
+def getListOfEWKFiles():
+    return ["wz3lnu-powheg",
+        "zz4l-powheg",
+        "tzq",
+        "st-schan",
+        "st-tchan-t",
+        "st-tchan-tbar",
+        "st-tw",
+        "st-tbarw",
+        "ttz",
+        "ttw",
+        "zzz",
+        "wwz",
+        "www",
+        "zg",
+        "ggZZ4e",
+        "ggZZ4m",
+        "ggZZ2e2mu",
+    ]
 def writeOutputListItem(item, directory):
     if item.ClassName() == "TList":
         d = directory.Get(item.GetName())
@@ -94,7 +113,6 @@ def getDifference(name, dir1, dir2, addRatios=True, composite=True):
     return differences
 
 def getRatios(hists):
-    print hists
     ratios = []
     for hist in hists:
         if "Tight" not in hist.GetName():
@@ -146,7 +164,6 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
                     meta_chain.Add(file_path)
                     meta_chain.Draw("1>>sumweights", "summedWeights")
                     sumweights_hist.SetDirectory(0)
-                    print sumweights_hist.Integral()
             except ValueError as e:
                 print e
                 sumweights_hist.Delete()
@@ -163,7 +180,7 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path))
 writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
-    ["wz3lnu-powheg", "zz4l-powheg", "ttz", "tzq",], path), False)
+    getListOfEWKFiles(), path), False)
 writeOutputListItem(allewk, fOut)
 final = getDifference("DataEWKCorrected", "AllData", "AllEWK")
 writeOutputListItem(final, fOut)

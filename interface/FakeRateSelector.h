@@ -38,6 +38,7 @@ public :
     TH1D* ratio1DEta_;
 
     Float_t genWeight;
+    Float_t Zmass;
     Float_t type1_pfMETEt;
     UInt_t nWWLooseElec;
     UInt_t nWZLooseMuon;
@@ -60,6 +61,7 @@ public :
     Float_t l3Pt;
     
     TBranch* b_genWeight;
+    TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_nWWLooseElec;
     TBranch* b_nWZLooseMuon;
@@ -127,6 +129,7 @@ void FakeRateSelector::Init(TTree *tree)
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
 
     if (channel_ == "eee") {
+        fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e3IsCBVIDTight", &l3IsTight, &b_l3IsTight);
@@ -144,6 +147,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
     }
     else if (channel_ == "eem") { 
+        fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e1IsEB", &e1IsEB, &b_e1IsEB);
@@ -159,6 +163,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
     }
     else if (channel_ == "emm") { 
+        fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
         fChain->SetBranchAddress("eIsCBVIDTight", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("eIsEB", &e3IsEB, &b_e3IsEB);
         fChain->SetBranchAddress("ePVDXY", &e3PVDXY, &b_e3PVDXY);
@@ -171,6 +176,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
     }
     else if (channel_ == "mmm") { 
+        fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
         fChain->SetBranchAddress("m1IsWZMediumMuon", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
         fChain->SetBranchAddress("m2IsWZMediumMuon", &l2IsTight, &b_l2IsTight);

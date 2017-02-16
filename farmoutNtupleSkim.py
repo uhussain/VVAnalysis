@@ -104,7 +104,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFa
         farmout_dict['job_dir'],
         selection,
         analysis,
-        ConfigureJobs.getTriggerName(sample_name, selection),
+        ConfigureJobs.getTriggerName(sample_name, analysis, selection),
         not noScaleFacs and ("data" not in sample_name),
         extraArgs
     )

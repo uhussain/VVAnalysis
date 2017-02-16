@@ -123,9 +123,9 @@ def getInputFilesPath(sample_name, manager_path, selection, analysis):
     return input_files[sample_name]['file_path']
 def getCutsJsonName(selection, analysis):
     return "/".join(["Cuts", analysis, selection + ".json"]) 
-def getTriggerName(sample_name, selection):
+def getTriggerName(sample_name, analysis, selection):
     trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG", "SingleMuon", "SingleElectron"]
-    if "data" in sample_name and "preselection" in selection:
+    if "data" in sample_name and getPreviousStep(selection, analysis) == "ntuples":
         for name in trigger_names:
             if name in sample_name:
                 return "-t " + name
