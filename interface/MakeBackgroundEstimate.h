@@ -119,6 +119,7 @@ private:
     bool IsFPFRegion();
     bool IsFFPRegion();
     bool IsPFFRegion();
+    bool IsFFFRegion();
 };
 
 #endif
