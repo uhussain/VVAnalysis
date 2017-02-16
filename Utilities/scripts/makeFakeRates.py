@@ -15,7 +15,6 @@ def getComLineArgs():
 
 def getListOfEWKFiles():
     return ["wz3lnu-powheg",
-        "wz3lnu-mg5amcnlo",
         "zz4l-powheg",
         "tzq",
         "st-schan",
@@ -114,7 +113,6 @@ def getDifference(name, dir1, dir2, addRatios=True, composite=True):
     return differences
 
 def getRatios(hists):
-    print hists
     ratios = []
     for hist in hists:
         if "Tight" not in hist.GetName():
@@ -166,7 +164,6 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
                     meta_chain.Add(file_path)
                     meta_chain.Draw("1>>sumweights", "summedWeights")
                     sumweights_hist.SetDirectory(0)
-                    print sumweights_hist.Integral()
             except ValueError as e:
                 print e
                 sumweights_hist.Delete()
