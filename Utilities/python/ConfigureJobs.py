@@ -79,9 +79,10 @@ def getListOfFilesWithXSec(filelist, manager_path):
         if "data" in file_name:
             info.update({file_name : 1})
         else:
-            info.update({file_name : mc_info[file_name]["cross_section"]})
+            info.update({file_name : mc_info[file_name.split("__")[0]]["cross_section"]})
     return info
 def getPreviousStep(selection, analysis):
+    selection_map = {}
     if analysis == "WZxsec2016":
         selection_map = { "ntuples" : "ntuples",
                 "loosepreselection" : "ntuples",
