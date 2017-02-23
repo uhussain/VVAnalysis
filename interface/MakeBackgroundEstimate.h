@@ -30,11 +30,18 @@ public :
     ScaleFactor * fakeRate_allMu;
     
     TList* histDir_;
-    TH1D* massHist_;
-
+    TH1D* zmassHist_;
+    TH1D* zmassHistPPF_;
+    TH1D* zmassHistPFP_;
+    TH1D* zmassHistFPP_;
+    TH1D* zmassHistFFP_;
+    TH1D* zmassHistFPF_;
+    TH1D* zmassHistPFF_;
+    TH1D* zmassHistFFF_;
     Float_t genWeight;
     Float_t type1_pfMETEt;
     Float_t Mass;
+    Float_t Zmass;
     UInt_t nWWLooseElec;
     UInt_t nWZLooseMuon;
     Bool_t l1IsTight;
@@ -60,6 +67,7 @@ public :
     Float_t l3Pt;
     
     TBranch* b_genWeight;
+    TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_Mass;
     TBranch* b_nWWLooseElec;
@@ -107,12 +115,12 @@ public :
 private:
     std::string name_ = "Unnamed";
     std::string channel_ = "undefined";
-    float getl1FakeRate();
-    float getl2FakeRate();
-    float getl3FakeRate();
     bool zlep1IsTight(); 
     bool zlep2IsTight(); 
     bool wlepIsTight(); 
+    float getl1FakeRate();
+    float getl2FakeRate();
+    float getl3FakeRate();
     bool IsFPPRegion();
     bool IsPFPRegion();
     bool IsPPFRegion();
@@ -144,6 +152,7 @@ void MakeBackgroundEstimate::Init(TTree *tree)
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
 
     if (channel_ == "eee") {
+        fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e3IsCBVIDTight", &l3IsTight, &b_l3IsTight);
@@ -165,6 +174,7 @@ void MakeBackgroundEstimate::Init(TTree *tree)
         fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
     }
     else if (channel_ == "eem") { 
+        fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e1IsEB", &e1IsEB, &b_e1IsEB);
@@ -184,6 +194,7 @@ void MakeBackgroundEstimate::Init(TTree *tree)
         fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
     }
     else if (channel_ == "emm") { 
+        fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
         fChain->SetBranchAddress("eIsCBVIDTight", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("eIsEB", &e3IsEB, &b_e3IsEB);
         fChain->SetBranchAddress("ePVDXY", &e3PVDXY, &b_e3PVDXY);
@@ -200,6 +211,7 @@ void MakeBackgroundEstimate::Init(TTree *tree)
         fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
     }
     else if (channel_ == "mmm") { 
+        fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
         fChain->SetBranchAddress("m1IsWZMediumMuon", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
         fChain->SetBranchAddress("m2IsWZMediumMuon", &l2IsTight, &b_l2IsTight);
