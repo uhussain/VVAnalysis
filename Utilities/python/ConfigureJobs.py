@@ -12,7 +12,9 @@ def getManagerPath():
     return path
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
-    selection_name = selection.split(",")[-1 ]
+    selections = selection.split(",")
+    selection_name = "To".join([selections[0],selections[-1]]) \
+        if len(selections) > 1 else selections[0]
     return '-'.join([date, sample_name, analysis, selection_name, 
         ("v%s" % version) if version.isdigit() else version])
 def getNumberAndSizeOfLocalFiles(path_to_files):
@@ -79,9 +81,12 @@ def getListOfFilesWithXSec(filelist, manager_path):
         if "data" in file_name:
             info.update({file_name : 1})
         else:
-            info.update({file_name : mc_info[file_name]["cross_section"]})
+            file_info= mc_info[file_name.split("__")[0]]
+            kfac = file_info["kfactor"] if "kfactor" in file_info.keys() else 1
+            info.update({file_name : file_info["cross_section"]*kfac})
     return info
 def getPreviousStep(selection, analysis):
+    selection_map = {}
     if analysis == "WZxsec2016":
         selection_map = { "ntuples" : "ntuples",
                 "loosepreselection" : "ntuples",
