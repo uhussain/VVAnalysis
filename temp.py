@@ -57,12 +57,12 @@ eCBTightFakeRate.SetName("fakeRate_allE")
 extra_inputs = [eCBTightFakeRate, mCBMedFakeRate]
 
 #background = SelectorTools.applySelector(["WZxsec2016-data"], "MakeBackgroundEstimate", "3LooseLeptons", extra_inputs=extra_inputs)
-background = SelectorTools.applySelector(["WZxsec2016-data", "DYm50__LO"], "MakeBackgroundEstimate", "WselectionLooseLeps", extra_inputs=extra_inputs)
+background = SelectorTools.applySelector(["WZxsec2016-data", "DYm50*"], "MakeBackgroundEstimate", "WselectionLooseLeps", extra_inputs=extra_inputs)
 for item in background:
     if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
         continue
     writeOutputListItem(item, fOut)
-mc = SelectorTools.applySelector(["WZxsec2016-nodata"], "WZSelector", "Wselection", addsumweights=True)
+mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", "Wselection", addsumweights=True)
 for item in mc:
     if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
         continue
@@ -70,5 +70,12 @@ for item in mc:
 path = ConfigureJobs.getManagerPath()
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path))
 writeOutputListItem(alldata, fOut)
-nonpromptmc = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(["DYm50__LO", "tt-lep"], path))
+nonpromptmc = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(["DYm50-*j", 
+        "tt-lep",
+        "st-schan",
+        "st-tchan-t",
+        "st-tchan-tbar",
+        "st-tw",
+        "st-tbarw",
+    ], path))
 writeOutputListItem(nonpromptmc, fOut)
