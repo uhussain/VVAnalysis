@@ -4,7 +4,7 @@
             "{object_name}IsCBVIDtight > 0.5"
         ],
         "m" : [
-            "{object_name}IsTightMuon > 0.5"
+            "{object_name}IsWZMediumMuon > 0.5"
         ]
     },
     "State" : {

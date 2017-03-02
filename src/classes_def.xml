@@ -1,3 +1,6 @@
 <lcgdict>
   <class name="FakeRateSelector"/>
+  <class name="WZSelector"/>
+  <class name="MakeBackgroundEstimate"/>
+  <class name="ScaleFactor"/>
 </lcgdict>

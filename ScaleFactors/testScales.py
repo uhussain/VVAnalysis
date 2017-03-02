@@ -27,15 +27,19 @@ dummyTree.Scan('randVal : globalFunc(randVal)', '', '', 10)
 
 # Generate with setupScaleFactors.py
 # Will need appropriate files in ../data/
-fScales = ROOT.TFile('scaleFactors.root')
+fScales = ROOT.TFile('../data/scaleFactors.root')
 pu = fScales.Get('pileupSF')
 muonIso = fScales.Get('muonTightIsoSF')
 muonId = fScales.Get('muonTightIdSF')
+mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
+mCBMedFakeRate = fScales.Get("mCBMedFakeRate_Svenja")
+eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
+eCBMedFakeRate = fScales.Get("eCBMedFakeRate_Svenja")
 del fScales # Make sure we don't rely on file being open
 
-pu.RegisterGlobalFunction()
-print "pileupSF(3) = ", ROOT.pileupSF(3)
-dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
+#pu.RegisterGlobalFunction()
+#print "pileupSF(3) = ", ROOT.pileupSF(3)
+#dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
 
 muonIso.RegisterGlobalFunction(2) # 2D function
 muonId.RegisterGlobalFunction(2) # 2D function
@@ -43,3 +47,17 @@ print "muonTightIsoSF(1.1, 30) = ", ROOT.muonTightIsoSF(1.1, 30)
 print "muonTightIdSF(1.1, 30) = ", ROOT.muonTightIdSF(1.1, 30)
 dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonTightIsoSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
 dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonTightIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+
+mCBTightFakeRate.RegisterGlobalFunction(2) # 2D function
+print "mCBTightFakeRate_Svenja(1.1, 30) = ", ROOT.mCBTightFakeRate_Svenja(30, 1.1)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : mCBTightFakeRate_Svenja(randVal2*5+30, abs(randVal*2))', '', '', 10)
+mCBMedFakeRate.RegisterGlobalFunction(2) # 2D function
+print "mCBMedFakeRate_Svenja(1.1, 30) = ", ROOT.mCBMedFakeRate_Svenja(30, 1.1)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : mCBMedFakeRate_Svenja(randVal2*5+30, abs(randVal*2))', '', '', 10)
+
+eCBTightFakeRate.RegisterGlobalFunction(2) # 2D function
+print "eCBTightFakeRate_Svenja(1.1, 30) = ", ROOT.eCBTightFakeRate(30, 1.1)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : eCBTightFakeRate_Svenja(randVal2*5+30, abs(randVal*2))', '', '', 10)
+eCBMedFakeRate.RegisterGlobalFunction(2) # 2D function
+print "eCBMedFakeRate_Svenja(1.1, 200) = ", ROOT.eCBMedFakeRate_Svenja(200, 1.1)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : eCBMedFakeRate_Svenja(randVal2*5+30, abs(randVal*2))', '', '', 10)

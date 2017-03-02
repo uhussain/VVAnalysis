@@ -5,8 +5,8 @@
 // found on file: /data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/skim-ntuplize_1.root
 //////////////////////////////////////////////////////////
 
-#ifndef FakeRateSelector_h
-#define FakeRateSelector_h
+#ifndef MakeBackgroundEstimate_h
+#define MakeBackgroundEstimate_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -19,27 +19,29 @@
 
 // Headers needed by this particular selector
 #include <vector>
+#include "Analysis/WZAnalysis/interface/ScaleFactor.h"
 
 
-
-class FakeRateSelector : public TSelector {
+class MakeBackgroundEstimate : public TSelector {
 public :
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
     
+    ScaleFactor * fakeRate_allE;
+    ScaleFactor * fakeRate_allMu;
+    
     TList* histDir_;
-    TH2D* passingTight2D_;
-    TH1D* passingTight1DPt_;
-    TH1D* passingTight1DEta_;
-    TH2D* passingLoose2D_;
-    TH1D* passingLoose1DPt_;
-    TH1D* passingLoose1DEta_;
-    TH2D* ratio2D_;
-    TH1D* ratio1DPt_;
-    TH1D* ratio1DEta_;
-
+    TH1D* zmassHist_;
+    TH1D* zmassHistPPF_;
+    TH1D* zmassHistPFP_;
+    TH1D* zmassHistFPP_;
+    TH1D* zmassHistFFP_;
+    TH1D* zmassHistFPF_;
+    TH1D* zmassHistPFF_;
+    TH1D* zmassHistFFF_;
     Float_t genWeight;
-    Float_t Zmass;
     Float_t type1_pfMETEt;
+    Float_t Mass;
+    Float_t Zmass;
     UInt_t nWWLooseElec;
     UInt_t nWZLooseMuon;
     Bool_t l1IsTight;
@@ -57,14 +59,17 @@ public :
     Float_t m1RelPFIsoDBR04;
     Float_t m2RelPFIsoDBR04;
     Float_t m3RelPFIsoDBR04;
-    Float_t l3Eta;
+    Float_t l1Eta;
     Float_t l1Pt;
+    Float_t l2Eta;
     Float_t l2Pt;
+    Float_t l3Eta;
     Float_t l3Pt;
     
     TBranch* b_genWeight;
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
+    TBranch* b_Mass;
     TBranch* b_nWWLooseElec;
     TBranch* b_nWZLooseMuon;
     TBranch* b_l1IsTight;
@@ -82,14 +87,16 @@ public :
     TBranch* b_m1RelPFIsoDBR04;
     TBranch* b_m2RelPFIsoDBR04;
     TBranch* b_m3RelPFIsoDBR04;
-    TBranch* b_l3Eta;
+    TBranch* b_l1Eta;
     TBranch* b_l1Pt;
+    TBranch* b_l2Eta;
     TBranch* b_l2Pt;
+    TBranch* b_l3Eta;
     TBranch* b_l3Pt;
 
     // Readers to access the data (delete the ones you do not need).
-    FakeRateSelector(TTree * /*tree*/ =0) { }
-    virtual ~FakeRateSelector() { }
+    MakeBackgroundEstimate(TTree * /*tree*/ =0) { }
+    virtual ~MakeBackgroundEstimate() { }
     virtual Int_t   Version() const { return 2; }
     virtual void    Begin(TTree *tree);
     virtual void    SlaveBegin(TTree *tree);
@@ -104,18 +111,29 @@ public :
     virtual void    SlaveTerminate();
     virtual void    Terminate();
 
-    ClassDef(FakeRateSelector,0);
+    ClassDef(MakeBackgroundEstimate,0);
 private:
     std::string name_ = "Unnamed";
     std::string channel_ = "undefined";
-    bool tightZLeptons();
-    bool lepton3IsTight();
+    bool zlep1IsTight(); 
+    bool zlep2IsTight(); 
+    bool wlepIsTight(); 
+    float getl1FakeRate();
+    float getl2FakeRate();
+    float getl3FakeRate();
+    bool IsFPPRegion();
+    bool IsPFPRegion();
+    bool IsPPFRegion();
+    bool IsFPFRegion();
+    bool IsFFPRegion();
+    bool IsPFFRegion();
+    bool IsFFFRegion();
 };
 
 #endif
 
-#ifdef FakeRateSelector_cxx
-void FakeRateSelector::Init(TTree *tree)
+#ifdef MakeBackgroundEstimate_cxx
+void MakeBackgroundEstimate::Init(TTree *tree)
 {
     // The Init() function is called when the selector needs to initialize
     // a new tree or chain. Typically here the reader is initialized.
@@ -128,6 +146,7 @@ void FakeRateSelector::Init(TTree *tree)
     if (name_.find("data") == std::string::npos){
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     }
+    fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
@@ -148,7 +167,9 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e3PVDZ", &e3PVDZ, &b_e3PVDZ);
         
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
     }
@@ -165,10 +186,12 @@ void FakeRateSelector::Init(TTree *tree)
         
         fChain->SetBranchAddress("mIsWZMediumMuon", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("mRelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
-        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
-        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
     }
     else if (channel_ == "emm") { 
         fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
@@ -180,10 +203,12 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
         fChain->SetBranchAddress("m2IsWZMediumMuon", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
-        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
-        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
     }
     else if (channel_ == "mmm") { 
         fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
@@ -194,7 +219,9 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m3IsWZMediumMuon", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m3RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("m3Eta", &l3Eta, &b_l3Eta);
     }
@@ -202,7 +229,7 @@ void FakeRateSelector::Init(TTree *tree)
         throw std::invalid_argument("Invalid channel choice!");
 }
 
-Bool_t FakeRateSelector::Notify()
+Bool_t MakeBackgroundEstimate::Notify()
 {
     // The Notify() function is called when a new file is opened. This
     // can be either for a new TTree in a TChain or when when a new TTree
@@ -214,4 +241,5 @@ Bool_t FakeRateSelector::Notify()
 }
 
 
-#endif // #ifdef FakeRateSelector_cxx
+#endif // #ifdef MakeBackgroundEstimate_cxx
+
