@@ -81,7 +81,7 @@ mCBTightFakeRate.Write()
 eCBMedFakeRate.Write()
 eCBTightFakeRate.Write()
 
-fakeRateFile = ROOT.TFile.Open('../data/fakeRate23Feb2017-3LooseLeptons.root')
+fakeRateFile = ROOT.TFile.Open('../data/fakeRate05Mar2017-3LooseLeptons.root')
 eCBTightFakeRateZjets = ROOT.ScaleFactor("eCBTightFakeRate", "Fake rate from Z+jet")
 eCBTightFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allE'), 0, 0, ROOT.ScaleFactor.NearestEntry)
 mCBTightFakeRateZjets = ROOT.ScaleFactor("mCBTightFakeRate", "Fake rate from Z+jet")
