@@ -3,13 +3,13 @@
         "e" : [ 
             "{object_name}Pt > 10",
             "abs({object_name}Eta) <  2.5",
-            "{object_name}IsCBVIDmedium > 0.5"
+            "{object_name}IsCBVIDHLTSafe > 0.5",
+            "{object_name}IsCBVIDTight > 0.5"
         ],
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsMediumMuonICHEP > 0.5",
-            "{object_name}RelPFIsoDBR04 < 0.15"
+            "{object_name}IsMedium > 0.5"
         ]
     },
     "State" : {
@@ -23,5 +23,6 @@
         ]
     },
     "Event" : [
+        "(singleMuPass || singleIsoMuPass || singleEPass || singleESingleMuPass || singleMuSingleEPass || doubleMuPass || doubleEPass)"
     ]
 }
