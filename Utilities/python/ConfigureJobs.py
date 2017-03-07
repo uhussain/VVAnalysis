@@ -10,11 +10,34 @@ def getManagerPath():
     path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
             "/afs/cern.ch/user/k/kelong/work"
     return path
+def getListOfEWKFilenames():
+    return ["wz3lnu-powheg",
+        "zz4l-powheg",
+        "tzq",
+        "ttz",
+        "ttw",
+        "zzz",
+        "wwz",
+        "www",
+        "zg",
+        "ggZZ4e",
+        "ggZZ4m",
+        "ggZZ2e2mu",
+    ]
+def getListOfNonpromptFilenames():
+    return ["tt-lep",
+        "st-schan",
+        "st-tchan-t",
+        "st-tchan-tbar",
+        "st-tw",
+        "st-tbarw",
+        "DYm50-0j-nlo",
+        "DYm50-1j-nlo",
+        "DYm50-2j-nlo",
+    ]
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
-    selections = selection.split(",")
-    selection_name = "To".join([selections[0],selections[-1]]) \
-        if len(selections) > 1 else selections[0]
+    selection_name = selection.split(",")[-1 ]
     return '-'.join([date, sample_name, analysis, selection_name, 
         ("v%s" % version) if version.isdigit() else version])
 def getNumberAndSizeOfLocalFiles(path_to_files):
@@ -47,7 +70,7 @@ def getListOfHDFSFiles(file_path):
         elif "root" in split[1]:
             files.append("/"+split[1])
     return files
-def getListOfFiles(filelist, manager_path):
+def getListOfFiles(filelist, manager_path, selection='ntuples'):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
@@ -56,7 +79,7 @@ def getListOfFiles(filelist, manager_path):
     for name in filelist:
         if "WZxsec2016" in name:
             allnames = json.load(open("/afs/cern.ch/user/k/kelong/work/"
-                "AnalysisDatasetManager/FileInfo/WZxsec2016/ntuples.json")).keys()
+                "AnalysisDatasetManager/FileInfo/WZxsec2016/%s.json" % selection)).keys()
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
                 names += nodata
@@ -81,9 +104,7 @@ def getListOfFilesWithXSec(filelist, manager_path):
         if "data" in file_name:
             info.update({file_name : 1})
         else:
-            file_info= mc_info[file_name.split("__")[0]]
-            kfac = file_info["kfactor"] if "kfactor" in file_info.keys() else 1
-            info.update({file_name : file_info["cross_section"]*kfac})
+            info.update({file_name : mc_info[file_name.split("__")[0]]["cross_section"]})
     return info
 def getPreviousStep(selection, analysis):
     selection_map = {}
@@ -92,6 +113,7 @@ def getPreviousStep(selection, analysis):
                 "loosepreselection" : "ntuples",
                 "preselection" : "ntuples",
                 "3LooseLeptons" : "ntuples",
+                "3LooseLeptonsNoVeto" : "ntuples",
                 "preselectionLooseVeto" : "ntuples",
                 "preselectionNoVeto" : "ntuples",
                 "LepVetoAnd3lmass" : "preselection",

@@ -163,7 +163,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e1PVDZ", &e1PVDZ, &b_e1PVDZ);
         fChain->SetBranchAddress("e2PVDZ", &e2PVDZ, &b_e2PVDZ);
         
-        fChain->SetBranchAddress("mIsWZMediumMuon", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("mIsMedium", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("mRelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
@@ -176,9 +176,9 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("eIsEB", &e3IsEB, &b_e3IsEB);
         fChain->SetBranchAddress("ePVDXY", &e3PVDXY, &b_e3PVDXY);
         fChain->SetBranchAddress("ePVDZ", &e3PVDZ, &b_e3PVDZ);
-        fChain->SetBranchAddress("m1IsWZMediumMuon", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
-        fChain->SetBranchAddress("m2IsWZMediumMuon", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
@@ -187,11 +187,11 @@ void FakeRateSelector::Init(TTree *tree)
     }
     else if (channel_ == "mmm") { 
         fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
-        fChain->SetBranchAddress("m1IsWZMediumMuon", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
-        fChain->SetBranchAddress("m2IsWZMediumMuon", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
-        fChain->SetBranchAddress("m3IsWZMediumMuon", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("m3IsMedium", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m3RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);

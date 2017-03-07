@@ -10,23 +10,9 @@ def getComLineArgs():
     parser.add_argument("--proof", "-p", 
         action='store_true', help="Don't use proof")
     parser.add_argument("--lumi", "-l", type=float,
-        default=36.87, help="luminosity value (in fb-1)")
+        default=35.87, help="luminosity value (in fb-1)")
     return vars(parser.parse_args())
 
-def getListOfEWKFiles():
-    return ["wz3lnu-powheg",
-        "zz4l-powheg",
-        "tzq",
-        "ttz",
-        "ttw",
-        "zzz",
-        "wwz",
-        "www",
-        "zg",
-        "ggZZ4e",
-        "ggZZ4m",
-        "ggZZ2e2mu",
-    ]
 def writeOutputListItem(item, directory):
     if item.ClassName() == "TList":
         d = directory.Get(item.GetName())
