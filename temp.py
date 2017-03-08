@@ -82,7 +82,7 @@ for item in background:
     if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
         continue
     writeOutputListItem(item, fOut)
-mc = SelectorTools.applySelector(["WZxsec2016-nodata"], "WZSelector", "Wselection", addsumweights=True)
+mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", "Wselection", addsumweights=True)
 for item in mc:
     if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
         continue
