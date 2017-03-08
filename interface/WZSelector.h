@@ -31,11 +31,14 @@ public :
     
     TList* histDir_;
     TH1D* zmassHist_;
+    TH1D* massHist_;
+    TH1D* mjjHist_;
 
     Float_t genWeight;
     Float_t type1_pfMETEt;
     Float_t Mass;
     Float_t Zmass;
+    Float_t mjj;
     UInt_t nWWLooseElec;
     UInt_t nWZLooseMuon;
     Bool_t l1IsTight;
@@ -64,6 +67,7 @@ public :
     TBranch* b_Mass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_Zmass;
+    TBranch* b_mjj;
     TBranch* b_nWWLooseElec;
     TBranch* b_nWZLooseMuon;
     TBranch* b_l1IsTight;
@@ -131,6 +135,7 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     }
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
+    fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);

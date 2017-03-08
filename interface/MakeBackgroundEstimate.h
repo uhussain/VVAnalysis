@@ -31,6 +31,8 @@ public :
     
     TList* histDir_;
     TH1D* zmassHist_;
+    TH1D* massHist_;
+    TH1D* mjjHist_;
     TH1D* zmassHistPPF_;
     TH1D* zmassHistPFP_;
     TH1D* zmassHistFPP_;
@@ -41,6 +43,7 @@ public :
     Float_t genWeight;
     Float_t type1_pfMETEt;
     Float_t Mass;
+    Float_t mjj;
     Float_t Zmass;
     UInt_t nWWLooseElec;
     UInt_t nWZLooseMuon;
@@ -70,6 +73,7 @@ public :
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_Mass;
+    TBranch* b_mjj;
     TBranch* b_nWWLooseElec;
     TBranch* b_nWZLooseMuon;
     TBranch* b_l1IsTight;
@@ -147,6 +151,7 @@ void MakeBackgroundEstimate::Init(TTree *tree)
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     }
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
+    fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
