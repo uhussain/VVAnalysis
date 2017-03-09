@@ -29,8 +29,11 @@ dummyTree.Scan('randVal : globalFunc(randVal)', '', '', 10)
 # Will need appropriate files in ../data/
 fScales = ROOT.TFile('../data/scaleFactors.root')
 pu = fScales.Get('pileupSF')
-muonIso = fScales.Get('muonTightIsoSF')
+muonIso = fScales.Get('muonIsoSF')
 muonId = fScales.Get('muonTightIdSF')
+electronTightId = fScales.Get('electronTightIdSF')
+electronMediumId = fScales.Get('electronMediumIdSF')
+
 #mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
 #mCBMedFakeRate = fScales.Get("mCBMedFakeRate_Svenja")
 #eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
@@ -39,16 +42,21 @@ mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
 del fScales # Make sure we don't rely on file being open
 
-#pu.RegisterGlobalFunction()
-#print "pileupSF(3) = ", ROOT.pileupSF(3)
-#dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
+pu.RegisterGlobalFunction()
+print "pileupSF(3) = ", ROOT.pileupSF(3)
+dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
 
 muonIso.RegisterGlobalFunction(2) # 2D function
 muonId.RegisterGlobalFunction(2) # 2D function
-print "muonTightIsoSF(1.1, 30) = ", ROOT.muonTightIsoSF(1.1, 30)
+print "muonIsoSF(1.1, 30) = ", ROOT.muonIsoSF(1.1, 30)
 print "muonTightIdSF(1.1, 30) = ", ROOT.muonTightIdSF(1.1, 30)
-dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonTightIsoSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonIsoSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
 dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonTightIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+
+electronMediumId.RegisterGlobalFunction(2) # 2D function
+electronTightId.RegisterGlobalFunction(2) # 2D function
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : electronMediumIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : electronTightIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
 
 mCBTightFakeRate.RegisterGlobalFunction(2) # 2D function
 print "mCBTightFakeRate(1.1, 30) = ", ROOT.mCBTightFakeRate(30, 1.1)
