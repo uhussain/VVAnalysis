@@ -36,7 +36,7 @@ def getHistNames(channels):
         return base_hists
     return [x+"_"+y for x in base_hists for y in channels]
 
-def makeCompositeHists(name, members, addRatios=True):
+def makeCompositeHists(name, members, addRatios=True, overflow=True):
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:
@@ -48,6 +48,24 @@ def makeCompositeHists(name, members, addRatios=True):
                     sumweights_hist = fOut.Get("/".join([directory, "sumweights"]))
                     sumweights = sumweights_hist.Integral()
                     hist.Scale(members[directory]*1000*args['lumi']/sumweights)
+                if overflow and isinstance(hist, ROOT.TH1):
+                    print "YES HERE WE ARE:"
+                    xbins = hist.GetNbinsX()
+                    ybins = hist.GetNbinsY()
+                    for i in range(1,xbins):
+                        setbin = hist.GetBin(i, ybins)
+                        obin = hist.GetBin(i, ybins+1)
+                        hist.SetBinContent(setbin, 
+                            hist.GetBinContent(obin)+hist.GetBinContent(setbin))
+                    for i in range(1, ybins):
+                        setbin = hist.GetBin(xbins, i)
+                        obin = hist.GetBin(xbins+1, i)
+                        hist.SetBinContent(setbin, 
+                            hist.GetBinContent(obin)+hist.GetBinContent(setbin))
+                    setbin = hist.GetBin(xbins, ybins)
+                    obin = hist.GetBin(xbins+1, ybins+1)
+                    hist.SetBinContent(setbin, 
+                        hist.GetBinContent(obin)+hist.GetBinContent(setbin))
             else:
                 raise RuntimeError("hist %s was not produced for "
                     "dataset %s!" % (histname, directory))
@@ -100,6 +118,7 @@ def getRatios(hists):
             continue
         ratio = hist.Clone()
         ratio.SetName(hist.GetName().replace("passingTight", "ratio"))
+        ratio.Sumw2()
         ratio.Divide(hists.FindObject(hist.GetName().replace("Tight", "Loose")))
         ratios.append(ratio)
     return ratios
@@ -111,55 +130,55 @@ if args['proof']:
     proof = ROOT.gProof
 today = datetime.date.today().strftime("%d%b%Y")
 tmpFileName = "fakeRate%s-%s.root" % (today, args['selection'])
-fOut = ROOT.TFile(tmpFileName, "UPDATE")#"recreate")
+fOut = ROOT.TFile(tmpFileName, "recreate")
 selector_name = "FakeRateSelector"
 path = ConfigureJobs.getManagerPath()
-#for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
-#    for chan in ["eee", "eem", "emm", "mmm"]:
-#        select = getattr(ROOT, selector_name)()
-#        inputs = ROOT.TList()
-#        select.SetInputList(inputs)
-#        tchan = ROOT.TNamed("channel", chan)
-#        tname = ROOT.TNamed("name", dataset)
-#        inputs.Add(tname)
-#        inputs.Add(tchan)
-#        ROOT.gROOT.cd()
-#        sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1,0,100)
-#        if proof:
-#            proof_path = "_".join([dataset, args['analysis'], 
-#                args['selection']+("#/%s/ntuple" % chan)])
-#            proof.Process(proof_path, select, "")
-#            proof_meta_path = "_".join([dataset, args['analysis'], 
-#                args['selection']+"#/metaInfo/metaInfo"])
-#            ## TODO proof draw command for meta tree
-#            #proof.DrawSelect(proof_path, "1>>sumweights", "")
-#        else: 
-#            chain = ROOT.TChain("%s/ntuple" % chan)
-#            meta_chain = ROOT.TChain("metaInfo/metaInfo")
-#            try:
-#                file_path = ConfigureJobs.getInputFilesPath(dataset, 
-#                    path, args['selection'], args['analysis'])
-#                chain.Add(file_path)
-#                chain.Process(select, "")
-#                if "data" not in dataset and chan == "eee":
-#                    meta_chain.Add(file_path)
-#                    meta_chain.Draw("1>>sumweights", "summedWeights")
-#                    sumweights_hist.SetDirectory(0)
-#            except ValueError as e:
-#                print e
-#                sumweights_hist.Delete()
-#                continue
-#        output = select.GetOutputList()
-#        if chan == "eee":
-#            outputlist = output.FindObject(dataset)
-#            outputlist.Add(sumweights_hist)
-#        for item in output:
-#            if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
-#                continue
-#            writeOutputListItem(item, fOut)
-#        sumweights_hist.Delete()
-#alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path))
-#writeOutputListItem(alldata, fOut)
+for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
+    for chan in ["eee", "eem", "emm", "mmm"]:
+        select = getattr(ROOT, selector_name)()
+        inputs = ROOT.TList()
+        select.SetInputList(inputs)
+        tchan = ROOT.TNamed("channel", chan)
+        tname = ROOT.TNamed("name", dataset)
+        inputs.Add(tname)
+        inputs.Add(tchan)
+        ROOT.gROOT.cd()
+        sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1,0,100)
+        if proof:
+            proof_path = "_".join([dataset, args['analysis'], 
+                args['selection']+("#/%s/ntuple" % chan)])
+            proof.Process(proof_path, select, "")
+            proof_meta_path = "_".join([dataset, args['analysis'], 
+                args['selection']+"#/metaInfo/metaInfo"])
+            ## TODO proof draw command for meta tree
+            #proof.DrawSelect(proof_path, "1>>sumweights", "")
+        else: 
+            chain = ROOT.TChain("%s/ntuple" % chan)
+            meta_chain = ROOT.TChain("metaInfo/metaInfo")
+            try:
+                file_path = ConfigureJobs.getInputFilesPath(dataset, 
+                    path, args['selection'], args['analysis'])
+                chain.Add(file_path)
+                chain.Process(select, "")
+                if "data" not in dataset and chan == "eee":
+                    meta_chain.Add(file_path)
+                    meta_chain.Draw("1>>sumweights", "summedWeights")
+                    sumweights_hist.SetDirectory(0)
+            except ValueError as e:
+                print e
+                sumweights_hist.Delete()
+                continue
+        output = select.GetOutputList()
+        if chan == "eee":
+            outputlist = output.FindObject(dataset)
+            outputlist.Add(sumweights_hist)
+        for item in output:
+            if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
+                continue
+            writeOutputListItem(item, fOut)
+        sumweights_hist.Delete()
+alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path))
+writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), path), False)
 writeOutputListItem(allewk, fOut)

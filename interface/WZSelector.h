@@ -26,16 +26,24 @@ class WZSelector : public TSelector {
 public :
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
     
-    ScaleFactor * fakeRate_allE;
-    ScaleFactor * fakeRate_allMu;
+    ScaleFactor* pileupSF_;
+    ScaleFactor* eIdSF_;
+    ScaleFactor* mIdSF_;
+    ScaleFactor* mIsoSF_;
     
     TList* histDir_;
+    TH1D* nvtxHist_;
     TH1D* zmassHist_;
     TH1D* massHist_;
     TH1D* mjjHist_;
+    TH1D* l1PtHist_;
+    TH1D* l2PtHist_;
+    TH1D* l3PtHist_;
 
     Float_t genWeight;
     Float_t type1_pfMETEt;
+    Float_t nTruePU;
+    UInt_t nvtx;
     Float_t Mass;
     Float_t Zmass;
     Float_t mjj;
@@ -64,6 +72,8 @@ public :
     Float_t l3Pt;
     
     TBranch* b_genWeight;
+    TBranch* b_nTruePU;
+    TBranch* b_nvtx;
     TBranch* b_Mass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_Zmass;
@@ -133,8 +143,10 @@ void WZSelector::Init(TTree *tree)
     fChain = tree;
     if (name_.find("data") == std::string::npos){
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
     }
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
+    fChain->SetBranchAddress("nvtx", &nvtx, &b_nvtx);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);

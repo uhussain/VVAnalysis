@@ -13,7 +13,7 @@ def getDifference(name, dir1, dir2, addRatios=True):
         hist2 = fOut.Get("/".join([dir2, histname]))
         if hist1 and hist2:
             diff = hist1.Clone()
-            diff.Add(hist2, -1)
+            diff.Divide(hist2)
         else:
             raise RuntimeError("hist %s was not produced for "
                 "dataset(s) %s and/or %s!" % (histname, dir1, dir2))
@@ -74,15 +74,22 @@ mCBMedFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
 mCBMedFakeRate.SetName("fakeRate_allMu")
 eCBTightFakeRate.SetName("fakeRate_allE")
-extra_inputs = [eCBTightFakeRate, mCBMedFakeRate]
+
+muonIsoSF = fScales.Get('muonIsoSF')
+muonIdSF = fScales.Get('muonTightIdSF')
+electronTightIdSF = fScales.Get('electronTightIdSF')
+pileupSF = fScales.Get('pileupSF')
+
+fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
+sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 
 #background = SelectorTools.applySelector(["WZxsec2016-data"], "MakeBackgroundEstimate", "3LooseLeptons", extra_inputs=extra_inputs)
-background = SelectorTools.applySelector(["WZxsec2016"], "MakeBackgroundEstimate", "WselectionLooseLeps", extra_inputs=extra_inputs)
+background = SelectorTools.applySelector(["WZxsec2016"], "MakeBackgroundEstimate", "WselectionLooseLeps", extra_inputs=fr_inputs)
 for item in background:
     if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
         continue
     writeOutputListItem(item, fOut)
-mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", "Wselection", addsumweights=True)
+mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", "Wselection", extra_inputs=sf_inputs, addsumweights=True)
 for item in mc:
     if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
         continue
