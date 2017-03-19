@@ -19,6 +19,8 @@ def getComLineArgs():
                         "ntuple (by default they are added)")
     parser.add_argument("-e", "--extraArgs", type=str, default='',
                         help="Extra arguments to pass to skimNtuples script")
+    parser.add_argument("--noSubmit", action='store_true',
+                        help="Create submit scripts but don't call farmout")
     return vars(parser.parse_args())
 
 def getFilesPerJob(path_to_files):
@@ -37,7 +39,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
 # The intention here was to make sure the output order isn't jumbled together,
 # as it is when subprocess outputs are written together. This is an admittedly
 # sloppy solution, however
-def callFarmout(output_dir, script_name):
+def callFarmout(output_dir, script_name, noSubmit):
     log_file_name = '/'.join([output_dir, 'log.txt'])
     with open(log_file_name, 'w') as log:
         log.write('Condor submit info created with the command:'
@@ -54,12 +56,14 @@ def callFarmout(output_dir, script_name):
         log.write('\n' +'-'*80 + '\n')
         log.write('-'*80 + '\n\n')
         log.write('The output of the generated farmout.sh script is below\n')
-    with open(log_file_name, 'a') as log:
-        status = subprocess.call(['bash', script_name], stdout=log, stderr=log)
-    if status != 0:
-        print "Error in submitting files to condor. Check the log file: %s" % log_file_name
+    status = 2
+    if not noSubmit:
+        with open(log_file_name, 'a') as log:
+            status = subprocess.call(['bash', script_name], stdout=log, stderr=log)
+        if status != 0:
+            print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     return status
-def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFacs, extraArgs):
+def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFacs, noSubmit, extraArgs):
     farmout_dict = {}
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
         sample_name, 
@@ -95,9 +99,11 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFa
         not noScaleFacs and ("data" not in sample_name),
         extraArgs
     )
-    status = callFarmout(farmout_dict['job_dir'], script_name)
+    status = callFarmout(farmout_dict['job_dir'], script_name, noSubmit)
     if status == 0:
         print "Submitted jobs for %s file set to condor." % sample_name
+    else: 
+        print "Jobs not submitted"
 def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleFacs, extraArgs):
     fill_dict = {'selection' : selection,
         'analysis' : analysis,
@@ -117,7 +123,8 @@ def main():
     for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path):
         try:
             farmoutNtupleSkim(file_name, path, args['selection'], 
-                args['analysis'], args['version'], args['noScaleFacs'], args['extraArgs'])
+                args['analysis'], args['version'], args['noScaleFacs'], 
+                args['noSubmit'], args['extraArgs'])
         except (ValueError, OSError) as error:
             logging.warning(error)
             logging.warning("Skipping submission for %s" % file_name)

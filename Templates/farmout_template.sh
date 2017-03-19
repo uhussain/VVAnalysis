@@ -10,7 +10,6 @@ if [ ! -f ${job_dir}/analysis_code.tar.gz ]; then
         -zcvf ${job_dir}/analysis_code.tar.gz \
         Cuts/ \
         Utilities/ \
-        ScaleFactors \
         skimNtuples.py
 fi
 if [ ! -f ${job_dir}/input_file_list.txt ]; then
