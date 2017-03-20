@@ -106,9 +106,9 @@ def getListOfFilesWithXSec(filelist, manager_path):
         if "data" in file_name:
             info.update({file_name : 1})
         else:
+            file_info = mc_info[file_name.split("__")[0]]
             kfac = file_info["kfactor"] if "kfactor" in file_info.keys() else 1
-            info.update({file_name : 
-                mc_info[file_name.split("__")[0]]["cross_section"]*kfac})
+            info.update({file_name : file_info["cross_section"]*kfac})
     return info
 def getPreviousStep(selection, analysis):
     selection_map = {}

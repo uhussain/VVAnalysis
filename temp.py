@@ -13,7 +13,7 @@ def getDifference(name, dir1, dir2, addRatios=True):
         hist2 = fOut.Get("/".join([dir2, histname]))
         if hist1 and hist2:
             diff = hist1.Clone()
-            diff.Divide(hist2)
+            diff.Add(hist2, -1)
         else:
             raise RuntimeError("hist %s was not produced for "
                 "dataset(s) %s and/or %s!" % (histname, dir1, dir2))
