@@ -29,6 +29,7 @@ farmoutAnalysisJobs \
     --input-dir=root://cmsxrootd.hep.wisc.edu/ \
     --assume-input-files-exist \
     --extra-inputs=${job_dir}/analysis_code.tar.gz \
+    --input-basenames-not-unique \
     $$1 \
     ${job_name} \
     /afs/cern.ch/work/k/kelong/CMSSW/CMSSW_8_0_23 \

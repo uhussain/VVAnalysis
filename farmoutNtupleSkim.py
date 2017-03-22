@@ -57,11 +57,13 @@ def callFarmout(output_dir, script_name, noSubmit):
         log.write('-'*80 + '\n\n')
         log.write('The output of the generated farmout.sh script is below\n')
     status = 2
-    if not noSubmit:
-        with open(log_file_name, 'a') as log:
-            status = subprocess.call(['bash', script_name], stdout=log, stderr=log)
-        if status != 0:
-            print "Error in submitting files to condor. Check the log file: %s" % log_file_name
+    farmout_command = ['bash', script_name]
+    if noSubmit:
+        farmout_command.append("--no-submit")
+    with open(log_file_name, 'a') as log:
+        status = subprocess.call(farmout_command, stdout=log, stderr=log)
+    if status != 0:
+        print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     return status
 def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFacs, noSubmit, extraArgs):
     farmout_dict = {}
