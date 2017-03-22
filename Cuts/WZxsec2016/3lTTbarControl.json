@@ -7,8 +7,7 @@
     },
     "State" : {
         "eee" : [
-            "e1_e3_Mass > 4 && e2_e3_Mass > 4",
-            "e3IsCBVIDTight > 0.5"
+            "e1_e3_Mass > 4 && e2_e3_Mass > 4"
         ],
         "mmm" : [
             "m1_m3_Mass > 4 && m2_m3_Mass > 4"
@@ -17,8 +16,7 @@
             "e1_m_Mass > 4 && e2_m_Mass > 4"
         ],
         "emm" : [
-            "e_m1_Mass > 4 && e_m2_Mass > 4",
-            "eIsCBVIDTight > 0.5"
+            "e_m1_Mass > 4 && e_m2_Mass > 4"
         ]
     },
     "Event" : [
