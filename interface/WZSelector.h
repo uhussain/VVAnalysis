@@ -39,7 +39,10 @@ public :
     TH1D* l1PtHist_;
     TH1D* l2PtHist_;
     TH1D* l3PtHist_;
+    TH1D* dEtajjHist_;
 
+    std::vector<float>* jetPt = NULL;
+    std::vector<float>* jetEta = NULL;
     Float_t genWeight;
     Float_t type1_pfMETEt;
     Float_t nTruePU;
@@ -47,7 +50,7 @@ public :
     Float_t Mass;
     Float_t Zmass;
     Float_t mjj;
-    UInt_t nWWLooseElec;
+    UInt_t nCBVIDVetoElec;
     UInt_t nWZLooseMuon;
     Bool_t l1IsTight;
     Bool_t l2IsTight;
@@ -71,6 +74,8 @@ public :
     Float_t l3Eta;
     Float_t l3Pt;
     
+    TBranch* b_jetPt;
+    TBranch* b_jetEta;
     TBranch* b_genWeight;
     TBranch* b_nTruePU;
     TBranch* b_nvtx;
@@ -78,7 +83,7 @@ public :
     TBranch* b_type1_pfMETEt;
     TBranch* b_Zmass;
     TBranch* b_mjj;
-    TBranch* b_nWWLooseElec;
+    TBranch* b_nCBVIDVetoElec;
     TBranch* b_nWZLooseMuon;
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
@@ -122,6 +127,8 @@ public :
     ClassDef(WZSelector,0);
 private:
     std::string name_ = "Unnamed";
+    bool isMC_ = false;
+    bool isaQGC_ = false;
     std::string channel_ = "undefined";
     bool zlep1IsTight(); 
     bool zlep2IsTight(); 
@@ -142,14 +149,19 @@ void WZSelector::Init(TTree *tree)
     if (!tree) return;
     fChain = tree;
     if (name_.find("data") == std::string::npos){
+        isMC_ = true;
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
         fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
     }
+    else if (name_.find("aqgc") != std::string::npos)
+        isaQGC_ = true;
+    fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
+    fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("nvtx", &nvtx, &b_nvtx);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
-    fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);
+    fChain->SetBranchAddress("nCBVIDVetoElec", &nCBVIDVetoElec, &b_nCBVIDVetoElec);
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
 
     if (channel_ == "eee") {

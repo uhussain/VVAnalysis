@@ -11,6 +11,7 @@
             "{object_name}IsMedium > 0.5",
             "({object_name}Pt > 20 ? {object_name}PVDXY < 0.02 : {object_name}PVDXY < 0.01)",
             "{object_name}PVDZ < 0.1",
+            "{object_name}TrackIso/pt< 0.4",
             "{object_name}RelPFIsoDBR04 < 0.4"
         ]
     },

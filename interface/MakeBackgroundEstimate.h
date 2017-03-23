@@ -21,7 +21,6 @@
 #include <vector>
 #include "Analysis/WZAnalysis/interface/ScaleFactor.h"
 
-
 class MakeBackgroundEstimate : public TSelector {
 public :
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
@@ -37,6 +36,7 @@ public :
     TH1D* l1PtHist_;
     TH1D* l2PtHist_;
     TH1D* l3PtHist_;
+    TH1D* dEtajjHist_;
     TH1D* zmassHistPPF_;
     TH1D* l1PtHistPPF_;
     TH1D* zmassHistPFP_;
@@ -45,13 +45,16 @@ public :
     TH1D* zmassHistFPF_;
     TH1D* zmassHistPFF_;
     TH1D* zmassHistFFF_;
+    
+    std::vector<float>* jetPt = nullptr;
+    std::vector<float>* jetEta = nullptr;
     UInt_t nvtx;
     Float_t genWeight;
     Float_t type1_pfMETEt;
     Float_t Mass;
     Float_t mjj;
     Float_t Zmass;
-    UInt_t nWWLooseElec;
+    UInt_t nCBVIDVetoElec;
     UInt_t nWZLooseMuon;
     Bool_t l1IsTight;
     Bool_t l2IsTight;
@@ -75,13 +78,15 @@ public :
     Float_t l3Eta;
     Float_t l3Pt;
     
+    TBranch* b_jetPt;
+    TBranch* b_jetEta;
     TBranch* b_nvtx;
     TBranch* b_genWeight;
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_Mass;
     TBranch* b_mjj;
-    TBranch* b_nWWLooseElec;
+    TBranch* b_nCBVIDVetoElec;
     TBranch* b_nWZLooseMuon;
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
@@ -161,8 +166,10 @@ void MakeBackgroundEstimate::Init(TTree *tree)
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
-    fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);
+    fChain->SetBranchAddress("nCBVIDVetoElec", &nCBVIDVetoElec, &b_nCBVIDVetoElec);
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
+    fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
+    fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
 
     if (channel_ == "eee") {
         fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);

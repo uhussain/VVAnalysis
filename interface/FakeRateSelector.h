@@ -40,7 +40,7 @@ public :
     Float_t genWeight;
     Float_t Zmass;
     Float_t type1_pfMETEt;
-    UInt_t nWWLooseElec;
+    UInt_t nCBVIDVetoElec;
     UInt_t nWZLooseMuon;
     Bool_t l1IsTight;
     Bool_t l2IsTight;
@@ -61,11 +61,12 @@ public :
     Float_t l1Pt;
     Float_t l2Pt;
     Float_t l3Pt;
+    Float_t l3MtToMET;
     
     TBranch* b_genWeight;
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
-    TBranch* b_nWWLooseElec;
+    TBranch* b_nCBVIDVetoElec;
     TBranch* b_nWZLooseMuon;
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
@@ -86,6 +87,7 @@ public :
     TBranch* b_l1Pt;
     TBranch* b_l2Pt;
     TBranch* b_l3Pt;
+    TBranch* b_l3MtToMET;
 
     // Readers to access the data (delete the ones you do not need).
     FakeRateSelector(TTree * /*tree*/ =0) { }
@@ -129,7 +131,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     }
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
-    fChain->SetBranchAddress("nWWLooseElec", &nWWLooseElec, &b_nWWLooseElec);
+    fChain->SetBranchAddress("nCBVIDVetoElec", &nCBVIDVetoElec, &b_nCBVIDVetoElec);
     fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
 
     if (channel_ == "eee") {
@@ -151,6 +153,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else if (channel_ == "eem") { 
         fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
@@ -169,6 +172,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else if (channel_ == "emm") { 
         fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
@@ -184,6 +188,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else if (channel_ == "mmm") { 
         fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
@@ -197,6 +202,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("m3Eta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else
         throw std::invalid_argument("Invalid channel choice!");

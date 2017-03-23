@@ -49,7 +49,6 @@ def makeCompositeHists(name, members, addRatios=True, overflow=True):
                     sumweights = sumweights_hist.Integral()
                     hist.Scale(members[directory]*1000*args['lumi']/sumweights)
                 if overflow and isinstance(hist, ROOT.TH1):
-                    print "YES HERE WE ARE:"
                     xbins = hist.GetNbinsX()
                     ybins = hist.GetNbinsY()
                     for i in range(1,xbins):
