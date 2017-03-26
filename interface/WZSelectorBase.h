@@ -118,6 +118,8 @@ public :
     std::set<TNamed**> allObjects_;
     // Derived classes override (and call) this to register new objects
     // With AddObject<Type>(localPtr, ...);
+    virtual void SetupNewDirectory();
+
     template<typename T, typename... Args>
     void AddObject(T* &ptr, Args... args) {
         static_assert(std::is_base_of<TNamed, T>::value, "Objects must inheirit from ROOT TNamed to be streamable from PROOF sessions");
@@ -129,7 +131,7 @@ public :
     void UpdateDirectory();
     ClassDef(WZSelectorBase,0);
 
-private:
+protected:
     std::string name_ = "Unnamed";
     std::string channelName_ = "Unnamed";
     Channel channel_ = Unknown;

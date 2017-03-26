@@ -11,22 +11,18 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
-#include <TSelector.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <exception>
 #include <iostream>
 
 // Headers needed by this particular selector
+#include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
 #include <vector>
 
 
-
-class FakeRateSelector : public TSelector { 
+class FakeRateSelector : public WZSelectorBase { 
 public :
-    TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
-    
-    TList* histDir_; 
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
     TH1D* passingTight1DEta_;
@@ -37,56 +33,24 @@ public :
     TH1D* ratio1DPt_;
     TH1D* ratio1DEta_;
 
-    Float_t genWeight;
     Float_t Zmass;
     Float_t type1_pfMETEt;
     UInt_t nCBVIDVetoElec;
     UInt_t nWZLooseMuon;
-    Bool_t l1IsTight;
-    Bool_t l2IsTight;
-    Bool_t l3IsTight;
-    Bool_t e1IsEB;
-    Bool_t e2IsEB;
-    Bool_t e3IsEB;
-    Float_t e1PVDXY;
-    Float_t e2PVDXY;
-    Float_t e3PVDXY;
-    Float_t e1PVDZ;
-    Float_t e2PVDZ;
-    Float_t e3PVDZ;
-    Float_t m1RelPFIsoDBR04;
-    Float_t m2RelPFIsoDBR04;
-    Float_t m3RelPFIsoDBR04;
-    Float_t l3Eta;
     Float_t l1Pt;
     Float_t l2Pt;
     Float_t l3Pt;
+    Float_t l3Eta;
     Float_t l3MtToMET;
     
-    TBranch* b_genWeight;
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_nCBVIDVetoElec;
     TBranch* b_nWZLooseMuon;
-    TBranch* b_l1IsTight;
-    TBranch* b_l2IsTight;
-    TBranch* b_l3IsTight;
-    TBranch* b_e1IsEB;
-    TBranch* b_e2IsEB;
-    TBranch* b_e3IsEB;
-    TBranch* b_e1PVDXY;
-    TBranch* b_e2PVDXY;
-    TBranch* b_e3PVDXY;
-    TBranch* b_e1PVDZ;
-    TBranch* b_e2PVDZ;
-    TBranch* b_e3PVDZ;
-    TBranch* b_m1RelPFIsoDBR04;
-    TBranch* b_m2RelPFIsoDBR04;
-    TBranch* b_m3RelPFIsoDBR04;
-    TBranch* b_l3Eta;
     TBranch* b_l1Pt;
     TBranch* b_l2Pt;
     TBranch* b_l3Pt;
+    TBranch* b_l3Eta;
     TBranch* b_l3MtToMET;
 
     // Readers to access the data (delete the ones you do not need).
@@ -105,119 +69,9 @@ public :
     virtual TList  *GetOutputList() const { return fOutput; }
     virtual void    SlaveTerminate();
     virtual void    Terminate();
+    virtual void    SetupNewDirectory() override;
 
     ClassDef(FakeRateSelector,0);
-private:
-    std::string name_ = "Unnamed";
-    std::string channel_ = "undefined";
-    bool tightZLeptons();
-    bool lepton3IsTight();
 };
 
 #endif
-
-#ifdef FakeRateSelector_cxx
-void FakeRateSelector::Init(TTree *tree)
-{
-    // The Init() function is called when the selector needs to initialize
-    // a new tree or chain. Typically here the reader is initialized.
-    // It is normally not necessary to make changes to the generated
-    // code, but the routine can be extended by the user if needed.
-    // Init() will be called many times when running on PROOF
-    // (once per file to be processed).
-    if (!tree) return;
-    fChain = tree;
-    if (name_.find("data") == std::string::npos){
-        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
-    }
-    fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
-    fChain->SetBranchAddress("nCBVIDVetoElec", &nCBVIDVetoElec, &b_nCBVIDVetoElec);
-    fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
-
-    if (channel_ == "eee") {
-        fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
-        fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("e3IsCBVIDTight", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("e1IsEB", &e1IsEB, &b_e1IsEB);
-        fChain->SetBranchAddress("e2IsEB", &e2IsEB, &b_e2IsEB);
-        fChain->SetBranchAddress("e3IsEB", &e3IsEB, &b_e3IsEB);
-        fChain->SetBranchAddress("e1PVDXY", &e1PVDXY, &b_e1PVDXY);
-        fChain->SetBranchAddress("e2PVDXY", &e2PVDXY, &b_e2PVDXY);
-        fChain->SetBranchAddress("e3PVDXY", &e3PVDXY, &b_e3PVDXY);
-        fChain->SetBranchAddress("e1PVDZ", &e1PVDZ, &b_e1PVDZ);
-        fChain->SetBranchAddress("e2PVDZ", &e2PVDZ, &b_e2PVDZ);
-        fChain->SetBranchAddress("e3PVDZ", &e3PVDZ, &b_e3PVDZ);
-        
-        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
-        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
-        fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
-        fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
-        fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
-    }
-    else if (channel_ == "eem") { 
-        fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
-        fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("e1IsEB", &e1IsEB, &b_e1IsEB);
-        fChain->SetBranchAddress("e2IsEB", &e2IsEB, &b_e2IsEB);
-        fChain->SetBranchAddress("e1PVDXY", &e1PVDXY, &b_e1PVDXY);
-        fChain->SetBranchAddress("e2PVDXY", &e2PVDXY, &b_e2PVDXY);
-        fChain->SetBranchAddress("e1PVDZ", &e1PVDZ, &b_e1PVDZ);
-        fChain->SetBranchAddress("e2PVDZ", &e2PVDZ, &b_e2PVDZ);
-        
-        fChain->SetBranchAddress("mIsMedium", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("mRelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
-        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
-        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
-        fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
-        fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
-        fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
-    }
-    else if (channel_ == "emm") { 
-        fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
-        fChain->SetBranchAddress("eIsCBVIDTight", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("eIsEB", &e3IsEB, &b_e3IsEB);
-        fChain->SetBranchAddress("ePVDXY", &e3PVDXY, &b_e3PVDXY);
-        fChain->SetBranchAddress("ePVDZ", &e3PVDZ, &b_e3PVDZ);
-        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
-        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
-        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
-        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
-        fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
-        fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
-        fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
-    }
-    else if (channel_ == "mmm") { 
-        fChain->SetBranchAddress("m1_m2_Mass", &Zmass, &b_Zmass);
-        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
-        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
-        fChain->SetBranchAddress("m3IsMedium", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("m3RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
-        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
-        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
-        fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
-        fChain->SetBranchAddress("m3Eta", &l3Eta, &b_l3Eta);
-        fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
-    }
-    else
-        throw std::invalid_argument("Invalid channel choice!");
-}
-
-Bool_t FakeRateSelector::Notify()
-{
-    // The Notify() function is called when a new file is opened. This
-    // can be either for a new TTree in a TChain or when when a new TTree
-    // is started when using PROOF. It is normally not necessary to make changes
-    // to the generated code, but the routine can be extended by the
-    // user if needed. The return value is currently not used.
-
-    return kTRUE;
-}
-
-
-#endif // #ifdef FakeRateSelector_cxx

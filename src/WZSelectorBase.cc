@@ -27,6 +27,12 @@ void WZSelectorBase::Begin(TTree * /*tree*/)
 
 void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
 {
+}
+void WZSelectorBase::Init(TTree *tree)
+{
+    if (!tree) return;
+    fChain = tree;
+    
     TString option = GetOption();
 
     if (GetInputList() != nullptr) {
@@ -40,8 +46,7 @@ void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
         }
     }
     std::cout << "Processing " << name_ << std::endl;
-    AddObject<TH2D>(passingTight2D_, ("passingTight2D_"+channelName_).c_str(), "Tight leptons; p_{T} [GeV]", 
-        4, 10, 50, 3, 0, 2.5);
+    
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
     if ( currentHistDir_ == nullptr ) {
         currentHistDir_ = new TList();
@@ -49,41 +54,47 @@ void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
         fOutput->Add(currentHistDir_);
         // Watch for something that I hope never happens,
         size_t existingObjectPtrsSize = allObjects_.size();
+        SetupNewDirectory();
         if ( existingObjectPtrsSize > 0 && allObjects_.size() != existingObjectPtrsSize ) {
             Abort(Form("WZSelectorBase: Size of allObjects has changed!: %lu to %lu", existingObjectPtrsSize, allObjects_.size()));
         }
     }
     UpdateDirectory();
 
-}
-void WZSelectorBase::Init(TTree *tree)
-{
-    if (!tree) return;
-    fChain = tree;
     isMC_ = false;
     if (name_.find("data") == std::string::npos){
         isMC_ = true;
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     }
 
-    if (channel_ == eee) {
+    if (channelName_ == "eee") {
+        channel_ = eee;
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e3IsCBVIDTight", &l3IsTight, &b_l3IsTight);
     }
-    else if (channel_ == eem) { 
+    else if (channelName_ == "eem") { 
+        channel_ = eem;
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("mIsMedium", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("mRelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
     }
-    else if (channel_ == emm) { 
+    else if (channelName_ == "emm") { 
+        channel_ = emm;
         fChain->SetBranchAddress("eIsCBVIDTight", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
+        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
     }
-    else if (channel_ == mmm) { 
+    else if (channelName_ == "mmm") { 
+        channel_ = mmm;
+        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
+        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
+        fChain->SetBranchAddress("m3IsMedium", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m3RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
     }
     else
@@ -94,8 +105,6 @@ Bool_t WZSelectorBase::Notify()
 {
     return kTRUE;
 }
-
-
 
 Bool_t WZSelectorBase::Process(Long64_t entry)
 {
@@ -155,4 +164,8 @@ void WZSelectorBase::UpdateDirectory()
     *objPtrPtr = (TNamed *) currentHistDir_->FindObject((*objPtrPtr)->GetName());
     if ( *objPtrPtr == nullptr ) Abort("WZSelectorBase: Call to UpdateObject but current directory has no instance");
   }
+}
+
+void WZSelectorBase::SetupNewDirectory()
+{
 }

@@ -5,6 +5,7 @@ import datetime
 from python import UserInput
 from python import ConfigureJobs
 
+channels = ["eee", "eem", "emm", "mmm"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 
@@ -21,6 +22,8 @@ def writeOutputListItem(item, directory):
             ROOT.SetOwnership(d, False)
         for subItem in item:
             writeOutputListItem(subItem, d)
+            if hasattr(subItem, "Delete"):
+                subItem.Delete()
     elif hasattr(item, 'Write'):
         directory.cd()
         item.Write()
@@ -91,7 +94,6 @@ def makeCompositeHists(name, members, addRatios=True, overflow=True):
 def getDifference(name, dir1, dir2, addRatios=True, composite=True):
     differences = ROOT.TList()
     differences.SetName(name)
-    channels = ["eee", "eem", "emm", "mmm"]
     if composite:
         channels.extend(["allE", "allMu"])
     for histname in getHistNames(channels):
@@ -117,7 +119,8 @@ def getRatios(hists):
             continue
         ratio = hist.Clone()
         ratio.SetName(hist.GetName().replace("passingTight", "ratio"))
-        ratio.Sumw2()
+        if not ratio.GetSumw2():
+            ratio.Sumw2()
         ratio.Divide(hists.FindObject(hist.GetName().replace("Tight", "Loose")))
         ratios.append(ratio)
     return ratios
@@ -133,7 +136,7 @@ fOut = ROOT.TFile(tmpFileName, "recreate")
 selector_name = "FakeRateSelector"
 path = ConfigureJobs.getManagerPath()
 for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
-    for chan in ["eee", "eem", "emm", "mmm"]:
+    for chan in channels: #["eee",]:# "eem", "emm", "mmm"]:
         select = getattr(ROOT, selector_name)()
         inputs = ROOT.TList()
         select.SetInputList(inputs)
@@ -175,7 +178,8 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
             if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
                 continue
             writeOutputListItem(item, fOut)
-        sumweights_hist.Delete()
+        if hasattr(sumweights_hist, "Delete"):
+            sumweights_hist.Delete()
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path))
 writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
