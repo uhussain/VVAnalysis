@@ -1,0 +1,134 @@
+//////////////////////////////////////////////////////////
+// This class has been automatically generated on
+// Wed Feb  8 23:47:12 2017 by ROOT version 6.06/01
+// from TTree ntuple/ntuple
+// found on file: /data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/skim-ntuplize_1.root
+//////////////////////////////////////////////////////////
+
+#ifndef WZSelectorBase_h
+#define WZSelectorBase_h
+
+#include <TROOT.h>
+#include <TChain.h>
+#include <TFile.h>
+#include <TSelector.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <exception>
+#include <iostream>
+
+// Headers needed by this particular selector
+#include <vector>
+
+
+
+class WZSelectorBase : public TSelector {
+public :
+    TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
+    
+    TList *currentHistDir_{nullptr};
+    TH2D* passingTight2D_;
+    TH1D* passingTight1DPt_;
+    TH1D* passingTight1DEta_;
+    TH2D* passingLoose2D_;
+    TH1D* passingLoose1DPt_;
+    TH1D* passingLoose1DEta_;
+    TH2D* ratio2D_;
+    TH1D* ratio1DPt_;
+    TH1D* ratio1DEta_;
+
+    Float_t genWeight;
+    Float_t Zmass;
+    Float_t type1_pfMETEt;
+    UInt_t nCBVIDVetoElec;
+    UInt_t nWZLooseMuon;
+    Bool_t l1IsTight;
+    Bool_t l2IsTight;
+    Bool_t l3IsTight;
+    Bool_t e1IsEB;
+    Bool_t e2IsEB;
+    Bool_t e3IsEB;
+    Float_t e1PVDXY;
+    Float_t e2PVDXY;
+    Float_t e3PVDXY;
+    Float_t e1PVDZ;
+    Float_t e2PVDZ;
+    Float_t e3PVDZ;
+    Float_t m1RelPFIsoDBR04;
+    Float_t m2RelPFIsoDBR04;
+    Float_t m3RelPFIsoDBR04;
+    Float_t l3Eta;
+    Float_t l1Pt;
+    Float_t l2Pt;
+    Float_t l3Pt;
+    Float_t l3MtToMET;
+    
+    TBranch* b_genWeight;
+    TBranch* b_Zmass;
+    TBranch* b_type1_pfMETEt;
+    TBranch* b_nCBVIDVetoElec;
+    TBranch* b_nWZLooseMuon;
+    TBranch* b_l1IsTight;
+    TBranch* b_l2IsTight;
+    TBranch* b_l3IsTight;
+    TBranch* b_e1IsEB;
+    TBranch* b_e2IsEB;
+    TBranch* b_e3IsEB;
+    TBranch* b_e1PVDXY;
+    TBranch* b_e2PVDXY;
+    TBranch* b_e3PVDXY;
+    TBranch* b_e1PVDZ;
+    TBranch* b_e2PVDZ;
+    TBranch* b_e3PVDZ;
+    TBranch* b_m1RelPFIsoDBR04;
+    TBranch* b_m2RelPFIsoDBR04;
+    TBranch* b_m3RelPFIsoDBR04;
+    TBranch* b_l3Eta;
+    TBranch* b_l1Pt;
+    TBranch* b_l2Pt;
+    TBranch* b_l3Pt;
+    TBranch* b_l3MtToMET;
+
+    // Readers to access the data (delete the ones you do not need).
+    WZSelectorBase(TTree * /*tree*/ =0) { }
+    virtual ~WZSelectorBase() { }
+    virtual Int_t   Version() const { return 2; }
+    virtual void    Begin(TTree *tree);
+    virtual void    SlaveBegin(TTree *tree);
+    virtual void    Init(TTree *tree);
+    virtual Bool_t  Notify();
+    virtual Bool_t  Process(Long64_t entry);
+    virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }
+    virtual void    SetOption(const char *option) { fOption = option; }
+    virtual void    SetObject(TObject *obj) { fObject = obj; }
+    virtual void    SetInputList(TList *input) { fInput = input; }
+    virtual TList  *GetOutputList() const { return fOutput; }
+    virtual void    SlaveTerminate();
+    virtual void    Terminate();
+
+    // We'll collect pointers to objects from derived classes
+    // as they are registered with AddObject, and update them to
+    // the new object when a dataset is switched
+    std::set<TNamed**> allObjects_;
+    // Derived classes override (and call) this to register new objects
+    // With AddObject<Type>(localPtr, ...);
+    template<typename T, typename... Args>
+    void AddObject(T* &ptr, Args... args) {
+        static_assert(std::is_base_of<TNamed, T>::value, "Objects must inheirit from ROOT TNamed to be streamable from PROOF sessions");
+        ptr = new T(args...);
+        ptr->SetDirectory(gROOT);
+        currentHistDir_->Add(ptr);
+        allObjects_.insert((TNamed**) &ptr);
+    };
+    void UpdateDirectory();
+    ClassDef(WZSelectorBase,0);
+
+private:
+    std::string name_ = "Unnamed";
+    std::string channel_ = "undefined";
+    bool tightZLeptons();
+    bool lepton3IsTight();
+};
+
+#endif
+
