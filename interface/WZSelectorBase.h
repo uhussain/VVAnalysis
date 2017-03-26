@@ -25,7 +25,13 @@
 class WZSelectorBase : public TSelector {
 public :
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
-    
+    enum Channel {
+        eee,
+        eem,
+        emm,
+        mmm,
+        Unknown,
+    }; 
     TList *currentHistDir_{nullptr};
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
@@ -125,7 +131,9 @@ public :
 
 private:
     std::string name_ = "Unnamed";
-    std::string channel_ = "undefined";
+    std::string channelName_ = "Unnamed";
+    Channel channel_ = Unknown;
+    bool isMC_;
     bool tightZLeptons();
     bool lepton3IsTight();
 };

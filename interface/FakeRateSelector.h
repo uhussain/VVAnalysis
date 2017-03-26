@@ -22,11 +22,11 @@
 
 
 
-class FakeRateSelector : public TSelector {
+class FakeRateSelector : public TSelector { 
 public :
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
     
-    TList* histDir_;
+    TList* histDir_; 
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
     TH1D* passingTight1DEta_;
