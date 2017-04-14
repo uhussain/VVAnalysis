@@ -1,10 +1,3 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Wed Feb  8 23:47:12 2017 by ROOT version 6.06/01
-// from TTree ntuple/ntuple
-// found on file: /data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/skim-ntuplize_1.root
-//////////////////////////////////////////////////////////
-
 #ifndef WZSelectorBase_h
 #define WZSelectorBase_h
 
@@ -19,8 +12,6 @@
 
 // Headers needed by this particular selector
 #include <vector>
-
-
 
 class WZSelectorBase : public TSelector {
 public :
@@ -136,8 +127,10 @@ protected:
     std::string channelName_ = "Unnamed";
     Channel channel_ = Unknown;
     bool isMC_;
-    bool tightZLeptons();
+    bool zlep1IsTight();
+    bool zlep2IsTight();
     bool lepton3IsTight();
+    bool tightZLeptons();
 };
 
 #endif

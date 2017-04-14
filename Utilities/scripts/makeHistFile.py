@@ -4,6 +4,22 @@ from python import SelectorTools
 from python import UserInput
 from python import ConfigureJobs
 
+def writeOutputListItem(item, directory):
+    if item.ClassName() == "TList":
+        d = directory.Get(item.GetName())
+        if not d:
+            d = directory.mkdir(item.GetName())
+            ROOT.SetOwnership(d, False)
+        for subItem in item:
+            writeOutputListItem(subItem, d)
+    elif hasattr(item, 'Write'):
+        directory.cd()
+        item.Write()
+    else:
+        print "Couldn't write output item:"
+        print repr(item)
+    directory.cd()
+
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 
@@ -39,6 +55,9 @@ def makeCompositeHists(name, members, lumi):
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:
+        if not fOut.Get(directory):
+            print "Skipping invalid filename %s" % directory
+            continue
         for histname in [i.GetName() for i in fOut.Get(directory).GetListOfKeys()]:
             if histname == "sumweights": continue
             hist = fOut.Get("/".join([directory, histname]))
@@ -57,22 +76,6 @@ def makeCompositeHists(name, members, lumi):
             else:
                 sumhist.Add(hist)
     return composite
-
-def writeOutputListItem(item, directory):
-    if item.ClassName() == "TList":
-        d = directory.Get(item.GetName())
-        if not d:
-            d = directory.mkdir(item.GetName())
-            ROOT.SetOwnership(d, False)
-        for subItem in item:
-            writeOutputListItem(subItem, d)
-    elif hasattr(item, 'Write'):
-        directory.cd()
-        item.Write()
-    else:
-        print "Couldn't write output item:"
-        print repr(item)
-    directory.cd()
 
 args = getComLineArgs()
 tmpFileName = args['output_file']
@@ -94,17 +97,9 @@ pileupSF = fScales.Get('pileupSF')
 fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 
-#background = SelectorTools.applySelector(["WZxsec2016-data"], "MakeBackgroundEstimate", "3LooseLeptons", extra_inputs=extra_inputs)
-background = SelectorTools.applySelector(["WZxsec2016"], "MakeBackgroundEstimate", args['selection'], extra_inputs=fr_inputs)
-for item in background:
-    if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
-        continue
-    writeOutputListItem(item, fOut)
-mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], extra_inputs=sf_inputs, addsumweights=True)
-for item in mc:
-    if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
-        continue
-    writeOutputListItem(item, fOut)
+background = SelectorTools.applySelector(["WZxsec2016"], "MakeBackgroundEstimate", args['selection'], fOut, extra_inputs=fr_inputs)
+mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, extra_inputs=sf_inputs, addsumweights=True)
+
 path = ConfigureJobs.getManagerPath()
 alldata = makeCompositeHists("AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path), args['lumi'])

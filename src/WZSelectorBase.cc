@@ -1,22 +1,3 @@
-// The class definition in WZSelectorBase.h has been generated automatically
-// by the ROOT utility TTree::MakeSelector(). This class is derived
-// from the ROOT class TSelector. For more information on the TSelector
-// framework see $ROOTSYS/README/README.SELECTOR or the ROOT User Manual.
-
-
-// The following methods are defined in this file:
-//    Begin():        called every time a loop on the tree starts,
-//                    a convenient place to create your histograms.
-//    SlaveBegin():   called after Begin(), when on PROOF called only on the
-//                    slave servers.
-//    Process():      called for each event, in this function you decide what
-//                    to read and fill your histograms.
-//    SlaveTerminate: called at the end of the loop on the tree, when on PROOF
-//                    called only on the slave servers.
-//    Terminate():    called at the end of the loop on the tree,
-//                    a convenient place to draw/fit your histograms.
-//
-
 #include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
 #include <TStyle.h>
 
@@ -131,23 +112,34 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     return kTRUE;
 }
 
-bool WZSelectorBase::tightZLeptons() {
+// Meant to be a wrapper for the tight ID just in case it changes
+// To be a function of multiple variables
+bool WZSelectorBase::zlep1IsTight() {
     if (channel_ == eem || channel_ == eee) {
-        return l1IsTight && l2IsTight; 
+        return l1IsTight; 
     }
     else 
-        return m1RelPFIsoDBR04 < 0.15 && m2RelPFIsoDBR04 < 0.15;
+        return l1IsTight;
+}
+
+bool WZSelectorBase::zlep2IsTight() {
+    if (channel_ == eem || channel_ == eee) {
+        return l2IsTight; 
+    }
+    else 
+        return l2IsTight;
+}
+
+bool WZSelectorBase::tightZLeptons() {
+    return zlep1IsTight() && zlep2IsTight(); 
 }
 
 bool WZSelectorBase::lepton3IsTight() {
     if (channel_ == eee || channel_ == emm) {
         return l3IsTight;
     }
-    else if (channel_ == mmm || channel_ == eem) {
-        return m3RelPFIsoDBR04 < 0.15;
-    }
     else
-        return false;
+        return l3IsTight;
 }
 
 void WZSelectorBase::Terminate()

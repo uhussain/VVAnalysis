@@ -4,13 +4,28 @@ import glob
 import datetime
 import ConfigureJobs
 
+def writeOutputListItem(item, directory):
+    if item.ClassName() == "TList":
+        d = directory.Get(item.GetName())
+        if not d:
+            d = directory.mkdir(item.GetName())
+            ROOT.SetOwnership(d, False)
+        for subItem in item:
+            writeOutputListItem(subItem, d)
+    elif hasattr(item, 'Write'):
+        directory.cd()
+        item.Write()
+    else:
+        print "Couldn't write output item:"
+        print repr(item)
+    directory.cd()
 
 def applySelector(filelist, selector_name, selection, 
+        rootfile,
         analysis="WZxsec2016", channels=["eee", "eem", "emm", "mmm"], 
         extra_inputs = [],
         addsumweights=False, proof=False):
     path = ConfigureJobs.getManagerPath()
-    output = []
     for dataset in ConfigureJobs.getListOfFiles(filelist, path):
         for chan in channels:
             select = getattr(ROOT, selector_name)()
@@ -54,5 +69,9 @@ def applySelector(filelist, selector_name, selection,
             if  sumweights_hist:
                 outputlist = out.FindObject(dataset)
                 outputlist.Add(sumweights_hist)
-            output.extend(out)
-    return output
+            for outlist in out:
+                writeOutputListItem(outlist, rootfile)
+                outlist.SetOwner()
+                ROOT.SetOwnership(outlist, False)
+                outlist.Delete()
+
