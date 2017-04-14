@@ -119,7 +119,7 @@ bool WZSelectorBase::zlep1IsTight() {
         return l1IsTight; 
     }
     else 
-        return l1IsTight;
+        return m1RelPFIsoDBR04 < 0.15;
 }
 
 bool WZSelectorBase::zlep2IsTight() {
@@ -127,7 +127,7 @@ bool WZSelectorBase::zlep2IsTight() {
         return l2IsTight; 
     }
     else 
-        return l2IsTight;
+        return m2RelPFIsoDBR04 < 0.15;
 }
 
 bool WZSelectorBase::tightZLeptons() {
@@ -139,7 +139,7 @@ bool WZSelectorBase::lepton3IsTight() {
         return l3IsTight;
     }
     else
-        return l3IsTight;
+        return m3RelPFIsoDBR04 < 0.15;
 }
 
 void WZSelectorBase::Terminate()

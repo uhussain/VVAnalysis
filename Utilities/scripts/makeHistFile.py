@@ -97,7 +97,8 @@ pileupSF = fScales.Get('pileupSF')
 fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 
-background = SelectorTools.applySelector(["WZxsec2016"], "MakeBackgroundEstimate", args['selection'], fOut, extra_inputs=fr_inputs)
+background = SelectorTools.applySelector(["WZxsec2016", "DY*"], 
+    "MakeBackgroundEstimate", args['selection'], fOut, extra_inputs=fr_inputs)
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, extra_inputs=sf_inputs, addsumweights=True)
 
 path = ConfigureJobs.getManagerPath()

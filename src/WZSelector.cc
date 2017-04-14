@@ -70,6 +70,8 @@ void WZSelector::SlaveBegin(TTree * /*tree*/)
 
 Bool_t WZSelector::Process(Long64_t entry)
 {
+    WZSelectorBase::Process(entry);
+
     b_Zmass->GetEntry(entry);
     b_Mass->GetEntry(entry);
     b_nvtx->GetEntry(entry);
