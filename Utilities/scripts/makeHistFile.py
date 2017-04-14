@@ -97,9 +97,13 @@ pileupSF = fScales.Get('pileupSF')
 fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 
+if args['proof']:
+    ROOT.TProof.Open('workers=12')
 background = SelectorTools.applySelector(["WZxsec2016", "DY*"], 
-    "MakeBackgroundEstimate", args['selection'], fOut, extra_inputs=fr_inputs)
-mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, extra_inputs=sf_inputs, addsumweights=True)
+    "WZBackgroundSelector", args['selection'], fOut, 
+        extra_inputs=fr_inputs, proof=args['proof'])
+mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
+        extra_inputs=sf_inputs, addsumweights=True, proof=args['proof'])
 
 path = ConfigureJobs.getManagerPath()
 alldata = makeCompositeHists("AllData", 

@@ -67,11 +67,9 @@ void WZSelector::SlaveBegin(TTree * /*tree*/)
     if (mIsoSF_ == nullptr ) 
         Abort("Must pass muon Iso SF");
 }
-
-Bool_t WZSelector::Process(Long64_t entry)
-{
+void WZSelector::LoadBranches(Long64_t entry) { 
     WZSelectorBase::Process(entry);
-
+    
     b_Zmass->GetEntry(entry);
     b_Mass->GetEntry(entry);
     b_nvtx->GetEntry(entry);
@@ -87,6 +85,11 @@ Bool_t WZSelector::Process(Long64_t entry)
     b_l3Pt->GetEntry(entry);
     b_jetPt->GetEntry(entry);
     b_jetEta->GetEntry(entry);
+    }
+
+Bool_t WZSelector::Process(Long64_t entry)
+{
+    LoadBranches(entry);
     if (isMC_) {
         if (channel_ == eee) {
             genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);

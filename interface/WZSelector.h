@@ -64,6 +64,8 @@ public :
     virtual void    SlaveBegin(TTree *tree) override;
 
     ClassDefOverride(WZSelector,0);
+protected:
+    void LoadBranches(Long64_t entry);
 };
 
 #endif

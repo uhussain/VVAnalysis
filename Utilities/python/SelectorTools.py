@@ -42,7 +42,7 @@ def applySelector(filelist, selector_name, selection,
             if proof:
                 proof_path = "_".join([dataset, analysis, 
                     selection+("#/%s/ntuple" % chan)])
-                proof.Process(proof_path, select, "")
+                ROOT.gProof.Process(proof_path, select, "")
                 proof_meta_path = "_".join([dataset, analysis, 
                     selection+"#/metaInfo/metaInfo"])
                 ## TODO proof draw command for meta tree
@@ -65,13 +65,14 @@ def applySelector(filelist, selector_name, selection,
                     if sumweights_hist:
                         sumweights_hist.Delete()
                     continue
-            out = select.GetOutputList()
+            output_list = select.GetOutputList()
             if  sumweights_hist:
-                outputlist = out.FindObject(dataset)
-                outputlist.Add(sumweights_hist)
-            for outlist in out:
-                writeOutputListItem(outlist, rootfile)
-                outlist.SetOwner()
-                ROOT.SetOwnership(outlist, False)
-                outlist.Delete()
+                dataset_list = output_list.FindObject(dataset)
+                dataset_list.Add(sumweights_hist)
+            for out in output_list:
+                writeOutputListItem(out, rootfile)
+                if out.ClassName() == "TList":
+                    out.SetOwner()
+                    ROOT.SetOwnership(out, False)
+                    out.Delete()
 
