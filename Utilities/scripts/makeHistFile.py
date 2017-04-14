@@ -99,8 +99,9 @@ sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
-background = SelectorTools.applySelector(["WZxsec2016", "DY*"], 
-    "WZBackgroundSelector", args['selection'], fOut, 
+background = SelectorTools.applySelector(["WZxsec2016-data"] +
+    ConfigureJobs.getListOfEWKFilenames(), 
+        "WZBackgroundSelector", args['selection'], fOut, 
         extra_inputs=fr_inputs, proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs, addsumweights=True, proof=args['proof'])

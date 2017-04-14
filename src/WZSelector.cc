@@ -85,11 +85,45 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_l3Pt->GetEntry(entry);
     b_jetPt->GetEntry(entry);
     b_jetEta->GetEntry(entry);
-    }
+    dEtajj = 0;
+    if (jetEta->size() >= 2)
+        dEtajj = std::abs(jetEta->at(0) - jetEta->at(1));
+}
+
+bool WZSelector::PassesSelection(bool tightLeps) { 
+    //if (type1_pfMETEt < 30)
+    //    return true;
+    //if (Mass < 100)
+    //    return true;
+    //if (l1Pt < 25 || l2Pt < 15)
+    //    return true;
+    //if (Zmass > 116.1876 || Zmass < 76.1876)
+    //    return true;
+    if (nWZLooseMuon + nCBVIDVetoElec > 3)
+        return false;
+    if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
+        return false;
+    return true;
+}
+
+void WZSelector::FillHistograms(float weight, bool noBlind) { 
+    zmassHist_->Fill(Zmass, weight);
+    nvtxHist_->Fill(nvtx, weight);
+    l1PtHist_->Fill(l1Pt, weight);
+    l2PtHist_->Fill(l2Pt, weight);
+    l3PtHist_->Fill(l3Pt, weight);
+    mjjHist_->Fill(mjj, weight*(isMC_ || mjj < 500 || noBlind));
+    if (dEtajj > 0)
+        dEtajjHist_->Fill(dEtajj, weight*(isMC_ || dEtajj < 2.5));
+    massHist_->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
+}
 
 Bool_t WZSelector::Process(Long64_t entry)
 {
     LoadBranches(entry);
+    if (!PassesSelection(true))
+        return true;
+
     if (isMC_) {
         if (channel_ == eee) {
             genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
@@ -122,33 +156,9 @@ Bool_t WZSelector::Process(Long64_t entry)
             genWeight *= pileupSF_->Evaluate1D(nTruePU);
         }
     }
-    //if (type1_pfMETEt < 30)
-    //    return true;
-    //if (Mass < 100)
-    //    return true;
-    //if (l1Pt < 25 || l2Pt < 15)
-    //    return true;
-    //if (Zmass > 116.1876 || Zmass < 76.1876)
-    //    return true;
-    if (nWZLooseMuon + nCBVIDVetoElec > 3)
-        return true;
-    if (!(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
-        return true;
-    float dEtajj = 0;
-    if (jetEta->size() >= 2)
-        dEtajj = std::abs(jetEta->at(0) - jetEta->at(1));
-    //if (dEtajj < 2.5 || mjj < 500)
-    //if (!(dEtajj > 2.5 || mjj > 500))
-    //    return true;
-    zmassHist_->Fill(Zmass, genWeight);
-    nvtxHist_->Fill(nvtx, genWeight);
-    l1PtHist_->Fill(l1Pt, genWeight);
-    l2PtHist_->Fill(l2Pt, genWeight);
-    l3PtHist_->Fill(l3Pt, genWeight);
-    mjjHist_->Fill(mjj, genWeight*(isMC_ || mjj < 500));
-    if (dEtajj > 0)
-        dEtajjHist_->Fill(dEtajj, genWeight*(isMC_ || dEtajj < 2.5));
-    massHist_->Fill(Mass, genWeight*(isMC_ || Mass < 400));
+    
+    FillHistograms(genWeight, false);
+    
     return true;
 }
 

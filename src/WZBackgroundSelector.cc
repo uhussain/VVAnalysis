@@ -31,23 +31,12 @@ void WZBackgroundSelector::SetupNewDirectory()
 
 Bool_t WZBackgroundSelector::Process(Long64_t entry)
 {
-    WZSelector::LoadBranches(entry);
-
-    //if (nCBVIDVetoElec + nWZLooseMuon > 3)
+    LoadBranches(entry);
+    //if (!PassesSelection(false))
     //    return true;
-    ////if (type1_pfMETEt < 30)
-    ////    return true;
-    ////if (Mass < 100)
-    ////    return true;
     if (nWZLooseMuon + nCBVIDVetoElec > 3)
         return true;
     float evtwgt = 0;
-    float dEtajj = 0;
-    if (jetEta->size() >= 2)
-        dEtajj = std::abs(jetEta->at(0) - jetEta->at(1));
-    //if (dEtajj < 2.5 || mjj < 500)
-    //if (!(dEtajj > 2.5 || mjj > 500))
-    //    return true;
     if (IsFPPRegion()) {
         zmassHistFPP_->Fill(Zmass, genWeight);
         evtwgt = getl1FakeRate()*genWeight;
@@ -57,7 +46,6 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
         evtwgt = getl2FakeRate()*genWeight;
     }
     else if (IsPPFRegion()) {
-    //if (IsPPFRegion()) {
         zmassHistPPF_->Fill(Zmass, genWeight);
         evtwgt = getl3FakeRate()*genWeight;
     }
@@ -79,16 +67,10 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
     }
     else
         return true;
-    nvtxHist_->Fill(nvtx, evtwgt);
-    zmassHist_->Fill(Zmass, evtwgt);
-    massHist_->Fill(Mass, evtwgt);
-    mjjHist_->Fill(mjj, evtwgt);
-    if (dEtajj > 0)
-        dEtajjHist_->Fill(dEtajj, evtwgt);
-    l1PtHist_->Fill(l1Pt, evtwgt);
-    l2PtHist_->Fill(l2Pt, evtwgt);
-    l3PtHist_->Fill(l3Pt, evtwgt);
-    return kTRUE;
+       
+    FillHistograms(evtwgt, true);
+
+    return true;
 }
 
 float WZBackgroundSelector::getl1FakeRate() {

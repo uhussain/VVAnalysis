@@ -21,6 +21,7 @@ public :
     TH1D* l3PtHist_;
     TH1D* dEtajjHist_;
 
+    float dEtajj;
     std::vector<float>* jetPt = NULL;
     std::vector<float>* jetEta = NULL;
     Float_t type1_pfMETEt;
@@ -66,6 +67,8 @@ public :
     ClassDefOverride(WZSelector,0);
 protected:
     void LoadBranches(Long64_t entry);
+    void FillHistograms(float weight, bool noBlind);
+    bool PassesSelection(bool tightLeps);
 };
 
 #endif
