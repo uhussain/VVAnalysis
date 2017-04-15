@@ -11,8 +11,6 @@ void WZSelector::Init(TTree *tree)
     fChain->SetBranchAddress("nvtx", &nvtx, &b_nvtx);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
-    fChain->SetBranchAddress("nCBVIDVetoElec", &nCBVIDVetoElec, &b_nCBVIDVetoElec);
-    fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
 
     if (channel_ == eee) {
         fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
@@ -75,8 +73,6 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_nvtx->GetEntry(entry);
     b_mjj->GetEntry(entry);
     b_type1_pfMETEt->GetEntry(entry);
-    b_nCBVIDVetoElec->GetEntry(entry);
-    b_nWZLooseMuon->GetEntry(entry);
     b_l1Eta->GetEntry(entry);
     b_l1Pt->GetEntry(entry);
     b_l2Eta->GetEntry(entry);
@@ -99,7 +95,7 @@ bool WZSelector::PassesSelection(bool tightLeps) {
     //    return true;
     //if (Zmass > 116.1876 || Zmass < 76.1876)
     //    return true;
-    if (nWZLooseMuon + nCBVIDVetoElec > 3)
+    if (!passesLeptonVeto)
         return false;
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
         return false;
@@ -175,4 +171,3 @@ void WZSelector::SetupNewDirectory()
     AddObject<TH1D>(l2PtHist_, ("Zlep2_Pt_"+channelName_).c_str(), "l2Pt; p_{T} trailing Z lepton [GeV]; Events / 10 GeV;", 12, 15, 135);
     AddObject<TH1D>(l3PtHist_, ("Wlep_Pt_"+channelName_).c_str(), "l2Pt; p_{T} W lepton [GeV]; Events / 10 GeV;", 10, 20, 220);
 }
-

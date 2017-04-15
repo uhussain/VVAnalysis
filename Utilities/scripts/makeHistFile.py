@@ -77,6 +77,8 @@ def makeCompositeHists(name, members, lumi):
                 sumhist.Add(hist)
     return composite
 
+ROOT.gROOT.SetBatch(True)
+
 args = getComLineArgs()
 tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")

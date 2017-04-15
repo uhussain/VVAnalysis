@@ -32,10 +32,10 @@ void WZBackgroundSelector::SetupNewDirectory()
 Bool_t WZBackgroundSelector::Process(Long64_t entry)
 {
     LoadBranches(entry);
-    //if (!PassesSelection(false))
-    //    return true;
-    if (nWZLooseMuon + nCBVIDVetoElec > 3)
+    
+    if (!passesLeptonVeto)
         return true;
+
     float evtwgt = 0;
     if (IsFPPRegion()) {
         zmassHistFPP_->Fill(Zmass, genWeight);

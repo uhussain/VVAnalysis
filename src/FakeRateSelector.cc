@@ -7,8 +7,6 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
 
     b_Zmass->GetEntry(entry);
     b_type1_pfMETEt->GetEntry(entry);
-    b_nCBVIDVetoElec->GetEntry(entry);
-    b_nWZLooseMuon->GetEntry(entry);
     
     b_l1Pt->GetEntry(entry);
     b_l2Pt->GetEntry(entry);
@@ -16,6 +14,8 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
     b_l3Eta->GetEntry(entry);
     b_l3MtToMET->GetEntry(entry);
     
+    if (!passesLeptonVeto)
+        return true;
     if (l1Pt < 25 || l2Pt < 15)
         return true;
     if (Zmass > 111.1876 || Zmass < 81.1876)
@@ -42,8 +42,6 @@ void FakeRateSelector::Init(TTree *tree)
     WZSelectorBase::Init(tree);
 
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
-    fChain->SetBranchAddress("nCBVIDVetoElec", &nCBVIDVetoElec, &b_nCBVIDVetoElec);
-    fChain->SetBranchAddress("nWZLooseMuon", &nWZLooseMuon, &b_nWZLooseMuon);
 
     if (channel_ == eee) {
         fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);

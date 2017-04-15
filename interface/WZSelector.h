@@ -30,8 +30,6 @@ public :
     Float_t Mass;
     Float_t Zmass;
     Float_t mjj;
-    UInt_t nCBVIDVetoElec;
-    UInt_t nWZLooseMuon;
     Float_t l1Eta;
     Float_t l1Pt;
     Float_t l2Eta;
@@ -47,8 +45,6 @@ public :
     TBranch* b_type1_pfMETEt;
     TBranch* b_Zmass;
     TBranch* b_mjj;
-    TBranch* b_nCBVIDVetoElec;
-    TBranch* b_nWZLooseMuon;
     TBranch* b_l1Eta;
     TBranch* b_l1Pt;
     TBranch* b_l2Eta;

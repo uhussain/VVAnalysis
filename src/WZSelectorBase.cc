@@ -80,6 +80,8 @@ void WZSelectorBase::Init(TTree *tree)
     }
     else
         throw std::invalid_argument("Invalid channel choice!");
+    fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
+    fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
 }
 
 Bool_t WZSelectorBase::Notify()
@@ -95,6 +97,10 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_l1IsTight->GetEntry(entry);
     b_l2IsTight->GetEntry(entry);
     b_l3IsTight->GetEntry(entry);
+    b_nCBVIDTightElec->GetEntry(entry);
+    b_nWZTightMuon->GetEntry(entry);
+    
+    passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3;
     
     if (channel_ == eem) {
         b_m3RelPFIsoDBR04->GetEntry(entry);

@@ -34,11 +34,12 @@ public :
     TH1D* ratio1DPt_;
     TH1D* ratio1DEta_;
 
+    bool passesLeptonVeto;
     Float_t genWeight;
     Float_t Zmass;
     Float_t type1_pfMETEt;
-    UInt_t nCBVIDVetoElec;
-    UInt_t nWZLooseMuon;
+    UInt_t nCBVIDTightElec;
+    UInt_t nWZTightMuon;
     Bool_t l1IsTight;
     Bool_t l2IsTight;
     Bool_t l3IsTight;
@@ -63,8 +64,8 @@ public :
     TBranch* b_genWeight;
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
-    TBranch* b_nCBVIDVetoElec;
-    TBranch* b_nWZLooseMuon;
+    TBranch* b_nCBVIDTightElec;
+    TBranch* b_nWZTightMuon;
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
     TBranch* b_l3IsTight;
