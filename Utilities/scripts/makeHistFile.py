@@ -77,6 +77,19 @@ def makeCompositeHists(name, members, lumi):
                 sumhist.Add(hist)
     return composite
 
+def getHistInfo():
+    info = ROOT.TList()
+    info.SetName("histinfo")
+    info.Add(ROOT.TNamed("Mass", "Mass; M_{3l} [GeV]; Events / 30 GeV; $ 14, 100, 520"))
+    info.Add(ROOT.TNamed("nvtx", "nvtx; Number of Vertices; Events; $ 60, 0, 60"))
+    info.Add(ROOT.TNamed("ZMass", "ZMass; M_{ll} [GeV]; Events; $ 15, 0, 150"))
+    info.Add(ROOT.TNamed("mjj", "mjj; m_{jj} [GeV]; Events / 50 GeV; $ 15, 0, 1500"))
+    info.Add(ROOT.TNamed("dEtajj", "dEtajj; #Delta#eta(j_{1}, j_{2}); Events; $ 12, 0, 6"))
+    info.Add(ROOT.TNamed("Zlep1_Pt", "Zlepl1_Pt; p_{T} leading Z lepton [GeV]; Events / 15 GeV; $ 10, 25, 175"))
+    info.Add(ROOT.TNamed("Zlep2_Pt", "Zlep2_Pt; p_{T} trailing Z lepton [GeV]; Events / 10 GeV; $ 12, 15, 135"))
+    info.Add(ROOT.TNamed("Wlep_Pt", "Wlep_Pt; p_{T} W lepton [GeV]; Events / 10 GeV; $ 10, 20, 220"))
+    return info
+
 ROOT.gROOT.SetBatch(True)
 
 args = getComLineArgs()
@@ -98,15 +111,16 @@ pileupSF = fScales.Get('pileupSF')
 
 fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
+hist_inputs = [getHistInfo()]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 background = SelectorTools.applySelector(["WZxsec2016-data"] +
     ConfigureJobs.getListOfEWKFilenames(), 
         "WZBackgroundSelector", args['selection'], fOut, 
-        extra_inputs=fr_inputs, proof=args['proof'])
+        extra_inputs=fr_inputs+hist_inputs, proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
-        extra_inputs=sf_inputs, addsumweights=True, proof=args['proof'])
+        extra_inputs=sf_inputs+hist_inputs, addsumweights=True, proof=args['proof'])
 
 path = ConfigureJobs.getManagerPath()
 alldata = makeCompositeHists("AllData", 

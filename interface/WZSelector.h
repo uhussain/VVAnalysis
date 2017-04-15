@@ -11,15 +11,32 @@ public :
     ScaleFactor* eIdSF_;
     ScaleFactor* mIdSF_;
     ScaleFactor* mIsoSF_;
+    TList* histInfo_;
     
-    TH1D* nvtxHist_;
-    TH1D* zmassHist_;
-    TH1D* massHist_;
-    TH1D* mjjHist_;
-    TH1D* l1PtHist_;
-    TH1D* l2PtHist_;
-    TH1D* l3PtHist_;
-    TH1D* dEtajjHist_;
+    //TH1D* nvtxHist_;
+    //TH1D* zmassHist_;
+    //TH1D* massHist_;
+    //TH1D* mjjHist_;
+    //TH1D* l1PtHist_;
+    //TH1D* l2PtHist_;
+    //TH1D* l3PtHist_;
+    //TH1D* dEtajjHist_;
+    std::map<const char*, TH1D*> hists1D_ = 
+    {
+        { "type1_pfMETEt", nullptr }, 
+        { "nTruePU", nullptr },
+        { "nvtx", nullptr },
+        { "ZMass", nullptr },
+        { "Zlep1_Eta", nullptr },
+        { "Zlep1_Pt", nullptr },
+        { "Zlep2_Eta", nullptr },
+        { "Zlep2_Pt", nullptr },
+        { "Wlep_Eta", nullptr },
+        { "Wlep_Pt", nullptr },
+        { "Mass", {} },
+        { "mjj", nullptr },
+        { "dEtajj", nullptr }
+    };
 
     float dEtajj;
     std::vector<float>* jetPt = NULL;
@@ -65,6 +82,7 @@ protected:
     void LoadBranches(Long64_t entry);
     void FillHistograms(float weight, bool noBlind);
     bool PassesSelection(bool tightLeps);
+    std::vector<std::string> ReadHistData(std::string histDataString);
 };
 
 #endif

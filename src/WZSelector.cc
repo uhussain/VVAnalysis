@@ -1,5 +1,5 @@
 #include "Analysis/WZAnalysis/interface/WZSelector.h"
-#include <TStyle.h>
+#include <boost/algorithm/string.hpp>
 
 void WZSelector::Init(TTree *tree)
 {
@@ -103,15 +103,26 @@ bool WZSelector::PassesSelection(bool tightLeps) {
 }
 
 void WZSelector::FillHistograms(float weight, bool noBlind) { 
-    zmassHist_->Fill(Zmass, weight);
-    nvtxHist_->Fill(nvtx, weight);
-    l1PtHist_->Fill(l1Pt, weight);
-    l2PtHist_->Fill(l2Pt, weight);
-    l3PtHist_->Fill(l3Pt, weight);
-    mjjHist_->Fill(mjj, weight*(isMC_ || mjj < 500 || noBlind));
-    if (dEtajj > 0)
-        dEtajjHist_->Fill(dEtajj, weight*(isMC_ || dEtajj < 2.5));
-    massHist_->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
+    //zmassHist_->Fill(Zmass, weight);
+    //nvtxHist_->Fill(nvtx, weight);
+    //l1PtHist_->Fill(l1Pt, weight);
+    //l2PtHist_->Fill(l2Pt, weight);
+    //l3PtHist_->Fill(l3Pt, weight);
+    //mjjHist_->Fill(mjj, weight*(isMC_ || mjj < 500 || noBlind));
+    //if (dEtajj > 0)
+    //    dEtajjHist_->Fill(dEtajj, weight*(isMC_ || dEtajj < 2.5));
+    //massHist_->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
+    std::cout << "And now for mass it's" << hists1D_["Mass"] << std::endl;
+    if (hists1D_["Mass"] != nullptr) {
+        std::cout << "Filling! ";
+        hists1D_["Mass"]->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
+    }
+    if (hists1D_["Zlep1_Pt"] != nullptr)
+        hists1D_["Zlep1_Pt"]->Fill(l1Pt, weight);
+    if (hists1D_["Zlep2_Pt"] != nullptr)
+        hists1D_["Zlep2_Pt"]->Fill(l2Pt, weight);
+    if (hists1D_["Wlep_Pt"] != nullptr)
+        hists1D_["Wlep_Pt"]->Fill(l3Pt, weight);
 }
 
 Bool_t WZSelector::Process(Long64_t entry)
@@ -158,16 +169,51 @@ Bool_t WZSelector::Process(Long64_t entry)
     return true;
 }
 
+std::vector<std::string> WZSelector::ReadHistData(std::string histDataString) {
+    std::vector<std::string> histData;
+    boost::split(histData, histDataString, boost::is_any_of("$"));
+    std::vector<std::string> binInfo;
+    if (histData.size() != 2)
+        return {};
+    
+    boost::split(binInfo, histData[1], boost::is_any_of(","));
+   
+    histData.pop_back();
+    for (const auto& x : binInfo) {
+        histData.push_back(x);
+    }
+    
+    return histData;
+}
+
 void WZSelector::SetupNewDirectory()
 {
     WZSelectorBase::SetupNewDirectory();
-
-    AddObject<TH1D>(nvtxHist_, ("nvtx_"+channelName_).c_str(), "nvtx; Number of Vertices; Events;", 60, 0, 60);
-    AddObject<TH1D>(zmassHist_, ("ZMass_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(massHist_, ("Mass_"+channelName_).c_str(), "Mass; M_{3l} [GeV]; Events / 30 GeV;", 14, 100, 520);
-    AddObject<TH1D>(mjjHist_, ("mjj_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events / 50 GeV;", 15, 0, 1500);
-    AddObject<TH1D>(dEtajjHist_, ("dEtajj_"+channelName_).c_str(), "dEtajj; #Delta#eta(j_{1}, j_{2}); Events;", 12, 0, 6);
-    AddObject<TH1D>(l1PtHist_, ("Zlep1_Pt_"+channelName_).c_str(), "l1Pt; p_{T} leading Z lepton [GeV]; Events / 15 GeV;", 10, 25, 175);
-    AddObject<TH1D>(l2PtHist_, ("Zlep2_Pt_"+channelName_).c_str(), "l2Pt; p_{T} trailing Z lepton [GeV]; Events / 10 GeV;", 12, 15, 135);
-    AddObject<TH1D>(l3PtHist_, ("Wlep_Pt_"+channelName_).c_str(), "l2Pt; p_{T} W lepton [GeV]; Events / 10 GeV;", 10, 20, 220);
+   
+    histInfo_ = (TList *) GetInputList()->FindObject("histinfo");
+    if (histInfo_ == nullptr ) 
+        Abort("Must pass histogram information");
+    
+    //for (auto & histEntry : hists1D_) {  
+        TNamed* currentHistInfo = dynamic_cast<TNamed*>(histInfo_->FindObject("Mass"));
+        //TNamed* currentHistInfo = dynamic_cast<TNamed*>(histInfo_->FindObject(histEntry.first));
+        if (currentHistInfo != nullptr) { 
+            std::vector<std::string> histData = ReadHistData(currentHistInfo->GetTitle());
+            if (histData.size() != 4) {
+                //std::cerr << "Malformed data string for histogram '" << histEntry.first
+                std::cerr << "Malformed data string for histogram '"
+                        << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'" << std::endl;
+                exit(1);
+            }
+            //std::cout << "Hist pointer is " << histEntry.second << std::endl;
+            std::cout << "Hist pointer is " << hists1D_["Mass"] << std::endl;
+            //AddObject<TH1D>(hists1D_[histEntry.first], 
+                //(std::string(histEntry.first)+"_"+channelName_).c_str(), histData[0].c_str(),
+            AddObject<TH1D>(hists1D_["Mass"], 
+                (std::string("Mass")+"_"+channelName_).c_str(), histData[0].c_str(),
+                std::stoi(histData[1]), std::stof(histData[2]), std::stof(histData[3]));
+            //std::cout << "And now it's " << histEntry.second << std::endl;
+        }
+    //}
+    std::cout << "And now for mass it's" << hists1D_["Mass"] << std::endl;
 }
