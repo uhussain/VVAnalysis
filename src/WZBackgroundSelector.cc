@@ -20,13 +20,13 @@ void WZBackgroundSelector::SetupNewDirectory()
         named->SetName(name.insert(name.length()-3, "Fakes_").c_str());
     }
     
-    AddObject<TH1D>(zmassHistPPF_, ("ZMass_PPF"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistPFP_, ("ZMass_PFP"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistFPP_, ("ZMass_FPP"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistFFP_, ("ZMass_FFP"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistFPF_, ("ZMass_FPF"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistPFF_, ("ZMass_PFF"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistFFF_, ("ZMass_FFF"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
+    AddObject<TH1D>(zmassHistPPF_, ("ZMass_PPF_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
+    AddObject<TH1D>(zmassHistPFP_, ("ZMass_PFP_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
+    AddObject<TH1D>(zmassHistFPP_, ("ZMass_FPP_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
+    AddObject<TH1D>(zmassHistFFP_, ("ZMass_FFP_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
+    AddObject<TH1D>(zmassHistFPF_, ("ZMass_FPF_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
+    AddObject<TH1D>(zmassHistPFF_, ("ZMass_PFF_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
+    AddObject<TH1D>(zmassHistFFF_, ("ZMass_FFF_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
 }
 
 Bool_t WZBackgroundSelector::Process(Long64_t entry)

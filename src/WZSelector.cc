@@ -103,26 +103,20 @@ bool WZSelector::PassesSelection(bool tightLeps) {
 }
 
 void WZSelector::FillHistograms(float weight, bool noBlind) { 
-    //zmassHist_->Fill(Zmass, weight);
-    //nvtxHist_->Fill(nvtx, weight);
-    //l1PtHist_->Fill(l1Pt, weight);
-    //l2PtHist_->Fill(l2Pt, weight);
-    //l3PtHist_->Fill(l3Pt, weight);
-    //mjjHist_->Fill(mjj, weight*(isMC_ || mjj < 500 || noBlind));
-    //if (dEtajj > 0)
-    //    dEtajjHist_->Fill(dEtajj, weight*(isMC_ || dEtajj < 2.5));
-    //massHist_->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
-    std::cout << "And now for mass it's" << hists1D_["Mass"] << std::endl;
-    if (hists1D_["Mass"] != nullptr) {
-        std::cout << "Filling! ";
+    if (hists1D_["mjj"] != nullptr)
+        hists1D_["mjj"]->Fill(mjj, weight*(isMC_ || mjj < 500 || noBlind));
+    if (hists1D_["dEtajj"] != nullptr && dEtajj > 0)
+        hists1D_["dEtajj"]->Fill(dEtajj, weight*(isMC_ || dEtajj < 2.5 || noBlind));
+    if (hists1D_["Mass"] != nullptr)
         hists1D_["Mass"]->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
-    }
     if (hists1D_["Zlep1_Pt"] != nullptr)
         hists1D_["Zlep1_Pt"]->Fill(l1Pt, weight);
     if (hists1D_["Zlep2_Pt"] != nullptr)
         hists1D_["Zlep2_Pt"]->Fill(l2Pt, weight);
     if (hists1D_["Wlep_Pt"] != nullptr)
         hists1D_["Wlep_Pt"]->Fill(l3Pt, weight);
+    if (hists1D_["nvtx"] != nullptr)
+        hists1D_["nvtx"]->Fill(nvtx, weight);
 }
 
 Bool_t WZSelector::Process(Long64_t entry)
@@ -190,30 +184,26 @@ void WZSelector::SetupNewDirectory()
 {
     WZSelectorBase::SetupNewDirectory();
    
-    histInfo_ = (TList *) GetInputList()->FindObject("histinfo");
-    if (histInfo_ == nullptr ) 
+    TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
+    if (histInfo == nullptr ) 
         Abort("Must pass histogram information");
     
-    //for (auto & histEntry : hists1D_) {  
-        TNamed* currentHistInfo = dynamic_cast<TNamed*>(histInfo_->FindObject("Mass"));
-        //TNamed* currentHistInfo = dynamic_cast<TNamed*>(histInfo_->FindObject(histEntry.first));
-        if (currentHistInfo != nullptr) { 
+    for (auto && entry : *histInfo) {  
+        TNamed* currentHistInfo = dynamic_cast<TNamed*>(entry);
+        std::string name = currentHistInfo->GetName();
+        if (hists1D_.find(name) != hists1D_.end()) { 
             std::vector<std::string> histData = ReadHistData(currentHistInfo->GetTitle());
             if (histData.size() != 4) {
-                //std::cerr << "Malformed data string for histogram '" << histEntry.first
-                std::cerr << "Malformed data string for histogram '"
-                        << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'" << std::endl;
+                std::cerr << "Malformed data string for histogram '" << name
+                          << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'"
+                          << std::endl;
                 exit(1);
             }
-            //std::cout << "Hist pointer is " << histEntry.second << std::endl;
-            std::cout << "Hist pointer is " << hists1D_["Mass"] << std::endl;
-            //AddObject<TH1D>(hists1D_[histEntry.first], 
-                //(std::string(histEntry.first)+"_"+channelName_).c_str(), histData[0].c_str(),
-            AddObject<TH1D>(hists1D_["Mass"], 
-                (std::string("Mass")+"_"+channelName_).c_str(), histData[0].c_str(),
+            AddObject<TH1D>(hists1D_[name], 
+                (name+"_"+channelName_).c_str(), histData[0].c_str(),
                 std::stoi(histData[1]), std::stof(histData[2]), std::stof(histData[3]));
-            //std::cout << "And now it's " << histEntry.second << std::endl;
         }
-    //}
-    std::cout << "And now for mass it's" << hists1D_["Mass"] << std::endl;
+        else
+            std::cerr << "Skipping invalid histogram " << name << std::endl;
+    }
 }

@@ -3,6 +3,8 @@ import ROOT
 from python import SelectorTools
 from python import UserInput
 from python import ConfigureJobs
+import os
+import sys
 
 def writeOutputListItem(item, directory):
     if item.ClassName() == "TList":
@@ -28,6 +30,11 @@ def getComLineArgs():
         default=35.87, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
         default="test.root", help="Output file name")
+    parser.add_argument("-b", "--hist_names", 
+                        type=lambda x : [i.strip() for i in x.split(',')],
+                        default=["all"], help="List of histograms, "
+                        "as defined in AnalysisDatasetManager, separated "
+                        "by commas")
     return vars(parser.parse_args())
 
 def getDifference(name, dir1, dir2, addRatios=True):
@@ -77,22 +84,23 @@ def makeCompositeHists(name, members, lumi):
                 sumhist.Add(hist)
     return composite
 
-def getHistInfo():
+def getHistExpr(hist_names, selection):
     info = ROOT.TList()
     info.SetName("histinfo")
-    info.Add(ROOT.TNamed("Mass", "Mass; M_{3l} [GeV]; Events / 30 GeV; $ 14, 100, 520"))
-    info.Add(ROOT.TNamed("nvtx", "nvtx; Number of Vertices; Events; $ 60, 0, 60"))
-    info.Add(ROOT.TNamed("ZMass", "ZMass; M_{ll} [GeV]; Events; $ 15, 0, 150"))
-    info.Add(ROOT.TNamed("mjj", "mjj; m_{jj} [GeV]; Events / 50 GeV; $ 15, 0, 1500"))
-    info.Add(ROOT.TNamed("dEtajj", "dEtajj; #Delta#eta(j_{1}, j_{2}); Events; $ 12, 0, 6"))
-    info.Add(ROOT.TNamed("Zlep1_Pt", "Zlepl1_Pt; p_{T} leading Z lepton [GeV]; Events / 15 GeV; $ 10, 25, 175"))
-    info.Add(ROOT.TNamed("Zlep2_Pt", "Zlep2_Pt; p_{T} trailing Z lepton [GeV]; Events / 10 GeV; $ 12, 15, 135"))
-    info.Add(ROOT.TNamed("Wlep_Pt", "Wlep_Pt; p_{T} W lepton [GeV]; Events / 10 GeV; $ 10, 20, 220"))
+    for hist_name in hist_names:
+        bin_info = HistTools.getHistBinInfo(manager_path, selection, hist_name)
+        bin_expr = "{nbins}, {xmin}, {xmax}".format(**bin_info)
+        info.Add(ROOT.TNamed(hist_name, "%s $ %s" % (hist_name, bin_expr))
+        )
     return info
 
 ROOT.gROOT.SetBatch(True)
 
 args = getComLineArgs()
+manager_path = os.path.expanduser("~/work/AnalysisDatasetManager")
+sys.path.append("/".join([manager_path, "Utilities/python"]))
+import HistTools 
+
 tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
@@ -111,7 +119,12 @@ pileupSF = fScales.Get('pileupSF')
 
 fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
-hist_inputs = [getHistInfo()]
+selection = args['selection'].replace("LooseLeps", "")
+hists = HistTools.getAllHistNames(manager_path, 
+            "/".join([args['analysis'], selection])) \
+    if "all" in args['hist_names'] else args['hist_names']
+    
+hist_inputs = [getHistExpr(hists, "/".join([args['analysis'], selection]))]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')

@@ -11,31 +11,22 @@ public :
     ScaleFactor* eIdSF_;
     ScaleFactor* mIdSF_;
     ScaleFactor* mIsoSF_;
-    TList* histInfo_;
     
-    //TH1D* nvtxHist_;
-    //TH1D* zmassHist_;
-    //TH1D* massHist_;
-    //TH1D* mjjHist_;
-    //TH1D* l1PtHist_;
-    //TH1D* l2PtHist_;
-    //TH1D* l3PtHist_;
-    //TH1D* dEtajjHist_;
-    std::map<const char*, TH1D*> hists1D_ = 
+    std::map<std::string, TH1D*> hists1D_ = 
     {
-        { "type1_pfMETEt", nullptr }, 
-        { "nTruePU", nullptr },
-        { "nvtx", nullptr },
-        { "ZMass", nullptr },
-        { "Zlep1_Eta", nullptr },
-        { "Zlep1_Pt", nullptr },
-        { "Zlep2_Eta", nullptr },
-        { "Zlep2_Pt", nullptr },
-        { "Wlep_Eta", nullptr },
-        { "Wlep_Pt", nullptr },
+        { "type1_pfMETEt",  {} }, 
+        { "nTruePU",  {} },
+        { "nvtx",  {} },
+        { "ZMass",  {} },
+        { "Zlep1_Eta",  {} },
+        { "Zlep1_Pt",  {} },
+        { "Zlep2_Eta",  {} },
+        { "Zlep2_Pt",  {} },
+        { "Wlep_Eta",  {} },
+        { "Wlep_Pt",  {} },
         { "Mass", {} },
-        { "mjj", nullptr },
-        { "dEtajj", nullptr }
+        { "mjj",  {} },
+        { "dEtajj",  {} }
     };
 
     float dEtajj;
