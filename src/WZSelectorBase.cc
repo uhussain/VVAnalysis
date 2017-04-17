@@ -28,6 +28,12 @@ void WZSelectorBase::Init(TTree *tree)
     }
     std::cout << "Processing " << name_ << std::endl;
     
+    isMC_ = false;
+    if (name_.find("data") == std::string::npos){
+        isMC_ = true;
+        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+    }
+
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
     if ( currentHistDir_ == nullptr ) {
         currentHistDir_ = new TList();
@@ -41,12 +47,6 @@ void WZSelectorBase::Init(TTree *tree)
         }
     }
     UpdateDirectory();
-
-    isMC_ = false;
-    if (name_.find("data") == std::string::npos){
-        isMC_ = true;
-        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
-    }
 
     if (channelName_ == "eee") {
         channel_ = eee;
