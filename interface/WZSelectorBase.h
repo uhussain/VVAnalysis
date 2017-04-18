@@ -1,10 +1,3 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Wed Feb  8 23:47:12 2017 by ROOT version 6.06/01
-// from TTree ntuple/ntuple
-// found on file: /data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/skim-ntuplize_1.root
-//////////////////////////////////////////////////////////
-
 #ifndef WZSelectorBase_h
 #define WZSelectorBase_h
 
@@ -19,8 +12,6 @@
 
 // Headers needed by this particular selector
 #include <vector>
-
-
 
 class WZSelectorBase : public TSelector {
 public :
@@ -43,11 +34,12 @@ public :
     TH1D* ratio1DPt_;
     TH1D* ratio1DEta_;
 
+    bool passesLeptonVeto;
     Float_t genWeight;
     Float_t Zmass;
     Float_t type1_pfMETEt;
-    UInt_t nCBVIDVetoElec;
-    UInt_t nWZLooseMuon;
+    UInt_t nCBVIDTightElec;
+    UInt_t nWZTightMuon;
     Bool_t l1IsTight;
     Bool_t l2IsTight;
     Bool_t l3IsTight;
@@ -72,8 +64,8 @@ public :
     TBranch* b_genWeight;
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
-    TBranch* b_nCBVIDVetoElec;
-    TBranch* b_nWZLooseMuon;
+    TBranch* b_nCBVIDTightElec;
+    TBranch* b_nWZTightMuon;
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
     TBranch* b_l3IsTight;
@@ -136,8 +128,10 @@ protected:
     std::string channelName_ = "Unnamed";
     Channel channel_ = Unknown;
     bool isMC_;
-    bool tightZLeptons();
+    bool zlep1IsTight();
+    bool zlep2IsTight();
     bool lepton3IsTight();
+    bool tightZLeptons();
 };
 
 #endif

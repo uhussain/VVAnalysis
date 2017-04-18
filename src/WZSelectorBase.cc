@@ -1,22 +1,3 @@
-// The class definition in WZSelectorBase.h has been generated automatically
-// by the ROOT utility TTree::MakeSelector(). This class is derived
-// from the ROOT class TSelector. For more information on the TSelector
-// framework see $ROOTSYS/README/README.SELECTOR or the ROOT User Manual.
-
-
-// The following methods are defined in this file:
-//    Begin():        called every time a loop on the tree starts,
-//                    a convenient place to create your histograms.
-//    SlaveBegin():   called after Begin(), when on PROOF called only on the
-//                    slave servers.
-//    Process():      called for each event, in this function you decide what
-//                    to read and fill your histograms.
-//    SlaveTerminate: called at the end of the loop on the tree, when on PROOF
-//                    called only on the slave servers.
-//    Terminate():    called at the end of the loop on the tree,
-//                    a convenient place to draw/fit your histograms.
-//
-
 #include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
 #include <TStyle.h>
 
@@ -47,6 +28,12 @@ void WZSelectorBase::Init(TTree *tree)
     }
     std::cout << "Processing " << name_ << std::endl;
     
+    isMC_ = false;
+    if (name_.find("data") == std::string::npos){
+        isMC_ = true;
+        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+    }
+
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
     if ( currentHistDir_ == nullptr ) {
         currentHistDir_ = new TList();
@@ -61,12 +48,6 @@ void WZSelectorBase::Init(TTree *tree)
     }
     UpdateDirectory();
 
-    isMC_ = false;
-    if (name_.find("data") == std::string::npos){
-        isMC_ = true;
-        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
-    }
-
     if (channelName_ == "eee") {
         channel_ = eee;
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
@@ -77,28 +58,24 @@ void WZSelectorBase::Init(TTree *tree)
         channel_ = eem;
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("mIsMedium", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("mRelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
+        fChain->SetBranchAddress("mIsWZTight", &l3IsTight, &b_l3IsTight);
     }
     else if (channelName_ == "emm") { 
         channel_ = emm;
         fChain->SetBranchAddress("eIsCBVIDTight", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
-        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
+        fChain->SetBranchAddress("m1IsWZTight", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m2IsWZTight", &l2IsTight, &b_l2IsTight);
     }
     else if (channelName_ == "mmm") { 
         channel_ = mmm;
-        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
-        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
-        fChain->SetBranchAddress("m3IsMedium", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("m3RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
+        fChain->SetBranchAddress("m1IsWZTight", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m2IsWZTight", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m3IsWZTight", &l3IsTight, &b_l3IsTight);
     }
     else
         throw std::invalid_argument("Invalid channel choice!");
+    fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
+    fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
 }
 
 Bool_t WZSelectorBase::Notify()
@@ -114,40 +91,30 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_l1IsTight->GetEntry(entry);
     b_l2IsTight->GetEntry(entry);
     b_l3IsTight->GetEntry(entry);
+    b_nCBVIDTightElec->GetEntry(entry);
+    b_nWZTightMuon->GetEntry(entry);
     
-    if (channel_ == eem) {
-        b_m3RelPFIsoDBR04->GetEntry(entry);
-    }
-    else if (channel_ == emm) {
-        b_m1RelPFIsoDBR04->GetEntry(entry);
-        b_m2RelPFIsoDBR04->GetEntry(entry);
-    }
-    else if (channel_ == mmm) {
-        b_m1RelPFIsoDBR04->GetEntry(entry);
-        b_m2RelPFIsoDBR04->GetEntry(entry);
-        b_m3RelPFIsoDBR04->GetEntry(entry);
-    }
-
+    passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3;
+    
     return kTRUE;
 }
 
+// Meant to be a wrapper for the tight ID just in case it changes
+// To be a function of multiple variables
+bool WZSelectorBase::zlep1IsTight() {
+    return l1IsTight; 
+}
+
+bool WZSelectorBase::zlep2IsTight() {
+    return l2IsTight; 
+}
+
 bool WZSelectorBase::tightZLeptons() {
-    if (channel_ == eem || channel_ == eee) {
-        return l1IsTight && l2IsTight; 
-    }
-    else 
-        return m1RelPFIsoDBR04 < 0.15 && m2RelPFIsoDBR04 < 0.15;
+    return zlep1IsTight() && zlep2IsTight(); 
 }
 
 bool WZSelectorBase::lepton3IsTight() {
-    if (channel_ == eee || channel_ == emm) {
-        return l3IsTight;
-    }
-    else if (channel_ == mmm || channel_ == eem) {
-        return m3RelPFIsoDBR04 < 0.15;
-    }
-    else
-        return false;
+    return l3IsTight;
 }
 
 void WZSelectorBase::Terminate()

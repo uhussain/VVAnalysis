@@ -4,13 +4,28 @@ import glob
 import datetime
 import ConfigureJobs
 
+def writeOutputListItem(item, directory):
+    if item.ClassName() == "TList":
+        d = directory.Get(item.GetName())
+        if not d:
+            d = directory.mkdir(item.GetName())
+            ROOT.SetOwnership(d, False)
+        for subItem in item:
+            writeOutputListItem(subItem, d)
+    elif hasattr(item, 'Write'):
+        directory.cd()
+        item.Write()
+    else:
+        print "Couldn't write output item:"
+        print repr(item)
+    directory.cd()
 
 def applySelector(filelist, selector_name, selection, 
+        rootfile,
         analysis="WZxsec2016", channels=["eee", "eem", "emm", "mmm"], 
         extra_inputs = [],
         addsumweights=False, proof=False):
     path = ConfigureJobs.getManagerPath()
-    output = []
     for dataset in ConfigureJobs.getListOfFiles(filelist, path):
         for chan in channels:
             select = getattr(ROOT, selector_name)()
@@ -27,7 +42,7 @@ def applySelector(filelist, selector_name, selection,
             if proof:
                 proof_path = "_".join([dataset, analysis, 
                     selection+("#/%s/ntuple" % chan)])
-                proof.Process(proof_path, select, "")
+                ROOT.gProof.Process(proof_path, select, "")
                 proof_meta_path = "_".join([dataset, analysis, 
                     selection+"#/metaInfo/metaInfo"])
                 ## TODO proof draw command for meta tree
@@ -50,9 +65,14 @@ def applySelector(filelist, selector_name, selection,
                     if sumweights_hist:
                         sumweights_hist.Delete()
                     continue
-            out = select.GetOutputList()
+            output_list = select.GetOutputList()
             if  sumweights_hist:
-                outputlist = out.FindObject(dataset)
-                outputlist.Add(sumweights_hist)
-            output.extend(out)
-    return output
+                dataset_list = output_list.FindObject(dataset)
+                dataset_list.Add(sumweights_hist)
+            for out in output_list:
+                writeOutputListItem(out, rootfile)
+                if out.ClassName() == "TList":
+                    out.SetOwner()
+                    ROOT.SetOwnership(out, False)
+                    out.Delete()
+

@@ -3,6 +3,24 @@ import ROOT
 from python import SelectorTools
 from python import UserInput
 from python import ConfigureJobs
+import os
+import sys
+
+def writeOutputListItem(item, directory):
+    if item.ClassName() == "TList":
+        d = directory.Get(item.GetName())
+        if not d:
+            d = directory.mkdir(item.GetName())
+            ROOT.SetOwnership(d, False)
+        for subItem in item:
+            writeOutputListItem(subItem, d)
+    elif hasattr(item, 'Write'):
+        directory.cd()
+        item.Write()
+    else:
+        print "Couldn't write output item:"
+        print repr(item)
+    directory.cd()
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
@@ -12,6 +30,11 @@ def getComLineArgs():
         default=35.87, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
         default="test.root", help="Output file name")
+    parser.add_argument("-b", "--hist_names", 
+                        type=lambda x : [i.strip() for i in x.split(',')],
+                        default=["all"], help="List of histograms, "
+                        "as defined in AnalysisDatasetManager, separated "
+                        "by commas")
     return vars(parser.parse_args())
 
 def getDifference(name, dir1, dir2, addRatios=True):
@@ -39,6 +62,9 @@ def makeCompositeHists(name, members, lumi):
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:
+        if not fOut.Get(directory):
+            print "Skipping invalid filename %s" % directory
+            continue
         for histname in [i.GetName() for i in fOut.Get(directory).GetListOfKeys()]:
             if histname == "sumweights": continue
             hist = fOut.Get("/".join([directory, histname]))
@@ -58,32 +84,35 @@ def makeCompositeHists(name, members, lumi):
                 sumhist.Add(hist)
     return composite
 
-def writeOutputListItem(item, directory):
-    if item.ClassName() == "TList":
-        d = directory.Get(item.GetName())
-        if not d:
-            d = directory.mkdir(item.GetName())
-            ROOT.SetOwnership(d, False)
-        for subItem in item:
-            writeOutputListItem(subItem, d)
-    elif hasattr(item, 'Write'):
-        directory.cd()
-        item.Write()
-    else:
-        print "Couldn't write output item:"
-        print repr(item)
-    directory.cd()
+def getHistExpr(hist_names, selection):
+    info = ROOT.TList()
+    info.SetName("histinfo")
+    for hist_name in hist_names:
+        bin_info = HistTools.getHistBinInfo(manager_path, selection, hist_name)
+        bin_expr = "{nbins}, {xmin}, {xmax}".format(**bin_info)
+        info.Add(ROOT.TNamed(hist_name, "%s $ %s" % (hist_name, bin_expr))
+        )
+    return info
+
+ROOT.gROOT.SetBatch(True)
 
 args = getComLineArgs()
+manager_path = os.path.expanduser("~/work/AnalysisDatasetManager")
+sys.path.append("/".join([manager_path, "Utilities/python"]))
+import HistTools 
+
 tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
 fScales = ROOT.TFile('data/scaleFactors.root')
 #mCBMedFakeRate = fScales.Get("mCBMedFakeRate_Svenja")
 #eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
-mCBMedFakeRate = fScales.Get("mCBTightFakeRate")
+mCBMedFakeRate = fScales.Get("mCBMedFakeRate")
+mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
-mCBMedFakeRate.SetName("fakeRate_allMu")
+# For medium muons
+#mCBMedFakeRate.SetName("fakeRate_allMu")
+mCBTightFakeRate.SetName("fakeRate_allMu")
 eCBTightFakeRate.SetName("fakeRate_allE")
 
 muonIsoSF = fScales.Get('muonIsoSF')
@@ -91,20 +120,24 @@ muonIdSF = fScales.Get('muonTightIdSF')
 electronTightIdSF = fScales.Get('electronTightIdSF')
 pileupSF = fScales.Get('pileupSF')
 
-fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
+fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
+selection = args['selection'].replace("LooseLeps", "")
+hists = HistTools.getAllHistNames(manager_path, 
+            "/".join([args['analysis'], selection])) \
+    if "all" in args['hist_names'] else args['hist_names']
+    
+hist_inputs = [getHistExpr(hists, "/".join([args['analysis'], selection]))]
 
-#background = SelectorTools.applySelector(["WZxsec2016-data"], "MakeBackgroundEstimate", "3LooseLeptons", extra_inputs=extra_inputs)
-background = SelectorTools.applySelector(["WZxsec2016"], "MakeBackgroundEstimate", args['selection'], extra_inputs=fr_inputs)
-for item in background:
-    if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
-        continue
-    writeOutputListItem(item, fOut)
-mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], extra_inputs=sf_inputs, addsumweights=True)
-for item in mc:
-    if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
-        continue
-    writeOutputListItem(item, fOut)
+if args['proof']:
+    ROOT.TProof.Open('workers=12')
+background = SelectorTools.applySelector(["WZxsec2016-data"] +
+    ConfigureJobs.getListOfEWKFilenames(), 
+        "WZBackgroundSelector", args['selection'], fOut, 
+        extra_inputs=fr_inputs+hist_inputs, proof=args['proof'])
+mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
+        extra_inputs=sf_inputs+hist_inputs, addsumweights=True, proof=args['proof'])
+
 path = ConfigureJobs.getManagerPath()
 alldata = makeCompositeHists("AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path), args['lumi'])

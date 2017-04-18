@@ -22,8 +22,6 @@ def writeOutputListItem(item, directory):
             ROOT.SetOwnership(d, False)
         for subItem in item:
             writeOutputListItem(subItem, d)
-            if hasattr(subItem, "Delete"):
-                subItem.Delete()
     elif hasattr(item, 'Write'):
         directory.cd()
         item.Write()
@@ -174,10 +172,14 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
         if chan == "eee":
             outputlist = output.FindObject(dataset)
             outputlist.Add(sumweights_hist)
+            ROOT.SetOwnership(sumweights_hist, False)
+            outputlist.SetOwner()
         for item in output:
             if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
                 continue
             writeOutputListItem(item, fOut)
+            ROOT.SetOwnership(item, False)
+            item.Delete()
         if hasattr(sumweights_hist, "Delete"):
             sumweights_hist.Delete()
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path))

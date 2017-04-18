@@ -1,10 +1,3 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Wed Feb  8 23:47:12 2017 by ROOT version 6.06/01
-// from TTree ntuple/ntuple
-// found on file: /data/kelong/DibosonAnalysisData/DYControlFakeRate/2017-02-05-data_MuonEG_Run2016B-23Sep2016-v3-WZxsec2016-DYControlFakeRate-v1/skim-ntuplize_1.root
-//////////////////////////////////////////////////////////
-
 #ifndef FakeRateSelector_h
 #define FakeRateSelector_h
 
@@ -56,22 +49,11 @@ public :
     // Readers to access the data (delete the ones you do not need).
     FakeRateSelector(TTree * /*tree*/ =0) { }
     virtual ~FakeRateSelector() { }
-    virtual Int_t   Version() const { return 2; }
-    virtual void    Begin(TTree *tree);
-    virtual void    SlaveBegin(TTree *tree);
-    virtual void    Init(TTree *tree);
-    virtual Bool_t  Notify();
-    virtual Bool_t  Process(Long64_t entry);
-    virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; }
-    virtual void    SetOption(const char *option) { fOption = option; }
-    virtual void    SetObject(TObject *obj) { fObject = obj; }
-    virtual void    SetInputList(TList *input) { fInput = input; }
-    virtual TList  *GetOutputList() const { return fOutput; }
-    virtual void    SlaveTerminate();
-    virtual void    Terminate();
+    virtual void    Init(TTree *tree) override;
+    virtual Bool_t  Process(Long64_t entry) override;
     virtual void    SetupNewDirectory() override;
 
-    ClassDef(FakeRateSelector,0);
+    ClassDefOverride(FakeRateSelector,0);
 };
 
 #endif
