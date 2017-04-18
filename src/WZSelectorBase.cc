@@ -101,7 +101,20 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_nWZTightMuon->GetEntry(entry);
     
     passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3;
-    
+
+    if (channel_ == eem) {
+        b_m3RelPFIsoDBR04->GetEntry(entry);
+    }
+    else if (channel_ == emm) {
+        b_m1RelPFIsoDBR04->GetEntry(entry);
+        b_m2RelPFIsoDBR04->GetEntry(entry);
+    }
+    else if (channel_ == mmm) {
+        b_m1RelPFIsoDBR04->GetEntry(entry);
+        b_m2RelPFIsoDBR04->GetEntry(entry);
+        b_m3RelPFIsoDBR04->GetEntry(entry);
+    } 
+
     return kTRUE;
 }
 
