@@ -107,9 +107,12 @@ fOut = ROOT.TFile(tmpFileName, "recreate")
 fScales = ROOT.TFile('data/scaleFactors.root')
 #mCBMedFakeRate = fScales.Get("mCBMedFakeRate_Svenja")
 #eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
-mCBMedFakeRate = fScales.Get("mCBTightFakeRate")
+mCBMedFakeRate = fScales.Get("mCBMedFakeRate")
+mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
-mCBMedFakeRate.SetName("fakeRate_allMu")
+# For medium muons
+#mCBMedFakeRate.SetName("fakeRate_allMu")
+mCBTightFakeRate.SetName("fakeRate_allMu")
 eCBTightFakeRate.SetName("fakeRate_allE")
 
 muonIsoSF = fScales.Get('muonIsoSF')
@@ -117,7 +120,7 @@ muonIdSF = fScales.Get('muonTightIdSF')
 electronTightIdSF = fScales.Get('electronTightIdSF')
 pileupSF = fScales.Get('pileupSF')
 
-fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
+fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 selection = args['selection'].replace("LooseLeps", "")
 hists = HistTools.getAllHistNames(manager_path, 
