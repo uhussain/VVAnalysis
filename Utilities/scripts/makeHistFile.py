@@ -111,8 +111,8 @@ mCBMedFakeRate = fScales.Get("mCBMedFakeRate")
 mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
 # For medium muons
-#mCBMedFakeRate.SetName("fakeRate_allMu")
-mCBTightFakeRate.SetName("fakeRate_allMu")
+mCBMedFakeRate.SetName("fakeRate_allMu")
+#mCBTightFakeRate.SetName("fakeRate_allMu")
 eCBTightFakeRate.SetName("fakeRate_allE")
 
 muonIsoSF = fScales.Get('muonIsoSF')
@@ -120,7 +120,7 @@ muonIdSF = fScales.Get('muonTightIdSF')
 electronTightIdSF = fScales.Get('electronTightIdSF')
 pileupSF = fScales.Get('pileupSF')
 
-fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
+fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 selection = args['selection'].replace("LooseLeps", "")
 hists = HistTools.getAllHistNames(manager_path, 

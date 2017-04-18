@@ -104,6 +104,7 @@ eCBMedFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allE'),
 mCBMedFakeRateZjets = ROOT.ScaleFactor("mCBMedFakeRate", "Fake rate from Z+jet")
 mCBMedFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu'), 0, 0, ROOT.ScaleFactor.AsInHist)
 fScales.cd()
+mCBMedFakeRateZjets.Write()
 
 fakeRateFile = ROOT.TFile.Open('../data/fakeRate18Apr2017-3LooseLeptons-TightMuons.root')
 eCBTightFakeRateZjets = ROOT.ScaleFactor("eCBTightFakeRate", "Fake rate from Z+jet")

@@ -58,19 +58,25 @@ void WZSelectorBase::Init(TTree *tree)
         channel_ = eem;
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("mIsWZTight", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("mIsMedium", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("mRelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
     }
     else if (channelName_ == "emm") { 
         channel_ = emm;
         fChain->SetBranchAddress("eIsCBVIDTight", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("m1IsWZTight", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("m2IsWZTight", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
+        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
     }
     else if (channelName_ == "mmm") { 
         channel_ = mmm;
-        fChain->SetBranchAddress("m1IsWZTight", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("m2IsWZTight", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("m3IsWZTight", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("m1IsMedium", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m1RelPFIsoDBR04", &m1RelPFIsoDBR04, &b_m1RelPFIsoDBR04);
+        fChain->SetBranchAddress("m2IsMedium", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m2RelPFIsoDBR04", &m2RelPFIsoDBR04, &b_m2RelPFIsoDBR04);
+        fChain->SetBranchAddress("m3IsMedium", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("m3RelPFIsoDBR04", &m3RelPFIsoDBR04, &b_m3RelPFIsoDBR04);
     }
     else
         throw std::invalid_argument("Invalid channel choice!");
@@ -102,11 +108,19 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
 // Meant to be a wrapper for the tight ID just in case it changes
 // To be a function of multiple variables
 bool WZSelectorBase::zlep1IsTight() {
-    return l1IsTight; 
+    if (channel_ == eem || channel_ == eee) {
+        return l1IsTight; 
+    }
+    else 
+        return m1RelPFIsoDBR04 < 0.15;
 }
 
 bool WZSelectorBase::zlep2IsTight() {
-    return l2IsTight; 
+    if (channel_ == eem || channel_ == eee) {
+        return l2IsTight; 
+    }
+    else 
+        return m2RelPFIsoDBR04 < 0.15;
 }
 
 bool WZSelectorBase::tightZLeptons() {
@@ -114,7 +128,11 @@ bool WZSelectorBase::tightZLeptons() {
 }
 
 bool WZSelectorBase::lepton3IsTight() {
-    return l3IsTight;
+    if (channel_ == eee || channel_ == emm) {
+        return l3IsTight;
+    }
+    else
+        return m3RelPFIsoDBR04 < 0.15;
 }
 
 void WZSelectorBase::Terminate()
