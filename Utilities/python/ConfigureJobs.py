@@ -160,4 +160,4 @@ def getTriggerName(sample_name, analysis, selection):
         for name in trigger_names:
             if name in sample_name:
                 return "-t " + name
-    return ""
+    return "-t MonteCarlo"

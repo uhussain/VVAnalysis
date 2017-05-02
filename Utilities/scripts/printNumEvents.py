@@ -2,7 +2,7 @@
 import ROOT
 import argparse
 import os
-from python import ConfigureJobs
+from python import ConfigureJobs,ApplySelection
 import datetime
 
 parser = argparse.ArgumentParser() 
@@ -19,6 +19,8 @@ parser.add_argument("-m", "--cut_string", required=False, type=str,
                     default="")
 parser.add_argument("-c", "--channels", required=False, type=str,
                     default="eee,eem,emm,mmm")
+parser.add_argument("-o", "--output_dir", required=False, type=str,
+                    default="")
 args = parser.parse_args()
 path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
         "/afs/cern.ch/user/k/kelong/work"
@@ -33,8 +35,12 @@ metaChain = ROOT.TChain("metaInfo/metaInfo")
 for name in filelist:
     print name
     if ".root" not in name:
-        file_path = ConfigureJobs.getInputFilesPath(name, path,
-            args.selection, "WZxsec2016")
+        try:
+            file_path = ConfigureJobs.getInputFilesPath(name, path,
+                args.selection, "WZxsec2016")
+        except ValueError as e:
+            print e
+            continue
     else:
         file_path = name
     print "Results for file %s" % name
@@ -44,15 +50,17 @@ for name in filelist:
         state = state.strip()
         chain = ROOT.TChain("%s/ntuple" % state)
         chain.Add(file_path)
+        ApplySelection.setAliases(chain, state, "Cuts/aliases.json")
         cut_tree = chain
         num_events = cut_tree.GetEntries(args.cut_string)
         print "Number of events in state %s is %i" % (state, num_events)
         if args.printEventNums:
             cut_tree = chain.CopyTree(args.cut_string) if args.cut_string != "" \
                 else chain
-            with open('WZEvents_{:%Y-%m-%d}_{selection}_{chan}.out'.format(datetime.date.today(), 
-                    selection=args.selection, chan=(state if args.channels != "" else ""))
-                    , "wa") as outfile:
+            file_name = 'WZEvents_{:%Y-%m-%d}_{selection}_{name}_{chan}.out'.format(datetime.date.today(), 
+                    selection=args.selection, name=name, chan=(state if args.channels != "" else ""))
+            output_file = file_name if args.output_dir == "" else "/".join([args.output_dir, file_name])
+            with open(output_file, "wa") as outfile:
                 outfile.write("# Made with cut: %s\n" % args.cut_string)
                 for row in cut_tree:
                     eventId = '{0}:{1}:{2}'.format(row.run, row.lumi,row.evt)

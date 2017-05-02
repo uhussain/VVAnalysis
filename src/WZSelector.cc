@@ -15,14 +15,19 @@ void WZSelector::Init(TTree *tree)
     }
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
+    fChain->SetBranchAddress("nJets", &nJets, &b_nJets);
     fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
+    fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
     fChain->SetBranchAddress("nvtx", &nvtx, &b_nvtx);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
+    fChain->SetBranchAddress("MtToMET", &MtToMET, &b_MtToMET);
 
     if (channel_ == eee) {
+        fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
@@ -31,7 +36,9 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
     }
     else if (channel_ == eem) { 
+        fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
@@ -40,7 +47,9 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
     }
     else if (channel_ == emm) { 
+        fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
@@ -49,7 +58,9 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
     }
     else if (channel_ == mmm) { 
+        fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
@@ -100,9 +111,7 @@ void WZSelector::LoadBranches(Long64_t entry) {
     
     b_ZMass->GetEntry(entry);
     b_Mass->GetEntry(entry);
-    b_nvtx->GetEntry(entry);
     b_mjj->GetEntry(entry);
-    b_type1_pfMETEt->GetEntry(entry);
     b_l1Eta->GetEntry(entry);
     b_l1Pt->GetEntry(entry);
     b_l2Eta->GetEntry(entry);
@@ -125,6 +134,10 @@ void WZSelector::LoadBranches(Long64_t entry) {
         dEtajj = std::abs(jetEta->at(0) - jetEta->at(1));
 }
 
+bool WZSelector::PassesVBSSelection() { 
+    return (mjj > 500 && dEtajj > 2.5);
+}
+
 bool WZSelector::PassesSelection(bool tightLeps) { 
     //if (type1_pfMETEt < 30)
     //    return true;
@@ -134,16 +147,30 @@ bool WZSelector::PassesSelection(bool tightLeps) {
     //    return true;
     //if (ZMass > 116.1876 || ZMass < 76.1876)
     //    return true;
-    if (!passesLeptonVeto)
-        return false;
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
         return false;
+    if (!passesLeptonVeto)
+        return false;
+    //if (!PassesVBSSelection())
+    //    return false;
     return true;
 }
 
-void WZSelector::FillHistograms(float weight, bool noBlind) { 
+void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) { 
     if (hists1D_["mjj"] != nullptr)
         hists1D_["mjj"]->Fill(mjj, weight*(isMC_ || mjj < 500 || noBlind));
+    if (hists1D_["jetPt[0]"] != nullptr && jetPt->size() > 0)
+        hists1D_["jetPt[0]"]->Fill(jetPt->at(0), weight);
+    if (hists1D_["jetPt[1]"] != nullptr && jetPt->size() > 1)
+        hists1D_["jetPt[1]"]->Fill(jetPt->at(1), weight);
+    if (hists1D_["jetPt[2]"] != nullptr && jetPt->size() > 2)
+        hists1D_["jetPt[2]"]->Fill(jetPt->at(2), weight);
+    if (hists1D_["jetEta[0]"] != nullptr && jetEta->size() > 0)
+        hists1D_["jetEta[0]"]->Fill(jetEta->at(0), weight);
+    if (hists1D_["jetEta[1]"] != nullptr && jetEta->size() > 1)
+        hists1D_["jetEta[1]"]->Fill(jetEta->at(1), weight);
+    if (hists1D_["jetEta[2]"] != nullptr && jetEta->size() > 2)
+        hists1D_["jetEta[2]"]->Fill(jetEta->at(2), weight);
     if (hists1D_["dEtajj"] != nullptr && dEtajj > 0)
         hists1D_["dEtajj"]->Fill(dEtajj, weight*(isMC_ || dEtajj < 2.5 || noBlind));
     if (hists1D_["Mass"] != nullptr)
@@ -162,8 +189,34 @@ void WZSelector::FillHistograms(float weight, bool noBlind) {
         hists1D_["Wlep_Pt"]->Fill(l3Pt, weight);
     if (hists1D_["Wlep_Eta"] != nullptr)
         hists1D_["Wlep_Eta"]->Fill(l3Eta, weight);
-    if (hists1D_["nvtx"] != nullptr)
+    if (hists1D_["MET"] != nullptr) {
+        b_type1_pfMETEt->GetEntry(entry);
+        hists1D_["MET"]->Fill(type1_pfMETEt, weight);
+    }
+    if (hists1D_["nJets"] != nullptr) {
+        b_nJets->GetEntry(entry);
+        hists1D_["nJets"]->Fill(nJets, weight);
+    }
+    if (hists1D_["Pt"] != nullptr) {
+        b_Pt->GetEntry(entry);
+        hists1D_["Pt"]->Fill(Pt, weight);
+    }
+    if (hists1D_["nvtx"] != nullptr) {
+        b_nvtx->GetEntry(entry);
         hists1D_["nvtx"]->Fill(nvtx, weight);
+    }
+    if (hists1D_["MtW"] != nullptr) {
+        b_l3MtToMET->GetEntry(entry);
+        hists1D_["MtW"]->Fill(l3MtToMET, weight);
+    }
+    if (hists1D_["MTWZ"] != nullptr) {
+        b_MtToMET->GetEntry(entry);
+        hists1D_["MTWZ"]->Fill(MtToMET, weight);
+    }
+    if (hists1D_["ZPt"] != nullptr) {
+        b_ZPt->GetEntry(entry);
+        hists1D_["ZPt"]->Fill(ZPt, weight);
+    }
     for (size_t i = 0; i < lheWeights.size(); i++) {
         if (weighthists_["mjj"] != nullptr)
             weighthists_["mjj"]->Fill(mjj, i, lheWeights[i]*weight*(isMC_ || mjj < 500 || noBlind));
@@ -187,6 +240,10 @@ void WZSelector::FillHistograms(float weight, bool noBlind) {
             weighthists_["Wlep_Eta"]->Fill(l3Eta, i, lheWeights[i]*weight);
         if (weighthists_["nvtx"] != nullptr)
             weighthists_["nvtx"]->Fill(nvtx, i, lheWeights[i]*weight);
+        if (weighthists_["MtW"] != nullptr)
+            weighthists_["MtW"]->Fill(l3MtToMET, i, lheWeights[i]*weight);
+        if (weighthists_["ZPt"] != nullptr)
+            weighthists_["ZPt"]->Fill(ZPt, i, lheWeights[i]*weight);
     }
 }
 
@@ -229,7 +286,7 @@ Bool_t WZSelector::Process(Long64_t entry)
         }
     }
     
-    FillHistograms(genWeight, false);
+    FillHistograms(entry, genWeight, false);
     
     return true;
 }
