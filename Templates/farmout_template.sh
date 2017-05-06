@@ -7,7 +7,7 @@ DATE=`date +%Y-%m-%d`
 pushd ${base_dir}
 if [ ! -f ${job_dir}/analysis_code.tar.gz ]; then
     tar \
-        -zcvf ${job_dir}/analysis_code.tar.gz \
+        -zcvhf ${job_dir}/analysis_code.tar.gz \
         Cuts/ \
         Utilities/ \
         skimNtuples.py

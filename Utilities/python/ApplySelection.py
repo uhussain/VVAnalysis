@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 from collections import OrderedDict
-from Utilities.python import ConfigureJobs
+import ConfigureJobs
 import os
 import sys
 import UserInput
@@ -40,7 +40,6 @@ def buildCutString(state, selections, analysis, trigger):
 def setAliases(tree, state, aliases_json):
     aliases = UserInput.readJson(aliases_json)
     for name, value in aliases["State"][state].iteritems():
-        print "Setting alias %s to %s" % (name, value)
         tree.SetAlias(name, value)
 def getTriggerCutString(trigger, analysis):
     triggers = UserInput.readJson("Cuts/%s/triggers.json" % analysis)
@@ -51,9 +50,6 @@ def applySelection(tree, state, selection, analysis, trigger):
     #tree.SetProof()
     listname = '_'.join(["list", state])
     num_passing = tree.Draw(">>" + listname, cut_string.getString(), "entrylist")
-    print cut_string.getString()
     #tlist = ROOT.gProof.GetOutputList().FindObject(listname) 
     tlist = ROOT.gDirectory.FindObject(listname);
-    print tlist
     tree.SetEntryList(tlist)
-    print tree.GetEntries()

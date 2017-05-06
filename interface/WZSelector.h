@@ -13,25 +13,36 @@ public :
     ScaleFactor* mIsoSF_;
     
     std::map<std::string, TH1D*> hists1D_ = {
-        { "type1_pfMETEt",  {} }, 
         { "nTruePU",  {} },
         { "nvtx",  {} },
         { "ZMass",  {} },
+        { "ZPt",  {} },
         { "Zlep1_Eta",  {} },
         { "Zlep1_Pt",  {} },
         { "Zlep2_Eta",  {} },
         { "Zlep2_Pt",  {} },
         { "Wlep_Eta",  {} },
         { "Wlep_Pt",  {} },
+        { "MET", {} },
+        { "MTWZ", {} },
         { "Mass", {} },
+        { "Pt", {} },
+        { "nJets", {} },
+        { "jetPt[0]", {} },
+        { "jetPt[1]", {} },
+        { "jetPt[2]", {} },
+        { "jetEta[0]", {} },
+        { "jetEta[1]", {} },
+        { "jetEta[2]", {} },
         { "mjj",  {} },
+        { "MtW",  {} },
         { "dEtajj",  {} }
     };
     std::map<std::string, TH2D*> weighthists_ = {
-        { "type1_pfMETEt",  {} }, 
         { "nTruePU",  {} },
         { "nvtx",  {} },
         { "ZMass",  {} },
+        { "ZPt",  {} },
         { "Zlep1_Eta",  {} },
         { "Zlep1_Pt",  {} },
         { "Zlep2_Eta",  {} },
@@ -39,7 +50,9 @@ public :
         { "Wlep_Eta",  {} },
         { "Wlep_Pt",  {} },
         { "Mass", {} },
+        { "Pt", {} },
         { "mjj",  {} },
+        { "MtW",  {} },
         { "dEtajj",  {} }
     };
 
@@ -53,8 +66,11 @@ public :
     Float_t type1_pfMETEt;
     Float_t nTruePU;
     UInt_t nvtx;
+    UInt_t nJets;
     Float_t Mass;
     Float_t ZMass;
+    Float_t Pt;
+    Float_t ZPt;
     Float_t mjj;
     Float_t l1Eta;
     Float_t l1Pt;
@@ -62,16 +78,23 @@ public :
     Float_t l2Pt;
     Float_t l3Eta;
     Float_t l3Pt;
+    Float_t l3MtToMET;
+    Float_t MtToMET;
     
+    TBranch* b_l3MtToMET;
+    TBranch* b_MtToMET;
     TBranch* b_pdfWeights;
     TBranch* b_scaleWeights;
+    TBranch* b_nJets;
     TBranch* b_jetPt;
     TBranch* b_jetEta;
     TBranch* b_nTruePU;
     TBranch* b_nvtx;
     TBranch* b_Mass;
+    TBranch* b_Pt;
     TBranch* b_type1_pfMETEt;
     TBranch* b_ZMass;
+    TBranch* b_ZPt;
     TBranch* b_mjj;
     TBranch* b_l1Eta;
     TBranch* b_l1Pt;
@@ -91,8 +114,9 @@ public :
     ClassDefOverride(WZSelector,0);
 protected:
     void LoadBranches(Long64_t entry);
-    void FillHistograms(float weight, bool noBlind);
+    void FillHistograms(Long64_t entry, float weight, bool noBlind);
     bool PassesSelection(bool tightLeps);
+    bool PassesVBSSelection();
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
 };

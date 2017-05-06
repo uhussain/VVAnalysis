@@ -33,7 +33,7 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
 {
     LoadBranches(entry);
     
-    if (!passesLeptonVeto)
+    if (!PassesSelection(false))
         return true;
 
     float evtwgt = 0;
@@ -68,7 +68,7 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
     else
         return true;
        
-    FillHistograms(evtwgt, true);
+    FillHistograms(entry, evtwgt, true);
 
     return true;
 }

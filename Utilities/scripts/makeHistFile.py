@@ -30,6 +30,9 @@ def getComLineArgs():
         default=35.87, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
         default="test.root", help="Output file name")
+    parser.add_argument("--output_selection", type=str,
+        default="", help="Selection stage of output file "
+        "(Same as input if not give)")
     parser.add_argument("-b", "--hist_names", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["all"], help="List of histograms, "
@@ -122,12 +125,13 @@ pileupSF = fScales.Get('pileupSF')
 
 fr_inputs = [eCBTightFakeRate, mCBMedFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
-selection = args['selection'].replace("LooseLeps", "")
-hists = HistTools.getAllHistNames(manager_path, 
-            "/".join([args['analysis'], selection])) \
+selection = args['selection'].replace("LooseLeps", "") \
+    if args['output_selection'] == "" else args['output_selection']
+analysis = "/".join([args['analysis'], selection])
+hists = HistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
     
-hist_inputs = [getHistExpr(hists, "/".join([args['analysis'], selection]))]
+hist_inputs = [getHistExpr(hists, analysis)]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
