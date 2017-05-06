@@ -12,6 +12,8 @@ def getComLineArgs():
         action='store_true', help="Don't use proof")
     parser.add_argument("--lumi", "-l", type=float,
         default=35.87, help="luminosity value (in fb-1)")
+    parser.add_argument("--output_file", "-o", type=str,
+        default="", help="Output file name")
     return vars(parser.parse_args())
 
 def writeOutputListItem(item, directory):
@@ -129,8 +131,9 @@ if args['proof']:
     ROOT.TProof.Open("workers=12")
     proof = ROOT.gProof
 today = datetime.date.today().strftime("%d%b%Y")
-tmpFileName = "fakeRate%s-%s.root" % (today, args['selection'])
-fOut = ROOT.TFile(tmpFileName, "recreate")
+fileName = "data/fakeRate%s-%s.root" % (today, args['selection']) if args['output_file'] == "" \
+        else args['output_file']
+fOut = ROOT.TFile(fileName, "recreate")
 selector_name = "FakeRateSelector"
 path = ConfigureJobs.getManagerPath()
 for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
