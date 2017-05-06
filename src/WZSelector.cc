@@ -176,7 +176,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     if (hists1D_["Mass"] != nullptr)
         hists1D_["Mass"]->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
     if (hists1D_["ZMass"] != nullptr)
-        hists1D_["ZMass"]->Fill(ZMass, weight*(isMC_ || Mass < 400 || noBlind));
+        hists1D_["ZMass"]->Fill(ZMass, weight);
     if (hists1D_["Zlep1_Pt"] != nullptr)
         hists1D_["Zlep1_Pt"]->Fill(l1Pt, weight);
     if (hists1D_["Zlep1_Eta"] != nullptr)
