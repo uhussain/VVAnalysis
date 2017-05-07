@@ -53,6 +53,7 @@ def applySelector(filelist, selector_name, selection,
                 try:
                     file_path = ConfigureJobs.getInputFilesPath(dataset, 
                         path, selection, analysis)
+                    print "File path is", file_path
                     chain.Add(file_path)
                     chain.Process(select, "")
                     if "data" not in dataset and addsumweights and chan == "eee":

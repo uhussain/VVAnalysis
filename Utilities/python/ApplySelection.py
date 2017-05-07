@@ -41,6 +41,8 @@ def setAliases(tree, state, aliases_json):
     aliases = UserInput.readJson(aliases_json)
     for name, value in aliases["State"][state].iteritems():
         tree.SetAlias(name, value)
+    for name, value in aliases["Event"].iteritems():
+        tree.SetAlias(name, value)
 def getTriggerCutString(trigger, analysis):
     triggers = UserInput.readJson("Cuts/%s/triggers.json" % analysis)
     return triggers[trigger]

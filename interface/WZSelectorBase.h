@@ -128,6 +128,8 @@ protected:
     std::string channelName_ = "Unnamed";
     Channel channel_ = Unknown;
     bool isMC_;
+    const float FR_MAX_PT_ = 50;
+    const float FR_MAX_ETA_ = 2.5;
     bool zlep1IsTight();
     bool zlep2IsTight();
     bool lepton3IsTight();

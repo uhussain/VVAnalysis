@@ -26,13 +26,15 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
     //    return true;
     if (!tightZLeptons())
         return true;
-    passingLoose2D_->Fill(l3Pt, std::abs(l3Eta), genWeight);
-    passingLoose1DPt_->Fill(l3Pt, genWeight);
-    passingLoose1DEta_->Fill(std::abs(l3Eta), genWeight);
+    float pt_fillval = l3Pt < FR_MAX_PT_ ? l3Pt : FR_MAX_PT_ - 0.01;
+    float eta_fillval = std::abs(l3Eta) < FR_MAX_ETA_ ? std::abs(l3Eta) : FR_MAX_ETA_ - 0.01;
+    passingLoose2D_->Fill(pt_fillval, eta_fillval, genWeight);
+    passingLoose1DPt_->Fill(pt_fillval, genWeight);
+    passingLoose1DEta_->Fill(eta_fillval, genWeight);
     if (lepton3IsTight()) {
-        passingTight2D_->Fill(l3Pt, std::abs(l3Eta), genWeight);
-        passingTight1DPt_->Fill(l3Pt, genWeight);
-        passingTight1DEta_->Fill(std::abs(l3Eta), genWeight);
+        passingTight2D_->Fill(pt_fillval, eta_fillval, genWeight);
+        passingTight1DPt_->Fill(pt_fillval, genWeight);
+        passingTight1DEta_->Fill(eta_fillval, genWeight);
     }
     return kTRUE;
 }

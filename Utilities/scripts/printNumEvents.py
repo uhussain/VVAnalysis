@@ -24,8 +24,10 @@ parser.add_argument("-o", "--output_dir", required=False, type=str,
 args = parser.parse_args()
 path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
         "/afs/cern.ch/user/k/kelong/work"
+isfile = any(os.path.isfile(name) or os.path.exists(name.rstrip("/*")) 
+                for name in args.filelist)
 filelist = ConfigureJobs.getListOfFiles(args.filelist, path) if \
-    not any("root" in x for x in args.filelist) else args.filelist
+    not isfile else args.filelist
 states = [x.strip() for x in args.channels.split(",")]
 totals = dict((i,0) for i in states)
 total = 0
@@ -34,7 +36,7 @@ if args.checkDuplicates:
 metaChain = ROOT.TChain("metaInfo/metaInfo")
 for name in filelist:
     print name
-    if ".root" not in name:
+    if not isfile:
         try:
             file_path = ConfigureJobs.getInputFilesPath(name, path,
                 args.selection, "WZxsec2016")
@@ -54,7 +56,7 @@ for name in filelist:
         cut_tree = chain
         num_events = cut_tree.GetEntries(args.cut_string)
         print "Number of events in state %s is %i" % (state, num_events)
-        if args.printEventNums:
+        if args.printEventNums or args.printDetail or args.printTrigger or args.checkDuplicates:
             cut_tree = chain.CopyTree(args.cut_string) if args.cut_string != "" \
                 else chain
             file_name = 'WZEvents_{:%Y-%m-%d}_{selection}_{name}_{chan}.out'.format(datetime.date.today(), 
@@ -64,7 +66,8 @@ for name in filelist:
                 outfile.write("# Made with cut: %s\n" % args.cut_string)
                 for row in cut_tree:
                     eventId = '{0}:{1}:{2}'.format(row.run, row.lumi,row.evt)
-                    outfile.write(eventId+'\n')
+                    if args.printEventNums:
+                        outfile.write(eventId+'\n')
                     if args.printTrigger or args.printDetail:
                         print "-"*20 + eventId + "_"*20
                         if args.printTrigger:
@@ -81,7 +84,7 @@ for name in filelist:
                                 print "Zmass :", row.m1_m2_Mass
                     if args.checkDuplicates:
                         if eventId in eventArray:
-                            print "Found a duplicate: %s" % eventId
+                            print "Duplicate: %s" % eventId
                         else:
                             eventArray.append(eventId)
         totals[state] += num_events

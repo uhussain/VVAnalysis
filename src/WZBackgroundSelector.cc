@@ -74,32 +74,32 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
 }
 
 float WZBackgroundSelector::getl1FakeRate() {
-    float pt_eval = l1Pt < 50 ? l1Pt : 49;
+    float pt_fillval = l1Pt < FR_MAX_PT_ ? l1Pt : FR_MAX_PT_ - 0.01;
     float fr = 1;
     if (channel_ == eem|| channel_ == eee)
-        fr = fakeRate_allE_->Evaluate2D(pt_eval, std::abs(l1Eta));
+        fr = fakeRate_allE_->Evaluate2D(pt_fillval, std::abs(l1Eta));
     else
-        fr = fakeRate_allMu_->Evaluate2D(pt_eval, std::abs(l1Eta));
+        fr = fakeRate_allMu_->Evaluate2D(pt_fillval, std::abs(l1Eta));
     return fr/(1-fr); 
 }
 
 float WZBackgroundSelector::getl2FakeRate() {
-    float pt_eval = l2Pt < 50 ? l2Pt : 49;
+    float pt_fillval = l2Pt < FR_MAX_PT_ ? l2Pt : FR_MAX_PT_ - 0.01;
     float fr = 1;
     if (channel_ == eem || channel_ == eee)
-        fr = fakeRate_allE_->Evaluate2D(pt_eval, std::abs(l2Eta));
+        fr = fakeRate_allE_->Evaluate2D(pt_fillval, std::abs(l2Eta));
     else
-        fr = fakeRate_allMu_->Evaluate2D(pt_eval, std::abs(l2Eta));
+        fr = fakeRate_allMu_->Evaluate2D(pt_fillval, std::abs(l2Eta));
     return fr/(1-fr); 
 }
 
 float WZBackgroundSelector::getl3FakeRate() {
-    float pt_eval = l3Pt < 50 ? l3Pt : 49;
+    float pt_fillval = l3Pt < FR_MAX_PT_ ? l3Pt : FR_MAX_PT_ - 0.01;
     float fr = 1;
     if (channel_ == emm || channel_ == eee)
-        fr = fakeRate_allE_->Evaluate2D(pt_eval, std::abs(l3Eta));
+        fr = fakeRate_allE_->Evaluate2D(pt_fillval, std::abs(l3Eta));
     else
-        fr = fakeRate_allMu_->Evaluate2D(pt_eval, std::abs(l3Eta));
+        fr = fakeRate_allMu_->Evaluate2D(pt_fillval, std::abs(l3Eta));
     return fr/(1-fr); 
 }
 
