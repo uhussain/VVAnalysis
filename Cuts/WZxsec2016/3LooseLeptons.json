@@ -8,10 +8,7 @@
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsMediumICHEP > 0.5",
-            "{object_name}PVDXY < 0.02",
-            "{object_name}PVDZ < 0.1",
-            "{object_name}RelPFIsoDBR04 < 0.4"
+            "{object_name}IsWZLoose > 0.5"
         ]
     },
     "State" : {
@@ -25,6 +22,6 @@
         ]
     },
     "Event" : [
-        "abs(nWZTightMuon + nCBVIDTightElec - 3) < 0.5"
+        "nWZMediumMuon + nCBVIDMediumElec < 3.5"
     ]
 }

@@ -14,9 +14,9 @@ import logging
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
-    parser.add_argument("--noScaleFacs", action='store_true',
-                        help="Don't add lepton and pilup scale factors to "
-                        "ntuple (by default they are added)")
+    parser.add_argument("--scaleFacs", action='store_true',
+                        help="Add lepton and pilup scale factors to "
+                        "ntuple (by default they are not added)")
     parser.add_argument("-e", "--extraArgs", type=str, default='',
                         help="Extra arguments to pass to skimNtuples script")
     parser.add_argument("--noSubmit", action='store_true',
@@ -66,7 +66,7 @@ def callFarmout(output_dir, script_name, noSubmit):
         print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     if noSubmit: status = -1
     return status
-def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFacs, noSubmit, extraArgs):
+def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs, noSubmit, extraArgs):
     farmout_dict = {}
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
         sample_name, 
@@ -99,7 +99,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, noScaleFa
         selection,
         analysis,
         ConfigureJobs.getTriggerName(sample_name, analysis, selection),
-        not noScaleFacs and ("data" not in sample_name),
+        scaleFacs and ("data" not in sample_name),
         extraArgs
     )
     status = callFarmout(farmout_dict['job_dir'], script_name, noSubmit)
@@ -128,7 +128,7 @@ def main():
     for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path):
         try:
             farmoutNtupleSkim(file_name, path, args['selection'], 
-                args['analysis'], args['version'], args['noScaleFacs'], 
+                args['analysis'], args['version'], args['scaleFacs'], 
                 args['noSubmit'], args['extraArgs'])
         except (ValueError, OSError) as error:
             logging.warning(error)

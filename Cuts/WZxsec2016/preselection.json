@@ -4,17 +4,13 @@
             "{object_name}Pt > 10",
             "abs({object_name}Eta) <  2.5",
             "{object_name}IsCBVIDHLTSafe > 0.5",
-            "{object_name}IsCBVIDTight > 0.5",
-            "({object_name}IsEB ? {object_name}PVDXY < 0.05 : {object_name}PVDXY < 0.1)",
-            "({object_name}IsEB ? {object_name}PVDZ < 0.1 : {object_name}PVDZ < 0.2)"
+            "{object_name}IsCBVIDTight > 0.5"
         ],
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsMedium > 0.5",
-            "({object_name}Pt > 20 ? {object_name}PVDXY < 0.02 : {object_name}PVDXY < 0.01)",
-            "{object_name}PVDZ < 0.1",
-            "{object_name}RelPFIsoDBR04 < 0.15"
+            "{object_name}IsWZLoose > 0.5",
+            "{object_name}IsWZTight > 0.5"
         ]
     },
     "State" : {
@@ -28,7 +24,6 @@
         ]
     },
     "Event" : [
-        "abs(nWZLooseMuon + nCBVIDVetoElec - 3) < 0.5",
-        "(singleMuPass || singleIsoMuPass || singleEPass || singleESingleMuPass || singleMuSingleEPass || doubleMuPass || doubleEPass)"
+        "abs(nWZTightMuon + nCBVIDTightElec - 3) < 0.5"
     ]
 }
