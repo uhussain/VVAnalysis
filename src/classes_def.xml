@@ -4,4 +4,5 @@
   <class name="WZBackgroundSelector"/>
   <class name="WZSelectorBase"/>
   <class name="ScaleFactor"/>
+  <class name="disambiguateFinalStates"/>
 </lcgdict>

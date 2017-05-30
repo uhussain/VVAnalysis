@@ -38,7 +38,7 @@ def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
     ROOT.gROOT.cd()
     return save_tree.GetEntries()
 def getDeduplicatedTree(tree, state, cut_string):
-    selector = ROOT.TSelector.GetSelector("Utilities/Selectors/disambiguateFinalStates.C+") 
+    selector = ROOT.disambiguateFinalStates()
     zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
     selector.setZCandidateBranchName(zcand_name)
     new_tree = tree.CopyTree(cut_string)

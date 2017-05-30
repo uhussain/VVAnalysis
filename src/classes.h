@@ -3,6 +3,8 @@
 #include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
 #include "Analysis/WZAnalysis/interface/WZBackgroundSelector.h"
 #include "Analysis/WZAnalysis/interface/ScaleFactor.h"
+#include "Analysis/WZAnalysis/interface/disambiguateFinalStates.h"
+
 namespace{
   namespace{
     FakeRateSelector pFakeRateSelector;
@@ -10,5 +12,6 @@ namespace{
     WZSelector pWZSelector;
     WZBackgroundSelector pWZBackgroundSelector;
     ScaleFactor pScaleFactor;
+    disambiguateFinalStates pDisambiguator;
   }
 }

@@ -32,5 +32,5 @@ farmoutAnalysisJobs \
     --input-basenames-not-unique \
     $$1 \
     ${job_name} \
-    /afs/cern.ch/work/k/kelong/CMSSW/CMSSW_8_0_23 \
+    $$CMSSW_BASE \
     ${job_dir}/skim.sh
