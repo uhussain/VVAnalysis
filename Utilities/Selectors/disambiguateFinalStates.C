@@ -76,7 +76,7 @@ void disambiguateFinalStates::findBestEntry()
     }
   }
 
-  if ( bestEntry > 0 )
+  if ( bestEntry >= 0 )
   {
     fBestCandidateEntryList->Enter(bestEntry);
   }
