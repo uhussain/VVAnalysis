@@ -12,6 +12,10 @@ void WZSelector::Init(TTree *tree)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
         if (weight_info_ == 2)
             fChain->SetBranchAddress("pdfWeights", &pdfWeights, &b_pdfWeights);
+        fChain->SetBranchAddress("mjj_jesUp", &mjj_jesUp, &b_mjj_jesUp);
+        fChain->SetBranchAddress("mjj_jesDown", &mjj_jesDown, &b_mjj_jesDown);
+        fChain->SetBranchAddress("mjj_jerUp", &mjj_jerUp, &b_mjj_jerUp);
+        fChain->SetBranchAddress("mjj_jerDown", &mjj_jerDown, &b_mjj_jerDown);
     }
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
@@ -153,8 +157,8 @@ bool WZSelector::PassesSelection(bool tightLeps) {
     if (!passesLeptonVeto)
         return false;
     // Don't blind background estimation
-    //if (!PassesVBSSelection(!tightLeps))
-    //    return false;
+    if (!PassesVBSSelection(!tightLeps))
+        return false;
     return true;
 }
 
@@ -229,6 +233,24 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         hists1D_["zepj3"]->Fill(jetEta->at(2) - std::abs(jetEta->at(1) + jetEta->at(0)), weight);
     //if (hists1D_["zepj3"] != nullptr && jetEta->size() > 2)
     //    std::abs(Phi - dijetPhi) < 3.14159 ? abs(Phi - dijetPhi) : abs(Phi - dijetPhi) - 3.14159
+    
+    // JES/JER uncertainties
+    if (hists1D_["mjj_jesUp"] != nullptr && isMC_) {
+        b_mjj_jesUp->GetEntry(entry);
+        hists1D_["mjj_jesUp"]->Fill(mjj_jesUp, weight);
+    }
+    if (hists1D_["mjj_jesDown"] != nullptr && isMC_) {
+        b_mjj_jesDown->GetEntry(entry);
+        hists1D_["mjj_jesDown"]->Fill(mjj_jesDown, weight);
+    }
+    if (hists1D_["mjj_jerUp"] != nullptr && isMC_) {
+        b_mjj_jerUp->GetEntry(entry);
+        hists1D_["mjj_jerUp"]->Fill(mjj_jerUp, weight);
+    }
+    if (hists1D_["mjj_jerDown"] != nullptr && isMC_) {
+        b_mjj_jerDown->GetEntry(entry);
+        hists1D_["mjj_jerDown"]->Fill(mjj_jerDown, weight);
+    }
     
     // VBS Variables for cut optimization
     if (hists1D_["jetEta12"] != nullptr && jetEta->size() > 1) {

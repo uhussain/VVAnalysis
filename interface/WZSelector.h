@@ -36,6 +36,10 @@ public :
         { "jetEta[1]", {} },
         { "jetEta[2]", {} },
         { "mjj",  {} },
+        { "mjj_jesUp",  {} },
+        { "mjj_jesDown",  {} },
+        { "mjj_jerUp",  {} },
+        { "mjj_jerDown",  {} },
         { "MtW",  {} },
         { "dEtajj",  {} },
         { "zep3l",  {} },
@@ -86,6 +90,10 @@ public :
     Float_t Pt;
     Float_t ZPt;
     Float_t mjj;
+    Float_t mjj_jesUp;
+    Float_t mjj_jesDown;
+    Float_t mjj_jerUp;
+    Float_t mjj_jerDown;
     Float_t l1Eta;
     Float_t l1Pt;
     Float_t l2Eta;
@@ -111,6 +119,10 @@ public :
     TBranch* b_ZMass;
     TBranch* b_ZPt;
     TBranch* b_mjj;
+    TBranch* b_mjj_jesUp;
+    TBranch* b_mjj_jesDown;
+    TBranch* b_mjj_jerUp;
+    TBranch* b_mjj_jerDown;
     TBranch* b_l1Eta;
     TBranch* b_l1Pt;
     TBranch* b_l2Eta;
