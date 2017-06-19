@@ -100,8 +100,9 @@ def getHistExpr(hist_names, selection):
 ROOT.gROOT.SetBatch(True)
 
 args = getComLineArgs()
-manager_path = os.path.expanduser("~/work/AnalysisDatasetManager")
-sys.path.append("/".join([manager_path, "Utilities/python"]))
+manager_path = ConfigureJobs.getManagerPath()
+sys.path.append("/".join([manager_path, 
+    "AnalysisDatasetManager", "Utilities/python"]))
 import HistTools 
 
 tmpFileName = args['output_file']
@@ -142,15 +143,14 @@ background = SelectorTools.applySelector(["WZxsec2016-data"] +
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs, addsumweights=True, proof=args['proof'])
 
-path = ConfigureJobs.getManagerPath()
 alldata = makeCompositeHists("AllData", 
-    ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path), args['lumi'])
+    ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
 writeOutputListItem(alldata, fOut)
 nonpromptmc = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
-    ConfigureJobs.getListOfNonpromptFilenames(), path), args['lumi'])
+    ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'])
 writeOutputListItem(nonpromptmc, fOut)
 ewkmc = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
-    ConfigureJobs.getListOfEWKFilenames(), path), args['lumi'])
+    ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'])
 writeOutputListItem(ewkmc, fOut)
 ewkcorr = getDifference("DataEWKCorrected", "AllData", "AllEWK", False)
 writeOutputListItem(ewkcorr, fOut)

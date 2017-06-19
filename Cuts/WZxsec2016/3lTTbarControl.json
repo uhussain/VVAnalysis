@@ -20,7 +20,8 @@
         ]
     },
     "Event" : [
-        "(bestZCand_Mass < 86.1876 || bestZCand_Mass > 96.1876)",
+        "(ZMass < 86.1876 || ZMass > 96.1876)",
+        "ZMass > 20",
         "Zlep1_Pt > 25.",
         "Zlep2_Pt > 15.",
         "Wlep_Pt > 20",

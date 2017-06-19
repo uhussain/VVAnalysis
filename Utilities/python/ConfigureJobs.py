@@ -5,6 +5,7 @@ import glob
 import subprocess
 import os
 import json
+import string
 
 def getManagerPath():
     path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
@@ -97,6 +98,12 @@ def getListOfFiles(filelist, manager_path, selection='ntuples'):
                 continue
             names += [name]
     return names
+def fillTemplatedFile(template_file_name, out_file_name, template_dict):
+    with open(template_file_name, "r") as templateFile:
+        source = string.Template(templateFile.read())
+        result = source.substitute(template_dict)
+    with open(out_file_name, "w") as outFile:
+        outFile.write(result)
 def getListOfFilesWithXSec(filelist, manager_path):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     files = getListOfFiles(filelist, manager_path)

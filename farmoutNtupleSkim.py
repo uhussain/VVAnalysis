@@ -3,7 +3,6 @@ import argparse
 import json
 import os
 import sys
-import string
 import datetime
 import subprocess
 import glob
@@ -30,12 +29,6 @@ def getFilesPerJob(path_to_files):
         raise ValueError("Size of file list is zero for path: %s" % path_to_files)
     average_size = tot_size/num
     return int(math.ceil(200./average_size))
-def fillTemplatedFile(template_file_name, out_file_name, template_dict):
-    with open(template_file_name, "r") as templateFile:
-        source = string.Template(templateFile.read())
-        result = source.substitute(template_dict)
-    with open(out_file_name, "w") as outFile:
-        outFile.write(result)
 # The intention here was to make sure the output order isn't jumbled together,
 # as it is when subprocess outputs are written together. This is an admittedly
 # sloppy solution, however
@@ -89,7 +82,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     farmout_dict['command'] = ' '.join(sys.argv)
     script_name = '/'.join([farmout_dict['job_dir'], 'farmout.sh'])
     os.mkdir(farmout_dict['job_dir'])
-    fillTemplatedFile('/'.join([farmout_dict['base_dir'], 
+    ConfigureJobs.fillTemplatedFile('/'.join([farmout_dict['base_dir'], 
         'Templates/farmout_template.sh']),
         script_name, 
         farmout_dict
@@ -118,7 +111,7 @@ def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleF
         'extraArgs' : extraArgs,
         'addScaleFacs' : addScaleFacs,
     }
-    fillTemplatedFile('/'.join([base_dir, 'Templates/skim_template.sh']),
+    ConfigureJobs.fillTemplatedFile('/'.join([base_dir, 'Templates/skim_template.sh']),
         '/'.join([job_dir, 'skim.sh']), fill_dict)
 def main():
     #for selection in selection_map.iteritems():

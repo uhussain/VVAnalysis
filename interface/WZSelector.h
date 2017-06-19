@@ -31,12 +31,25 @@ public :
         { "jetPt[0]", {} },
         { "jetPt[1]", {} },
         { "jetPt[2]", {} },
+        { "jetEta12", {} },
         { "jetEta[0]", {} },
         { "jetEta[1]", {} },
         { "jetEta[2]", {} },
         { "mjj",  {} },
         { "MtW",  {} },
-        { "dEtajj",  {} }
+        { "dEtajj",  {} },
+        { "zep3l",  {} },
+        { "zepj3",  {} },
+        { "mjj_dEtajj2", {} },
+        { "mjj_dEtajj2p25",{} },
+        { "mjj_dEtajj2p5",{} },
+        { "mjj_dEtajj2p75",{} },
+        { "mjj_dEtajj3",{} },
+        { "dEtajj_mjj400",{} },
+        { "dEtajj_mjj450",{} },
+        { "dEtajj_mjj500",{} },
+        { "dEtajj_mjj550",{} },
+        { "dEtajj_mjj600", {} }
     };
     std::map<std::string, TH2D*> weighthists_ = {
         { "nTruePU",  {} },
@@ -68,6 +81,7 @@ public :
     UInt_t nvtx;
     UInt_t nJets;
     Float_t Mass;
+    Float_t Eta;
     Float_t ZMass;
     Float_t Pt;
     Float_t ZPt;
@@ -91,6 +105,7 @@ public :
     TBranch* b_nTruePU;
     TBranch* b_nvtx;
     TBranch* b_Mass;
+    TBranch* b_Eta;
     TBranch* b_Pt;
     TBranch* b_type1_pfMETEt;
     TBranch* b_ZMass;
@@ -116,7 +131,7 @@ protected:
     void LoadBranches(Long64_t entry);
     void FillHistograms(Long64_t entry, float weight, bool noBlind);
     bool PassesSelection(bool tightLeps);
-    bool PassesVBSSelection();
+    bool PassesVBSSelection(bool noBlind);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
 };
