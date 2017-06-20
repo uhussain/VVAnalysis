@@ -95,6 +95,7 @@ fIn = ROOT.TFile(args['input_file'])
 
 card_info = {
     "eee" : { 
+        "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
         "wz-mgmlm" : 0,
         "top-ewk" : 0,
@@ -102,6 +103,7 @@ card_info = {
         "vv" : 0,
     },
     "eem" : {
+        "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
         "wz-mgmlm" : 0,
         "top-ewk" : 0,
@@ -109,6 +111,7 @@ card_info = {
         "vv" : 0,
     },
     "emm" : {
+        "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
         "wz-mgmlm" : 0,
         "top-ewk" : 0,
@@ -116,6 +119,7 @@ card_info = {
         "vv" : 0,
     },
     "mmm" : {
+        "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
         "wz-mgmlm" : 0,
         "top-ewk" : 0,
@@ -138,7 +142,7 @@ for chan in chans:
     hist = nonprompt.FindObject("mjj_Fakes_"+chan)
     card_info[chan]["nonprompt"] = round(hist.Integral(), 4)
 writeOutputListItem(nonprompt, fOut)
-for plot_group in ["wz-mgmlm", "wzjj-ewk", "top-ewk", "zg", "vv"]:
+for plot_group in ["wz-mgmlm", "wzjj-ewk", "wzjj-vbfnlo", "top-ewk", "zg", "vv"]:
     group = makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'],
             ["mjj_" + c for c in ["eee", "eem", "emm", "mmm"]]+

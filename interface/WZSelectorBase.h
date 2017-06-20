@@ -23,6 +23,10 @@ public :
         mmm,
         Unknown,
     }; 
+    enum Selection {
+        tightleptons,
+        VBSselection,
+    }; 
     TList *currentHistDir_{nullptr};
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
@@ -127,6 +131,8 @@ protected:
     std::string name_ = "Unnamed";
     std::string channelName_ = "Unnamed";
     Channel channel_ = Unknown;
+    std::string selectionName_ = "tightleptons";
+    Selection selection_ = tightleptons;
     bool isMC_;
     const float FR_MAX_PT_ = 50;
     const float FR_MAX_ETA_ = 2.5;

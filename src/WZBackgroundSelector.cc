@@ -33,7 +33,7 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
 {
     LoadBranches(entry);
     
-    if (!PassesSelection(false))
+    if (!PassesSelection(false, selection_))
         return true;
 
     float evtwgt = 0;

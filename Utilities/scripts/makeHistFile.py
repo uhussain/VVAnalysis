@@ -133,15 +133,16 @@ hists = HistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
     
 hist_inputs = [getHistExpr(hists, analysis)]
+tselection = [ROOT.TNamed("selection", selection)]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 background = SelectorTools.applySelector(["WZxsec2016-data"] +
     ConfigureJobs.getListOfEWKFilenames(), 
         "WZBackgroundSelector", args['selection'], fOut, 
-        extra_inputs=fr_inputs+hist_inputs, proof=args['proof'])
+        extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
-        extra_inputs=sf_inputs+hist_inputs, addsumweights=True, proof=args['proof'])
+        extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
 
 alldata = makeCompositeHists("AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])

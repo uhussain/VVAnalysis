@@ -49,6 +49,10 @@ public :
         { "mjj_dEtajj2p5",{} },
         { "mjj_dEtajj2p75",{} },
         { "mjj_dEtajj3",{} },
+        { "mjj_dEtajj3p25",{} },
+        { "mjj_dEtajj3p5",{} },
+        { "mjj_dEtajj3p75",{} },
+        { "mjj_dEtajj4",{} },
         { "dEtajj_mjj400",{} },
         { "dEtajj_mjj450",{} },
         { "dEtajj_mjj500",{} },
@@ -78,8 +82,16 @@ public :
     std::vector<float> lheWeights;
     unsigned int weight_info_;
     float dEtajj;
+    float dEtajj_jesUp;
+    float dEtajj_jesDown;
+    float dEtajj_jerUp;
+    float dEtajj_jerDown;
     std::vector<float>* jetPt = NULL;
     std::vector<float>* jetEta = NULL;
+    std::vector<float>* jetEta_jesUp = NULL;
+    std::vector<float>* jetEta_jesDown = NULL;
+    std::vector<float>* jetEta_jerUp = NULL;
+    std::vector<float>* jetEta_jerDown = NULL;
     Float_t type1_pfMETEt;
     Float_t nTruePU;
     UInt_t nvtx;
@@ -110,6 +122,10 @@ public :
     TBranch* b_nJets;
     TBranch* b_jetPt;
     TBranch* b_jetEta;
+    TBranch* b_jetEta_jesUp;
+    TBranch* b_jetEta_jesDown;
+    TBranch* b_jetEta_jerUp;
+    TBranch* b_jetEta_jerDown;
     TBranch* b_nTruePU;
     TBranch* b_nvtx;
     TBranch* b_Mass;
@@ -142,8 +158,9 @@ public :
 protected:
     void LoadBranches(Long64_t entry);
     void FillHistograms(Long64_t entry, float weight, bool noBlind);
-    bool PassesSelection(bool tightLeps);
-    bool PassesVBSSelection(bool noBlind);
+    void FillVBSHistograms(Long64_t entry, float weight, bool noBlind);
+    bool PassesSelection(bool tightLeps, Selection selection);
+    bool PassesVBSSelection(bool noBlind, float dijetMass, float deltaEtajj);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
 };

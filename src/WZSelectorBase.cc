@@ -19,11 +19,15 @@ void WZSelectorBase::Init(TTree *tree)
     if (GetInputList() != nullptr) {
         TNamed* name = (TNamed *) GetInputList()->FindObject("name");
         TNamed* chan = (TNamed *) GetInputList()->FindObject("channel");
+        TNamed* selection = (TNamed *) GetInputList()->FindObject("selection");
         if (name != nullptr) {
             name_ = name->GetTitle();
         }
         if (chan != nullptr) {
             channelName_ = chan->GetTitle();
+        }
+        if (selection != nullptr) {
+            selectionName_ = selection->GetTitle();
         }
     }
     std::cout << "Processing " << name_ << std::endl;
@@ -74,6 +78,16 @@ void WZSelectorBase::Init(TTree *tree)
     }
     else
         throw std::invalid_argument("Invalid channel choice!");
+
+    if (selectionName_ == "tightleptons" || selectionName_ == "Wselection")
+        selection_ = tightleptons;
+    if (selectionName_ == "VBSselection")
+        selection_ = VBSselection;
+    else {
+        std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
+        selection_ = tightleptons;
+    }
+
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
 }
