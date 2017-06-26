@@ -90,6 +90,15 @@ void WZSelectorBase::Init(TTree *tree)
 
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
+    fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
+    fChain->SetBranchAddress("Flag_BadChargedCandidateFilterPass", &Flag_BadChargedCandidateFilterPass, &b_Flag_BadChargedCandidateFilterPass);
+    fChain->SetBranchAddress("Flag_BadPFMuonFilterPass", &Flag_BadPFMuonFilterPass, &b_Flag_BadPFMuonFilterPass);
+    fChain->SetBranchAddress("Flag_HBHENoiseFilterPass", &Flag_HBHENoiseFilterPass, &b_Flag_HBHENoiseFilterPass);
+    fChain->SetBranchAddress("Flag_HBHENoiseIsoFilterPass", &Flag_HBHENoiseIsoFilterPass, &b_Flag_HBHENoiseIsoFilterPass);
+    fChain->SetBranchAddress("Flag_EcalDeadCellTriggerPrimitiveFilterPass", &Flag_EcalDeadCellTriggerPrimitiveFilterPass, &b_Flag_EcalDeadCellTriggerPrimitiveFilterPass);
+    fChain->SetBranchAddress("Flag_goodVerticesPass", &Flag_goodVerticesPass, &b_Flag_goodVerticesPass);
+    fChain->SetBranchAddress("Flag_eeBadScFilterPass", &Flag_eeBadScFilterPass, &b_Flag_eeBadScFilterPass);
+    fChain->SetBranchAddress("Flag_globalTightHalo2016FilterPass", &Flag_globalTightHalo2016FilterPass, &b_Flag_globalTightHalo2016FilterPass);
 }
 
 Bool_t WZSelectorBase::Notify()
@@ -107,7 +116,15 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_l3IsTight->GetEntry(entry);
     b_nCBVIDTightElec->GetEntry(entry);
     b_nWZTightMuon->GetEntry(entry);
-    
+    b_Flag_BadChargedCandidateFilterPass->GetEntry(entry);          
+    b_Flag_BadPFMuonFilterPass->GetEntry(entry);                    
+    b_Flag_HBHENoiseFilterPass->GetEntry(entry);                    
+    b_Flag_HBHENoiseIsoFilterPass->GetEntry(entry);                 
+    b_Flag_EcalDeadCellTriggerPrimitiveFilterPass->GetEntry(entry); 
+    b_Flag_goodVerticesPass->GetEntry(entry);                       
+    b_Flag_eeBadScFilterPass->GetEntry(entry);                      
+    b_Flag_globalTightHalo2016FilterPass->GetEntry(entry);          
+
     passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3;
     
     return kTRUE;

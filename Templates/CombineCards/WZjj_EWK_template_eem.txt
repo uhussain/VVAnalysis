@@ -3,7 +3,7 @@ jmax 5  number of backgrounds
 kmax 8  number of nuisance parameters (sources of systematical uncertainties)
 ------------
 
-shapes WZjj_EWK  * VBSselection-19Jun2017-Tight.root wzjj-ewk/mjj_$$CHANNEL     wzjj-ewk/mjj_$$SYSTEMATIC_$$CHANNEL
+shapes WZjj_EWK  * VBSselection-19Jun2017-Tight.root wzjj-vbfnlo/mjj_$$CHANNEL     wzjj-vbfnlo/mjj_$$SYSTEMATIC_$$CHANNEL
 shapes WZjj_QCD  * VBSselection-19Jun2017-Tight.root wz-mgmlm/mjj_$$CHANNEL     wz-mgmlm/mjj_$$SYSTEMATIC_$$CHANNEL 
 shapes vv        * VBSselection-19Jun2017-Tight.root vv/mjj_$$CHANNEL           vv/mjj_$$SYSTEMATIC_$$CHANNEL 
 shapes top-ewk   * VBSselection-19Jun2017-Tight.root top-ewk/mjj_$$CHANNEL      top-ewk/mjj_$$SYSTEMATIC_$$CHANNEL 
@@ -23,7 +23,7 @@ observation  -1.0
 bin                     eem             eem             eem         eem             eem         eem         
 process                 WZjj_EWK        WZjj_QCD        vv          top-ewk         zg          nonprompt   
 process                 0               1               2           3               4           5           
-rate                    ${wzjj_ewk}     ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
+rate                    ${wzjj_vbfnlo}     ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
 ------------                                                                                                                                                                                                                 
 lumi            lnN     1.025           1.025           1.025       1.025           1.025       -          
 PDF             lnN     1.05            1.05            1.05        1.05            1.05        -          

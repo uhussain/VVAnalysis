@@ -64,6 +64,14 @@ public :
     Float_t l2Pt;
     Float_t l3Pt;
     Float_t l3MtToMET;
+    Float_t Flag_BadChargedCandidateFilterPass;
+    Float_t Flag_BadPFMuonFilterPass;
+    Bool_t Flag_HBHENoiseFilterPass;
+    Bool_t Flag_HBHENoiseIsoFilterPass;
+    Bool_t Flag_EcalDeadCellTriggerPrimitiveFilterPass;
+    Bool_t Flag_goodVerticesPass;
+    Bool_t Flag_eeBadScFilterPass;
+    Bool_t Flag_globalTightHalo2016FilterPass;
     
     TBranch* b_genWeight;
     TBranch* b_Zmass;
@@ -90,6 +98,14 @@ public :
     TBranch* b_l2Pt;
     TBranch* b_l3Pt;
     TBranch* b_l3MtToMET;
+    TBranch* b_Flag_BadChargedCandidateFilterPass;
+    TBranch* b_Flag_BadPFMuonFilterPass;
+    TBranch* b_Flag_HBHENoiseFilterPass;
+    TBranch* b_Flag_HBHENoiseIsoFilterPass;
+    TBranch* b_Flag_EcalDeadCellTriggerPrimitiveFilterPass;
+    TBranch* b_Flag_goodVerticesPass;
+    TBranch* b_Flag_eeBadScFilterPass;
+    TBranch* b_Flag_globalTightHalo2016FilterPass;
 
     // Readers to access the data (delete the ones you do not need).
     WZSelectorBase(TTree * /*tree*/ =0) { }

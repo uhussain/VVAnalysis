@@ -137,7 +137,7 @@ tselection = [ROOT.TNamed("selection", selection)]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
-background = SelectorTools.applySelector(["WZxsec2016-data"] +
+background = SelectorTools.applySelector(["WZxsec2016"] +
     ConfigureJobs.getListOfEWKFilenames(), 
         "WZBackgroundSelector", args['selection'], fOut, 
         extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])

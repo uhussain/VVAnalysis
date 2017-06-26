@@ -60,6 +60,9 @@ def applySelector(filelist, selector_name, selection,
                         sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1,0,100)
                         meta_chain.Add(file_path)
                         meta_chain.Draw("1>>sumweights", "summedWeights")
+                        if sumweights_hist.Integral() <= 0:
+                            raise ValueError("Sum of weights <= 0 found for file"
+                                    "%s. Probably the file is empty." % dataset)
                         sumweights_hist.SetDirectory(0)
                 except ValueError as e:
                     print e

@@ -28,6 +28,7 @@ public :
         { "Mass", {} },
         { "Pt", {} },
         { "nJets", {} },
+        { "nJetCSVv2T", {} },
         { "jetPt[0]", {} },
         { "jetPt[1]", {} },
         { "jetPt[2]", {} },
@@ -96,6 +97,7 @@ public :
     Float_t nTruePU;
     UInt_t nvtx;
     UInt_t nJets;
+    UInt_t nJetCSVv2T;
     Float_t Mass;
     Float_t Eta;
     Float_t ZMass;
@@ -120,6 +122,7 @@ public :
     TBranch* b_pdfWeights;
     TBranch* b_scaleWeights;
     TBranch* b_nJets;
+    TBranch* b_nJetCSVv2T;
     TBranch* b_jetPt;
     TBranch* b_jetEta;
     TBranch* b_jetEta_jesUp;
