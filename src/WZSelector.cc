@@ -7,6 +7,7 @@ void WZSelector::Init(TTree *tree)
     
     weight_info_ = 0;
     if (isMC_) {
+        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
         weight_info_ = GetLheWeightInfo();
         if (weight_info_ > 0)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
@@ -131,6 +132,7 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_jetPt->GetEntry(entry);
     b_jetEta->GetEntry(entry);
     if (isMC_) {
+        b_nTruePU->GetEntry(entry);
         b_mjj_jesUp->GetEntry(entry);
         b_mjj_jesDown->GetEntry(entry);
         b_mjj_jerUp->GetEntry(entry);
@@ -413,14 +415,12 @@ Bool_t WZSelector::Process(Long64_t entry)
             genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
             genWeight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
             genWeight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            genWeight *= pileupSF_->Evaluate1D(nTruePU);
         }
         else if (channel_ == eem) {
             genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
             genWeight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
             genWeight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
             genWeight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            genWeight *= pileupSF_->Evaluate1D(nTruePU);
         }
         else if (channel_ == emm) {
             genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
@@ -428,7 +428,6 @@ Bool_t WZSelector::Process(Long64_t entry)
             genWeight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
             genWeight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
             genWeight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            genWeight *= pileupSF_->Evaluate1D(nTruePU);
         }
         else {
             genWeight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
@@ -437,8 +436,8 @@ Bool_t WZSelector::Process(Long64_t entry)
             genWeight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
             genWeight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
             genWeight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            genWeight *= pileupSF_->Evaluate1D(nTruePU);
         }
+        genWeight *= pileupSF_->Evaluate1D(nTruePU);
     }
     
     FillHistograms(entry, genWeight, false);

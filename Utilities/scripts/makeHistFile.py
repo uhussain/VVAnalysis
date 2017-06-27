@@ -51,9 +51,12 @@ def getDifference(name, dir1, dir2, addRatios=True):
         if hist1 and hist2:
             diff = hist1.Clone()
             diff.Add(hist2, -1)
-        else:
-            raise RuntimeError("hist %s was not produced for "
-                "dataset(s) %s and/or %s!" % (histname, dir1, dir2))
+        elif not hist1:
+            print "WARNING: Hist %s was not produced for " \
+                "dataset(s) %s" % (histname, dir1)
+        elif not hist2:
+            print "WARNING: Hist %s was not produced for " \
+                "dataset(s) %s" % (histname, dir2)
         differences.Add(diff)
     if addRatios:
         ratios = getRatios(differences)
@@ -154,4 +157,5 @@ ewkmc = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'])
 writeOutputListItem(ewkmc, fOut)
 ewkcorr = getDifference("DataEWKCorrected", "AllData", "AllEWK", False)
+
 writeOutputListItem(ewkcorr, fOut)
