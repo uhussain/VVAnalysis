@@ -93,6 +93,10 @@ public :
     std::vector<float>* jetEta_jesDown = NULL;
     std::vector<float>* jetEta_jerUp = NULL;
     std::vector<float>* jetEta_jerDown = NULL;
+    std::vector<float>* jetPt_jesUp = NULL;
+    std::vector<float>* jetPt_jesDown = NULL;
+    std::vector<float>* jetPt_jerUp = NULL;
+    std::vector<float>* jetPt_jerDown = NULL;
     Float_t type1_pfMETEt;
     Float_t nTruePU;
     UInt_t nvtx;
@@ -129,6 +133,10 @@ public :
     TBranch* b_jetEta_jesDown;
     TBranch* b_jetEta_jerUp;
     TBranch* b_jetEta_jerDown;
+    TBranch* b_jetPt_jesUp;
+    TBranch* b_jetPt_jesDown;
+    TBranch* b_jetPt_jerUp;
+    TBranch* b_jetPt_jerDown;
     TBranch* b_nTruePU;
     TBranch* b_nvtx;
     TBranch* b_Mass;
@@ -163,7 +171,8 @@ protected:
     void FillHistograms(Long64_t entry, float weight, bool noBlind);
     void FillVBSHistograms(Long64_t entry, float weight, bool noBlind);
     bool PassesSelection(bool tightLeps, Selection selection);
-    bool PassesVBSSelection(bool noBlind, float dijetMass, float deltaEtajj);
+    bool PassesVBSSelection(bool noBlind, float dijetMass, 
+            std::vector<float>* jPt, std::vector<float>* jEta);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
 };

@@ -21,6 +21,10 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("jetEta_jesDown", &jetEta_jesDown, &b_jetEta_jesDown);
         fChain->SetBranchAddress("jetEta_jerUp", &jetEta_jerUp, &b_jetEta_jerUp);
         fChain->SetBranchAddress("jetEta_jerDown", &jetEta_jerDown, &b_jetEta_jerDown);
+        fChain->SetBranchAddress("jetPt_jesUp", &jetPt_jesUp, &b_jetPt_jesUp);
+        fChain->SetBranchAddress("jetPt_jesDown", &jetPt_jesDown, &b_jetPt_jesDown);
+        fChain->SetBranchAddress("jetPt_jerUp", &jetPt_jerUp, &b_jetPt_jerUp);
+        fChain->SetBranchAddress("jetPt_jerDown", &jetPt_jerDown, &b_jetPt_jerDown);
     }
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
@@ -131,6 +135,8 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_l3Pt->GetEntry(entry);
     b_jetPt->GetEntry(entry);
     b_jetEta->GetEntry(entry);
+    b_type1_pfMETEt->GetEntry(entry);
+    b_Eta->GetEntry(entry);
     if (isMC_) {
         b_nTruePU->GetEntry(entry);
         b_mjj_jesUp->GetEntry(entry);
@@ -141,6 +147,10 @@ void WZSelector::LoadBranches(Long64_t entry) {
         b_jetEta_jesDown->GetEntry(entry);
         b_jetEta_jerUp->GetEntry(entry);
         b_jetEta_jerDown->GetEntry(entry);
+        b_jetPt_jesUp->GetEntry(entry);
+        b_jetPt_jesDown->GetEntry(entry);
+        b_jetPt_jerUp->GetEntry(entry);
+        b_jetPt_jerDown->GetEntry(entry);
 
         dEtajj_jesUp = -1;
         if (jetEta_jesUp->size() >= 2)
@@ -176,8 +186,21 @@ void WZSelector::LoadBranches(Long64_t entry) {
     }
 }
 
-bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass, float deltaEtajj) { 
-    return ((isMC_ || noBlind) && dijetMass > 500 && deltaEtajj > 2.5);
+bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass, 
+        std::vector<float>* jPt, std::vector<float>* jEta) { 
+    if (jPt->size() != jEta->size() || jPt->size() < 2)
+        return false;
+    if (jPt->at(0) < 50 || jPt->at(1) < 50)
+        return false;
+
+    float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
+    float zep3l = Eta - 0.5*(jEta->at(1) + jEta->at(0));
+    if (dijetMass < 500 && deltaEtajj < 2.5)
+        return false;
+    if (std::abs(zep3l) < 2.5)
+        return false;
+
+    return ((isMC_ || noBlind) && type1_pfMETEt > 50);
 }
 
 bool WZSelector::PassesSelection(bool tightLeps, Selection selection) { 
@@ -205,7 +228,7 @@ bool WZSelector::PassesSelection(bool tightLeps, Selection selection) {
         return false;
     // Don't blind background estimation
     if (selection == VBSselection) {
-        if (!PassesVBSSelection(!tightLeps, mjj, dEtajj))
+        if (!PassesVBSSelection(!tightLeps, mjj, jetPt, jetEta))
             return false;
     }
     return true;
@@ -214,40 +237,42 @@ bool WZSelector::PassesSelection(bool tightLeps, Selection selection) {
 void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) { 
     // JES/JER uncertainties
     // Need to separate check VBS cuts using JER/JES variations
-    if (selection_ != VBSselection || PassesVBSSelection(noBlind, mjj_jesUp, dEtajj_jesUp)) {
-        if (hists1D_["mjj_jesUp"] != nullptr && isMC_) {
-            hists1D_["mjj_jesUp"]->Fill(mjj_jesUp, weight);
+    if (isMC_) {
+        if (selection_ != VBSselection || PassesVBSSelection(noBlind, mjj_jesUp, jetPt_jesUp, jetEta_jesUp)) {
+            if (hists1D_["mjj_jesUp"] != nullptr) {
+                hists1D_["mjj_jesUp"]->Fill(mjj_jesUp, weight);
+            }
+            if (hists1D_["dEtajj_jesUp"] != nullptr) {
+                hists1D_["dEtajj_jesUp"]->Fill(dEtajj_jesUp, weight);
+            }
         }
-        if (hists1D_["dEtajj_jesUp"] != nullptr && isMC_) {
-            hists1D_["dEtajj_jesUp"]->Fill(dEtajj_jesUp, weight);
+        if (selection_ != VBSselection || PassesVBSSelection(noBlind, mjj_jesDown, jetPt_jesDown, jetEta_jesDown)) {
+            if (hists1D_["mjj_jesDown"] != nullptr) {
+                hists1D_["mjj_jesDown"]->Fill(mjj_jesDown, weight);
+            }
+            if (hists1D_["dEtajj_jesDown"] != nullptr) {
+                hists1D_["dEtajj_jesDown"]->Fill(dEtajj_jesDown, weight);
+            }
+        }   
+        if (selection_ != VBSselection || PassesVBSSelection(noBlind, mjj_jerUp, jetPt_jerUp, jetEta_jerUp)) {
+            if (hists1D_["mjj_jerUp"] != nullptr) {
+                hists1D_["mjj_jerUp"]->Fill(mjj_jerUp, weight);
+            }
+            if (hists1D_["dEtajj_jerUp"] != nullptr) {
+                hists1D_["dEtajj_jerUp"]->Fill(dEtajj_jerUp, weight);
+            }
         }
+        if (selection_ != VBSselection || PassesVBSSelection(noBlind, mjj_jerDown, jetPt_jerDown, jetEta_jerDown)) {
+            if (hists1D_["mjj_jerDown"] != nullptr) {
+                hists1D_["mjj_jerDown"]->Fill(mjj_jerDown, weight);
+            }
+            if (hists1D_["dEtajj_jerDown"] != nullptr) {
+                hists1D_["dEtajj_jerDown"]->Fill(dEtajj_jerDown, weight);
+            }
+        }   
     }
-    if (selection_ != VBSselection || PassesVBSSelection(noBlind, mjj_jesDown, dEtajj_jesDown)) {
-        if (hists1D_["mjj_jesDown"] != nullptr && isMC_) {
-            hists1D_["mjj_jesDown"]->Fill(mjj_jesDown, weight);
-        }
-        if (hists1D_["dEtajj_jesDown"] != nullptr && isMC_) {
-            hists1D_["dEtajj_jesDown"]->Fill(dEtajj_jesDown, weight);
-        }
-    }   
-    if (selection_ != VBSselection || PassesVBSSelection(noBlind, mjj_jerUp, dEtajj_jerUp)) {
-        if (hists1D_["mjj_jerUp"] != nullptr && isMC_) {
-            hists1D_["mjj_jerUp"]->Fill(mjj_jerUp, weight);
-        }
-        if (hists1D_["dEtajj_jerUp"] != nullptr && isMC_) {
-            hists1D_["dEtajj_jerUp"]->Fill(dEtajj_jerUp, weight);
-        }
-    }
-    if (selection_ != VBSselection || PassesVBSSelection(noBlind, mjj_jerDown, dEtajj_jerDown)) {
-        if (hists1D_["mjj_jerDown"] != nullptr && isMC_) {
-            hists1D_["mjj_jerDown"]->Fill(mjj_jerDown, weight);
-        }
-        if (hists1D_["dEtajj_jerDown"] != nullptr && isMC_) {
-            hists1D_["dEtajj_jerDown"]->Fill(dEtajj_jerDown, weight);
-        }
-    }   
     
-    if (selection_ == VBSselection && !PassesVBSSelection(noBlind, mjj, dEtajj))
+    if (selection_ == VBSselection && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
         return;
     if (hists1D_["mjj"] != nullptr)
         hists1D_["mjj"]->Fill(mjj, weight*(isMC_ || (mjj < 500) || noBlind));
@@ -284,7 +309,7 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
     if (hists1D_["dEtajj_mjj600"] != nullptr && mjj < 600)
         hists1D_["dEtajj_mjj600"]->Fill(dEtajj, weight*(isMC_ || noBlind));
     
-    if (selection_ == VBSselection && !PassesVBSSelection(noBlind, mjj, dEtajj))
+    if (selection_ == VBSselection && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
         return;
 
     if (hists1D_["jetPt[0]"] != nullptr && jetPt->size() > 0)
@@ -304,11 +329,10 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
     //if (hists1D_["zepj3"] != nullptr && jetEta->size() > 2)
     //    std::abs(Phi - dijetPhi) < 3.14159 ? abs(Phi - dijetPhi) : abs(Phi - dijetPhi) - 3.14159
     if (hists1D_["zep3l"] != nullptr && jetEta->size() >= 2) {
-        b_Eta->GetEntry(entry);
-        hists1D_["zep3l"]->Fill(Eta - std::abs(jetEta->at(1) + jetEta->at(0)), weight);
+        hists1D_["zep3l"]->Fill(Eta - 0.5*(jetEta->at(1) + jetEta->at(0)), weight);
     }
     if (hists1D_["zepj3"] != nullptr && jetEta->size() > 2)
-        hists1D_["zepj3"]->Fill(jetEta->at(2) - std::abs(jetEta->at(1) + jetEta->at(0)), weight);
+        hists1D_["zepj3"]->Fill(jetEta->at(2) - 0.5*(jetEta->at(1) + jetEta->at(0)), weight);
     
     
     // VBS Variables for cut optimization
@@ -320,7 +344,7 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
 
 void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) { 
     FillVBSHistograms(entry, weight, noBlind);
-    if (selection_ == VBSselection && !PassesVBSSelection(noBlind, mjj, dEtajj))
+    if (selection_ == VBSselection && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
         return;
 
     if (hists1D_["Mass"] != nullptr)
@@ -340,7 +364,6 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     if (hists1D_["Wlep_Eta"] != nullptr)
         hists1D_["Wlep_Eta"]->Fill(l3Eta, weight);
     if (hists1D_["MET"] != nullptr) {
-        b_type1_pfMETEt->GetEntry(entry);
         hists1D_["MET"]->Fill(type1_pfMETEt, weight);
     }
     if (hists1D_["nJets"] != nullptr) {
