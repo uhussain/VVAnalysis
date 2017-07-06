@@ -3,6 +3,7 @@ import ROOT
 from python import SelectorTools
 from python import UserInput
 from python import ConfigureJobs
+import datetime
 import os
 import sys
 
@@ -24,17 +25,16 @@ def writeOutputListItem(item, directory):
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
-    parser.add_argument("--proof", "-p", 
-        action='store_true', help="Don't use proof")
+    parser.add_argument("--vbfnlo",
+        action='store_true', help="Use VBFNLO for signal")
     parser.add_argument("--lumi", "-l", type=float,
         default=35.87, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
         default="test.root", help="Output file name")
     parser.add_argument("--input_file", "-i", type=str,
         default="test.root", help="Output file name")
-    parser.add_argument("--output_selection", type=str,
-        default="", help="Selection stage of output file "
-        "(Same as input if not give)")
+    parser.add_argument("--folder_name", type=str,
+        default="", help="Name for combine folder (date by default)")
     parser.add_argument("-b", "--hist_names", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["all"], help="List of histograms, "
@@ -128,10 +128,6 @@ card_info = {
     },
 }
 
-selection = args['selection'].replace("LooseLeps", "") \
-    if args['output_selection'] == "" else args['output_selection']
-analysis = "/".join([args['analysis'], selection])
-    
 alldata = makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     ["mjj_" + c for c in chans])
@@ -142,21 +138,39 @@ for chan in chans:
     hist = nonprompt.FindObject("mjj_Fakes_"+chan)
     card_info[chan]["nonprompt"] = round(hist.Integral(), 4)
 writeOutputListItem(nonprompt, fOut)
-for plot_group in ["wz-mgmlm", "wzjj-ewk", "wzjj-vbfnlo", "top-ewk", "zg", "vv"]:
+for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]:
+
     group = makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'],
-            ["mjj_" + c for c in ["eee", "eem", "emm", "mmm"]]+
-            ["mjj_jesUp_" + c for c in ["eee", "eem", "emm", "mmm"]]+
-            ["mjj_jesDown_" + c for c in ["eee", "eem", "emm", "mmm"]]+
-            ["mjj_jerUp_" + c for c in ["eee", "eem", "emm", "mmm"]]+
-            ["mjj_jerDown_" + c for c in ["eee", "eem", "emm", "mmm"]])
+            ["mjj_" + c for c in chans]+
+            ["mjj_jesUp_" + c for c in chans]+
+            ["mjj_jesDown_" + c for c in chans]+
+            ["mjj_jerUp_" + c for c in chans]+
+            ["mjj_jerDown_" + c for c in chans])
     for chan in chans:
         hist = group.FindObject("mjj_"+chan)
         card_info[chan][plot_group.replace("-", "_")] = round(hist.Integral(), 4) 
+        card_info[chan]["output_file"] = args['output_file']
     writeOutputListItem(group, fOut)
-for chan in chans:
+combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit"
+folder_name = args['folder_name'] if args['folder_name'] != "" else \
+                datetime.date.today().strftime("%d%b%Y")
+output_dir = '/'.join([combine_dir,args['selection'], folder_name])
+try:
+    os.makedirs(output_dir)
+except OSError as e:
+    print e
+    pass
+
+signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
+for chan, chan_dict in card_info.iteritems():
+    chan_dict["signal_name"] = signal.replace("_", "-")
+    chan_dict["signal_yield"] = chan_dict[signal]
+    print "Channel", chan
+    print "Yield", chan_dict["signal_yield"]
+    print "Yield in dict", chan_dict["signal_yield"]
     ConfigureJobs.fillTemplatedFile(
         'Templates/CombineCards/WZjj_EWK_template_%s.txt' % chan,
-        'test_%s.txt' % chan, 
-        card_info[chan]
+        '%s/WZjj_%s_%s.txt' % (output_dir, "vbfnlo" if args['vbfnlo'] else "MG", chan), 
+        chan_dict
     )

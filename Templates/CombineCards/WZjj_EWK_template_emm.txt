@@ -3,14 +3,14 @@ jmax 5  number of backgrounds
 kmax 8  number of nuisance parameters (sources of systematical uncertainties)
 ------------
 
-shapes WZjj_EWK  * VBSselection-19Jun2017-Tight.root wzjj-vbfnlo/mjj_$$CHANNEL     wzjj-vbfnlo/mjj_$$SYSTEMATIC_$$CHANNEL
-shapes WZjj_QCD  * VBSselection-19Jun2017-Tight.root wz-mgmlm/mjj_$$CHANNEL     wz-mgmlm/mjj_$$SYSTEMATIC_$$CHANNEL 
-shapes vv        * VBSselection-19Jun2017-Tight.root vv/mjj_$$CHANNEL           vv/mjj_$$SYSTEMATIC_$$CHANNEL 
-shapes top-ewk   * VBSselection-19Jun2017-Tight.root top-ewk/mjj_$$CHANNEL      top-ewk/mjj_$$SYSTEMATIC_$$CHANNEL 
-shapes zg        * VBSselection-19Jun2017-Tight.root zg/mjj_$$CHANNEL           zg/mjj_$$SYSTEMATIC_$$CHANNEL 
+shapes WZjj_EWK  * ${output_file} ${signal_name}/mjj_$$CHANNEL  ${signal_name}/mjj_$$SYSTEMATIC_$$CHANNEL
+shapes WZjj_QCD  * ${output_file} wz-mgmlm/mjj_$$CHANNEL       wz-mgmlm/mjj_$$SYSTEMATIC_$$CHANNEL 
+shapes vv        * ${output_file} vv/mjj_$$CHANNEL             vv/mjj_$$SYSTEMATIC_$$CHANNEL 
+shapes top-ewk   * ${output_file} top-ewk/mjj_$$CHANNEL        top-ewk/mjj_$$SYSTEMATIC_$$CHANNEL 
+shapes zg        * ${output_file} zg/mjj_$$CHANNEL             zg/mjj_$$SYSTEMATIC_$$CHANNEL 
 
-shapes nonprompt * VBSselection-19Jun2017-Tight.root DataEWKCorrected/mjj_Fakes_$$CHANNEL
-shapes data_obs * VBSselection-19Jun2017-Tight.root AllData/mjj_$$CHANNEL
+shapes nonprompt * ${output_file} DataEWKCorrected/mjj_Fakes_$$CHANNEL
+shapes data_obs *  ${output_file} AllData/mjj_$$CHANNEL
 
 bin          emm   
 observation  -1.0 
@@ -23,7 +23,7 @@ observation  -1.0
 bin                     emm             emm             emm         emm             emm         emm         
 process                 WZjj_EWK        WZjj_QCD        vv          top-ewk         zg          nonprompt   
 process                 0               1               2           3               4           5           
-rate                    ${wzjj_vbfnlo}     ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
+rate                    ${signal_yield} ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
 ------------                                                                                                                                                                                                                 
 lumi            lnN     1.025           1.025           1.025       1.025           1.025       -          
 PDF             lnN     1.05            1.05            1.05        1.05            1.05        -          
@@ -31,5 +31,5 @@ bkgd_scale      lnN     -               -               1.05        1.05        
 WZjj_ewk_scale  lnN     1.1             -               -           -               -           -
 WZjj_qcd_scale  lnN     -               1.15            -           -               -           -          
 norm_nonprompt  lnN     -               -               -           -               -           1.4        
-jes             shape   1               1               1           1               1           -
-jer             shape   1               1               1           1               1           -
+jes             shape   1               1               1           1               0           -
+jer             shape   1               1               1           1               0           -
