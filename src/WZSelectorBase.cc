@@ -83,13 +83,59 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = tightleptons;
     else if (selectionName_ == "VBSselection")
         selection_ = VBSselection;
-    else if (selectionName_ == "VBSselectionTight") {
+    else if (selectionName_ == "VBSselectionTight")
         selection_ = VBSselectionTight;
-    }
+    else if (selectionName_ == "VBSselection_j1_35_j2_30") 
+        selection_ = VBSselection_j1_35_j2_30;
+    else if (selectionName_ == "VBSselection_j1_35_j2_35") 
+        selection_ = VBSselection_j1_35_j2_35; 
+    // j1 > 40
+    else if (selectionName_ == "VBSselection_j1_40_j2_30") 
+        selection_ = VBSselection_j1_40_j2_30; 
+    else if (selectionName_ == "VBSselection_j1_40_j2_35") 
+        selection_ = VBSselection_j1_40_j2_35; 
+    else if (selectionName_ == "VBSselection_j1_40_j2_40") 
+        selection_ = VBSselection_j1_40_j2_40; 
+    // j1 > 45
+    else if (selectionName_ == "VBSselection_j1_45_j2_30") 
+        selection_ = VBSselection_j1_45_j2_30; 
+    else if (selectionName_ == "VBSselection_j1_45_j2_35") 
+        selection_ = VBSselection_j1_45_j2_35; 
+    else if (selectionName_ == "VBSselection_j1_45_j2_40") 
+        selection_ = VBSselection_j1_45_j2_40; 
+    else if (selectionName_ == "VBSselection_j1_45_j2_45") 
+        selection_ = VBSselection_j1_45_j2_45; 
+    // j1 > 50
+    else if (selectionName_ == "VBSselection_j1_50_j2_30") 
+        selection_ = VBSselection_j1_50_j2_30;
+    else if (selectionName_ == "VBSselection_j1_50_j2_35") 
+        selection_ = VBSselection_j1_50_j2_35;
+    else if (selectionName_ == "VBSselection_j1_50_j2_40") 
+        selection_ = VBSselection_j1_50_j2_40;
+    else if (selectionName_ == "VBSselection_j1_50_j2_45") 
+        selection_ = VBSselection_j1_50_j2_45;
+    else if (selectionName_ == "VBSselection_j1_50_j2_50") 
+        selection_ = VBSselection_j1_50_j2_50;
     else {
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;
     }
+    isVBS_ = (selection_ == VBSselection || 
+        selection_ == VBSselectionTight || 
+        selection_ == VBSselection_j1_35_j2_30 ||  
+        selection_ == VBSselection_j1_35_j2_35 ||  
+        selection_ == VBSselection_j1_40_j2_30 ||  
+        selection_ == VBSselection_j1_40_j2_35 ||  
+        selection_ == VBSselection_j1_40_j2_40 ||  
+        selection_ == VBSselection_j1_45_j2_30 ||  
+        selection_ == VBSselection_j1_45_j2_35 ||  
+        selection_ == VBSselection_j1_45_j2_40 ||  
+        selection_ == VBSselection_j1_45_j2_45 ||  
+        selection_ == VBSselection_j1_50_j2_30 || 
+        selection_ == VBSselection_j1_50_j2_35 || 
+        selection_ == VBSselection_j1_50_j2_40 || 
+        selection_ == VBSselection_j1_50_j2_45 || 
+        selection_ == VBSselection_j1_50_j2_50);
 
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);

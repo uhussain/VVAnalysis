@@ -27,7 +27,22 @@ public :
         tightleptons,
         VBSselection,
         VBSselectionTight,
+        VBSselection_j1_35_j2_30, 
+        VBSselection_j1_35_j2_35, 
+        VBSselection_j1_40_j2_30, 
+        VBSselection_j1_40_j2_35, 
+        VBSselection_j1_40_j2_40, 
+        VBSselection_j1_45_j2_30, 
+        VBSselection_j1_45_j2_35, 
+        VBSselection_j1_45_j2_40, 
+        VBSselection_j1_45_j2_45, 
+        VBSselection_j1_50_j2_30,
+        VBSselection_j1_50_j2_35,
+        VBSselection_j1_50_j2_40,
+        VBSselection_j1_50_j2_45,
+        VBSselection_j1_50_j2_50
     }; 
+    bool isVBS_;
     TList *currentHistDir_{nullptr};
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
