@@ -55,7 +55,7 @@ def getNumberAndSizeOfHDFSFiles(file_path):
     file_info = []
     for line in out.splitlines():
         split = line.split()
-        if len(split) != 8:
+        if len(split) != 9:
             continue
         file_info.append(float(split[4].rstrip("mkg")))
     return (0,0) if len(file_info) == 0 else (len(file_info), sum(file_info))
@@ -158,7 +158,8 @@ def getInputFilesPath(sample_name, manager_path, selection, analysis):
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
                " to a definition in %s" % (sample_name, input_file_name))
-    return input_files[sample_name]['file_path']
+    filename = input_files[sample_name]['file_path']
+    return filename
 def getCutsJsonName(selection, analysis):
     return "/".join(["Cuts", analysis, selection + ".json"]) 
 def getTriggerName(sample_name, analysis, selection):

@@ -17,12 +17,18 @@ public :
         { "nvtx",  {} },
         { "ZMass",  {} },
         { "ZPt",  {} },
+        { "ZEta",  {} },
+        { "ZPhi",  {} },
+        { "dR_lW_Z",  {} },
         { "Zlep1_Eta",  {} },
+        { "Zlep1_Phi",  {} },
         { "Zlep1_Pt",  {} },
         { "Zlep2_Eta",  {} },
+        { "Zlep2_Phi",  {} },
         { "Zlep2_Pt",  {} },
         { "Wlep_Eta",  {} },
         { "Wlep_Pt",  {} },
+        { "Wlep_Phi",  {} },
         { "MET", {} },
         { "MTWZ", {} },
         { "Mass", {} },
@@ -123,16 +129,21 @@ public :
     Float_t ZMass;
     Float_t Pt;
     Float_t ZPt;
+    Float_t ZEta;
+    Float_t ZPhi;
     Float_t mjj;
     Float_t mjj_jesUp;
     Float_t mjj_jesDown;
     Float_t mjj_jerUp;
     Float_t mjj_jerDown;
     Float_t l1Eta;
+    Float_t l1Phi;
     Float_t l1Pt;
     Float_t l2Eta;
+    Float_t l2Phi;
     Float_t l2Pt;
     Float_t l3Eta;
+    Float_t l3Phi;
     Float_t l3Pt;
     Float_t l3MtToMET;
     Float_t MtToMET;
@@ -161,16 +172,21 @@ public :
     TBranch* b_type1_pfMETEt;
     TBranch* b_ZMass;
     TBranch* b_ZPt;
+    TBranch* b_ZPhi;
+    TBranch* b_ZEta;
     TBranch* b_mjj;
     TBranch* b_mjj_jesUp;
     TBranch* b_mjj_jesDown;
     TBranch* b_mjj_jerUp;
     TBranch* b_mjj_jerDown;
     TBranch* b_l1Eta;
+    TBranch* b_l1Phi;
     TBranch* b_l1Pt;
     TBranch* b_l2Eta;
+    TBranch* b_l2Phi;
     TBranch* b_l2Pt;
     TBranch* b_l3Eta;
+    TBranch* b_l3Phi;
     TBranch* b_l3Pt;
 
     // Readers to access the data (delete the ones you do not need).

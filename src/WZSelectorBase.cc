@@ -81,8 +81,11 @@ void WZSelectorBase::Init(TTree *tree)
 
     if (selectionName_ == "tightleptons" || selectionName_ == "Wselection")
         selection_ = tightleptons;
-    if (selectionName_ == "VBSselection")
+    else if (selectionName_ == "VBSselection")
         selection_ = VBSselection;
+    else if (selectionName_ == "VBSselectionTight") {
+        selection_ = VBSselectionTight;
+    }
     else {
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;

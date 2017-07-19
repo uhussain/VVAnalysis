@@ -130,17 +130,17 @@ pileupSF = fScales.Get('pileupSF')
 fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 selection = args['selection'].replace("LooseLeps", "") \
-    if args['output_selection'] == "" else args['output_selection']
+    if args['output_selection'] == "" else args['output_selection'].replace("Tight", "")
 analysis = "/".join([args['analysis'], selection])
 hists = HistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
     
 hist_inputs = [getHistExpr(hists, analysis)]
-tselection = [ROOT.TNamed("selection", selection)]
+tselection = [ROOT.TNamed("selection", args['output_selection'])]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
-background = SelectorTools.applySelector(["WZxsec2016"] +
+background = SelectorTools.applySelector(["WZxsec2016data"] +
     ConfigureJobs.getListOfEWKFilenames(), 
         "WZBackgroundSelector", args['selection'], fOut, 
         extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])

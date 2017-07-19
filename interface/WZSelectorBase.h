@@ -26,6 +26,7 @@ public :
     enum Selection {
         tightleptons,
         VBSselection,
+        VBSselectionTight,
     }; 
     TList *currentHistDir_{nullptr};
     TH2D* passingTight2D_;
