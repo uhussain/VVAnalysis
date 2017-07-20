@@ -3,9 +3,11 @@ import ROOT
 from python import SelectorTools
 from python import UserInput
 from python import ConfigureJobs
+from python.prettytable import PrettyTable
 import datetime
 import os
 import sys
+import math
 
 def writeOutputListItem(item, directory):
     if item.ClassName() == "TList":
@@ -136,8 +138,11 @@ nonprompt = makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}
     ["mjj_Fakes_" + c for c in chans])
 for chan in chans:
     hist = nonprompt.FindObject("mjj_Fakes_"+chan)
-    card_info[chan]["nonprompt"] = round(hist.Integral(), 4)
+    card_info[chan]["nonprompt"] = round(hist.Integral() if hist.Integral() > 0 else 0, 4)
 writeOutputListItem(nonprompt, fOut)
+output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
+significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
+
 for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]:
 
     group = makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
@@ -149,9 +154,44 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
             ["mjj_jerDown_" + c for c in chans])
     for chan in chans:
         hist = group.FindObject("mjj_"+chan)
-        card_info[chan][plot_group.replace("-", "_")] = round(hist.Integral(), 4) 
+        name = plot_group.replace("-", "_")
+        card_info[chan][name] = round(hist.Integral(), 4) 
         card_info[chan]["output_file"] = args['output_file']
     writeOutputListItem(group, fOut)
+    output_info.add_row([plot_group, card_info["eee"][name], 
+        card_info["eem"][name], 
+        card_info["emm"][name], 
+        card_info["mmm"][name], 
+        sum([card_info[c][name] for c in chans])]
+    )
+output_info.add_row(["nonprompt", card_info["eee"]["nonprompt"], 
+    card_info["eem"]["nonprompt"], 
+    card_info["emm"]["nonprompt"], 
+    card_info["mmm"]["nonprompt"], 
+    sum([card_info[c]["nonprompt"] for c in chans])]
+)
+background = {c : 0 for c in chans}
+for chan,yields in card_info.iteritems():
+    for name,value in yields.iteritems():
+        if name not in ["wzjj_ewk", "wzjj_vbfnlo", "output_file"]:
+            background[chan] += float(value)
+output_info.add_row(["Total background", 
+    round(background["eee"], 4), 
+    round(background["eem"], 4), 
+    round(background["emm"], 4), 
+    round(background["mmm"], 4),
+    round(sum([background[c] for c in chans]), 4), 
+])
+for name in ["wzjj_ewk", "wzjj_vbfnlo"]:
+    significance_info.add_row([name, 
+        round(card_info["eee"][name]/math.sqrt(background["eee"]), 4), 
+        round(card_info["eem"][name]/math.sqrt(background["eem"]), 4), 
+        round(card_info["emm"][name]/math.sqrt(background["emm"]), 4), 
+        round(card_info["mmm"][name]/math.sqrt(background["mmm"]), 4), 
+        round(sum([card_info[c][name] for c in chans])
+            /math.sqrt(sum([background[c] for c in chans])), 4), 
+    ])
+
 combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit"
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
                 datetime.date.today().strftime("%d%b%Y")
@@ -161,16 +201,24 @@ try:
 except OSError as e:
     print e
     pass
+with open("/".join([output_dir, "Yields.out"]), "w") as yields:
+    yields.write("\n" + " "*30 + "Event Yields")
+    yields.write("\n" + str(output_info))
+    yields.write("\n" + " "*30 + "S/sqrt(B)")
+    yields.write("\n" + str(significance_info))
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
+signal_abv = "vbfnlo" if args['vbfnlo'] else "MG"
 for chan, chan_dict in card_info.iteritems():
     chan_dict["signal_name"] = signal.replace("_", "-")
     chan_dict["signal_yield"] = chan_dict[signal]
-    print "Channel", chan
-    print "Yield", chan_dict["signal_yield"]
-    print "Yield in dict", chan_dict["signal_yield"]
     ConfigureJobs.fillTemplatedFile(
         'Templates/CombineCards/WZjj_EWK_template_%s.txt' % chan,
-        '%s/WZjj_%s_%s.txt' % (output_dir, "vbfnlo" if args['vbfnlo'] else "MG", chan), 
+        '%s/WZjj_%s_%s.txt' % (output_dir, signal_abv, chan), 
         chan_dict
     )
+ConfigureJobs.fillTemplatedFile(
+    'Templates/CombineCards/runCombine_Template.sh',
+    '%s/runCombine_%s.sh' % (output_dir, signal_abv), 
+    {"sample" : signal_abv}
+)
