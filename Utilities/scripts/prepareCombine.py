@@ -129,6 +129,17 @@ card_info = {
         "vv" : 0,
     },
 }
+def getStatHists(hist, name, chan):
+    statUp_hist = hist.Clone(hist.GetName().replace(
+        chan, "%s_statUp_%s" % (name, chan)))
+    statDown_hist = hist.Clone(hist.GetName().replace(
+        chan, "%s_statDown_%s" % (name, chan)))
+    for i in range(hist.GetNbinsX()):
+        up = hist.GetBinContent(i)+hist.GetBinErrorUp(i)
+        down = hist.GetBinContent(i)-hist.GetBinErrorLow(i)
+        statUp_hist.SetBinContent(i, up if up > 0 else 0) 
+        statDown_hist.SetBinContent(i, down if down > 0 else 0) 
+    return [statUp_hist, statDown_hist]
 
 alldata = makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
@@ -139,12 +150,13 @@ nonprompt = makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}
 for chan in chans:
     hist = nonprompt.FindObject("mjj_Fakes_"+chan)
     card_info[chan]["nonprompt"] = round(hist.Integral() if hist.Integral() > 0 else 0, 4)
+    stat_hists = getStatHists(hist, "nonprompt", chan)
+    nonprompt.extend(stat_hists[:])
 writeOutputListItem(nonprompt, fOut)
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
 for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]:
-
     group = makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'],
             ["mjj_" + c for c in chans]+
@@ -152,11 +164,13 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
             ["mjj_jesDown_" + c for c in chans]+
             ["mjj_jerUp_" + c for c in chans]+
             ["mjj_jerDown_" + c for c in chans])
+    name = plot_group.replace("-", "_")
     for chan in chans:
         hist = group.FindObject("mjj_"+chan)
-        name = plot_group.replace("-", "_")
         card_info[chan][name] = round(hist.Integral(), 4) 
         card_info[chan]["output_file"] = args['output_file']
+        stat_hists = getStatHists(hist, plot_group, chan)
+        group.extend(stat_hists)
     writeOutputListItem(group, fOut)
     output_info.add_row([plot_group, card_info["eee"][name], 
         card_info["eem"][name], 
