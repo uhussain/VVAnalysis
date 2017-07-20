@@ -115,9 +115,9 @@ for name in filelist:
         state_yields["processed"] += row.nevents
         totals["processed"] += row.nevents
     event_info.add_row([name, state_yields["eee"], state_yields["eem"], state_yields["emm"],
-        state_yields["mmm"], sum(state_yields.values()), state_yields["processed"]])
+        state_yields["mmm"], sum(state_yields.values()[:-1]), state_yields["processed"]])
     print "Number of events in all states is %i" % total
-event_info.add_row(["All files", totals["eee"], totals["eem"], totals["emm"], totals["mmm"], sum(totals.values()), totals["processed"]])
+event_info.add_row(["All files", totals["eee"], totals["eem"], totals["emm"], totals["mmm"], sum(totals.values()[:-1]), totals["processed"]])
 
 print ""
 print "Results for all files:"
