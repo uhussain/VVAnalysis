@@ -129,17 +129,33 @@ card_info = {
         "vv" : 0,
     },
 }
+
+def removeZeros(hist):
+    for i in range(0, hist.GetNbinsX()+1):
+        if hist.GetBinContent(i) <= 0:
+            if "Up" in hist.GetName():
+                hist.SetBinContent(i, 0.0001)
+            elif "Down" in hist.GetName():
+                hist.SetBinContent(i, 0.00001)
+            else: 
+                hist.SetBinContent(i, 0.00005)
+
 def getStatHists(hist, name, chan):
-    statUp_hist = hist.Clone(hist.GetName().replace(
-        chan, "%s_statUp_%s" % (name, chan)))
-    statDown_hist = hist.Clone(hist.GetName().replace(
-        chan, "%s_statDown_%s" % (name, chan)))
-    for i in range(hist.GetNbinsX()):
-        up = hist.GetBinContent(i)+hist.GetBinErrorUp(i)
+    stat_hists = []
+    for i in range(1, hist.GetNbinsX()+1):
+        statUp_hist = hist.Clone(hist.GetName().replace(
+            chan, "%s_statBin%sUp_%s" % (name, i, chan)))
+        statDown_hist = hist.Clone(hist.GetName().replace(
+            chan, "%s_statBin%iDown_%s" % (name, i, chan)))
+        up = hist.GetBinContent(i)+hist.GetBinErrorUp(i) if \
+                hist.GetBinContent(i) > 0 else hist.GetBinErrorUp(i)
         down = hist.GetBinContent(i)-hist.GetBinErrorLow(i)
-        statUp_hist.SetBinContent(i, up if up > 0 else 0) 
-        statDown_hist.SetBinContent(i, down if down > 0 else 0) 
-    return [statUp_hist, statDown_hist]
+        statUp_hist.SetBinContent(i, up) 
+        statDown_hist.SetBinContent(i, down if down > 0 else 0.0001) 
+        stat_hists.extend([statUp_hist, statDown_hist][:])
+    for hist in stat_hists:
+        removeZeros(hist)
+    return stat_hists
 
 alldata = makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
@@ -149,7 +165,8 @@ nonprompt = makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}
     ["mjj_Fakes_" + c for c in chans])
 for chan in chans:
     hist = nonprompt.FindObject("mjj_Fakes_"+chan)
-    card_info[chan]["nonprompt"] = round(hist.Integral() if hist.Integral() > 0 else 0, 4)
+    removeZeros(hist)
+    card_info[chan]["nonprompt"] = round(hist.Integral() if hist.Integral() > 0 else 0.001, 4)
     stat_hists = getStatHists(hist, "nonprompt", chan)
     nonprompt.extend(stat_hists[:])
 writeOutputListItem(nonprompt, fOut)
@@ -171,6 +188,8 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
         card_info[chan]["output_file"] = args['output_file']
         stat_hists = getStatHists(hist, plot_group, chan)
         group.extend(stat_hists)
+    for hist in group:
+        removeZeros(hist)
     writeOutputListItem(group, fOut)
     output_info.add_row([plot_group, card_info["eee"][name], 
         card_info["eem"][name], 

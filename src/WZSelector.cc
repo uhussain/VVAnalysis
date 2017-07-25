@@ -148,7 +148,6 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_ZPhi->GetEntry(entry);
     b_ZEta->GetEntry(entry);
     b_Mass->GetEntry(entry);
-    b_mjj->GetEntry(entry);
     b_l1Eta->GetEntry(entry);
     b_l1Phi->GetEntry(entry);
     b_l1Pt->GetEntry(entry);
@@ -162,6 +161,7 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_jetEta->GetEntry(entry);
     b_type1_pfMETEt->GetEntry(entry);
     b_Eta->GetEntry(entry);
+    b_mjj->GetEntry(entry);
     if (isMC_) {
         b_nTruePU->GetEntry(entry);
         b_mjj_jesUp->GetEntry(entry);
@@ -217,6 +217,11 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
         return false;
     if (jPt->size() != jEta->size() || jPt->size() < 2)
         return false;
+    // j1 > 30
+    if (selection_ == VBSselection_j1_30_j2_30) { 
+        if (jPt->at(0) < 30 || jPt->at(1) < 30)
+            return false;
+    }
     // j1 > 35
     if (selection_ == VBSselection_j1_35_j2_30) { 
         if (jPt->at(0) < 35 || jPt->at(1) < 30)
@@ -277,6 +282,60 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
         if (jPt->at(0) < 50 || jPt->at(1) < 50)
             return false;
     }
+    // j1 > 55
+    else if (selection_ == VBSselection_j1_55_j2_30) { 
+        if (jPt->at(0) < 55 || jPt->at(1) < 30)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_55_j2_35) { 
+        if (jPt->at(0) < 55 || jPt->at(1) < 35)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_55_j2_40) { 
+        if (jPt->at(0) < 55 || jPt->at(1) < 40)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_55_j2_45) { 
+        if (jPt->at(0) < 55 || jPt->at(1) < 45)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_55_j2_50) { 
+        if (jPt->at(0) < 55 || jPt->at(1) < 50)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_55_j2_55) { 
+        if (jPt->at(0) < 55 || jPt->at(1) < 55)
+            return false;
+    }
+    // j1 > 60
+    else if (selection_ == VBSselection_j1_60_j2_30) { 
+        if (jPt->at(0) < 60 || jPt->at(1) < 30)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_60_j2_35) { 
+        if (jPt->at(0) < 60 || jPt->at(1) < 35)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_60_j2_40) { 
+        if (jPt->at(0) < 60 || jPt->at(1) < 40)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_60_j2_45) { 
+        if (jPt->at(0) < 60 || jPt->at(1) < 45)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_60_j2_50) { 
+        if (jPt->at(0) < 60 || jPt->at(1) < 50)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_60_j2_55) { 
+        if (jPt->at(0) < 60 || jPt->at(1) < 55)
+            return false;
+    }
+    else if (selection_ == VBSselection_j1_60_j2_60) { 
+        if (jPt->at(0) < 60 || jPt->at(1) < 60)
+            return false;
+    }
     else if (selection_ == VBSselectionTight) { 
         if (jPt->at(0) < 50 || jPt->at(1) < 50)
             return false;
@@ -292,15 +351,7 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
     return dijetMass > 500 && deltaEtajj > 2.5;
 }
 
-bool WZSelector::PassesSelection(bool tightLeps, Selection selection) { 
-    //if (type1_pfMETEt < 30)
-    //    return true;
-    //if (Mass < 100)
-    //    return true;
-    //if (l1Pt < 25 || l2Pt < 15)
-    //    return true;
-    //if (ZMass > 116.1876 || ZMass < 76.1876)
-    //    return true;
+bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) { 
     if (!(Flag_BadChargedCandidateFilterPass
             && Flag_BadPFMuonFilterPass 
             && Flag_HBHENoiseFilterPass 
@@ -542,40 +593,20 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         hists1D_["ZPt"]->Fill(ZPt, weight);
     }
     
-        //for (size_t i = 0; i < lheWeights.size(); i++) {
-    //    if (weighthists_["mjj"] != nullptr)
-    //        weighthists_["mjj"]->Fill(mjj, i, lheWeights[i]*weight*(isMC_ || mjj < 500 || noBlind));
-    //    if (weighthists_["dEtajj"] != nullptr && dEtajj > 0)
-    //        weighthists_["dEtajj"]->Fill(dEtajj, i, lheWeights[i]*weight*(isMC_ || dEtajj < 2.5 || noBlind));
-    //    if (weighthists_["Mass"] != nullptr)
-    //        weighthists_["Mass"]->Fill(Mass, i, lheWeights[i]*weight*(isMC_ || Mass < 400 || noBlind));
-    //    if (weighthists_["ZMass"] != nullptr)
-    //        weighthists_["ZMass"]->Fill(ZMass, i, lheWeights[i]*weight*(isMC_ || Mass < 400 || noBlind));
-    //    if (weighthists_["Zlep1_Pt"] != nullptr)
-    //        weighthists_["Zlep1_Pt"]->Fill(l1Pt, i, lheWeights[i]*weight);
-    //    if (weighthists_["Zlep1_Eta"] != nullptr)
-    //        weighthists_["Zlep1_Eta"]->Fill(l1Eta, i, lheWeights[i]*weight);
-    //    if (weighthists_["Zlep2_Pt"] != nullptr)
-    //        weighthists_["Zlep2_Pt"]->Fill(l2Pt, i, lheWeights[i]*weight);
-    //    if (weighthists_["Zlep2_Eta"] != nullptr)
-    //        weighthists_["Zlep2_Eta"]->Fill(l2Eta, i, lheWeights[i]*weight);
-    //    if (weighthists_["Wlep_Pt"] != nullptr)
-    //        weighthists_["Wlep_Pt"]->Fill(l3Pt, i, lheWeights[i]*weight);
-    //    if (weighthists_["Wlep_Eta"] != nullptr)
-    //        weighthists_["Wlep_Eta"]->Fill(l3Eta, i, lheWeights[i]*weight);
-    //    if (weighthists_["nvtx"] != nullptr)
-    //        weighthists_["nvtx"]->Fill(nvtx, i, lheWeights[i]*weight);
-    //    if (weighthists_["MtW"] != nullptr)
-    //        weighthists_["MtW"]->Fill(l3MtToMET, i, lheWeights[i]*weight);
-    //    if (weighthists_["ZPt"] != nullptr)
-    //        weighthists_["ZPt"]->Fill(ZPt, i, lheWeights[i]*weight);
-    //}
+    for (size_t i = 0; i < lheWeights.size(); i++) {
+        if (weighthists_["mjj"] != nullptr)
+            weighthists_["mjj"]->Fill(mjj, i, lheWeights[i]*weight*(isMC_ || mjj < 500 || noBlind));
+        if (weighthists_["Mass"] != nullptr)
+            weighthists_["Mass"]->Fill(Mass, i, lheWeights[i]*weight*(isMC_ || Mass < 400 || noBlind));
+        if (weighthists_["MTWZ"] != nullptr)
+            weighthists_["MTWZ"]->Fill(MtToMET, i, lheWeights[i]*weight*(isMC_ || MtToMET < 340 || noBlind));
+    }
 }
 
 Bool_t WZSelector::Process(Long64_t entry)
 {
     LoadBranches(entry);
-    if (!PassesSelection(true, selection_))
+    if (!PassesBaseSelection(true, selection_))
         return true;
 
     if (isMC_) {

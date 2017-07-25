@@ -85,6 +85,8 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = VBSselection;
     else if (selectionName_ == "VBSselectionTight")
         selection_ = VBSselectionTight;
+    else if (selectionName_ == "VBSselection_j1_30_j2_30") 
+        selection_ = VBSselection_j1_35_j2_30;
     else if (selectionName_ == "VBSselection_j1_35_j2_30") 
         selection_ = VBSselection_j1_35_j2_30;
     else if (selectionName_ == "VBSselection_j1_35_j2_35") 
@@ -116,6 +118,32 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = VBSselection_j1_50_j2_45;
     else if (selectionName_ == "VBSselection_j1_50_j2_50") 
         selection_ = VBSselection_j1_50_j2_50;
+    else if (selectionName_ == "VBSselection_j1_55_j2_30") 
+        selection_ = VBSselection_j1_55_j2_30;
+    else if (selectionName_ == "VBSselection_j1_55_j2_35") 
+        selection_ = VBSselection_j1_55_j2_35;
+    else if (selectionName_ == "VBSselection_j1_55_j2_40") 
+        selection_ = VBSselection_j1_55_j2_40;
+    else if (selectionName_ == "VBSselection_j1_55_j2_45") 
+        selection_ = VBSselection_j1_55_j2_45;
+    else if (selectionName_ == "VBSselection_j1_55_j2_50") 
+        selection_ = VBSselection_j1_55_j2_50;
+    else if (selectionName_ == "VBSselection_j1_55_j2_55") 
+        selection_ = VBSselection_j1_55_j2_55;
+    else if (selectionName_ == "VBSselection_j1_60_j2_30") 
+        selection_ = VBSselection_j1_60_j2_30;
+    else if (selectionName_ == "VBSselection_j1_60_j2_35") 
+        selection_ = VBSselection_j1_60_j2_35;
+    else if (selectionName_ == "VBSselection_j1_60_j2_40") 
+        selection_ = VBSselection_j1_60_j2_40;
+    else if (selectionName_ == "VBSselection_j1_60_j2_45") 
+        selection_ = VBSselection_j1_60_j2_45;
+    else if (selectionName_ == "VBSselection_j1_60_j2_50") 
+        selection_ = VBSselection_j1_60_j2_50;
+    else if (selectionName_ == "VBSselection_j1_60_j2_55") 
+        selection_ = VBSselection_j1_60_j2_55;
+    else if (selectionName_ == "VBSselection_j1_60_j2_60") 
+        selection_ = VBSselection_j1_60_j2_60;
     else {
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;
@@ -135,7 +163,21 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ == VBSselection_j1_50_j2_35 || 
         selection_ == VBSselection_j1_50_j2_40 || 
         selection_ == VBSselection_j1_50_j2_45 || 
-        selection_ == VBSselection_j1_50_j2_50);
+        selection_ == VBSselection_j1_50_j2_50 ||
+        selection_ == VBSselection_j1_55_j2_30 || 
+        selection_ == VBSselection_j1_55_j2_35 || 
+        selection_ == VBSselection_j1_55_j2_40 || 
+        selection_ == VBSselection_j1_55_j2_45 || 
+        selection_ == VBSselection_j1_55_j2_50 ||
+        selection_ == VBSselection_j1_55_j2_55 ||
+        selection_ == VBSselection_j1_60_j2_30 || 
+        selection_ == VBSselection_j1_60_j2_35 || 
+        selection_ == VBSselection_j1_60_j2_40 || 
+        selection_ == VBSselection_j1_60_j2_45 || 
+        selection_ == VBSselection_j1_60_j2_50 ||
+        selection_ == VBSselection_j1_60_j2_55 ||
+        selection_ == VBSselection_j1_60_j2_60
+        );
 
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);

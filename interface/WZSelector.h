@@ -83,21 +83,21 @@ public :
         { "dEtajj_mjj600", {} }
     };
     std::map<std::string, TH2D*> weighthists_ = {
-        { "nTruePU",  {} },
-        { "nvtx",  {} },
-        { "ZMass",  {} },
-        { "ZPt",  {} },
-        { "Zlep1_Eta",  {} },
-        { "Zlep1_Pt",  {} },
-        { "Zlep2_Eta",  {} },
-        { "Zlep2_Pt",  {} },
-        { "Wlep_Eta",  {} },
-        { "Wlep_Pt",  {} },
-        { "Mass", {} },
-        { "Pt", {} },
-        { "mjj",  {} },
-        { "MtW",  {} },
-        { "dEtajj",  {} }
+        //{ "nTruePU",  {} },
+        //{ "nvtx",  {} },
+        //{ "ZMass",  {} },
+        //{ "ZPt",  {} },
+        //{ "Zlep1_Eta",  {} },
+        //{ "Zlep1_Pt",  {} },
+        //{ "Zlep2_Eta",  {} },
+        //{ "Zlep2_Pt",  {} },
+        //{ "Wlep_Eta",  {} },
+        //{ "Wlep_Pt",  {} },
+        //{ "Mass", {} },
+        //{ "Pt", {} },
+        //{ "MtW",  {} },
+        //{ "dEtajj",  {} },
+        { "mjj",  {} }
     };
 
     std::vector<float>* scaleWeights = NULL;
@@ -202,7 +202,7 @@ protected:
     void LoadBranches(Long64_t entry);
     void FillHistograms(Long64_t entry, float weight, bool noBlind);
     void FillVBSHistograms(Long64_t entry, float weight, bool noBlind);
-    bool PassesSelection(bool tightLeps, Selection selection);
+    bool PassesBaseSelection(bool tightLeps, Selection selection);
     bool PassesVBSSelection(bool noBlind, float dijetMass, 
             std::vector<float>* jPt, std::vector<float>* jEta);
     unsigned int GetLheWeightInfo();

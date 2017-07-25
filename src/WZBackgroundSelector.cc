@@ -20,49 +20,51 @@ void WZBackgroundSelector::SetupNewDirectory()
         named->SetName(name.insert(name.length()-3, "Fakes_").c_str());
     }
     
-    AddObject<TH1D>(zmassHistPPF_, ("ZMass_PPF_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistPFP_, ("ZMass_PFP_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistFPP_, ("ZMass_FPP_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistFFP_, ("ZMass_FFP_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistFPF_, ("ZMass_FPF_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistPFF_, ("ZMass_PFF_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
-    AddObject<TH1D>(zmassHistFFF_, ("ZMass_FFF_"+channelName_).c_str(), "ZMass; M_{ll} [GeV]; Events;", 15, 0, 150);
+    AddObject<TH1D>(mjjHistPPF_, ("mjj_PPF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
+    AddObject<TH1D>(mjjHistPFP_, ("mjj_PFP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
+    AddObject<TH1D>(mjjHistFPP_, ("mjj_FPP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
+    AddObject<TH1D>(mjjHistFFP_, ("mjj_FFP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
+    AddObject<TH1D>(mjjHistFPF_, ("mjj_FPF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
+    AddObject<TH1D>(mjjHistPFF_, ("mjj_PFF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
+    AddObject<TH1D>(mjjHistFFF_, ("mjj_FFF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
 }
 
 Bool_t WZBackgroundSelector::Process(Long64_t entry)
 {
     LoadBranches(entry);
     
-    if (!PassesSelection(false, selection_))
+    if (!PassesBaseSelection(false, selection_))
+        return true;
+    if (isVBS_ && !PassesVBSSelection(true, mjj, jetPt, jetEta))
         return true;
 
     float evtwgt = 0;
     if (IsFPPRegion()) {
-        zmassHistFPP_->Fill(Zmass, genWeight);
+        mjjHistFPP_->Fill(mjj, genWeight);
         evtwgt = getl1FakeRate()*genWeight;
     }
     else if (IsPFPRegion()) {
-        zmassHistPFP_->Fill(Zmass, genWeight);
+        mjjHistPFP_->Fill(mjj, genWeight);
         evtwgt = getl2FakeRate()*genWeight;
     }
     else if (IsPPFRegion()) {
-        zmassHistPPF_->Fill(Zmass, genWeight);
+        mjjHistPPF_->Fill(mjj, genWeight);
         evtwgt = getl3FakeRate()*genWeight;
     }
     else if (IsFFFRegion()) {
-        zmassHistFFF_->Fill(Zmass, genWeight);
+        mjjHistFFF_->Fill(mjj, genWeight);
         evtwgt = getl1FakeRate()*getl2FakeRate()*getl3FakeRate()*genWeight;
     }
     else if (IsFPFRegion()) {
-        zmassHistFPF_->Fill(Zmass, genWeight);
+        mjjHistFPF_->Fill(mjj, genWeight);
         evtwgt = -1*getl1FakeRate()*getl3FakeRate()*genWeight;
     }
     else if (IsFFPRegion()) {
-        zmassHistFFP_->Fill(Zmass, genWeight);
+        mjjHistFFP_->Fill(mjj, genWeight);
         evtwgt = -1*getl1FakeRate()*getl2FakeRate()*genWeight;
     }
     else if (IsPFFRegion()) {
-        zmassHistPFF_->Fill(Zmass, genWeight);
+        mjjHistPFF_->Fill(mjj, genWeight);
         evtwgt = -1*getl2FakeRate()*getl3FakeRate()*genWeight;
     }
     else

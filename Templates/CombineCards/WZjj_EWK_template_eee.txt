@@ -1,6 +1,6 @@
 imax 1  number of channels
 jmax 5  number of backgrounds
-kmax 14  number of nuisance parameters (sources of systematical uncertainties)
+kmax 38 number of nuisance parameters (sources of systematical uncertainties)
 ------------
 
 shapes WZjj_EWK  * ${output_file} ${signal_name}/mjj_$$CHANNEL  ${signal_name}/mjj_$$SYSTEMATIC_$$CHANNEL
@@ -20,22 +20,46 @@ observation  -1.0
 # the second 'process' line must have a positive number for backgrounds, and 0 for signal
 # then we list the independent sources of uncertainties, and give their effect (syst. error)
 # on each process and bin
-bin                     eee             eee             eee         eee             eee         eee         
-process                 WZjj_EWK        WZjj_QCD        vv          top-ewk         zg          nonprompt   
-process                 0               1               2           3               4           5           
-rate                    ${signal_yield} ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
-------------                                                                                                                                                                                                                 
-lumi            lnN     1.025           1.025           1.025       1.025           1.025       -          
-PDF             lnN     1.05            1.05            1.05        1.05            1.05        -          
-bkgd_scale      lnN     -               -               1.05        1.05            1.1         -          
-WZjj_ewk_scale  lnN     1.1             -               -           -               -           -
-WZjj_qcd_scale  lnN     -               1.15            -           -               -           -          
-norm_nonprompt  lnN     -               -               -           -               -           1.4        
-jes             shape   1               1               1           1               0           -
-jer             shape   1               1               1           1               0           -
-${signal_name}_stat shape 1             -               -           -               -           -
-wz-mgmlm_stat   shape   -               1               -           -               -           -
-vv_stat         shape   -               -               1           -               -           -
-top-ewk_stat    shape   -               -               -           1               -           -
-zg_stat         shape   -               -               -           -               1           -
-nonprompt_stat  shape   -               -               -           -               -           1
+bin                        eee             eee             eee         eee             eee         eee         
+process                    WZjj_EWK        WZjj_QCD        vv          top-ewk         zg          nonprompt   
+process                    0               1               2           3               4           5           
+rate                       ${signal_yield} ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
+------------                                                                                                                                                                                                                    
+lumi               lnN     1.025           1.025           1.025       1.025           1.025       -          
+PDF                lnN     1.05            1.05            1.05        1.05            1.05        -          
+bkgd_scale         lnN     -               -               1.05        1.05            1.1         -          
+WZjj_ewk_scale     lnN     1.1             -               -           -               -           -
+WZjj_qcd_scale     lnN     -               1.15            -           -               -           -          
+norm_nonprompt     lnN     -               -               -           -               -           1.4        
+jes                shape   1               1               1           1               -           -
+jer                shape   1               1               1           1               -           -
+${signal_name}_statBin1 shape 1             -               -           -               -           -
+${signal_name}_statBin2 shape 1             -               -           -               -           -
+${signal_name}_statBin3 shape 1             -               -           -               -           -
+${signal_name}_statBin4 shape 1             -               -           -               -           -
+${signal_name}_statBin5 shape 1             -               -           -               -           -
+wz-mgmlm_statBin1  shape   -               1               -           -               -           -
+wz-mgmlm_statBin2  shape   -               1               -           -               -           -
+wz-mgmlm_statBin3  shape   -               1               -           -               -           -
+wz-mgmlm_statBin4  shape   -               1               -           -               -           -
+wz-mgmlm_statBin5  shape   -               1               -           -               -           -
+vv_statBin1        shape   -               -               1           -               -           -
+vv_statBin2        shape   -               -               1           -               -           -
+vv_statBin3        shape   -               -               1           -               -           -
+vv_statBin4        shape   -               -               1           -               -           -
+vv_statBin5        shape   -               -               1           -               -           -
+top-ewk_statBin1   shape   -               -               -           1               -           -
+top-ewk_statBin2   shape   -               -               -           1               -           -
+top-ewk_statBin3   shape   -               -               -           1               -           -
+top-ewk_statBin4   shape   -               -               -           1               -           -
+top-ewk_statBin5   shape   -               -               -           1               -           -
+zg_statBin1        shape   -               -               -           -               1           -
+zg_statBin2        shape   -               -               -           -               1           -
+zg_statBin3        shape   -               -               -           -               1           -
+zg_statBin4        shape   -               -               -           -               1           -
+zg_statBin5        shape   -               -               -           -               1           -
+nonprompt_statBin1 shape   -               -               -           -               -           1
+nonprompt_statBin2 shape   -               -               -           -               -           1
+nonprompt_statBin3 shape   -               -               -           -               -           1
+nonprompt_statBin4 shape   -               -               -           -               -           1
+nonprompt_statBin5 shape   -               -               -           -               -           1

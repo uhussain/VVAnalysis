@@ -27,6 +27,7 @@ public :
         tightleptons,
         VBSselection,
         VBSselectionTight,
+        VBSselection_j1_30_j2_30, 
         VBSselection_j1_35_j2_30, 
         VBSselection_j1_35_j2_35, 
         VBSselection_j1_40_j2_30, 
@@ -40,7 +41,20 @@ public :
         VBSselection_j1_50_j2_35,
         VBSselection_j1_50_j2_40,
         VBSselection_j1_50_j2_45,
-        VBSselection_j1_50_j2_50
+        VBSselection_j1_50_j2_50,
+        VBSselection_j1_55_j2_30,
+        VBSselection_j1_55_j2_35,
+        VBSselection_j1_55_j2_40,
+        VBSselection_j1_55_j2_45,
+        VBSselection_j1_55_j2_50,
+        VBSselection_j1_55_j2_55,
+        VBSselection_j1_60_j2_30,
+        VBSselection_j1_60_j2_35,
+        VBSselection_j1_60_j2_40,
+        VBSselection_j1_60_j2_45,
+        VBSselection_j1_60_j2_50,
+        VBSselection_j1_60_j2_55,
+        VBSselection_j1_60_j2_60
     }; 
     bool isVBS_;
     TList *currentHistDir_{nullptr};
