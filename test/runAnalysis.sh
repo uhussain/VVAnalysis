@@ -3,8 +3,8 @@
 lumi=35.87
 lepid="Tight"
 DATE=$(date +%d%b%Y)
-frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-3LooseLeptons-${lepid}Leps.root
-#frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate26Jun2017-3LooseLeptons-${lepid}Leps.root
+#frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-3LooseLeptons-${lepid}Leps.root
+frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate27Jul2017-3LooseLeptons-${lepid}Leps.root
 output=VBSselection_Tight
 #output=Wselection
 input=WselectionLooseLeps

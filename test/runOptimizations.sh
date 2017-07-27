@@ -4,20 +4,19 @@ lumi=35.87
 lepid="Tight"
 DATE=$(date +%d%b%Y)
 #frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-3LooseLeptons-${lepid}Leps.root
-frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate26Jun2017-3LooseLeptons-${lepid}Leps.root
+frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate27Jul2017-3LooseLeptons-${lepid}Leps.root
 input=WselectionLooseLeps
-jetselec=j1Pt50-j2Pt50
+jetselec=j1Pt30-j2Pt30
 
 for mjj in `seq 400 50 600`; do
     for dEtajj in `seq 2 0.5 4`; do
         etajj=${dEtajj/./p}
-        #output=VBSselection_mjj_${mjj}_detajj_${etajj/p0/}
-        output=VBSselection_Tight
+        output=VBSselection_mjj_${mjj}_detajj_${etajj/p0/}
         #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}.root
         histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${jetselec}/${output}-${DATE}-${lepid}.root
 
         cd $CMSSW_BASE/src/Analysis/WZAnalysis
-        if [ ! -f $frfile ]; then
+       if [ ! -f $frfile ]; then
             ./Utilities/scripts/makeFakeRates.py -s 3LooseLeptons -l $lumi -o $frfile
             python ScaleFactors/setupScaleFactors.py -t $frfile 
         fi
@@ -28,7 +27,7 @@ for mjj in `seq 400 50 600`; do
         echo ./Utilities/scripts/prepareCombine.py \
             --input_file $histfile --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/VBSselection_MJJ-EtaJJ_Optimization/${jetselec}/`basename $histfile` \
             -l $lumi -s WZxsec2016/VBSselection \
-            --folder_name ${jetselec}/mjj${mjj}-dEtajj${dEtajj/./p}_Tight/${DATE}_NoNonpromptStat
+            --folder_name ${jetselec}/mjj${mjj}-dEtajj${dEtajj/./p}/${DATE}
     done
 done
 
