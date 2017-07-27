@@ -212,8 +212,7 @@ void WZSelector::LoadBranches(Long64_t entry) {
 }
 
 bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass, 
-        std::vector<float>* jPt, std::vector<float>* jEta,
-        extra_cuts) { 
+        std::vector<float>* jPt, std::vector<float>* jEta) { 
     if (!(isMC_ || noBlind))
         return false;
     if (jPt->size() != jEta->size() || jPt->size() < 2)
