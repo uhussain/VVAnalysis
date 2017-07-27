@@ -83,100 +83,89 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = tightleptons;
     else if (selectionName_ == "VBSselection")
         selection_ = VBSselection;
-    else if (selectionName_ == "VBSselectionTight")
-        selection_ = VBSselectionTight;
-    else if (selectionName_ == "VBSselection_j1_30_j2_30") 
-        selection_ = VBSselection_j1_35_j2_30;
-    else if (selectionName_ == "VBSselection_j1_35_j2_30") 
-        selection_ = VBSselection_j1_35_j2_30;
-    else if (selectionName_ == "VBSselection_j1_35_j2_35") 
-        selection_ = VBSselection_j1_35_j2_35; 
-    // j1 > 40
-    else if (selectionName_ == "VBSselection_j1_40_j2_30") 
-        selection_ = VBSselection_j1_40_j2_30; 
-    else if (selectionName_ == "VBSselection_j1_40_j2_35") 
-        selection_ = VBSselection_j1_40_j2_35; 
-    else if (selectionName_ == "VBSselection_j1_40_j2_40") 
-        selection_ = VBSselection_j1_40_j2_40; 
-    // j1 > 45
-    else if (selectionName_ == "VBSselection_j1_45_j2_30") 
-        selection_ = VBSselection_j1_45_j2_30; 
-    else if (selectionName_ == "VBSselection_j1_45_j2_35") 
-        selection_ = VBSselection_j1_45_j2_35; 
-    else if (selectionName_ == "VBSselection_j1_45_j2_40") 
-        selection_ = VBSselection_j1_45_j2_40; 
-    else if (selectionName_ == "VBSselection_j1_45_j2_45") 
-        selection_ = VBSselection_j1_45_j2_45; 
-    // j1 > 50
-    else if (selectionName_ == "VBSselection_j1_50_j2_30") 
-        selection_ = VBSselection_j1_50_j2_30;
-    else if (selectionName_ == "VBSselection_j1_50_j2_35") 
-        selection_ = VBSselection_j1_50_j2_35;
-    else if (selectionName_ == "VBSselection_j1_50_j2_40") 
-        selection_ = VBSselection_j1_50_j2_40;
-    else if (selectionName_ == "VBSselection_j1_50_j2_45") 
-        selection_ = VBSselection_j1_50_j2_45;
-    else if (selectionName_ == "VBSselection_j1_50_j2_50") 
-        selection_ = VBSselection_j1_50_j2_50;
-    else if (selectionName_ == "VBSselection_j1_55_j2_30") 
-        selection_ = VBSselection_j1_55_j2_30;
-    else if (selectionName_ == "VBSselection_j1_55_j2_35") 
-        selection_ = VBSselection_j1_55_j2_35;
-    else if (selectionName_ == "VBSselection_j1_55_j2_40") 
-        selection_ = VBSselection_j1_55_j2_40;
-    else if (selectionName_ == "VBSselection_j1_55_j2_45") 
-        selection_ = VBSselection_j1_55_j2_45;
-    else if (selectionName_ == "VBSselection_j1_55_j2_50") 
-        selection_ = VBSselection_j1_55_j2_50;
-    else if (selectionName_ == "VBSselection_j1_55_j2_55") 
-        selection_ = VBSselection_j1_55_j2_55;
-    else if (selectionName_ == "VBSselection_j1_60_j2_30") 
-        selection_ = VBSselection_j1_60_j2_30;
-    else if (selectionName_ == "VBSselection_j1_60_j2_35") 
-        selection_ = VBSselection_j1_60_j2_35;
-    else if (selectionName_ == "VBSselection_j1_60_j2_40") 
-        selection_ = VBSselection_j1_60_j2_40;
-    else if (selectionName_ == "VBSselection_j1_60_j2_45") 
-        selection_ = VBSselection_j1_60_j2_45;
-    else if (selectionName_ == "VBSselection_j1_60_j2_50") 
-        selection_ = VBSselection_j1_60_j2_50;
-    else if (selectionName_ == "VBSselection_j1_60_j2_55") 
-        selection_ = VBSselection_j1_60_j2_55;
-    else if (selectionName_ == "VBSselection_j1_60_j2_60") 
-        selection_ = VBSselection_j1_60_j2_60;
+    else if (selectionName_ == "VBSselection_Tight")
+        selection_ = VBSselection_Tight;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_2")
+        selection_ = VBSselection_mjj_400_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_2p5")
+        selection_ = VBSselection_mjj_400_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_3")
+        selection_ = VBSselection_mjj_400_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_3p5")
+        selection_ = VBSselection_mjj_400_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_4")
+        selection_ = VBSselection_mjj_400_detajj_4;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_2")
+        selection_ = VBSselection_mjj_450_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_2p5")
+        selection_ = VBSselection_mjj_450_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_3")
+        selection_ = VBSselection_mjj_450_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_3p5")
+        selection_ = VBSselection_mjj_450_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_4")
+        selection_ = VBSselection_mjj_450_detajj_4;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_2")
+        selection_ = VBSselection_mjj_500_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_2p5")
+        selection_ = VBSselection_mjj_500_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_3")
+        selection_ = VBSselection_mjj_500_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_3p5")
+        selection_ = VBSselection_mjj_500_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_4")
+        selection_ = VBSselection_mjj_500_detajj_4;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_2")
+        selection_ = VBSselection_mjj_550_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_2p5")
+        selection_ = VBSselection_mjj_550_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_3")
+        selection_ = VBSselection_mjj_550_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_3p5")
+        selection_ = VBSselection_mjj_550_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_4")
+        selection_ = VBSselection_mjj_550_detajj_4;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_2")
+        selection_ = VBSselection_mjj_600_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_2p5")
+        selection_ = VBSselection_mjj_600_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_3")
+        selection_ = VBSselection_mjj_600_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_3p5")
+        selection_ = VBSselection_mjj_600_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_4")
+        selection_ = VBSselection_mjj_600_detajj_4;
     else {
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;
     }
     isVBS_ = (selection_ == VBSselection || 
-        selection_ == VBSselectionTight || 
-        selection_ == VBSselection_j1_35_j2_30 ||  
-        selection_ == VBSselection_j1_35_j2_35 ||  
-        selection_ == VBSselection_j1_40_j2_30 ||  
-        selection_ == VBSselection_j1_40_j2_35 ||  
-        selection_ == VBSselection_j1_40_j2_40 ||  
-        selection_ == VBSselection_j1_45_j2_30 ||  
-        selection_ == VBSselection_j1_45_j2_35 ||  
-        selection_ == VBSselection_j1_45_j2_40 ||  
-        selection_ == VBSselection_j1_45_j2_45 ||  
-        selection_ == VBSselection_j1_50_j2_30 || 
-        selection_ == VBSselection_j1_50_j2_35 || 
-        selection_ == VBSselection_j1_50_j2_40 || 
-        selection_ == VBSselection_j1_50_j2_45 || 
-        selection_ == VBSselection_j1_50_j2_50 ||
-        selection_ == VBSselection_j1_55_j2_30 || 
-        selection_ == VBSselection_j1_55_j2_35 || 
-        selection_ == VBSselection_j1_55_j2_40 || 
-        selection_ == VBSselection_j1_55_j2_45 || 
-        selection_ == VBSselection_j1_55_j2_50 ||
-        selection_ == VBSselection_j1_55_j2_55 ||
-        selection_ == VBSselection_j1_60_j2_30 || 
-        selection_ == VBSselection_j1_60_j2_35 || 
-        selection_ == VBSselection_j1_60_j2_40 || 
-        selection_ == VBSselection_j1_60_j2_45 || 
-        selection_ == VBSselection_j1_60_j2_50 ||
-        selection_ == VBSselection_j1_60_j2_55 ||
-        selection_ == VBSselection_j1_60_j2_60
+        selection_ == VBSselection_Tight || 
+        selection_ == VBSselection_mjj_400_detajj_2 || 
+        selection_ == VBSselection_mjj_400_detajj_2p5 || 
+        selection_ == VBSselection_mjj_400_detajj_3 || 
+        selection_ == VBSselection_mjj_400_detajj_3p5 || 
+        selection_ == VBSselection_mjj_400_detajj_4 || 
+        selection_ == VBSselection_mjj_450_detajj_2 || 
+        selection_ == VBSselection_mjj_450_detajj_2p5 || 
+        selection_ == VBSselection_mjj_450_detajj_3 || 
+        selection_ == VBSselection_mjj_450_detajj_3p5 || 
+        selection_ == VBSselection_mjj_450_detajj_4 || 
+        selection_ == VBSselection_mjj_500_detajj_2 || 
+        selection_ == VBSselection_mjj_500_detajj_2p5 || 
+        selection_ == VBSselection_mjj_500_detajj_3 || 
+        selection_ == VBSselection_mjj_500_detajj_3p5 || 
+        selection_ == VBSselection_mjj_500_detajj_4 || 
+        selection_ == VBSselection_mjj_550_detajj_2 || 
+        selection_ == VBSselection_mjj_550_detajj_2p5 || 
+        selection_ == VBSselection_mjj_550_detajj_3 || 
+        selection_ == VBSselection_mjj_550_detajj_3p5 || 
+        selection_ == VBSselection_mjj_550_detajj_4 || 
+        selection_ == VBSselection_mjj_600_detajj_2 || 
+        selection_ == VBSselection_mjj_600_detajj_2p5 || 
+        selection_ == VBSselection_mjj_600_detajj_3 || 
+        selection_ == VBSselection_mjj_600_detajj_3p5 || 
+        selection_ == VBSselection_mjj_600_detajj_4
         );
 
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);

@@ -206,8 +206,6 @@ void WZSelector::LoadBranches(Long64_t entry) {
 
     if (jetEta->size() >= 2) {
         dEtajj = std::abs(jetEta->at(0) - jetEta->at(1));
-        if (isMC_) {
-        }
     }
 }
 
@@ -216,127 +214,96 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
     if (!(isMC_ || noBlind))
         return false;
     if (jPt->size() != jEta->size() || jPt->size() < 2)
+            return false;
+
+    // Use optimized point of pT(j1,j2) > 50 GeV
+    if (jPt->at(0) < 50 || jPt->at(1) < 50)
         return false;
-    // j1 > 30
-    if (selection_ == VBSselection_j1_30_j2_30) { 
-        if (jPt->at(0) < 30 || jPt->at(1) < 30)
-            return false;
+
+    float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
+
+    // mjj > 400
+    if (selection_ == VBSselection_mjj_400_detajj_2) { 
+        return dijetMass > 400 && deltaEtajj > 2.;
     }
-    // j1 > 35
-    if (selection_ == VBSselection_j1_35_j2_30) { 
-        if (jPt->at(0) < 35 || jPt->at(1) < 30)
-            return false;
+    else if (selection_ == VBSselection_mjj_400_detajj_2p5) { 
+        return dijetMass > 400 && deltaEtajj > 2.5;
     }
-    else if (selection_ == VBSselection_j1_35_j2_35) { 
-        if (jPt->at(0) < 35 || jPt->at(1) < 35)
-            return false;
+    else if (selection_ == VBSselection_mjj_400_detajj_3) { 
+        return dijetMass > 400 && deltaEtajj > 3.;
     }
-    // j1 > 40
-    else if (selection_ == VBSselection_j1_40_j2_30) { 
-        if (jPt->at(0) < 40 || jPt->at(1) < 30)
-            return false;
+    else if (selection_ == VBSselection_mjj_400_detajj_3p5) { 
+        return dijetMass > 400 && deltaEtajj > 3.5;
     }
-    else if (selection_ == VBSselection_j1_40_j2_35) { 
-        if (jPt->at(0) < 40 || jPt->at(1) < 35)
-            return false;
+    else if (selection_ == VBSselection_mjj_400_detajj_4) { 
+        return dijetMass > 400 && deltaEtajj > 4.;
     }
-    else if (selection_ == VBSselection_j1_40_j2_40) { 
-        if (jPt->at(0) < 40 || jPt->at(1) < 40)
-            return false;
+    // mjj > 450
+    else if (selection_ == VBSselection_mjj_450_detajj_2) { 
+        return dijetMass > 450 && deltaEtajj > 2.;
     }
-    // j1 > 45
-    else if (selection_ == VBSselection_j1_45_j2_30) { 
-        if (jPt->at(0) < 45 || jPt->at(1) < 30)
-            return false;
+    else if (selection_ == VBSselection_mjj_450_detajj_2p5) { 
+        return dijetMass > 450 && deltaEtajj > 2.5;
     }
-    else if (selection_ == VBSselection_j1_45_j2_35) { 
-        if (jPt->at(0) < 45 || jPt->at(1) < 35)
-            return false;
+    else if (selection_ == VBSselection_mjj_450_detajj_3) { 
+        return dijetMass > 450 && deltaEtajj > 3.;
     }
-    else if (selection_ == VBSselection_j1_45_j2_40) { 
-        if (jPt->at(0) < 45 || jPt->at(1) < 40)
-            return false;
+    else if (selection_ == VBSselection_mjj_450_detajj_3p5) { 
+        return dijetMass > 450 && deltaEtajj > 3.5;
     }
-    else if (selection_ == VBSselection_j1_45_j2_45) { 
-        if (jPt->at(0) < 45 || jPt->at(1) < 45)
-            return false;
+    else if (selection_ == VBSselection_mjj_450_detajj_4) { 
+        return dijetMass > 450 && deltaEtajj > 4.;
     }
-    // j1 > 50
-    else if (selection_ == VBSselection_j1_50_j2_30) { 
-        if (jPt->at(0) < 50 || jPt->at(1) < 30)
-            return false;
+    // mjj > 500
+    else if (selection_ == VBSselection_mjj_500_detajj_2) { 
+        return dijetMass > 500 && deltaEtajj > 2.;
     }
-    else if (selection_ == VBSselection_j1_50_j2_35) { 
-        if (jPt->at(0) < 50 || jPt->at(1) < 35)
-            return false;
+    else if (selection_ == VBSselection_mjj_500_detajj_2p5) { 
+        return dijetMass > 500 && deltaEtajj > 2.5;
     }
-    else if (selection_ == VBSselection_j1_50_j2_40) { 
-        if (jPt->at(0) < 50 || jPt->at(1) < 40)
-            return false;
+    else if (selection_ == VBSselection_mjj_500_detajj_3) { 
+        return dijetMass > 500 && deltaEtajj > 3.;
     }
-    else if (selection_ == VBSselection_j1_50_j2_45) { 
-        if (jPt->at(0) < 50 || jPt->at(1) < 45)
-            return false;
+    else if (selection_ == VBSselection_mjj_500_detajj_3p5) { 
+        return dijetMass > 500 && deltaEtajj > 3.5;
     }
-    else if (selection_ == VBSselection_j1_50_j2_50) { 
-        if (jPt->at(0) < 50 || jPt->at(1) < 50)
-            return false;
+    else if (selection_ == VBSselection_mjj_500_detajj_4) { 
+        return dijetMass > 500 && deltaEtajj > 4.;
     }
-    // j1 > 55
-    else if (selection_ == VBSselection_j1_55_j2_30) { 
-        if (jPt->at(0) < 55 || jPt->at(1) < 30)
-            return false;
+    // mjj > 550
+    else if (selection_ == VBSselection_mjj_550_detajj_2) { 
+        return dijetMass > 550 && deltaEtajj > 2.;
     }
-    else if (selection_ == VBSselection_j1_55_j2_35) { 
-        if (jPt->at(0) < 55 || jPt->at(1) < 35)
-            return false;
+    else if (selection_ == VBSselection_mjj_550_detajj_2p5) { 
+        return dijetMass > 550 && deltaEtajj > 2.5;
     }
-    else if (selection_ == VBSselection_j1_55_j2_40) { 
-        if (jPt->at(0) < 55 || jPt->at(1) < 40)
-            return false;
+    else if (selection_ == VBSselection_mjj_550_detajj_3) { 
+        return dijetMass > 550 && deltaEtajj > 3.;
     }
-    else if (selection_ == VBSselection_j1_55_j2_45) { 
-        if (jPt->at(0) < 55 || jPt->at(1) < 45)
-            return false;
+    else if (selection_ == VBSselection_mjj_550_detajj_3p5) { 
+        return dijetMass > 550 && deltaEtajj > 3.5;
     }
-    else if (selection_ == VBSselection_j1_55_j2_50) { 
-        if (jPt->at(0) < 55 || jPt->at(1) < 50)
-            return false;
+    else if (selection_ == VBSselection_mjj_550_detajj_4) { 
+        return dijetMass > 550 && deltaEtajj > 4.;
     }
-    else if (selection_ == VBSselection_j1_55_j2_55) { 
-        if (jPt->at(0) < 55 || jPt->at(1) < 55)
-            return false;
+
+    // mjj > 600
+    else if (selection_ == VBSselection_mjj_600_detajj_2) { 
+        return dijetMass > 600 && deltaEtajj > 2.;
     }
-    // j1 > 60
-    else if (selection_ == VBSselection_j1_60_j2_30) { 
-        if (jPt->at(0) < 60 || jPt->at(1) < 30)
-            return false;
+    else if (selection_ == VBSselection_mjj_600_detajj_2p5) { 
+        return dijetMass > 600 && deltaEtajj > 2.5;
     }
-    else if (selection_ == VBSselection_j1_60_j2_35) { 
-        if (jPt->at(0) < 60 || jPt->at(1) < 35)
-            return false;
+    else if (selection_ == VBSselection_mjj_600_detajj_3) { 
+        return dijetMass > 600 && deltaEtajj > 3.;
     }
-    else if (selection_ == VBSselection_j1_60_j2_40) { 
-        if (jPt->at(0) < 60 || jPt->at(1) < 40)
-            return false;
+    else if (selection_ == VBSselection_mjj_600_detajj_3p5) { 
+        return dijetMass > 600 && deltaEtajj > 3.5;
     }
-    else if (selection_ == VBSselection_j1_60_j2_45) { 
-        if (jPt->at(0) < 60 || jPt->at(1) < 45)
-            return false;
+    else if (selection_ == VBSselection_mjj_600_detajj_4) { 
+        return dijetMass > 600 && deltaEtajj > 4.;
     }
-    else if (selection_ == VBSselection_j1_60_j2_50) { 
-        if (jPt->at(0) < 60 || jPt->at(1) < 50)
-            return false;
-    }
-    else if (selection_ == VBSselection_j1_60_j2_55) { 
-        if (jPt->at(0) < 60 || jPt->at(1) < 55)
-            return false;
-    }
-    else if (selection_ == VBSselection_j1_60_j2_60) { 
-        if (jPt->at(0) < 60 || jPt->at(1) < 60)
-            return false;
-    }
-    else if (selection_ == VBSselectionTight) { 
+    else if (selection_ == VBSselection_Tight) { 
         if (jPt->at(0) < 50 || jPt->at(1) < 50)
             return false;
         if (type1_pfMETEt < 50)
@@ -345,10 +312,9 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
         float zep3l = Eta - 0.5*(jEta->at(1) + jEta->at(0));
         if (std::abs(zep3l) > 2.5)
             return false;
+        return dijetMass > 500 && deltaEtajj > 2.5;
     }
-
-    float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
-    return dijetMass > 500 && deltaEtajj > 2.5;
+    return true;
 }
 
 bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) { 

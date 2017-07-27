@@ -44,7 +44,7 @@ def getComLineArgs():
                         "by commas")
     return vars(parser.parse_args())
 
-def makeCompositeHists(hist_file, name, members, lumi, hists=[]):
+def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True, overflow=True):
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:
@@ -62,12 +62,14 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[]):
                     sumweights_hist = hist_file.Get("/".join([directory, "sumweights"]))
                     sumweights = sumweights_hist.Integral()
                     hist.Scale(members[directory]*1000*lumi/sumweights)
-                overflow = True
                 if overflow:
                     # Returns num bins + overflow + underflow
                     num_bins = hist.GetSize() - 2
                     add_overflow = hist.GetBinContent(num_bins) + hist.GetBinContent(num_bins + 1)
                     hist.SetBinContent(num_bins, add_overflow)
+                if overflow:
+                    add_underflow = hist.GetBinContent(0) + hist.GetBinContent(1)
+                    hist.SetBinContent(1, add_underflow)
             else:
                 raise RuntimeError("hist %s was not produced for "
                     "dataset %s!" % (histname, directory))
@@ -131,7 +133,7 @@ card_info = {
 }
 
 def removeZeros(hist):
-    for i in range(0, hist.GetNbinsX()+1):
+    for i in range(1, hist.GetNbinsX()+1):
         if hist.GetBinContent(i) <= 0:
             if "Up" in hist.GetName():
                 hist.SetBinContent(i, 0.0001)

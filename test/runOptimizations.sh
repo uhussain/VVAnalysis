@@ -6,12 +6,15 @@ DATE=$(date +%d%b%Y)
 #frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-3LooseLeptons-${lepid}Leps.root
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate26Jun2017-3LooseLeptons-${lepid}Leps.root
 input=WselectionLooseLeps
+jetselec=j1Pt50-j2Pt50
 
-for jPt1 in `seq 30 5 60`; do
-    for jPt2 in `seq 30 5 $jPt1`; do
-        output=VBSselection_j1_${jPt1}_j2_${jPt2}
+for mjj in `seq 400 50 600`; do
+    for dEtajj in `seq 2 0.5 4`; do
+        etajj=${dEtajj/./p}
+        #output=VBSselection_mjj_${mjj}_detajj_${etajj/p0/}
+        output=VBSselection_Tight
         #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}.root
-        histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}.root
+        histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${jetselec}/${output}-${DATE}-${lepid}.root
 
         cd $CMSSW_BASE/src/Analysis/WZAnalysis
         if [ ! -f $frfile ]; then
@@ -23,9 +26,9 @@ for jPt1 in `seq 30 5 60`; do
             -b "mjj,mjj_jesUp,mjj_jesDown,mjj_jerUp,mjj_jerDown,jetPt[0],jetPt[1],jetPt[2],jetEta[0],jetEta[1],jetEta[2],dEtajj,nJets"
 
         echo ./Utilities/scripts/prepareCombine.py \
-            --input_file $histfile --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/VBSselection_JetPtOptimization/`basename $histfile` \
+            --input_file $histfile --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/VBSselection_MJJ-EtaJJ_Optimization/${jetselec}/`basename $histfile` \
             -l $lumi -s WZxsec2016/VBSselection \
-            --folder_name j1Pt${jPt1}-j2Pt${jPt2}/$DATE 
+            --folder_name ${jetselec}/mjj${mjj}-dEtajj${dEtajj/./p}_Tight/${DATE}_NoNonpromptStat
     done
 done
 
