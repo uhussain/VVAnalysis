@@ -12,7 +12,13 @@ def getManagerPath():
             "/afs/cern.ch/user/k/kelong/work"
     return path
 def getListOfEWKFilenames():
-    return ["wz3lnu-powheg",
+    return [
+    # Use jet binned WZ samples for subtraction by default
+    #"wz3lnu-powheg",
+        "wz3lnu-mgmlm-0j",
+        "wz3lnu-mgmlm-1j",
+        "wz3lnu-mgmlm-2j",
+        "wz3lnu-mgmlm-3j",
         "zz4l-powheg",
         "tzq",
         "ttz",
