@@ -10,13 +10,13 @@ public :
     ScaleFactor * fakeRate_allE_;
     ScaleFactor * fakeRate_allMu_;
     
-    TH1D* zmassHistPPF_;
-    TH1D* zmassHistPFP_;
-    TH1D* zmassHistFPP_;
-    TH1D* zmassHistFFP_;
-    TH1D* zmassHistFPF_;
-    TH1D* zmassHistPFF_;
-    TH1D* zmassHistFFF_;
+    TH1D* mjjHistPPF_;
+    TH1D* mjjHistPFP_;
+    TH1D* mjjHistFPP_;
+    TH1D* mjjHistFFP_;
+    TH1D* mjjHistFPF_;
+    TH1D* mjjHistPFF_;
+    TH1D* mjjHistFFF_;
     
     WZBackgroundSelector(TTree * /*tree*/ =0) { }
     virtual ~WZBackgroundSelector() { }

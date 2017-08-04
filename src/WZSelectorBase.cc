@@ -83,13 +83,16 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = tightleptons;
     else if (selectionName_ == "VBSselection")
         selection_ = VBSselection;
-    else if (selectionName_ == "VBSselectionTight") {
-        selection_ = VBSselectionTight;
+    else if (selectionName_ == "VBSselection_Tight") {
+        selection_ = VBSselection_Tight;
     }
     else {
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;
     }
+    isVBS_ = (selection_ == VBSselection || 
+        selection_ == VBSselection_Tight
+    );
 
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);

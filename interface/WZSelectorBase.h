@@ -26,7 +26,7 @@ public :
     enum Selection {
         tightleptons,
         VBSselection,
-        VBSselectionTight,
+        VBSselection_Tight,
     }; 
     TList *currentHistDir_{nullptr};
     TH2D* passingTight2D_;
@@ -39,6 +39,7 @@ public :
     TH1D* ratio1DPt_;
     TH1D* ratio1DEta_;
 
+    bool isVBS_;
     bool passesLeptonVeto;
     Float_t genWeight;
     Float_t Zmass;
