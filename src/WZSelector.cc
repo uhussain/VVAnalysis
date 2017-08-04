@@ -529,11 +529,11 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     
     for (size_t i = 0; i < lheWeights.size(); i++) {
         if (weighthists_["mjj"] != nullptr)
-            weighthists_["mjj"]->Fill(mjj, i, lheWeights[i]*weight*(isMC_ || mjj < 500 || noBlind));
+            weighthists_["mjj"]->Fill(mjj, i, lheWeights[i]/lheWeights[0]*weight);
         if (weighthists_["Mass"] != nullptr)
-            weighthists_["Mass"]->Fill(Mass, i, lheWeights[i]*weight*(isMC_ || Mass < 400 || noBlind));
+            weighthists_["Mass"]->Fill(Mass, i, lheWeights[i]/lheWeights[0]*weight);
         if (weighthists_["MTWZ"] != nullptr)
-            weighthists_["MTWZ"]->Fill(MtToMET, i, lheWeights[i]*weight*(isMC_ || MtToMET < 340 || noBlind));
+            weighthists_["MTWZ"]->Fill(MtToMET, i, lheWeights[i]/lheWeights[0]*weight);
     }
 }
 
