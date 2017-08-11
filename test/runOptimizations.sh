@@ -6,7 +6,7 @@ DATE=$(date +%d%b%Y)
 #frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-3LooseLeptons-${lepid}Leps.root
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate27Jul2017-3LooseLeptons-${lepid}Leps.root
 input=WselectionLooseLeps
-jetselec=j1Pt30-j2Pt30
+jetselec=j1Pt50-j2Pt50
 
 for mjj in `seq 400 50 600`; do
     for dEtajj in `seq 2 0.5 4`; do

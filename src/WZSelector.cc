@@ -217,8 +217,8 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
             return false;
 
     // Use optimized point of pT(j1,j2) > 50 GeV
-    //if (jPt->at(0) < 50 || jPt->at(1) < 50)
-    //    return false;
+    if (jPt->at(0) < 50 || jPt->at(1) < 50)
+        return false;
 
     float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
 
