@@ -131,6 +131,7 @@ def getPreviousStep(selection, analysis):
                 "preselection" : "ntuples",
                 "3LooseLeptons" : "ntuples",
                 "3LooseLeptonsNoVeto" : "ntuples",
+                "3MediumLeptonsNoVeto" : "ntuples",
                 "preselectionLooseVeto" : "ntuples",
                 "preselectionNoVeto" : "ntuples",
                 "LepVetoAnd3lmass" : "preselection",
