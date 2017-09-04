@@ -25,7 +25,7 @@
         "Zlep1_Pt > 25.",
         "Zlep2_Pt > 15.",
         "Wlep_Pt > 20",
-        "(nJetCSVv2T > 0.5 && nJetCSVv2T <= nJets)",
+        "Max$(jetCSVv2) > 0.9535",
         "type1_pfMETEt > 30"
     ]
 }

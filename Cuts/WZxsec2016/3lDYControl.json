@@ -21,7 +21,7 @@
     },
     "Event" : [
         "Wlep_Pt > 20",
-        "nJetCSVv2T < 0.5",
+        "Max$(jetCSVv2) < 0.9535",
         "type1_pfMETEt < 30"
     ]
 }

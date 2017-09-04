@@ -137,7 +137,7 @@ fOut = ROOT.TFile(fileName, "recreate")
 selector_name = "FakeRateSelector"
 path = ConfigureJobs.getManagerPath()
 for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
-    for chan in channels: #["eee",]:# "eem", "emm", "mmm"]:
+    for chan in channels: 
         select = getattr(ROOT, selector_name)()
         inputs = ROOT.TList()
         select.SetInputList(inputs)
@@ -161,6 +161,7 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     path, args['selection'], args['analysis'])
+                print file_path
                 chain.Add(file_path)
                 chain.Process(select, "")
                 if "data" not in dataset and chan == "eee":

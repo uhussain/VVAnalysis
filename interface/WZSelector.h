@@ -105,11 +105,11 @@ public :
     std::vector<float>* jetPt_jesDown = NULL;
     std::vector<float>* jetPt_jerUp = NULL;
     std::vector<float>* jetPt_jerDown = NULL;
+    std::vector<float>* jetCSVv2 = NULL;
     Float_t type1_pfMETEt;
     Float_t nTruePU;
     UInt_t nvtx;
     UInt_t nJets;
-    UInt_t nJetCSVv2T;
     Float_t Mass;
     Float_t Eta;
     Float_t ZMass;
@@ -139,7 +139,7 @@ public :
     TBranch* b_pdfWeights;
     TBranch* b_scaleWeights;
     TBranch* b_nJets;
-    TBranch* b_nJetCSVv2T;
+    TBranch* b_jetCSVv2;
     TBranch* b_jetPt;
     TBranch* b_jetEta;
     TBranch* b_jetEta_jesUp;

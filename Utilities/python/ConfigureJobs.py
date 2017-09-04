@@ -13,12 +13,12 @@ def getManagerPath():
     return path
 def getListOfEWKFilenames():
     return [
+        "wz3lnu-powheg",
     # Use jet binned WZ samples for subtraction by default
-    #"wz3lnu-powheg",
-        "wz3lnu-mgmlm-0j",
-        "wz3lnu-mgmlm-1j",
-        "wz3lnu-mgmlm-2j",
-        "wz3lnu-mgmlm-3j",
+    #    "wz3lnu-mgmlm-0j",
+    #    "wz3lnu-mgmlm-1j",
+    #    "wz3lnu-mgmlm-2j",
+    #    "wz3lnu-mgmlm-3j",
         "zz4l-powheg",
         "tzq",
         "ttz",

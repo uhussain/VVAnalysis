@@ -29,7 +29,7 @@ void WZSelector::Init(TTree *tree)
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
     fChain->SetBranchAddress("nJets", &nJets, &b_nJets);
-    fChain->SetBranchAddress("nJetCSVv2T", &nJetCSVv2T, &b_nJetCSVv2T);
+    fChain->SetBranchAddress("jetCSVv2", &jetCSVv2, &b_jetCSVv2);
     fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("Eta", &Eta, &b_Eta);
@@ -108,7 +108,7 @@ void WZSelector::Init(TTree *tree)
 unsigned int WZSelector::GetLheWeightInfo() {
     std::vector<std::string> noLheWeights = {
         "ggZZ2e2mu", "ggZZ4e", "ggZZ4m", "wzjj-vbfnlo-of",
-        "wzjj-vbfnlo-sf", "st-schan", "st-tchan"
+        "wzjj-vbfnlo-sf", "st-schan", "st-tchan", "st-tchan-t", "st-tchan-tbar"
     };
     std::vector<std::string> allLheWeights = {
         // PDF weights are saved in the ntuples but not really used at this point
@@ -238,13 +238,17 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
 
 bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) { 
     if (!(Flag_BadChargedCandidateFilterPass
-            && Flag_BadPFMuonFilterPass 
             && Flag_HBHENoiseFilterPass 
             && Flag_HBHENoiseIsoFilterPass 
+            && Flag_BadPFMuonFilterPass
             && Flag_EcalDeadCellTriggerPrimitiveFilterPass 
             && Flag_goodVerticesPass 
             && Flag_globalTightHalo2016FilterPass
-            && (isMC_ || Flag_eeBadScFilterPass))
+            && (isMC_ || (Flag_eeBadScFilterPass
+                && !Flag_duplicateMuonsPass 
+                && !Flag_badMuonsPass)
+            )
+        )
     ) 
         return false;
     if (!passesLeptonVeto)
@@ -422,8 +426,13 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         hists1D_["nJets"]->Fill(nJets, weight);
     }
     if (hists1D_["nJetCSVv2T"] != nullptr) {
-        b_nJetCSVv2T->GetEntry(entry);
-        hists1D_["nJetCSVv2T"]->Fill(nJetCSVv2T, weight);
+        b_jetCSVv2->GetEntry(entry);
+        unsigned int bjets = 0;
+        for (const auto& jetCSVval : *jetCSVv2) {
+            if (jetCSVval > 0.9535)
+                bjets++;
+        }
+        hists1D_["nJetCSVv2T"]->Fill(bjets, weight);
     }
     if (hists1D_["Pt"] != nullptr) {
         b_Pt->GetEntry(entry);

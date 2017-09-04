@@ -129,7 +129,7 @@ pileupSF = fScales.Get('pileupSF')
 
 fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
 sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
-selection = args['selection'].replace("LooseLeps", "") \
+selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
 analysis = "/".join([args['analysis'], selection])
 hists = HistTools.getAllHistNames(manager_path, analysis) \

@@ -68,6 +68,8 @@ public :
     Float_t l3MtToMET;
     Float_t Flag_BadChargedCandidateFilterPass;
     Float_t Flag_BadPFMuonFilterPass;
+    Bool_t Flag_duplicateMuonsPass;
+    Bool_t Flag_badMuonsPass;
     Bool_t Flag_HBHENoiseFilterPass;
     Bool_t Flag_HBHENoiseIsoFilterPass;
     Bool_t Flag_EcalDeadCellTriggerPrimitiveFilterPass;
@@ -102,6 +104,8 @@ public :
     TBranch* b_l3MtToMET;
     TBranch* b_Flag_BadChargedCandidateFilterPass;
     TBranch* b_Flag_BadPFMuonFilterPass;
+    TBranch* b_Flag_badMuonsPass;
+    TBranch* b_Flag_duplicateMuonsPass;
     TBranch* b_Flag_HBHENoiseFilterPass;
     TBranch* b_Flag_HBHENoiseIsoFilterPass;
     TBranch* b_Flag_EcalDeadCellTriggerPrimitiveFilterPass;

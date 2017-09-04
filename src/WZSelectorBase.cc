@@ -37,6 +37,10 @@ void WZSelectorBase::Init(TTree *tree)
         isMC_ = true;
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     }
+    else {
+        fChain->SetBranchAddress("Flag_duplicateMuonsPass", &Flag_duplicateMuonsPass, &b_Flag_duplicateMuonsPass);
+        fChain->SetBranchAddress("Flag_badMuonsPass", &Flag_badMuonsPass, &b_Flag_badMuonsPass);
+    }
 
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
     if ( currentHistDir_ == nullptr ) {
@@ -117,13 +121,17 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     genWeight = 1;
     if (isMC_)
         b_genWeight->GetEntry(entry);
+    else {
+        b_Flag_duplicateMuonsPass->GetEntry(entry);          
+        b_Flag_badMuonsPass->GetEntry(entry);          
+    }
     b_l1IsTight->GetEntry(entry);
     b_l2IsTight->GetEntry(entry);
     b_l3IsTight->GetEntry(entry);
     b_nCBVIDTightElec->GetEntry(entry);
     b_nWZTightMuon->GetEntry(entry);
-    b_Flag_BadChargedCandidateFilterPass->GetEntry(entry);          
     b_Flag_BadPFMuonFilterPass->GetEntry(entry);                    
+    b_Flag_BadChargedCandidateFilterPass->GetEntry(entry);          
     b_Flag_HBHENoiseFilterPass->GetEntry(entry);                    
     b_Flag_HBHENoiseIsoFilterPass->GetEntry(entry);                 
     b_Flag_EcalDeadCellTriggerPrimitiveFilterPass->GetEntry(entry); 
