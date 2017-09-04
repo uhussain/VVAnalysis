@@ -14,6 +14,7 @@ parser.add_argument("-f", "--filelist",
 parser.add_argument("-s", "--selection", required=True)
 parser.add_argument("--output_selection", required=False, default="")
 parser.add_argument("-p", "--printEventNums", action='store_true')
+parser.add_argument("--latex", action='store_true', help='table in latex format')
 parser.add_argument("-t", "--printTrigger", action='store_true')
 parser.add_argument("--printDetail", action='store_true')
 parser.add_argument("-d", "--checkDuplicates", action='store_true')
@@ -128,7 +129,10 @@ for state, count in totals.iteritems():
     total += count
 print "Summed events for all files in all states is %i" % total
 print "A total of %i events were processed from the dataset" % totals["processed"]
-print event_info
+if args.latex:
+    print event_info.get_latex_string(hrules=0)
+else:
+    print event_info
 
 if args.printEventNums:
     file_name = "summary.txt"
