@@ -79,7 +79,7 @@ def getListOfHDFSFiles(file_path):
         elif "root" in split[1]:
             files.append("/"+split[1])
     return files
-def getListOfFiles(filelist, manager_path, selection='ntuples'):
+def getListOfFiles(filelist, manager_path, selection):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
@@ -87,8 +87,9 @@ def getListOfFiles(filelist, manager_path, selection='ntuples'):
     names = []
     for name in filelist:
         if "WZxsec2016" in name:
-            allnames = json.load(open("/afs/cern.ch/user/k/kelong/work/"
-                "AnalysisDatasetManager/FileInfo/WZxsec2016/%s.json" % selection)).keys()
+            dataset_file = "/afs/cern.ch/user/k/kelong/work/" + \
+                "AnalysisDatasetManager/FileInfo/WZxsec2016/%s.json" % selection
+            allnames = json.load(open(dataset_file)).keys()
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
                 names += nodata
@@ -112,7 +113,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
         outFile.write(result)
 def getListOfFilesWithXSec(filelist, manager_path):
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
-    files = getListOfFiles(filelist, manager_path)
+    files = getListOfFiles(filelist, manager_path, "ntuples")
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     info = {}
     for file_name in files:

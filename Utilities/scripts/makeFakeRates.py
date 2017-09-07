@@ -136,7 +136,7 @@ fileName = "data/fakeRate%s-%s.root" % (today, args['selection']) if args['outpu
 fOut = ROOT.TFile(fileName, "recreate")
 selector_name = "FakeRateSelector"
 path = ConfigureJobs.getManagerPath()
-for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
+for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selection']):
     for chan in channels: 
         select = getattr(ROOT, selector_name)()
         inputs = ROOT.TList()

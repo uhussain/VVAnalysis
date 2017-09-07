@@ -26,7 +26,7 @@ def applySelector(filelist, selector_name, selection,
         extra_inputs = [],
         addsumweights=False, proof=False):
     path = ConfigureJobs.getManagerPath()
-    for dataset in ConfigureJobs.getListOfFiles(filelist, path):
+    for dataset in ConfigureJobs.getListOfFiles(filelist, path, selection):
         for chan in channels:
             select = getattr(ROOT, selector_name)()
             inputs = ROOT.TList()
@@ -59,6 +59,7 @@ def applySelector(filelist, selector_name, selection,
                     if "data" not in dataset and addsumweights and chan == "eee":
                         sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1,0,100)
                         meta_chain.Add(file_path)
+                        print file_path
                         meta_chain.Draw("1>>sumweights", "summedWeights")
                         if sumweights_hist.Integral() <= 0:
                             raise ValueError("Sum of weights <= 0 found for file"
