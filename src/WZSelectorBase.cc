@@ -87,16 +87,90 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = tightleptons;
     else if (selectionName_ == "VBSselection")
         selection_ = VBSselection;
-    else if (selectionName_ == "VBSselection_Tight") {
+    else if (selectionName_ == "VBSselection_Tight")
         selection_ = VBSselection_Tight;
-    }
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_2")
+        selection_ = VBSselection_mjj_400_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_2p5")
+        selection_ = VBSselection_mjj_400_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_3")
+        selection_ = VBSselection_mjj_400_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_3p5")
+        selection_ = VBSselection_mjj_400_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_400_detajj_4")
+        selection_ = VBSselection_mjj_400_detajj_4;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_2")
+        selection_ = VBSselection_mjj_450_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_2p5")
+        selection_ = VBSselection_mjj_450_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_3")
+        selection_ = VBSselection_mjj_450_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_3p5")
+        selection_ = VBSselection_mjj_450_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_450_detajj_4")
+        selection_ = VBSselection_mjj_450_detajj_4;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_2")
+        selection_ = VBSselection_mjj_500_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_2p5")
+        selection_ = VBSselection_mjj_500_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_3")
+        selection_ = VBSselection_mjj_500_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_3p5")
+        selection_ = VBSselection_mjj_500_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_500_detajj_4")
+        selection_ = VBSselection_mjj_500_detajj_4;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_2")
+        selection_ = VBSselection_mjj_550_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_2p5")
+        selection_ = VBSselection_mjj_550_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_3")
+        selection_ = VBSselection_mjj_550_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_3p5")
+        selection_ = VBSselection_mjj_550_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_550_detajj_4")
+        selection_ = VBSselection_mjj_550_detajj_4;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_2")
+        selection_ = VBSselection_mjj_600_detajj_2;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_2p5")
+        selection_ = VBSselection_mjj_600_detajj_2p5;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_3")
+        selection_ = VBSselection_mjj_600_detajj_3;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_3p5")
+        selection_ = VBSselection_mjj_600_detajj_3p5;
+    else if (selectionName_ == "VBSselection_mjj_600_detajj_4")
+        selection_ = VBSselection_mjj_600_detajj_4;
     else {
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;
     }
     isVBS_ = (selection_ == VBSselection || 
-        selection_ == VBSselection_Tight
-    );
+        selection_ == VBSselection_Tight || 
+        selection_ == VBSselection_mjj_400_detajj_2 || 
+        selection_ == VBSselection_mjj_400_detajj_2p5 || 
+        selection_ == VBSselection_mjj_400_detajj_3 || 
+        selection_ == VBSselection_mjj_400_detajj_3p5 || 
+        selection_ == VBSselection_mjj_400_detajj_4 || 
+        selection_ == VBSselection_mjj_450_detajj_2 || 
+        selection_ == VBSselection_mjj_450_detajj_2p5 || 
+        selection_ == VBSselection_mjj_450_detajj_3 || 
+        selection_ == VBSselection_mjj_450_detajj_3p5 || 
+        selection_ == VBSselection_mjj_450_detajj_4 || 
+        selection_ == VBSselection_mjj_500_detajj_2 || 
+        selection_ == VBSselection_mjj_500_detajj_2p5 || 
+        selection_ == VBSselection_mjj_500_detajj_3 || 
+        selection_ == VBSselection_mjj_500_detajj_3p5 || 
+        selection_ == VBSselection_mjj_500_detajj_4 || 
+        selection_ == VBSselection_mjj_550_detajj_2 || 
+        selection_ == VBSselection_mjj_550_detajj_2p5 || 
+        selection_ == VBSselection_mjj_550_detajj_3 || 
+        selection_ == VBSselection_mjj_550_detajj_3p5 || 
+        selection_ == VBSselection_mjj_550_detajj_4 || 
+        selection_ == VBSselection_mjj_600_detajj_2 || 
+        selection_ == VBSselection_mjj_600_detajj_2p5 || 
+        selection_ == VBSselection_mjj_600_detajj_3 || 
+        selection_ == VBSselection_mjj_600_detajj_3p5 || 
+        selection_ == VBSselection_mjj_600_detajj_4
+        );
 
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);

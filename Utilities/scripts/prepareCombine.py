@@ -43,8 +43,18 @@ def getComLineArgs():
                         "as defined in AnalysisDatasetManager, separated "
                         "by commas")
     return vars(parser.parse_args())
-
-def makeCompositeHists(hist_file, name, members, lumi, hists=[]):
+def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
+    if not "TH1" in hist.ClassName():
+        return
+    if overflow:
+        # Returns num bins + overflow + underflow
+        num_bins = hist.GetNbinsX() - 1
+        add_overflow = hist.GetBinContent(num_bins) + hist.GetBinContent(num_bins + 1)
+        hist.SetBinContent(num_bins, add_overflow)
+    if underflow:
+        add_underflow = hist.GetBinContent(0) + hist.GetBinContent(1)
+        hist.SetBinContent(1, add_underflow)
+def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True, overflow=True):
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:
@@ -62,12 +72,7 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[]):
                     sumweights_hist = hist_file.Get("/".join([directory, "sumweights"]))
                     sumweights = sumweights_hist.Integral()
                     hist.Scale(members[directory]*1000*lumi/sumweights)
-                overflow = True
-                if overflow:
-                    # Returns num bins + overflow + underflow
-                    num_bins = hist.GetSize() - 2
-                    add_overflow = hist.GetBinContent(num_bins) + hist.GetBinContent(num_bins + 1)
-                    hist.SetBinContent(num_bins, add_overflow)
+                addOverflowAndUnderflow(hist, underflow, overflow)
             else:
                 raise RuntimeError("hist %s was not produced for "
                     "dataset %s!" % (histname, directory))
@@ -141,6 +146,66 @@ def getStatHists(hist, name, chan):
         statDown_hist.SetBinContent(i, down if down > 0 else 0) 
     return [statUp_hist, statDown_hist]
 
+def removeZeros(hist):
+    for i in range(1, hist.GetNbinsX()+1):
+        if hist.GetBinContent(i) <= 0:
+            if "Up" in hist.GetName():
+                hist.SetBinContent(i, 0.0001)
+            elif "Down" in hist.GetName():
+                hist.SetBinContent(i, 0.00001)
+            else: 
+                hist.SetBinContent(i, 0.00005)
+
+def getStatHists(hist, name, chan):
+    stat_hists = []
+    for i in range(1, hist.GetNbinsX()+1):
+        statUp_hist = hist.Clone(hist.GetName().replace(
+            chan, "%s_statBin%sUp_%s" % (name, i, chan)))
+        statDown_hist = hist.Clone(hist.GetName().replace(
+            chan, "%s_statBin%iDown_%s" % (name, i, chan)))
+        up = hist.GetBinContent(i)+hist.GetBinErrorUp(i) if \
+                hist.GetBinContent(i) > 0 else hist.GetBinErrorUp(i)
+        down = hist.GetBinContent(i)-hist.GetBinErrorLow(i)
+        statUp_hist.SetBinContent(i, up) 
+        statDown_hist.SetBinContent(i, down if down > 0 else 0.0001) 
+        stat_hists.extend([statUp_hist, statDown_hist][:])
+    for hist in stat_hists:
+        removeZeros(hist)
+    return stat_hists
+
+def getScaleHists(scale_hist2D, name, chan, underflow=True, overflow=True):
+    scale_hists = []
+    for i in range(1,10):
+        if i == 7 or i == 9: continue
+        scale_hist = scale_hist2D.ProjectionX(name+"_weight%i"%i, i, i, "e")
+        addOverflowAndUnderflow(scale_hist, underflow, overflow)
+        scale_hists.append(scale_hist)
+    scale_histCentral = scale_hist2D.ProjectionX(name+"_central", 1, 1, "e")
+    addOverflowAndUnderflow(scale_histCentral, underflow, overflow)
+    scale_histUp = scale_histCentral.Clone("_".join(["mjj", name, "scaleUp", chan]))
+    scale_histDown = scale_histCentral.Clone("_".join(["mjj",name, "scaleDown", chan]))
+    for i in range(0, scale_hists[0].GetNbinsX()+1):
+        for hist in scale_hists:
+            if hist.GetBinContent(i) > scale_histUp.GetBinContent(i):
+                scale_histUp.SetBinContent(i, hist.GetBinContent(i))
+            if hist.GetBinContent(i) < scale_histDown.GetBinContent(i):
+                scale_histDown.SetBinContent(i, hist.GetBinContent(i))
+        if scale_histDown.GetBinContent(i) >= scale_histCentral.GetBinContent(i) and hist.GetBinContent(i) != 0:
+            raise RuntimeError("Down scale variation >= central value for %s."
+                " This shouldn't be possible.\n"
+                "scaleDown_hist: %0.4f\n" 
+                "central_hist: %0.4f\n" 
+                % (name, scale_histDown.GetBinContent(i), scale_histCentral.GetBinContent(i))
+            )
+        if scale_histUp.GetBinContent(i) <= scale_histCentral.GetBinContent(i) and hist.GetBinContent(i) != 0:
+            raise RuntimeError("Up scale variation <= central value for %s."
+                " This shouldn't be possible.\n"
+                "scaleUp_hist: %0.2f\n" 
+                "central_hist: %0.2f\n" 
+                % (name, scale_histUp.GetBinContent(i), scale_histCentral.GetBinContent(i))
+            )
+    return [scale_histUp, scale_histDown]
+
 alldata = makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     ["mjj_" + c for c in chans])
@@ -149,7 +214,8 @@ nonprompt = makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}
     ["mjj_Fakes_" + c for c in chans])
 for chan in chans:
     hist = nonprompt.FindObject("mjj_Fakes_"+chan)
-    card_info[chan]["nonprompt"] = round(hist.Integral() if hist.Integral() > 0 else 0, 4)
+    removeZeros(hist)
+    card_info[chan]["nonprompt"] = round(hist.Integral() if hist.Integral() > 0 else 0.001, 4)
     stat_hists = getStatHists(hist, "nonprompt", chan)
     nonprompt.extend(stat_hists[:])
 writeOutputListItem(nonprompt, fOut)
@@ -163,7 +229,8 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
             ["mjj_jesUp_" + c for c in chans]+
             ["mjj_jesDown_" + c for c in chans]+
             ["mjj_jerUp_" + c for c in chans]+
-            ["mjj_jerDown_" + c for c in chans])
+            ["mjj_jerDown_" + c for c in chans]+
+            ["mjj_lheWeights_" + c for c in chans])
     name = plot_group.replace("-", "_")
     for chan in chans:
         hist = group.FindObject("mjj_"+chan)
@@ -171,6 +238,11 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
         card_info[chan]["output_file"] = args['output_file']
         stat_hists = getStatHists(hist, plot_group, chan)
         group.extend(stat_hists)
+        if plot_group not in ["zg"]:
+            scale_hists = getScaleHists(group.FindObject("mjj_lheWeights_"+chan), plot_group, chan)
+            group.extend(scale_hists)
+    for hist in group:
+        removeZeros(hist)
     writeOutputListItem(group, fOut)
     output_info.add_row([plot_group, card_info["eee"][name], 
         card_info["eem"][name], 

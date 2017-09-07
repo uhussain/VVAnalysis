@@ -222,7 +222,88 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
 
     float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
 
-    if (selection_ == VBSselection_Tight) { 
+    // mjj > 400
+    if (selection_ == VBSselection_mjj_400_detajj_2) { 
+        return dijetMass > 400 && deltaEtajj > 2.;
+    }
+    else if (selection_ == VBSselection_mjj_400_detajj_2p5) { 
+        return dijetMass > 400 && deltaEtajj > 2.5;
+    }
+    else if (selection_ == VBSselection_mjj_400_detajj_3) { 
+        return dijetMass > 400 && deltaEtajj > 3.;
+    }
+    else if (selection_ == VBSselection_mjj_400_detajj_3p5) { 
+        return dijetMass > 400 && deltaEtajj > 3.5;
+    }
+    else if (selection_ == VBSselection_mjj_400_detajj_4) { 
+        return dijetMass > 400 && deltaEtajj > 4.;
+    }
+    // mjj > 450
+    else if (selection_ == VBSselection_mjj_450_detajj_2) { 
+        return dijetMass > 450 && deltaEtajj > 2.;
+    }
+    else if (selection_ == VBSselection_mjj_450_detajj_2p5) { 
+        return dijetMass > 450 && deltaEtajj > 2.5;
+    }
+    else if (selection_ == VBSselection_mjj_450_detajj_3) { 
+        return dijetMass > 450 && deltaEtajj > 3.;
+    }
+    else if (selection_ == VBSselection_mjj_450_detajj_3p5) { 
+        return dijetMass > 450 && deltaEtajj > 3.5;
+    }
+    else if (selection_ == VBSselection_mjj_450_detajj_4) { 
+        return dijetMass > 450 && deltaEtajj > 4.;
+    }
+    // mjj > 500
+    else if (selection_ == VBSselection_mjj_500_detajj_2) { 
+        return dijetMass > 500 && deltaEtajj > 2.;
+    }
+    else if (selection_ == VBSselection_mjj_500_detajj_2p5) { 
+        return dijetMass > 500 && deltaEtajj > 2.5;
+    }
+    else if (selection_ == VBSselection_mjj_500_detajj_3) { 
+        return dijetMass > 500 && deltaEtajj > 3.;
+    }
+    else if (selection_ == VBSselection_mjj_500_detajj_3p5) { 
+        return dijetMass > 500 && deltaEtajj > 3.5;
+    }
+    else if (selection_ == VBSselection_mjj_500_detajj_4) { 
+        return dijetMass > 500 && deltaEtajj > 4.;
+    }
+    // mjj > 550
+    else if (selection_ == VBSselection_mjj_550_detajj_2) { 
+        return dijetMass > 550 && deltaEtajj > 2.;
+    }
+    else if (selection_ == VBSselection_mjj_550_detajj_2p5) { 
+        return dijetMass > 550 && deltaEtajj > 2.5;
+    }
+    else if (selection_ == VBSselection_mjj_550_detajj_3) { 
+        return dijetMass > 550 && deltaEtajj > 3.;
+    }
+    else if (selection_ == VBSselection_mjj_550_detajj_3p5) { 
+        return dijetMass > 550 && deltaEtajj > 3.5;
+    }
+    else if (selection_ == VBSselection_mjj_550_detajj_4) { 
+        return dijetMass > 550 && deltaEtajj > 4.;
+    }
+
+    // mjj > 600
+    else if (selection_ == VBSselection_mjj_600_detajj_2) { 
+        return dijetMass > 600 && deltaEtajj > 2.;
+    }
+    else if (selection_ == VBSselection_mjj_600_detajj_2p5) { 
+        return dijetMass > 600 && deltaEtajj > 2.5;
+    }
+    else if (selection_ == VBSselection_mjj_600_detajj_3) { 
+        return dijetMass > 600 && deltaEtajj > 3.;
+    }
+    else if (selection_ == VBSselection_mjj_600_detajj_3p5) { 
+        return dijetMass > 600 && deltaEtajj > 3.5;
+    }
+    else if (selection_ == VBSselection_mjj_600_detajj_4) { 
+        return dijetMass > 600 && deltaEtajj > 4.;
+    }
+    else if (selection_ == VBSselection_Tight) { 
         if (jPt->at(0) < 50 || jPt->at(1) < 50)
             return false;
         if (type1_pfMETEt < 50)

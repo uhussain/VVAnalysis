@@ -27,7 +27,33 @@ public :
         tightleptons,
         VBSselection,
         VBSselection_Tight,
-    }; 
+        VBSselection_mjj_400_detajj_2, 
+        VBSselection_mjj_400_detajj_2p5, 
+        VBSselection_mjj_400_detajj_3, 
+        VBSselection_mjj_400_detajj_3p5, 
+        VBSselection_mjj_400_detajj_4, 
+        VBSselection_mjj_450_detajj_2, 
+        VBSselection_mjj_450_detajj_2p5, 
+        VBSselection_mjj_450_detajj_3, 
+        VBSselection_mjj_450_detajj_3p5, 
+        VBSselection_mjj_450_detajj_4, 
+        VBSselection_mjj_500_detajj_2, 
+        VBSselection_mjj_500_detajj_2p5, 
+        VBSselection_mjj_500_detajj_3, 
+        VBSselection_mjj_500_detajj_3p5, 
+        VBSselection_mjj_500_detajj_4, 
+        VBSselection_mjj_550_detajj_2, 
+        VBSselection_mjj_550_detajj_2p5, 
+        VBSselection_mjj_550_detajj_3, 
+        VBSselection_mjj_550_detajj_3p5, 
+        VBSselection_mjj_550_detajj_4, 
+        VBSselection_mjj_600_detajj_2, 
+        VBSselection_mjj_600_detajj_2p5, 
+        VBSselection_mjj_600_detajj_3, 
+        VBSselection_mjj_600_detajj_3p5, 
+        VBSselection_mjj_600_detajj_4
+    };
+
     TList *currentHistDir_{nullptr};
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
