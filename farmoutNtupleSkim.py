@@ -118,7 +118,7 @@ def main():
     args = getComLineArgs()
     path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
             "/afs/cern.ch/user/k/kelong/work"
-    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path):
+    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selection']):
         try:
             farmoutNtupleSkim(file_name, path, args['selection'], 
                 args['analysis'], args['version'], args['scaleFacs'], 

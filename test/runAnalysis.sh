@@ -19,11 +19,11 @@ output=VBSselection
 #output=Zselection
 #input=${looselepsfile}
 #output=3LooseLeptons
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/j1Pt50-j2Pt50/${output}-${DATE}-${lepid}From${looselepsfile}.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
-./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
-python ScaleFactors/setupScaleFactors.py -t $frfile 
+#./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
+#python ScaleFactors/setupScaleFactors.py -t $frfile 
 ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output
 if [ -f $histfile ]; then
     echo "Histogram file $histfile produced"

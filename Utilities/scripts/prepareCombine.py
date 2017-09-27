@@ -48,7 +48,7 @@ def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
         return
     if overflow:
         # Returns num bins + overflow + underflow
-        num_bins = hist.GetNbinsX() - 1
+        num_bins = hist.GetNbinsX()
         add_overflow = hist.GetBinContent(num_bins) + hist.GetBinContent(num_bins + 1)
         hist.SetBinContent(num_bins, add_overflow)
     if underflow:
@@ -147,7 +147,7 @@ def getStatHists(hist, name, chan):
     return [statUp_hist, statDown_hist]
 
 def removeZeros(hist):
-    for i in range(1, hist.GetNbinsX()+1):
+    for i in range(hist.GetNbinsX()+2):
         if hist.GetBinContent(i) <= 0:
             if "Up" in hist.GetName():
                 hist.SetBinContent(i, 0.0001)
@@ -234,7 +234,6 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
     name = plot_group.replace("-", "_")
     for chan in chans:
         hist = group.FindObject("mjj_"+chan)
-        card_info[chan][name] = round(hist.Integral(), 4) 
         card_info[chan]["output_file"] = args['output_file']
         stat_hists = getStatHists(hist, plot_group, chan)
         group.extend(stat_hists)
@@ -243,6 +242,9 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
             group.extend(scale_hists)
     for hist in group:
         removeZeros(hist)
+    for chan in chans:
+        hist = group.FindObject("mjj_"+chan)
+        card_info[chan][name] = round(hist.Integral(0, 4)) if hist.Integral() > 0 else 0.001
     writeOutputListItem(group, fOut)
     output_info.add_row([plot_group, card_info["eee"][name], 
         card_info["eem"][name], 

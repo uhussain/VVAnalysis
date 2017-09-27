@@ -13,10 +13,9 @@ for mjj in `seq 400 50 600`; do
     for dEtajj in `seq 2 0.5 4`; do
         etajj=${dEtajj/./p}
         output=VBSselection_mjj_${mjj}_detajj_${etajj/p0/}
-        #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}.root
         histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${jetselec}/${output}-${DATE}-${lepid}.root
 
-        cd $CMSSW_BASE/src/Analysis/WZAnalysis
+       cd $CMSSW_BASE/src/Analysis/WZAnalysis
        if [ ! -f $frfile ]; then
             ./Utilities/scripts/makeFakeRates.py -s 3LooseLeptons -l $lumi -o $frfile
             python ScaleFactors/setupScaleFactors.py -t $frfile 
