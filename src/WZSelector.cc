@@ -36,70 +36,50 @@ void WZSelector::Init(TTree *tree)
     fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
     fChain->SetBranchAddress("nvtx", &nvtx, &b_nvtx);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
-    fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("MtToMET", &MtToMET, &b_MtToMET);
 
     if (channel_ == eee) {
-        fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
         fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("e1_e2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("e1_e2_Phi", &ZPhi, &b_ZPhi);
-        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
-        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
-        fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
-        fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("e3Phi", &l3Phi, &b_l3Phi);
     }
     else if (channel_ == eem) { 
-        fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
         fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("e1_e2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("e1_e2_Phi", &ZPhi, &b_ZPhi);
-        fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
-        fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("mPhi", &l3Phi, &b_l3Phi);
-        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
-        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
     }
     else if (channel_ == emm) { 
-        fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
         fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("m1_m2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("m1_m2_Phi", &ZPhi, &b_ZPhi);
-        fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
-        fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("ePhi", &l3Phi, &b_l3Phi);
-        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("m1Phi", &l1Phi, &b_l1Phi);
-        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("m2Phi", &l2Phi, &b_l2Phi);
     }
     else if (channel_ == mmm) { 
-        fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
         fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("m1_m2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("m1_m2_Phi", &ZPhi, &b_ZPhi);
-        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("m1Phi", &l1Phi, &b_l1Phi);
-        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("m2Phi", &l2Phi, &b_l2Phi);
-        fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("m3Eta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("m3Phi", &l3Phi, &b_l3Phi);
     }
@@ -144,22 +124,16 @@ void WZSelector::SlaveBegin(TTree * /*tree*/)
 void WZSelector::LoadBranches(Long64_t entry) { 
     WZSelectorBase::Process(entry);
     
-    b_ZMass->GetEntry(entry);
     b_ZPhi->GetEntry(entry);
     b_ZEta->GetEntry(entry);
     b_Mass->GetEntry(entry);
     b_l1Eta->GetEntry(entry);
     b_l1Phi->GetEntry(entry);
-    b_l1Pt->GetEntry(entry);
     b_l2Eta->GetEntry(entry);
     b_l2Phi->GetEntry(entry);
-    b_l2Pt->GetEntry(entry);
-    b_l3Eta->GetEntry(entry);
     b_l3Phi->GetEntry(entry);
-    b_l3Pt->GetEntry(entry);
     b_jetPt->GetEntry(entry);
     b_jetEta->GetEntry(entry);
-    b_type1_pfMETEt->GetEntry(entry);
     b_Eta->GetEntry(entry);
     b_mjj->GetEntry(entry);
     if (isMC_) {
@@ -334,6 +308,18 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
         return false;
     if (!passesLeptonVeto)
         return false;
+    if (selection == FakeRateSelectionLoose || selection == FakeRateSelectionTight) {
+        if (l1Pt < 25 || l2Pt < 15)
+            return false;
+        if (ZMass > 111.1876 || ZMass < 81.1876)
+            return false;
+        if (type1_pfMETEt > 30)
+            return false;
+        if (!tightZLeptons())
+            return false;
+    if (selection == FakeRateSelectionLoose)
+        tightLeps = false;
+    }
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
         return false;
     return true;
@@ -489,6 +475,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         hists1D_["Zlep2_Phi"]->Fill(l2Phi, weight);
     if (hists1D_["Wlep_Pt"] != nullptr)
         hists1D_["Wlep_Pt"]->Fill(l3Pt, weight);
+    if (hists1D_["WlepRelPFIsoDBR04"] != nullptr)
+        hists1D_["WlepRelPFIsoDBR04"]->Fill(l3Pt, weight);
     if (hists1D_["Wlep_Eta"] != nullptr)
         hists1D_["Wlep_Eta"]->Fill(l3Eta, weight);
     if (hists1D_["Wlep_Phi"] != nullptr)
@@ -524,7 +512,6 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         hists1D_["nvtx"]->Fill(nvtx, weight);
     }
     if (hists1D_["MtW"] != nullptr) {
-        b_l3MtToMET->GetEntry(entry);
         hists1D_["MtW"]->Fill(l3MtToMET, weight);
     }
     if (hists1D_["MTWZ"] != nullptr) {

@@ -110,10 +110,9 @@ public :
     Float_t type1_pfMETEt;
     Float_t nTruePU;
     UInt_t nvtx;
-    UInt_t nJets;
+    Int_t nJets;
     Float_t Mass;
     Float_t Eta;
-    Float_t ZMass;
     Float_t Pt;
     Float_t ZPt;
     Float_t ZEta;
@@ -125,14 +124,9 @@ public :
     Float_t mjj_jerDown;
     Float_t l1Eta;
     Float_t l1Phi;
-    Float_t l1Pt;
     Float_t l2Eta;
     Float_t l2Phi;
-    Float_t l2Pt;
-    Float_t l3Eta;
     Float_t l3Phi;
-    Float_t l3Pt;
-    Float_t l3MtToMET;
     Float_t MtToMET;
     
     TBranch* b_l3MtToMET;
@@ -157,7 +151,6 @@ public :
     TBranch* b_Eta;
     TBranch* b_Pt;
     TBranch* b_type1_pfMETEt;
-    TBranch* b_ZMass;
     TBranch* b_ZPt;
     TBranch* b_ZPhi;
     TBranch* b_ZEta;
@@ -168,13 +161,9 @@ public :
     TBranch* b_mjj_jerDown;
     TBranch* b_l1Eta;
     TBranch* b_l1Phi;
-    TBranch* b_l1Pt;
     TBranch* b_l2Eta;
     TBranch* b_l2Phi;
-    TBranch* b_l2Pt;
-    TBranch* b_l3Eta;
     TBranch* b_l3Phi;
-    TBranch* b_l3Pt;
 
     // Readers to access the data (delete the ones you do not need).
     WZSelector(TTree * /*tree*/ =0) { }

@@ -140,10 +140,12 @@ tselection = [ROOT.TNamed("selection", args['output_selection'])]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
-background = SelectorTools.applySelector(["WZxsec2016data"] +
-    ConfigureJobs.getListOfEWKFilenames(), 
-        "WZBackgroundSelector", args['selection'], fOut, 
-        extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
+
+if "FakeRate" not in args['output_selection']:
+    background = SelectorTools.applySelector(["WZxsec2016data"] +
+        ConfigureJobs.getListOfEWKFilenames(), 
+            "WZBackgroundSelector", args['selection'], fOut, 
+            extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
 

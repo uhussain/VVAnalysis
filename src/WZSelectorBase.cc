@@ -61,30 +61,58 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e3IsCBVIDTight", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else if (channelName_ == "eem") { 
         channel_ = eem;
         fChain->SetBranchAddress("e1IsCBVIDTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e2IsCBVIDTight", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("mIsWZTight", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else if (channelName_ == "emm") { 
         channel_ = emm;
         fChain->SetBranchAddress("eIsCBVIDTight", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m1IsWZTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m2IsWZTight", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else if (channelName_ == "mmm") { 
         channel_ = mmm;
         fChain->SetBranchAddress("m1IsWZTight", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m2IsWZTight", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("m3IsWZTight", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("m3Eta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else
         throw std::invalid_argument("Invalid channel choice!");
 
     if (selectionName_ == "tightleptons" || selectionName_ == "Wselection")
         selection_ = tightleptons;
+    else if (selectionName_ == "FakeRateSelectionLoose")
+        selection_ = FakeRateSelectionLoose;
+    else if (selectionName_ == "FakeRateSelectionTight")
+        selection_ = FakeRateSelectionTight;
     else if (selectionName_ == "VBSselection")
         selection_ = VBSselection;
     else if (selectionName_ == "VBSselection_Tight")
@@ -172,6 +200,7 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ == VBSselection_mjj_600_detajj_4
         );
 
+    fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
@@ -199,9 +228,16 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
         b_Flag_duplicateMuonsPass->GetEntry(entry);          
         b_Flag_badMuonsPass->GetEntry(entry);          
     }
+    b_ZMass->GetEntry(entry);
     b_l1IsTight->GetEntry(entry);
     b_l2IsTight->GetEntry(entry);
     b_l3IsTight->GetEntry(entry);
+    b_l1Pt->GetEntry(entry);
+    b_l2Pt->GetEntry(entry);
+    b_l3Pt->GetEntry(entry);
+    b_l3Eta->GetEntry(entry);
+    b_l3MtToMET->GetEntry(entry);
+    b_type1_pfMETEt->GetEntry(entry);
     b_nCBVIDTightElec->GetEntry(entry);
     b_nWZTightMuon->GetEntry(entry);
     b_Flag_BadPFMuonFilterPass->GetEntry(entry);                    

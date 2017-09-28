@@ -5,21 +5,23 @@ lepid="Tight"
 DATE=$(date +%d%b%Y)
 #looselepsfile=3MediumLeptons
 looselepsfile=3LooseLeptons
-frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-${lepid}LepsFrom${looselepsfile}.root
+#frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-${lepid}LepsFrom${looselepsfile}.root
+frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate14Sep2017-${lepid}LepsFrom${looselepsfile}.root
 
 #input=3lDYControl${looselepsfile/3/}
 #output=3lDYControl
 #input=3lTTbarControl
 #output=3lTTbarControl
-input=Wselection${looselepsfile/3/}
+#input=Wselection${looselepsfile/3/}
 #output=Wselection
-output=VBSselection
+#output=VBSselection
 #output=VBSselectionTight
 #input=Zselection${looselepsfile/3/}
 #output=Zselection
-#input=${looselepsfile}
-#output=3LooseLeptons
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/j1Pt50-j2Pt50/${output}-${DATE}-${lepid}From${looselepsfile}.root
+input=${looselepsfile}
+#output=FakeRateSelectionLoose
+output=FakeRateSelectionTight
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
 #./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile

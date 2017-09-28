@@ -25,6 +25,8 @@ public :
     }; 
     enum Selection {
         tightleptons,
+        FakeRateSelectionLoose,
+        FakeRateSelectionTight,
         VBSselection,
         VBSselection_Tight,
         VBSselection_mjj_400_detajj_2, 
@@ -68,7 +70,7 @@ public :
     bool isVBS_;
     bool passesLeptonVeto;
     Float_t genWeight;
-    Float_t Zmass;
+    Float_t ZMass;
     Float_t type1_pfMETEt;
     UInt_t nCBVIDTightElec;
     UInt_t nWZTightMuon;
@@ -125,6 +127,7 @@ public :
     TBranch* b_m3RelPFIsoDBR04;
     TBranch* b_l3Eta;
     TBranch* b_l1Pt;
+    TBranch* b_ZMass;
     TBranch* b_l2Pt;
     TBranch* b_l3Pt;
     TBranch* b_l3MtToMET;

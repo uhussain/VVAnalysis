@@ -26,25 +26,13 @@ public :
     TH1D* ratio1DPt_;
     TH1D* ratio1DEta_;
 
-    Float_t Zmass;
     Float_t type1_pfMETEt;
     UInt_t nCBVIDVetoElec;
     UInt_t nWZLooseMuon;
-    Float_t l1Pt;
-    Float_t l2Pt;
-    Float_t l3Pt;
-    Float_t l3Eta;
-    Float_t l3MtToMET;
     
-    TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_nCBVIDVetoElec;
     TBranch* b_nWZLooseMuon;
-    TBranch* b_l1Pt;
-    TBranch* b_l2Pt;
-    TBranch* b_l3Pt;
-    TBranch* b_l3Eta;
-    TBranch* b_l3MtToMET;
 
     // Readers to access the data (delete the ones you do not need).
     FakeRateSelector(TTree * /*tree*/ =0) { }
