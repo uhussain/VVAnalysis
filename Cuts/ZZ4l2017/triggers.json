@@ -3,6 +3,6 @@
     "DoubleEG" : "(doubleEPass || tripleEPass)",
     "DoubleMuon" : "(doubleMuPass || doubleMuDZPass || tripleMuPass) && !(doubleEPass || tripleEPass)",
     "MuonEG" : "((singleESingleMuPass || singleMuSingleEPass || doubleMuSingleEPass || doubleESingleMuPass) && !(doubleMuPass || doubleMuDZPass || tripleMuPass) && !(doubleEPass || tripleEPass))", 
-    "SingleElectron" : "(singleEPass && !(singleESingleMuPass || singleMuSingleEPass || doubleMuSingleEPass || doubleESingleMuPass) && !(doubleMuPass || doubleMuDZPass || tripleMuPass) && !(doubleEPass || tripleEPass))"
-    "SingleMuon" : "((singleMuPass || singleIsoMuPass) && !(singleEPass || singleESingleMuPass || singleMuSingleEPass || doubleMuSingleEPass || doubleESingleMuPass) && !(doubleMuPass || doubleMuDZPass || tripleMuPass) && !(doubleEPass || tripleEPass))",
+    "SingleElectron" : "(singleEPass && !(singleESingleMuPass || singleMuSingleEPass || doubleMuSingleEPass || doubleESingleMuPass) && !(doubleMuPass || doubleMuDZPass || tripleMuPass) && !(doubleEPass || tripleEPass))",
+    "SingleMuon" : "((singleMuPass || singleIsoMuPass) && !(singleEPass || singleESingleMuPass || singleMuSingleEPass || doubleMuSingleEPass || doubleESingleMuPass) && !(doubleMuPass || doubleMuDZPass || tripleMuPass) && !(doubleEPass || tripleEPass))"
 }
