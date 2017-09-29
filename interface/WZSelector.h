@@ -107,7 +107,6 @@ public :
     std::vector<float>* jetPt_jerUp = NULL;
     std::vector<float>* jetPt_jerDown = NULL;
     std::vector<float>* jetCSVv2 = NULL;
-    Float_t type1_pfMETEt;
     Float_t nTruePU;
     UInt_t nvtx;
     Int_t nJets;
@@ -150,7 +149,6 @@ public :
     TBranch* b_Mass;
     TBranch* b_Eta;
     TBranch* b_Pt;
-    TBranch* b_type1_pfMETEt;
     TBranch* b_ZPt;
     TBranch* b_ZPhi;
     TBranch* b_ZEta;

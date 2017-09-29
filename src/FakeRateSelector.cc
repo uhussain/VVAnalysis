@@ -11,8 +11,10 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
         return true;
     if (ZMass > 111.1876 || ZMass < 81.1876)
         return true;
-    if (type1_pfMETEt > 30)
+    if (type1_pfMETEt > 25)
         return true;
+    if (l3MtToMET > 30)
+        return false;
     if (!tightZLeptons())
         return true;
     float pt_fillval = l3Pt < FR_MAX_PT_ ? l3Pt : FR_MAX_PT_ - 0.01;
@@ -31,8 +33,6 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
 void FakeRateSelector::Init(TTree *tree)
 {
     WZSelectorBase::Init(tree);
-
-    fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
 }
 
 void FakeRateSelector::SetupNewDirectory()

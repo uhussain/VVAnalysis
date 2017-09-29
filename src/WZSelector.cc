@@ -313,7 +313,9 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
             return false;
         if (ZMass > 111.1876 || ZMass < 81.1876)
             return false;
-        if (type1_pfMETEt > 30)
+        if (type1_pfMETEt > 25)
+            return false;
+        if (l3MtToMET > 30)
             return false;
         if (!tightZLeptons())
             return false;

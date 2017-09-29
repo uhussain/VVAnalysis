@@ -13,19 +13,19 @@ frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate14Sep2017-${lepid}Lep
 #input=3lTTbarControl
 #output=3lTTbarControl
 #input=Wselection${looselepsfile/3/}
-#output=Wselection
+output=Wselection
 #output=VBSselection
 #output=VBSselectionTight
 #input=Zselection${looselepsfile/3/}
 #output=Zselection
 input=${looselepsfile}
 #output=FakeRateSelectionLoose
-output=FakeRateSelectionTight
+#output=FakeRateSelectionTight
 histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
-#./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
-#python ScaleFactors/setupScaleFactors.py -t $frfile 
+./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
+python ScaleFactors/setupScaleFactors.py -t $frfile 
 ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output
 if [ -f $histfile ]; then
     echo "Histogram file $histfile produced"
