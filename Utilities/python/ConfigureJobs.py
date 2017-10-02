@@ -26,6 +26,7 @@ def getListOfEWKFilenames():
         "zzz",
         "wwz",
         "www",
+        "ww",
         "zg",
         "ggZZ4e",
         "ggZZ4m",
@@ -38,9 +39,11 @@ def getListOfNonpromptFilenames():
         "st-tchan-tbar",
         "st-tw",
         "st-tbarw",
-        "DYm50-0j-nlo",
-        "DYm50-1j-nlo",
-        "DYm50-2j-nlo",
+        #"DYm50",
+        "DYm50-1j",
+        "DYm50-2j",
+        "DYm50-3j",
+        "DYm50-4j",
     ]
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())

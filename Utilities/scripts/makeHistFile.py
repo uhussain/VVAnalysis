@@ -143,7 +143,8 @@ if args['proof']:
 
 if "FakeRate" not in args['output_selection']:
     background = SelectorTools.applySelector(["WZxsec2016data"] +
-        ConfigureJobs.getListOfEWKFilenames(), 
+        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
+        ConfigureJobs.getListOfNonpromptFilenames(), 
             "WZBackgroundSelector", args['selection'], fOut, 
             extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 

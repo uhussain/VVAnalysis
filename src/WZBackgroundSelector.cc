@@ -20,13 +20,20 @@ void WZBackgroundSelector::SetupNewDirectory()
         named->SetName(name.insert(name.length()-3, "Fakes_").c_str());
     }
     
-    AddObject<TH1D>(mjjHistPPF_, ("mjj_PPF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
-    AddObject<TH1D>(mjjHistPFP_, ("mjj_PFP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
-    AddObject<TH1D>(mjjHistFPP_, ("mjj_FPP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
-    AddObject<TH1D>(mjjHistFFP_, ("mjj_FFP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
-    AddObject<TH1D>(mjjHistFPF_, ("mjj_FPF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
-    AddObject<TH1D>(mjjHistPFF_, ("mjj_PFF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
-    AddObject<TH1D>(mjjHistFFF_, ("mjj_FFF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 5, 0, 2500);
+    AddObject<TH1D>(mjjHistPPF_, ("mjj_PPF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 15, 0, 1500);
+    AddObject<TH1D>(mjjHistPFP_, ("mjj_PFP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 15, 0, 1500);
+    AddObject<TH1D>(mjjHistFPP_, ("mjj_FPP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 15, 0, 1500);
+    AddObject<TH1D>(mjjHistFFP_, ("mjj_FFP_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 15, 0, 1500);
+    AddObject<TH1D>(mjjHistFPF_, ("mjj_FPF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 15, 0, 1500);
+    AddObject<TH1D>(mjjHistPFF_, ("mjj_PFF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 15, 0, 1500);
+    AddObject<TH1D>(mjjHistFFF_, ("mjj_FFF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 15, 0, 1500);
+    AddObject<TH1D>(ZMassHistPPF_, ("ZMass_PPF_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
+    AddObject<TH1D>(ZMassHistPFP_, ("ZMass_PFP_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
+    AddObject<TH1D>(ZMassHistFPP_, ("ZMass_FPP_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
+    AddObject<TH1D>(ZMassHistFFP_, ("ZMass_FFP_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
+    AddObject<TH1D>(ZMassHistFPF_, ("ZMass_FPF_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
+    AddObject<TH1D>(ZMassHistPFF_, ("ZMass_PFF_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
+    AddObject<TH1D>(ZMassHistFFF_, ("ZMass_FFF_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
 }
 
 Bool_t WZBackgroundSelector::Process(Long64_t entry)
@@ -45,26 +52,32 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
     }
     else if (IsPFPRegion()) {
         mjjHistPFP_->Fill(mjj, genWeight);
+        ZMassHistPFP_->Fill(ZMass, genWeight);
         evtwgt = getl2FakeRate()*genWeight;
     }
     else if (IsPPFRegion()) {
         mjjHistPPF_->Fill(mjj, genWeight);
+        ZMassHistPPF_->Fill(ZMass, genWeight);
         evtwgt = getl3FakeRate()*genWeight;
     }
     else if (IsFFFRegion()) {
         mjjHistFFF_->Fill(mjj, genWeight);
+        ZMassHistFFF_->Fill(ZMass, genWeight);
         evtwgt = getl1FakeRate()*getl2FakeRate()*getl3FakeRate()*genWeight;
     }
     else if (IsFPFRegion()) {
         mjjHistFPF_->Fill(mjj, genWeight);
+        ZMassHistFPF_->Fill(ZMass, genWeight);
         evtwgt = -1*getl1FakeRate()*getl3FakeRate()*genWeight;
     }
     else if (IsFFPRegion()) {
         mjjHistFFP_->Fill(mjj, genWeight);
+        ZMassHistFFP_->Fill(ZMass, genWeight);
         evtwgt = -1*getl1FakeRate()*getl2FakeRate()*genWeight;
     }
     else if (IsPFFRegion()) {
         mjjHistPFF_->Fill(mjj, genWeight);
+        ZMassHistPFF_->Fill(ZMass, genWeight);
         evtwgt = -1*getl2FakeRate()*getl3FakeRate()*genWeight;
     }
     else

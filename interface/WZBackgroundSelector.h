@@ -17,6 +17,13 @@ public :
     TH1D* mjjHistFPF_;
     TH1D* mjjHistPFF_;
     TH1D* mjjHistFFF_;
+    TH1D* ZMassHistPPF_;
+    TH1D* ZMassHistPFP_;
+    TH1D* ZMassHistFPP_;
+    TH1D* ZMassHistFFP_;
+    TH1D* ZMassHistFPF_;
+    TH1D* ZMassHistPFF_;
+    TH1D* ZMassHistFFF_;
     
     WZBackgroundSelector(TTree * /*tree*/ =0) { }
     virtual ~WZBackgroundSelector() { }
