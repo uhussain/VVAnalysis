@@ -5,6 +5,8 @@ import datetime
 from python import UserInput
 from python import ConfigureJobs
 
+ROOT.gROOT.SetBatch(True)
+
 channels = ["eee", "eem", "emm", "mmm"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
@@ -191,5 +193,8 @@ writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), path), False)
 writeOutputListItem(allewk, fOut)
+allnonprompt = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(
+    ConfigureJobs.getListOfNonpromptFilenames(), path))
+writeOutputListItem(allnonprompt, fOut)
 final = getDifference("DataEWKCorrected", "AllData", "AllEWK")
 writeOutputListItem(final, fOut)

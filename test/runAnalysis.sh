@@ -5,8 +5,7 @@ lepid="Tight"
 DATE=$(date +%d%b%Y)
 #looselepsfile=3MediumLeptons
 looselepsfile=3LooseLeptons
-#frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-${lepid}LepsFrom${looselepsfile}.root
-frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate14Sep2017-${lepid}LepsFrom${looselepsfile}.root
+frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-${lepid}LepsFrom${looselepsfile}.root
 
 #input=3lDYControl${looselepsfile/3/}
 #output=3lDYControl
@@ -25,6 +24,7 @@ histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}F
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
 ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
+exit 1
 python ScaleFactors/setupScaleFactors.py -t $frfile 
 ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output
 if [ -f $histfile ]; then
