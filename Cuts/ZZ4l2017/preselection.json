@@ -1,0 +1,42 @@
+{
+    //Tight Lepton ID and Isolation
+    "Object" : {
+        "e" : [ 
+            "{object_name}Pt >= 7.0",
+            "abs({object_name}Eta) <  2.5",
+            "abs({object_name}PVDXY) < 0.5",
+            "abs({object_name}PVDZ) < 1.0",
+            //Making it Tight
+            "{object_name}ZZTightIDNoVtx >= 1",
+            //Isolation
+            "{object_name}ZZIsoPass > 0.5"
+        ],
+        "m" : [
+            "{object_name}Pt > 5.0",
+            "abs({object_name}Eta) < 2.4",
+             //mTrkOrGlob
+            "{object_name}IsGlobal >= 1 || ({object_name}IsTracker >= 1 && {object_name}MatchedStations >= 1)",
+            "abs({object_name}PVDXY) < 0.5",
+            "abs({object_name}PVDZ) < 1.0",
+            //BestTrackType
+            "{object_name}BestTrackType !=2",
+            //Making it Tight
+            "{object_name}IsPFMuon >= 1",
+            //Isolation
+            "{object_name}ZZIsoPass > 0.5"
+        ]
+    },
+    "State" : {
+        //Lepton Pt Requirements, have a lepton with Pt >=20 (only need to test 1 and 3 because of uwvv/FSA ordering) and have another with Pt >=12,10(e,m)
+        "eeee" : ["(e1Pt >= 20 && (e2Pt >= 12 || e3Pt >= 12 || e4Pt >= 12)) || (e3Pt >= 20 && (e1Pt >= 12 || e2Pt >= 12 || e4Pt >= 12))"
+        ],
+        "eemm" : ["(e1Pt >= 20 && (e2Pt >= 12 || m1Pt >= 10 || m2Pt >= 10)) || (m1Pt >= 20 && (m2Pt >= 10 || e1Pt >= 12 || e2Pt >= 12))" 
+        ],
+        "mmmm" : ["(m1Pt >= 20 && (m2Pt >= 10 || m3Pt >= 10 || m4Pt >= 10)) || (m3Pt >= 20 && (m1Pt >= 10 || m2Pt >= 10 || m4Pt >= 10))" 
+        ]
+    },
+    "Event" : [
+        //Good Vertex
+        "pvndof >=4 && abs(pvZ) < 24 && pvRho < 2",
+    ]
+}
