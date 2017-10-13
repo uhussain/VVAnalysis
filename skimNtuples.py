@@ -65,7 +65,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     for file_path in input_files:
         metaTree.Add(file_path)
     event_counts = {"initial" : {}, "selected" : {}}
-    for state in ["eee", "eem", "emm", "mmm"]:
+    for state in ["eeee", "eemm", "mmmm"]:
         tree = ROOT.TChain("%s/ntuple" % state)
         for file_path in input_files:
             tree.Add(file_path)
@@ -75,13 +75,13 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
             selections.split(","), analysis, trigger).getString())
         cut_string = cuts.getString()
         print "Cut string is %s " % cut_string
-        ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
+        #ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
         event_counts["selected"][state] = writeNtupleToFile(output_file, tree, state, cut_string,
             deduplicate)
     writeMetaTreeToFile(output_file, metaTree)
-    event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
+    event_info = PrettyTable(["Selection", "eeee", "eemm","mmmm"])
     for selection, events in event_counts.iteritems():
-        event_info.add_row([selection, events["eee"], events["eem"], events["emm"], events["mmm"]])
+        event_info.add_row([selection, events["eeee"], events["eemm"],events["mmmm"]])
     print "\nResults for selection: %s" % selections
     if deduplicate:
         print "NOTE: Events deduplicated by choosing the ordering with m_l1_l2 " \
