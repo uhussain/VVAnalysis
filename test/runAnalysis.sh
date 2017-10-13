@@ -3,29 +3,54 @@
 lumi=35.87
 lepid="Tight"
 DATE=$(date +%d%b%Y)
+DATE_MONTHONLY=$(date +%b%Y)
 #looselepsfile=3MediumLeptons
 looselepsfile=3LooseLeptons
-frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE}-${lepid}LepsFrom${looselepsfile}.root
 
-#input=3lDYControl${looselepsfile/3/}
-#output=3lDYControl
-#input=3lTTbarControl
-#output=3lTTbarControl
 input=Wselection${looselepsfile/3/}
 output=Wselection
-#output=VBSselection
-#output=VBSselectionTight
-#input=Zselection${looselepsfile/3/}
-#output=Zselection
-#input=${looselepsfile}
-#output=FakeRateSelectionLoose
-#output=FakeRateSelectionTight
+if [[ $1 == "VBSselection_Loose" ]]; then
+    output=VBSselection_Loose
+elif [[ $1 == "VBSselection_Tight" ]]; then
+    output=VBSselection_Tight
+elif [[ $1 == "3lDYControl" ]]; then
+    if [[ $looselepsfile == "3MediumLeptons" ]]; then
+        input=3lDYControl${looselepsfile/3/}
+    else
+        input=3lDYControl
+    fi
+    output=3lDYControl
+elif [[ $1 == "3lTTbarControl" ]]; then
+    if [[ $looselepsfile == "3MediumLeptons" ]]; then
+        input=3lTTbarControl${looselepsfile/3/}
+    else
+        input=3lTTbarControl
+    fi
+    output=3lTTbarControl
+elif [[ $1 == "Zselection" ]]; then
+    input=Zselection${looselepsfile/3/}
+    output=Zselection
+elif [[ $1 == "FakeRateSelectionLoose" ]]; then
+    input=${looselepsfile}
+    output=FakeRateSelectionLoose
+elif [[ $1 == "FakeRateSelectionTight" ]]; then
+    input=${looselepsfile}
+    output=FakeRateSelectionTight
+else
+    echo "INFO: Using default selection 'Wselection'"
+fi
+
+frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
 histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
-./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
-exit 1
-python ScaleFactors/setupScaleFactors.py -t $frfile 
+if [ -f $frfile ]; then
+    echo "INFO: Fake rate file $frfile exists! Using exisiting file."
+else
+    echo "INFO: Fake rate file $frfile not found. It will be created."
+    ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
+    python ScaleFactors/setupScaleFactors.py -t $frfile 
+fi
 ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output
 if [ -f $histfile ]; then
     echo "Histogram file $histfile produced"

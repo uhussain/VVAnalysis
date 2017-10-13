@@ -10,8 +10,8 @@ def getComLineArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--selections", type=str,
                         required=True, help="Name of selections to apply, "
-                        "separated by commas. They must be"
-                        " mapped to a cuts json via Cuts/definitions.json")
+                        "separated by commas. They must be defined in
+                        Cuts/<analysis>/<selection_name>.json"
     parser.add_argument("-t", "--trigger", type=str, default="",
                         choices=["DoubleEG", "DoubleMuon", "MuonEG", 
                             "SingleMuon", "SingleElectron", "MonteCarlo", ""],
@@ -65,7 +65,12 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     for file_path in input_files:
         metaTree.Add(file_path)
     event_counts = {"initial" : {}, "selected" : {}}
-    for state in ["eee", "eem", "emm", "mmm"]:
+    states = []
+    if "WZ" in analysis:
+        states = ["eee", "eem", "emm", "mmm"]
+    elif "ZZ" in analysis:
+        states = ["eeee", "eemm", "mmmm"]
+    for state in states:
         tree = ROOT.TChain("%s/ntuple" % state)
         for file_path in input_files:
             tree.Add(file_path)

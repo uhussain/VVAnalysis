@@ -25,9 +25,10 @@ public :
     }; 
     enum Selection {
         tightleptons,
+        Wselection,
         FakeRateSelectionLoose,
         FakeRateSelectionTight,
-        VBSselection,
+        VBSselection_Loose,
         VBSselection_Tight,
         VBSselection_mjj_400_detajj_2, 
         VBSselection_mjj_400_detajj_2p5, 

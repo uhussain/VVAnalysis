@@ -191,8 +191,10 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
             return false;
 
     // Use optimized point of pT(j1,j2) > 50 GeV
-    if (jPt->at(0) < 50 || jPt->at(1) < 50)
-        return false;
+    if (selection_ != VBSselection_Loose) { 
+        if (jPt->at(0) < 50 || jPt->at(1) < 50)
+            return false;
+    }
 
     float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
 
@@ -541,6 +543,7 @@ Bool_t WZSelector::Process(Long64_t entry)
     if (!PassesBaseSelection(true, selection_))
         return true;
 
+    //TODO This should really be properly applied to MC in background estimation
     if (isMC_) {
         if (channel_ == eee) {
             genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
@@ -571,7 +574,8 @@ Bool_t WZSelector::Process(Long64_t entry)
         genWeight *= pileupSF_->Evaluate1D(nTruePU);
     }
     
-    FillHistograms(entry, genWeight, false);
+    bool blindVBS = (selection_ != Wselection && !isVBS_);
+    FillHistograms(entry, genWeight, blindVBS);
     
     return true;
 }

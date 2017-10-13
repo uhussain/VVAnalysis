@@ -215,7 +215,7 @@ nonprompt = makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}
 for chan in chans:
     hist = nonprompt.FindObject("mjj_Fakes_"+chan)
     removeZeros(hist)
-    card_info[chan]["nonprompt"] = round(hist.Integral() if hist.Integral() > 0 else 0.001, 4)
+    card_info[chan]["nonprompt"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     stat_hists = getStatHists(hist, "nonprompt", chan)
     nonprompt.extend(stat_hists[:])
 writeOutputListItem(nonprompt, fOut)
@@ -244,7 +244,7 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
         removeZeros(hist)
     for chan in chans:
         hist = group.FindObject("mjj_"+chan)
-        card_info[chan][name] = round(hist.Integral(0, 4)) if hist.Integral() > 0 else 0.001
+        card_info[chan][name] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     writeOutputListItem(group, fOut)
     output_info.add_row([plot_group, card_info["eee"][name], 
         card_info["eem"][name], 

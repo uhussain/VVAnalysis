@@ -107,14 +107,16 @@ void WZSelectorBase::Init(TTree *tree)
     else
         throw std::invalid_argument("Invalid channel choice!");
 
-    if (selectionName_ == "tightleptons" || selectionName_ == "Wselection")
+    if (selectionName_ == "tightleptons")
         selection_ = tightleptons;
+    else if (selectionName_ == "Wselection")
+        selection_ = Wselection;
     else if (selectionName_ == "FakeRateSelectionLoose")
         selection_ = FakeRateSelectionLoose;
     else if (selectionName_ == "FakeRateSelectionTight")
         selection_ = FakeRateSelectionTight;
-    else if (selectionName_ == "VBSselection")
-        selection_ = VBSselection;
+    else if (selectionName_ == "VBSselection_Loose")
+        selection_ = VBSselection_Loose;
     else if (selectionName_ == "VBSselection_Tight")
         selection_ = VBSselection_Tight;
     else if (selectionName_ == "VBSselection_mjj_400_detajj_2")
@@ -171,7 +173,7 @@ void WZSelectorBase::Init(TTree *tree)
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;
     }
-    isVBS_ = (selection_ == VBSselection || 
+    isVBS_ = (selection_ == VBSselection_Loose || 
         selection_ == VBSselection_Tight || 
         selection_ == VBSselection_mjj_400_detajj_2 || 
         selection_ == VBSselection_mjj_400_detajj_2p5 || 
