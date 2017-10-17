@@ -182,8 +182,9 @@ def getScaleHists(scale_hist2D, name, chan, underflow=True, overflow=True):
         scale_hists.append(scale_hist)
     scale_histCentral = scale_hist2D.ProjectionX(name+"_central", 1, 1, "e")
     addOverflowAndUnderflow(scale_histCentral, underflow, overflow)
-    scale_histUp = scale_histCentral.Clone("_".join(["mjj", name, "scaleUp", chan]))
-    scale_histDown = scale_histCentral.Clone("_".join(["mjj",name, "scaleDown", chan]))
+    hist_name = scale_hist2D.GetName().replace("lheWeights", name+"_scaleUp")
+    scale_histUp = scale_histCentral.Clone(hist_name)
+    scale_histDown = scale_histCentral.Clone(hist_name.replace("Up", "Down"))
     for i in range(0, scale_hists[0].GetNbinsX()+1):
         for hist in scale_hists:
             if hist.GetBinContent(i) > scale_histUp.GetBinContent(i):
@@ -206,12 +207,14 @@ def getScaleHists(scale_hist2D, name, chan, underflow=True, overflow=True):
             )
     return [scale_histUp, scale_histDown]
 
+isVBS = "VBS" in args['selection'] 
+variable = "mjj" if isVBS else "yield"
 alldata = makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
-    ["mjj_" + c for c in chans])
+    [variable +"_"+ c for c in chans])
 writeOutputListItem(alldata, fOut)
 nonprompt = makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
-    ["mjj_Fakes_" + c for c in chans])
+    [variable+"_Fakes_" + c for c in chans])
 for chan in chans:
     hist = nonprompt.FindObject("mjj_Fakes_"+chan)
     removeZeros(hist)
@@ -223,14 +226,14 @@ output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"]
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
 for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]:
+    plots = [variable+"_" + c for c in chans]
+    variations = ["lheWeights"] 
+    if variable == "mjj":
+        variations += ["jerUp", "jerDown", "jesUp", "jesDown"] 
+    plots += ["_".join([variable, var, c]) for var in variations for c in chans]
+
     group = makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
-        config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'],
-            ["mjj_" + c for c in chans]+
-            ["mjj_jesUp_" + c for c in chans]+
-            ["mjj_jesDown_" + c for c in chans]+
-            ["mjj_jerUp_" + c for c in chans]+
-            ["mjj_jerDown_" + c for c in chans]+
-            ["mjj_lheWeights_" + c for c in chans])
+        config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots)
     name = plot_group.replace("-", "_")
     for chan in chans:
         hist = group.FindObject("mjj_"+chan)
@@ -300,13 +303,16 @@ signal_abv = "vbfnlo" if args['vbfnlo'] else "MG"
 for chan, chan_dict in card_info.iteritems():
     chan_dict["signal_name"] = signal.replace("_", "-")
     chan_dict["signal_yield"] = chan_dict[signal]
-    ConfigureJobs.fillTemplatedFile(
-        'Templates/CombineCards/WZjj_EWK_template_%s.txt' % chan,
-        '%s/WZjj_%s_%s.txt' % (output_dir, signal_abv, chan), 
+    file_name = '%s/WZjj_%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
+            else '%s/WZ_%s.txt' % (output_dir, chan)
+    template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
+        (args['selection'].split("/")[-1], ("WZjj_EWK" if isVBS else "WZ"), chan)
+    ConfigureJobs.fillTemplatedFile(template_name,
+        file_name,
         chan_dict
     )
 ConfigureJobs.fillTemplatedFile(
-    'Templates/CombineCards/runCombine_Template.sh',
+    'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
     '%s/runCombine_%s.sh' % (output_dir, signal_abv), 
     {"sample" : signal_abv}
 )

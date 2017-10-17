@@ -457,6 +457,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     if (isVBS_ && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
         return;
 
+    hists1D_["yield"]->Fill(1, weight);
     if (hists1D_["Mass"] != nullptr)
         hists1D_["Mass"]->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
     if (hists1D_["ZMass"] != nullptr)
@@ -528,6 +529,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     }
     
     for (size_t i = 0; i < lheWeights.size(); i++) {
+        weighthists_["yield"]->Fill(1, i, lheWeights[i]/lheWeights[0]*weight);
         if (weighthists_["mjj"] != nullptr)
             weighthists_["mjj"]->Fill(mjj, i, lheWeights[i]/lheWeights[0]*weight);
         if (weighthists_["Mass"] != nullptr)
@@ -630,4 +632,7 @@ void WZSelector::SetupNewDirectory()
                 1000, 0, 1000);
         }
     }
+    AddObject<TH1D>(hists1D_["yield"], ("yield_"+channelName_).c_str(), "yield", 1, 0, 10);
+    AddObject<TH2D>(weighthists_["yield"], ("yield_lheWeights_"+channelName_).c_str(), "yield", 
+        1, 0, 10, 1000, 0, 1000);
 }

@@ -13,6 +13,7 @@ public :
     ScaleFactor* mIsoSF_;
     
     std::map<std::string, TH1D*> hists1D_ = {
+        { "yield",  {} },
         { "nTruePU",  {} },
         { "nvtx",  {} },
         { "ZMass",  {} },
@@ -84,7 +85,8 @@ public :
         //{ "Pt", {} },
         //{ "MtW",  {} },
         //{ "dEtajj",  {} },
-        { "mjj",  {} }
+        { "mjj",  {} },
+        { "yield",  {} }
     };
 
     std::vector<float>* scaleWeights = NULL;
