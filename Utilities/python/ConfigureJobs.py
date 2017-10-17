@@ -8,8 +8,8 @@ import json
 import string
 
 def getManagerPath():
-    path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
-            "/afs/cern.ch/user/k/kelong/work"
+    path = "/cms/uhussain" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
+            "/afs/cern.ch/user/u/uhussain/work"
     return path
 def getListOfEWKFilenames():
     return [
@@ -86,9 +86,9 @@ def getListOfFiles(filelist, manager_path, selection):
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
-        if "WZxsec2016" in name:
-            dataset_file = "/afs/cern.ch/user/k/kelong/work/" + \
-                "AnalysisDatasetManager/FileInfo/WZxsec2016/%s.json" % selection
+        if "ZZ4l2017" in name:
+            dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                "AnalysisDatasetManager/FileInfo/ZZ4l2017/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
@@ -126,21 +126,8 @@ def getListOfFilesWithXSec(filelist, manager_path):
     return info
 def getPreviousStep(selection, analysis):
     selection_map = {}
-    if analysis == "WZxsec2016":
-        selection_map = { "ntuples" : "ntuples",
-                "loosepreselection" : "ntuples",
-                "preselection" : "ntuples",
-                "3LooseLeptons" : "ntuples",
-                "3LooseLeptonsNoVeto" : "ntuples",
-                "3MediumLeptonsNoVeto" : "ntuples",
-                "preselectionLooseVeto" : "ntuples",
-                "preselectionNoVeto" : "ntuples",
-                "LepVetoAnd3lmass" : "preselection",
-                "3lmass" : "preselection",
-                "Zselection" : "3lmass",
-                "Wselection" : "Zselection",
-                "3lDYControl" : "Zselection",
-                "3lTTbarControl" : "3lmass",
+    if analysis == "ZZ4l2017":
+        selection_map = { "ntuples" : "ntuples"
         }
     elif analysis == "WZDecemberAnalysis":
         selection_map = { "ntuples" : "ntuples",
