@@ -37,8 +37,8 @@ def callFarmout(output_dir, script_name, noSubmit):
     with open(log_file_name, 'w') as log:
         log.write('Condor submit info created with the command:'
             '\n    %s\n' % ' '.join(sys.argv))
-        log.write('Using WZAnalysis code by Kenneth Long (U. Wisconsin):\n')
-        log.write('https://github.com/kdlong/WZAnalysis\n\n')
+        log.write('Using VVAnalysis code by Kenneth Long (U. Wisconsin):\n')
+        log.write('https://github.com/uhussain/VVAnalysis\n\n')
         log.write('The git hash of the commit used and the output of git diff is below\n') 
         log.write('-'*80 + '\n')
         log.write('-'*80 + '\n')
@@ -69,8 +69,8 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     )
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
-    submission_dir = ('/data/kelong/%s' if "kelong" in path else "/nfs_scratch/kdlong/%s") \
-        % '{:%Y-%m-%d}_WZAnalysisJobs'.format(datetime.date.today())
+    submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
+        % '{:%Y-%m-%d}_ZZAnalysisJobs'.format(datetime.date.today())
     try:
         os.mkdir(submission_dir)
     except:
@@ -116,8 +116,8 @@ def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleF
 def main():
     #for selection in selection_map.iteritems():
     args = getComLineArgs()
-    path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
-            "/afs/cern.ch/user/k/kelong/work"
+    path = "/cms/uhussain" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
+            "/afs/cern.ch/user/u/uhussain/work"
     for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path):
         try:
             farmoutNtupleSkim(file_name, path, args['selection'], 
