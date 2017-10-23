@@ -63,8 +63,8 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     farmout_dict = {}
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
         sample_name, 
-        path, 
-        ConfigureJobs.getPreviousStep(selection, analysis), 
+        path,
+        #ConfigureJobs.getPreviousStep(selection, analysis), 
         analysis
     )
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
@@ -118,7 +118,7 @@ def main():
     args = getComLineArgs()
     path = "/cms/uhussain" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
             "/afs/cern.ch/user/u/uhussain/work"
-    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path,args['selection']):
+    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path):
         try:
             farmoutNtupleSkim(file_name, path, args['selection'], 
                 args['analysis'], args['version'], args['scaleFacs'], 

@@ -79,7 +79,7 @@ def getListOfHDFSFiles(file_path):
         elif "root" in split[1]:
             files.append("/"+split[1])
     return files
-def getListOfFiles(filelist, manager_path, selection):
+def getListOfFiles(filelist, manager_path):
     data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
@@ -88,7 +88,7 @@ def getListOfFiles(filelist, manager_path, selection):
     for name in filelist:
         if "ZZ4l2017" in name:
             dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2017/%s.json" % selection
+                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2017/%s.json" % "ntuples"
             allnames = json.load(open(dataset_file)).keys()
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
@@ -146,10 +146,10 @@ def getPreviousStep(selection, analysis):
             raise ValueError("Invalid selection '%s'. Valid selections are:"
                 "%s" % (first_selection, selection_map.keys()))
     return selection_map[first_selection]
-def getInputFilesPath(sample_name, manager_path, selection, analysis):
+def getInputFilesPath(sample_name, manager_path, analysis):
     data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
-        selection])
+        "ntuples"])
     input_files = UserInput.readJson(input_file_name)
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
