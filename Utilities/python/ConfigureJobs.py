@@ -80,7 +80,7 @@ def getListOfHDFSFiles(file_path):
             files.append("/"+split[1])
     return files
 def getListOfFiles(filelist, manager_path, selection):
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     valid_names = data_info.keys() + mc_info.keys()
@@ -88,7 +88,7 @@ def getListOfFiles(filelist, manager_path, selection):
     for name in filelist:
         if "ZZ4l2017" in name:
             dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                "AnalysisDatasetManager/FileInfo/ZZ4l2017/%s.json" % selection
+                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2017/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
@@ -112,7 +112,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
     with open(out_file_name, "w") as outFile:
         outFile.write(result)
 def getListOfFilesWithXSec(filelist, manager_path):
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     files = getListOfFiles(filelist, manager_path, "ntuples")
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     info = {}
@@ -127,7 +127,8 @@ def getListOfFilesWithXSec(filelist, manager_path):
 def getPreviousStep(selection, analysis):
     selection_map = {}
     if analysis == "ZZ4l2017":
-        selection_map = { "ntuples" : "ntuples"
+        selection_map = { "ntuples": "ntuples",
+                "preselection" : "ntuples"
         }
     elif analysis == "WZDecemberAnalysis":
         selection_map = { "ntuples" : "ntuples",
@@ -146,7 +147,7 @@ def getPreviousStep(selection, analysis):
                 "%s" % (first_selection, selection_map.keys()))
     return selection_map[first_selection]
 def getInputFilesPath(sample_name, manager_path, selection, analysis):
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
         selection])
     input_files = UserInput.readJson(input_file_name)
