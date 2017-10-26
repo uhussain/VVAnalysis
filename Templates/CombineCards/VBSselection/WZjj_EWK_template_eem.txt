@@ -1,6 +1,6 @@
 imax 1  number of channels
 jmax 5  number of backgrounds
-kmax 40 number of nuisance parameters (sources of systematical uncertainties)
+kmax 50 number of nuisance parameters (sources of systematical uncertainties)
 ------------
 
 shapes WZjj_EWK  * ${output_file} ${signal_name}/mjj_$$CHANNEL  ${signal_name}/mjj_$$SYSTEMATIC_$$CHANNEL
@@ -29,17 +29,27 @@ lumi                    lnN     1.025           1.025           1.025       1.02
 PDF                     lnN     1.05            1.05            1.05        1.05            1.05        -          
 WZjj_qcd_modeling       lnN     -               1.10            -           -               -           -          
 norm_nonprompt          lnN     -               -               -           -               -           1.4        
+MET                     lnN     1.02            1.02            1.04        1.06            1.05        1.02     
+btag                    lnN     1.02            1.02            -           1.07            -           -
+ePhiRes                 lnN     1.025           1.025           1.025       1.025           1.025       - 
+eRhoRes                 lnN     1.025           1.025           1.025       1.025           1.025       -
+eScale                  lnN     1.04            1.04            1.04        1.04            1.04        -
+eEff                    lnN     1.05            1.05            1.05        1.05            1.05        -
+mPhiRes                 lnN     1.01            1.01            1.01        1.01            1.01        -  
+mRhoRes                 lnN     1.01            1.01            1.01        1.01            1.01        -  
+mScale                  lnN     1.02            1.02            1.02        1.02            1.02        -  
+mEff                    lnN     1.02            1.02            1.02        1.02            1.02        -  
 ${signal_name}_scale    shape   1               -               -           -               -           -
 wz-mgmlm_scale          shape   -               1               -           -               -           -
 vv_scale                shape   -               -               1           -               -           -
 top-ewk_scale           shape   -               -               -           1               -           -
-jes                     shape   1               1               1           1               0           -
-jer                     shape   1               1               1           1               0           -
-${signal_name}_statBin1 shape 1             -               -           -               -           -
-${signal_name}_statBin2 shape 1             -               -           -               -           -
-${signal_name}_statBin3 shape 1             -               -           -               -           -
-${signal_name}_statBin4 shape 1             -               -           -               -           -
-${signal_name}_statBin5 shape 1             -               -           -               -           -
+jes                     shape   1               1               1           1               -           -
+jer                     shape   1               1               1           1               -           -
+${signal_name}_statBin1 shape   1               -               -           -               -           -
+${signal_name}_statBin2 shape   1               -               -           -               -           -
+${signal_name}_statBin3 shape   1               -               -           -               -           -
+${signal_name}_statBin4 shape   1               -               -           -               -           -
+${signal_name}_statBin5 shape   1               -               -           -               -           -
 wz-mgmlm_statBin1       shape   -               1               -           -               -           -
 wz-mgmlm_statBin2       shape   -               1               -           -               -           -
 wz-mgmlm_statBin3       shape   -               1               -           -               -           -

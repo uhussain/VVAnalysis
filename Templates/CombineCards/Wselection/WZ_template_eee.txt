@@ -1,18 +1,18 @@
 imax 1  number of channels
-jmax 5  number of backgrounds
-kmax 40 number of nuisance parameters (sources of systematical uncertainties)
+jmax 4  number of backgrounds
+kmax 19 number of nuisance parameters (sources of systematical uncertainties)
 ------------
 
-shapes WZjj_QCD  * ${output_file} wz-mgmlm/yield_$$CHANNEL        wz-mgmlm/yield_$$SYSTEMATIC_$$CHANNEL 
-shapes vv        * ${output_file} vv/yield_$$CHANNEL              vv/yield_$$SYSTEMATIC_$$CHANNEL 
+shapes wz-powheg * ${output_file} wz-powheg/yield_$$CHANNEL       wz-powheg/yield_$$SYSTEMATIC_$$CHANNEL 
+shapes vv-powheg * ${output_file} vv-powheg/yield_$$CHANNEL       vv-powheg/yield_$$SYSTEMATIC_$$CHANNEL 
 shapes top-ewk   * ${output_file} top-ewk/yield_$$CHANNEL         top-ewk/yield_$$SYSTEMATIC_$$CHANNEL 
 shapes zg        * ${output_file} zg/yield_$$CHANNEL              zg/yield_$$SYSTEMATIC_$$CHANNEL 
 
 shapes nonprompt * ${output_file} DataEWKCorrected/yield_Fakes_$$CHANNEL DataEWKCorrected/yield_Fakes_$$SYSTEMATIC_$$CHANNEL
-shapes data_obs  *  ${output_file} AllData/yield_$$CHANNEL
+shapes data_obs  * ${output_file} data_2016/yield_$$CHANNEL
 
 bin          eee   
-observation  -1.0 
+observation  ${data_2016}
 
 ------------
 # now we list the expected events for signal and all backgrounds in that bin
@@ -20,18 +20,26 @@ observation  -1.0
 # then we list the independent sources of uncertainties, and give their effect (syst. error)
 # on each process and bin
 bin                               eee             eee         eee             eee         eee         
-process                           WZ              vv          top-ewk         zg          nonprompt   
-process                           1               2           3               4           5           
-rate                              ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
+process                           wz-powheg       vv-powheg   top-ewk         zg          nonprompt   
+process                           0               1           2               3           4
+rate                              ${wz_powheg}    ${vv_powheg} ${top_ewk}     ${zg}       ${nonprompt} 
 ------------                                                                                                                                                                                                   
 lumi                    lnN       1.025           1.025       1.025           1.025       -          
-PDF                     lnN       1.05            1.05        1.05            1.05        -          
+PDF                     lnN       -               1.05        1.05            1.05        -          
 norm_nonprompt          lnN       -               -           -               -           1.4        
-vv_scale                shape     -               1           -               -           -
+MET                     lnN       1.02            1.04        1.06            1.05        1.02     
+btag                    lnN       1.02            -           1.07            -           -
+ePhiRes                 lnN       1.04            1.04        1.04            1.04        - 
+eRhoRes                 lnN       1.04            1.04        1.04            1.04        -
+eScale                  lnN       1.06            1.06        1.06            1.06        -
+eEff                    lnN       1.07            1.07        1.07            1.07        -
+mPhiRes                 lnN       -               -           -               -           - 
+mRhoRes                 lnN       -               -           -               -           -
+mScale                  lnN       -               -           -               -           -   
+mEff                    lnN       -               -           -               -           -   
+vv-powheg_scale         shape     -               1           -               -           -
 top-ewk_scale           shape     -               -           1               -           -
-jes                     shape     1               1           1               0           -
-jer                     shape     1               1           1               0           -
-vv_statBin1             shape     -               1           -               -           -
+vv-powheg_statBin1      shape     -               1           -               -           -
 top-ewk_statBin1        shape     -               -           1               -           -
 zg_statBin1             shape     -               -           -               1           -
 nonprompt_statBin1      shape     -               -           -               -           1

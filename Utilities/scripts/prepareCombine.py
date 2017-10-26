@@ -105,33 +105,43 @@ card_info = {
         "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
         "wz-mgmlm" : 0,
+        "wz-powheg" : 0,
+        "vv-powheg" : 0,
         "top-ewk" : 0,
         "zg" : 0,
         "vv" : 0,
+        "AllData" : 0,
     },
     "eem" : {
         "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
-        "wz-mgmlm" : 0,
+        "wz-powheg" : 0,
+        "vv-powheg" : 0,
         "top-ewk" : 0,
         "zg" : 0,
         "vv" : 0,
+        "AllData" : 0,
+        "AllData" : 0,
     },
     "emm" : {
         "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
-        "wz-mgmlm" : 0,
+        "wz-powheg" : 0,
+        "vv-powheg" : 0,
         "top-ewk" : 0,
         "zg" : 0,
         "vv" : 0,
+        "AllData" : 0,
     },
     "mmm" : {
         "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
-        "wz-mgmlm" : 0,
+        "wz-powheg" : 0,
+        "vv-powheg" : 0,
         "top-ewk" : 0,
         "zg" : 0,
         "vv" : 0,
+        "AllData" : 0,
     },
 }
 def getStatHists(hist, name, chan):
@@ -216,7 +226,7 @@ writeOutputListItem(alldata, fOut)
 nonprompt = makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans])
 for chan in chans:
-    hist = nonprompt.FindObject("mjj_Fakes_"+chan)
+    hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
     removeZeros(hist)
     card_info[chan]["nonprompt"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     stat_hists = getStatHists(hist, "nonprompt", chan)
@@ -225,9 +235,13 @@ writeOutputListItem(nonprompt, fOut)
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
-for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]:
+plot_groups = ["wz-powheg", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv-powheg", "data_2016"]
+if isVBS:
+    plot_groups = ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
+
+for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
-    variations = ["lheWeights"] 
+    variations = ["lheWeights"] if "data" not in plot_group else []
     if variable == "mjj":
         variations += ["jerUp", "jerDown", "jesUp", "jesDown"] 
     plots += ["_".join([variable, var, c]) for var in variations for c in chans]
@@ -236,17 +250,17 @@ for plot_group in ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots)
     name = plot_group.replace("-", "_")
     for chan in chans:
-        hist = group.FindObject("mjj_"+chan)
+        hist = group.FindObject(variable+"_"+chan)
         card_info[chan]["output_file"] = args['output_file']
         stat_hists = getStatHists(hist, plot_group, chan)
         group.extend(stat_hists)
         if plot_group not in ["zg"]:
-            scale_hists = getScaleHists(group.FindObject("mjj_lheWeights_"+chan), plot_group, chan)
+            scale_hists = getScaleHists(group.FindObject(variable+"_lheWeights_"+chan), plot_group, chan)
             group.extend(scale_hists)
     for hist in group:
         removeZeros(hist)
     for chan in chans:
-        hist = group.FindObject("mjj_"+chan)
+        hist = group.FindObject(variable+"_"+chan)
         card_info[chan][name] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     writeOutputListItem(group, fOut)
     output_info.add_row([plot_group, card_info["eee"][name], 
@@ -287,6 +301,7 @@ combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_7_4_7/src/Higg
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
                 datetime.date.today().strftime("%d%b%Y")
 output_dir = '/'.join([combine_dir,args['selection'], folder_name])
+print output_dir
 try:
     os.makedirs(output_dir)
 except OSError as e:
