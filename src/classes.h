@@ -1,9 +1,9 @@
-#include "Analysis/WZAnalysis/interface/FakeRateSelector.h"
-#include "Analysis/WZAnalysis/interface/WZSelector.h"
-#include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
-#include "Analysis/WZAnalysis/interface/WZBackgroundSelector.h"
-#include "Analysis/WZAnalysis/interface/ScaleFactor.h"
-#include "Analysis/WZAnalysis/interface/disambiguateFinalStates.h"
+#include "Analysis/VVAnalysis/interface/FakeRateSelector.h"
+#include "Analysis/VVAnalysis/interface/WZSelector.h"
+#include "Analysis/VVAnalysis/interface/WZSelectorBase.h"
+#include "Analysis/VVAnalysis/interface/WZBackgroundSelector.h"
+#include "Analysis/VVAnalysis/interface/ScaleFactor.h"
+#include "Analysis/VVAnalysis/interface/disambiguateFinalStates.h"
 
 namespace{
   namespace{

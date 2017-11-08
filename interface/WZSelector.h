@@ -2,8 +2,8 @@
 #define WZSelector_h
 
 #include <vector>
-#include "Analysis/WZAnalysis/interface/ScaleFactor.h"
-#include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
+#include "Analysis/VVAnalysis/interface/ScaleFactor.h"
+#include "Analysis/VVAnalysis/interface/WZSelectorBase.h"
 
 class WZSelector : public WZSelectorBase {
 public :

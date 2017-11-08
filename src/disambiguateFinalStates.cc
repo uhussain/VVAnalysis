@@ -16,10 +16,10 @@ void disambiguateFinalStates::Init(TTree *tree)
   if (!tree) return;
   fChain = tree;
 
-  fChain->SetBranchAddress(l1_l2_cand_mass, &l1_l2_Mass, &b_l1_l2_Mass);
-  fChain->SetBranchAddress(l1_l2_cand_pt, &l1_l2_Pt, &b_l1_l2_Pt);
-  fChain->SetBranchAddress(l3_l4_cand_mass, &l3_l4_Mass, &b_l3_l4_Mass);
-  fChain->SetBranchAddress(l3_l4_cand_pt, &l3_l4_Pt, &b_l3_l4_Pt);
+  fChain->SetBranchAddress(l1_l2_Cand_mass, &l1_l2_Mass, &b_l1_l2_Mass);
+  fChain->SetBranchAddress(l1_l2_Cand_pt, &l1_l2_Pt, &b_l1_l2_Pt);
+  fChain->SetBranchAddress(l3_l4_Cand_mass, &l3_l4_Mass, &b_l3_l4_Mass);
+  fChain->SetBranchAddress(l3_l4_Cand_pt, &l3_l4_Pt, &b_l3_l4_Pt);
   fChain->SetBranchAddress("evt", &evt, &b_evt);
   fChain->SetBranchAddress("run", &run, &b_run);
 
@@ -75,7 +75,7 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
     else{ 
       mass_discriminant = fabs(l3_l4_Mass-91.1876);
       Z2ptSum = l1_l2_Pt;}  
-    }
+    
     fEntriesToCompare.push_back(entry);
     fEntryDiscriminants.push_back(mass_discriminant);
     fEntryZ2PtSum.push_back(Z2ptSum);
@@ -111,7 +111,7 @@ void disambiguateFinalStates::findBestEntry()
   {
     if ((fEntryDiscriminants[i] < lowestDiscriminant) || ((fEntryDiscriminants[i] == lowestDiscriminant) && (fEntryZ2PtSum[i] > MaxPtSum)))
     {
-      MaxPtSum = fEntryPtSum[i];
+      MaxPtSum = fEntryZ2PtSum[i];
       lowestDiscriminant = fEntryDiscriminants[i];
       bestEntry = fEntriesToCompare[i];
     }

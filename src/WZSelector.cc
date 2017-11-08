@@ -1,4 +1,4 @@
-#include "Analysis/WZAnalysis/interface/WZSelector.h"
+#include "Analysis/VVAnalysis/interface/WZSelector.h"
 #include <boost/algorithm/string.hpp>
 
 void WZSelector::Init(TTree *tree)

@@ -55,10 +55,7 @@ def getDeduplicatedTree(tree, state, cut_string):
         l3_l4_cand_mass = "m1_m2_Mass"
         l3_l4_cand_pt = "m1_m2_Pt"
     #zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
-    selector.setZCandidateBranchName(l1_l2_cand_mass)
-    selector.setZCandidateBranchName(l1_l2_cand_pt) 
-    selector.setZCandidateBranchName(l3_l4_cand_mass)
-    selector.setZCandidateBranchName(l3_l4_cand_pt)
+    selector.setZCandidateBranchName(l1_l2_cand_mass,l1_l2_cand_pt,l3_l4_cand_mass,l3_l4_cand_pt)
     new_tree = tree.CopyTree(cut_string)
     new_tree.Process(selector)#, cut_string)
     entryList = selector.GetOutputList().FindObject('bestCandidates')

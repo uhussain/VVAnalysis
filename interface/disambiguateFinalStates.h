@@ -60,7 +60,12 @@ public :
   virtual TList  *GetOutputList() const { return fOutput; }
   virtual void    SlaveTerminate();
   virtual void    Terminate();
-  void setZCandidateBranchName(const char* name) { zCand_name = const_cast<char*>(name); }
+  void setZCandidateBranchName(const char* name1,const char* name2,const char* name3,const char* name4) { 
+    l1_l2_Cand_mass = const_cast<char*>(name1);  
+    l1_l2_Cand_pt = const_cast<char*>(name2); 
+    l3_l4_Cand_mass = const_cast<char*>(name3); 
+    l3_l4_Cand_pt = const_cast<char*>(name4); 
+  }
 
   ClassDef(disambiguateFinalStates,0);
 
@@ -71,7 +76,10 @@ private :
   std::vector<Long64_t> fEntriesToCompare;
   std::vector<float> fEntryDiscriminants; 
   std::vector<float> fEntryZ2PtSum;
-  char* zCand_name;
+  char* l1_l2_Cand_mass; 
+  char* l1_l2_Cand_pt; 
+  char* l3_l4_Cand_mass; 
+  char* l3_l4_Cand_pt; 
 };
 
 #endif
