@@ -1,11 +1,14 @@
 /*
+ *
  * TSelector deduplicate events in combinatorical ntuple
  * by choosing event with l1_l2_Mass pairing closest to
- * M_PDG(Z) = 91.1876
+ * M_PDG(Z) = 91.1876 
+ * with the highest scalar Pt sum of the remaining leptons
+ * used as a tiebreaker. 
  *
- * Modified from N. Smith, U. Wisconsin
+ * Modified from K. Long, U. Wisconsin
  *
- * https://github.com/nsmith-/ZHinvAnalysis/blob/master/disambiguateFinalStates.h
+ * https://https://github.com/kdlong/VVAnalysis/blob/master/src/disambiguateFinalStates.cc
  */
 #ifndef disambiguateFinalStates_h
 #define disambiguateFinalStates_h
@@ -21,11 +24,18 @@ class disambiguateFinalStates : public TSelector {
 public :
   TTree          *fChain;
 
-  Float_t         Mass;
+  float           l1_l2_Mass;
+  float           l1_l2_Pt;
+  float           l3_l4_Mass;
+  float           l3_l4_Pt;
   ULong64_t        evt;
   UInt_t           run;
 
-  TBranch        *b_Mass;
+  TBranch        *b_l1_l2_Mass;
+  TBranch        *b_l1_l2_Pt;
+  TBranch        *b_l3_l4_Mass;
+  TBranch        *b_l3_l4_Pt;
+
   TBranch        *b_evt;
   TBranch        *b_run;
 
@@ -59,7 +69,8 @@ private :
   UInt_t fCurrentRun;
   ULong64_t fCurrentEvt;
   std::vector<Long64_t> fEntriesToCompare;
-  std::vector<Float_t> fEntryDiscriminants;
+  std::vector<float> fEntryDiscriminants; 
+  std::vector<float> fEntryZ2PtSum;
   char* zCand_name;
 };
 

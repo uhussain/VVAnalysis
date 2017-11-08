@@ -39,8 +39,26 @@ def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
     return save_tree.GetEntries()
 def getDeduplicatedTree(tree, state, cut_string):
     selector = ROOT.disambiguateFinalStates()
-    zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
-    selector.setZCandidateBranchName(zcand_name)
+    if state.count('e') > 2:
+        l1_l2_cand_mass = "e1_e2_Mass"
+        l1_l2_cand_pt = "e1_e2_Pt"
+        l3_l4_cand_mass = "e3_e4_Mass"
+        l3_l4_cand_pt = "e3_e4_Pt"
+    elif state.count('m') > 2:
+        l1_l2_cand_mass = "m1_m2_Mass"
+        l1_l2_cand_pt = "m1_m2_Pt"
+        l3_l4_cand_mass = "m3_m4_Mass"
+        l3_l4_cand_pt = "m3_m4_Pt"
+    else: 
+        l1_l2_cand_mass = "e1_e2_Mass"
+        l1_l2_cand_pt = "e1_e2_Pt"
+        l3_l4_cand_mass = "m1_m2_Mass"
+        l3_l4_cand_pt = "m1_m2_Pt"
+    #zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
+    selector.setZCandidateBranchName(l1_l2_cand_mass)
+    selector.setZCandidateBranchName(l1_l2_cand_pt) 
+    selector.setZCandidateBranchName(l3_l4_cand_mass)
+    selector.setZCandidateBranchName(l3_l4_cand_pt)
     new_tree = tree.CopyTree(cut_string)
     new_tree.Process(selector)#, cut_string)
     entryList = selector.GetOutputList().FindObject('bestCandidates')
