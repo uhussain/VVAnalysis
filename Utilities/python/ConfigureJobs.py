@@ -91,10 +91,10 @@ def getListOfFiles(filelist, manager_path):
                 "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2017/%s.json" % "ntuples"
             allnames = json.load(open(dataset_file)).keys()
             if "nodata" in name:
-                nodata = [x for x in allnames if "data" not in x]
+                nodata = [x for x in allnames if "Run" not in x]
                 names += nodata
-            elif "data" in name:
-                names += [x for x in allnames if "data" in x]
+            elif "Run" in name:
+                names += [x for x in allnames if "Run" in x]
             else:
                 names += allnames
         elif "*" in name:
@@ -117,7 +117,7 @@ def getListOfFilesWithXSec(filelist, manager_path):
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     info = {}
     for file_name in files:
-        if "data" in file_name:
+        if "Run" in file_name:
             info.update({file_name : 1})
         else:
             file_info = mc_info[file_name.split("__")[0]]
@@ -146,10 +146,10 @@ def getPreviousStep(selection, analysis):
             raise ValueError("Invalid selection '%s'. Valid selections are:"
                 "%s" % (first_selection, selection_map.keys()))
     return selection_map[first_selection]
-def getInputFilesPath(sample_name, manager_path, analysis):
+def getInputFilesPath(sample_name, manager_path,selection, analysis):
     data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
-        "ntuples"])
+        selection])
     input_files = UserInput.readJson(input_file_name)
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
@@ -160,7 +160,7 @@ def getCutsJsonName(selection, analysis):
     return "/".join(["Cuts", analysis, selection + ".json"]) 
 def getTriggerName(sample_name, analysis, selection):
     trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG", "SingleMuon", "SingleElectron"]
-    if "data" in sample_name and getPreviousStep(selection, analysis) == "ntuples":
+    if "Run" in sample_name and getPreviousStep(selection, analysis) == "ntuples":
         for name in trigger_names:
             if name in sample_name:
                 return "-t " + name

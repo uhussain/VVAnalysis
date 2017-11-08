@@ -64,7 +64,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
         sample_name, 
         path,
-        #ConfigureJobs.getPreviousStep(selection, analysis), 
+        ConfigureJobs.getPreviousStep(selection, analysis), 
         analysis
     )
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
@@ -92,7 +92,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
         selection,
         analysis,
         ConfigureJobs.getTriggerName(sample_name, analysis, selection),
-        scaleFacs and ("data" not in sample_name),
+        scaleFacs and ("Run" not in sample_name),
         extraArgs
     )
     status = callFarmout(farmout_dict['job_dir'], script_name, noSubmit)
