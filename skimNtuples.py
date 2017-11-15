@@ -2,6 +2,7 @@
 import ROOT
 import argparse
 import os
+import json
 import sys
 from Utilities.python import ApplySelection
 from Utilities.python.prettytable import PrettyTable
@@ -79,35 +80,83 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     metaTree = ROOT.TChain("metaInfo/metaInfo")
     for file_path in input_files:
         metaTree.Add(file_path)
-    event_counts = {"initial" : {}, "selected" : {}}
+    EventCounts={}
+    #creating different event_counts dictionaries for each selection
+    for selection in selections.split(","):
+        EventCounts[selection] = {"eeee" : {}, "eemm" : {},"mmmm" : {}}
+    print EventCounts
     for state in ["eeee", "eemm", "mmmm"]:
         tree = ROOT.TChain("%s/ntuple" % state)
         for file_path in input_files:
             tree.Add(file_path)
-        event_counts["initial"][state] = tree.GetEntries()
-        cuts = ApplySelection.CutString()
-        cuts.append(ApplySelection.buildCutString(state, 
-            selections.split(","), analysis, trigger).getString())
-        cut_string = cuts.getString()
-        print "Cut string is %s " % cut_string
-        #ApplySelection.setAliases(tree, state, "Cuts/aliases.json")
-        event_counts["selected"][state] = writeNtupleToFile(output_file, tree, state, cut_string,
-            deduplicate)
+        #cuts = ApplySelection.CutString()
+        for selection in selections.split(","):
+            print selection
+            EventCounts[selection][state]["initial"] = tree.GetEntries()
+            cut = ApplySelection.CutString()
+            cut.append(ApplySelection.buildCutString(state, 
+            selection, analysis, trigger).getString())
+            cut_string = cut.getString()
+        #cuts.append(ApplySelection.buildCutString(state, 
+            #selections.split(","), analysis, trigger).getString())
+        #cut_string = cuts.getString()
+            print "Cut string is %s " % cut_string
+        #ApplySelection.setAliases(tree, state, "Cuts/aliases.json") 
+            if(selection == 'empty'):
+                EventCounts[selection][state]["PassTrigger"] = writeNtupleToFile(output_file, tree, state, cut_string,deduplicate)
+
+            else:
+                EventCounts[selection][state]["%s"%selection] = writeNtupleToFile(output_file, tree, state, cut_string,deduplicate)
+            #event_counts[state]["%s"%selection] = writeNtupleToFile(output_file, tree, state, cut_string,deduplicate)
+    #print event_counts
+    #This loop over selections again to produce .json files for each selection containing events selected
+    for selection in selections.split(","):
+        if(selection == 'empty'):
+            with open('PassTrigger.json', 'w') as fp:
+                json.dump(EventCounts[selection],fp)
+
+            event_info = PrettyTable(["Channels", "Initial", "PassTrigger"])
+            print EventCounts[selection]
+            for channel, events in EventCounts[selection].iteritems():
+                event_info.add_row([channel, events["initial"], events["PassTrigger"]])
+    
+            print "\nResults for selection: PassTrigger"
+
+            print event_info.get_string()
+        else:
+            with open('%s.json' %selection, 'w') as fp:
+                json.dump(EventCounts[selection],fp)
+        
+            event_info = PrettyTable(["Channels", "Initial", "%s"%selection])
+
+            for channel, events in EventCounts[selection].iteritems():
+                event_info.add_row([channel, events["initial"], events["%s"%selection]])
+    
+            print "\nResults for selection: %s" % selection
+
+            print event_info.get_string()
+    #for states,status in event_counts.iteritems():
+    #        #print states,status
+    #        print json.dumps({states:{'processed': status['initial'], 'selected': status['selected']},})
     writeMetaTreeToFile(output_file, metaTree)
-    event_info = PrettyTable(["Selection", "eeee", "eemm","mmmm"])
-    for selection, events in event_counts.iteritems():
-        event_info.add_row([selection, events["eeee"], events["eemm"],events["mmmm"]])
-    print "\nResults for selection: %s" % selections
+    #event_info = PrettyTable(["Selection", "eeee", "eemm","mmmm"]) 
+    #event_info = PrettyTable(["Channels", "Initial", "Selected"])
+    #for selection, events in event_counts.iteritems():
+    #    event_info.add_row([selection, events["eeee"], events["eemm"],events["mmmm"]]) 
+    #for channel, events in event_counts.iteritems():
+    #    event_info.add_row([channel, events["initial"], events["selected"]])
+    #print "\nResults for selection: %s" % selections
     if deduplicate:
         print "NOTE: Events deduplicated by choosing the ordering with m_l1_l2 " \
             "closest to m_{Z}^{PDG} AFTER making full selection\n"
     else:
         print "NOTE: Events NOT deduplicated! Event may appear in multiple rows of ntuple!\n"
-    print event_info.get_string()
+    #print event_info.get_string()
     
     os.chdir(current_path)
 def main():
     args = getComLineArgs()
+    print args['filelist']
     skimNtuple(args['selections'], args['analysis'], args['trigger'], args['filelist'], 
         args['output_file_name'], not args['no_deduplicate'])
     exit(0)
