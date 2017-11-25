@@ -1,6 +1,6 @@
 combineCards.py eee=WZ_eee.txt eem=WZ_eem.txt emm=WZ_emm.txt mmm=WZ_mmm.txt > WZ.txt
 text2workspace.py WZ.txt -m 999 -o WZ.root
-combine -M MaximumLikelihoodFit -t -1 -d WZ.root
+combine -M MaxLikelihoodFit -d WZ.root $$1
 
 if [[ $$1 == "impacts" ]]; then
     rm -rf impact

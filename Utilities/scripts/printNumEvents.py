@@ -29,7 +29,7 @@ path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
         "/afs/cern.ch/user/k/kelong/work"
 isfile = any(os.path.isfile(name) or os.path.exists(name.rstrip("/*")) 
                 for name in args.filelist)
-filelist = ConfigureJobs.getListOfFiles(args.filelist, path) if \
+filelist = ConfigureJobs.getListOfFiles(args.filelist, path, args.selection) if \
     not isfile else args.filelist
 states = [x.strip() for x in args.channels.split(",")]
 state_yields = dict((i,0) for i in ["eee", "emm", "eem", "mmm"])
@@ -73,7 +73,7 @@ for name in filelist:
         state = state.strip()
         chain = ROOT.TChain("%s/ntuple" % state)
         chain.Add(file_path)
-        ApplySelection.setAliases(chain, state, "Cuts/aliases.json")
+        ApplySelection.setAliases(chain, state, "Cuts/WZxsec2016/aliases.json")
         cut_tree = chain
         num_events = cut_tree.GetEntries(args.cut_string)
         print "Number of events in state %s is %i" % (state, num_events)

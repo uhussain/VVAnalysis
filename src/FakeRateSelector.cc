@@ -9,7 +9,7 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
         return true;
     if (l1Pt < 25 || l2Pt < 15)
         return true;
-    if (ZMass > 111.1876 || ZMass < 81.1876)
+    if (ZMass > 101.1876 || ZMass < 81.1876)
         return true;
     if (type1_pfMETEt > 25)
         return true;

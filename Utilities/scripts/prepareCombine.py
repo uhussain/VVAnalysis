@@ -254,7 +254,7 @@ for plot_group in plot_groups:
         card_info[chan]["output_file"] = args['output_file']
         stat_hists = getStatHists(hist, plot_group, chan)
         group.extend(stat_hists)
-        if plot_group not in ["zg"]:
+        if "data" not in plot_group:
             scale_hists = getScaleHists(group.FindObject(variable+"_lheWeights_"+chan), plot_group, chan)
             group.extend(scale_hists)
     for hist in group:
@@ -301,7 +301,6 @@ combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_7_4_7/src/Higg
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
                 datetime.date.today().strftime("%d%b%Y")
 output_dir = '/'.join([combine_dir,args['selection'], folder_name])
-print output_dir
 try:
     os.makedirs(output_dir)
 except OSError as e:

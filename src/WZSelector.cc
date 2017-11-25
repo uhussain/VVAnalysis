@@ -280,14 +280,12 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
         return dijetMass > 600 && deltaEtajj > 4.;
     }
     else if (selection_ == VBSselection_Tight) { 
-        if (jPt->at(0) < 50 || jPt->at(1) < 50)
-            return false;
-        if (type1_pfMETEt < 50)
-            return false;
+        //if (type1_pfMETEt < 50)
+        //    return false;
 
-        float zep3l = Eta - 0.5*(jEta->at(1) + jEta->at(0));
-        if (std::abs(zep3l) > 2.5)
-            return false;
+        //float zep3l = Eta - 0.5*(jEta->at(1) + jEta->at(0));
+        //if (std::abs(zep3l) > 2.5)
+        //    return false;
         return dijetMass > 500 && deltaEtajj > 2.5;
     }
     return dijetMass > 500 && deltaEtajj > 2.5;

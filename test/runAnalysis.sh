@@ -51,9 +51,21 @@ else
     ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
     python ScaleFactors/setupScaleFactors.py -t $frfile 
 fi
-./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output
-if [ -f $histfile ]; then
-    echo "Histogram file $histfile produced"
-else
-    echo "ERROR: $histfile was not produced!"
+
+if [ "$2" != "combineOnly" ]; then
+    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output
+    if [ -f $histfile ]; then
+        echo "Histogram file $histfile produced"
+    else
+        echo "ERROR: $histfile was not produced!"
+    fi
+fi
+
+if [ "$2" != "noCombine" ]; then
+    ./Utilities/scripts/prepareCombine.py \
+        --input_file $histfile \
+        -s WZxsec2016/${1/_*/} \
+        --folder_name ${1/*_/}/${DATE} \
+        -l 35.9 \
+        --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) $3
 fi
