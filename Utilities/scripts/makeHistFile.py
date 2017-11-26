@@ -112,9 +112,8 @@ tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
 fScales = ROOT.TFile('data/scaleFactors.root')
-#mCBMedFakeRate = fScales.Get("mCBMedFakeRate_Svenja")
+#mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
 #eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
-mCBMedFakeRate = fScales.Get("mCBMedFakeRate")
 mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
 # For medium muons

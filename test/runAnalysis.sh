@@ -41,10 +41,11 @@ else
 fi
 
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_SvenjasFakeRates.root
+#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
-if [ -f $frfile ]; then
+if [ -f $frfile ] && [ "$2" != "RedoFakeRate" ]; then
     echo "INFO: Fake rate file $frfile exists! Using exisiting file."
 else
     echo "INFO: Fake rate file $frfile not found. It will be created."
@@ -62,10 +63,17 @@ if [ "$2" != "combineOnly" ]; then
 fi
 
 if [ "$2" != "noCombine" ]; then
+    combine_selection=WZxsec2016/${output}
+    combine_folder=${DATE}
+    if [[ $output == *_* ]]; then
+        combine_selection=WZxsec2016/${output/_*/}
+        combine_folder=${output/*_/}/${DATE}
+    fi
+
     ./Utilities/scripts/prepareCombine.py \
         --input_file $histfile \
-        -s WZxsec2016/${1/_*/} \
-        --folder_name ${1/*_/}/${DATE} \
+        -s $combine_selection \
+        --folder_name $combine_folder \
         -l 35.9 \
         --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) $3
 fi

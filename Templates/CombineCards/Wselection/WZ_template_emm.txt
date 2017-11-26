@@ -41,3 +41,5 @@ vv-powheg_statBin1      shape     -               1           -               - 
 top-ewk_statBin1        shape     -               -           1               -           -
 zg_statBin1             shape     -               -           -               1           -
 nonprompt_statBin1      shape     -               -           -               -           1
+
+nonprompt_all group = norm_nonprompt nonprompt_statBin1 

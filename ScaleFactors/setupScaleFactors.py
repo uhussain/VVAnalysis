@@ -90,7 +90,7 @@ muonIsoSF.Set2DHist(muIso_allratio)
 fScales.cd()
 muonIsoSF.Write()
 
-fakeRateFile = ROOT.TFile.Open('data/CutBasedFakeRate_fromSvenja.root')
+fakeRateFile = ROOT.TFile.Open('/eos/user/k/kelong/WZAnalysisData/FakeRates/CutBasedFakeRate_fromSvenja_final.root')
 eCBMedFakeRate = ROOT.ScaleFactor("eCBMedFakeRate_Svenja", "Fake rate from dijet control, by Svenja")
 eCBMedFakeRate.Set2DHist(float2double(fakeRateFile.Get('e/medium/fakeratePtEta')), 0, 0, ROOT.ScaleFactor.AsInHist)
 eCBTightFakeRate = ROOT.ScaleFactor("eCBTightFakeRate_Svenja", "Fake rate from dijet control, by Svenja")

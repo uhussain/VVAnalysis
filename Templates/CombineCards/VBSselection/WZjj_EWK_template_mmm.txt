@@ -73,3 +73,7 @@ nonprompt_statBin2      shape   -               -               -           -   
 nonprompt_statBin3      shape   -               -               -           -               -           1
 nonprompt_statBin4      shape   -               -               -           -               -           1
 nonprompt_statBin5      shape   -               -               -           -               -           1
+
+nonprompt_stat group = nonprompt_statBin1 nonprompt_statBin2 nonprompt_statBin3 nonprompt_statBin4 nonprompt_statBin5 
+nonprompt_all group = norm_nonprompt nonprompt_statBin1 nonprompt_statBin2 nonprompt_statBin3 nonprompt_statBin4 nonprompt_statBin5 
+wz_qcd_all group = wz-mgmlm_scale WZjj_qcd_modeling wz-mgmlm_statBin1 wz-mgmlm_statBin2 wz-mgmlm_statBin3 wz-mgmlm_statBin4 wz-mgmlm_statBin5

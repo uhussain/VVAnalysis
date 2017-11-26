@@ -17,8 +17,8 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
         return false;
     if (!tightZLeptons())
         return true;
-    float pt_fillval = l3Pt < FR_MAX_PT_ ? l3Pt : FR_MAX_PT_ - 0.01;
-    float eta_fillval = std::abs(l3Eta) < FR_MAX_ETA_ ? std::abs(l3Eta) : FR_MAX_ETA_ - 0.01;
+    float pt_fillval = l3Pt;
+    float eta_fillval = std::abs(l3Eta);
     passingLoose2D_->Fill(pt_fillval, eta_fillval, genWeight);
     passingLoose1DPt_->Fill(pt_fillval, genWeight);
     passingLoose1DEta_->Fill(eta_fillval, genWeight);
@@ -39,11 +39,13 @@ void FakeRateSelector::SetupNewDirectory()
 {
     WZSelectorBase::SetupNewDirectory();
 
-    AddObject<TH2D>(passingTight2D_, ("passingTight2D_"+channelName_).c_str(), "#eta; p_{T} [GeV]", 4, 10, 50, 3, 0, 2.5);
-    AddObject<TH1D>(passingTight1DPt_, ("passingTight1DPt_"+channelName_).c_str(), "Tight leptons; p_{T} [GeV]", 4, 10, 50);
+    const int nvarbins = 3;
+    double variable_pt_bins[nvarbins+1] = {10, 20, 30, FR_MAX_PT_};
+    AddObject<TH2D>(passingTight2D_, ("passingTight2D_"+channelName_).c_str(), "#eta; p_{T} [GeV]", nvarbins, variable_pt_bins, 3, 0, 2.5);
+    AddObject<TH1D>(passingTight1DPt_, ("passingTight1DPt_"+channelName_).c_str(), "Tight leptons; p_{T} [GeV]", nvarbins, variable_pt_bins);
     AddObject<TH1D>(passingTight1DEta_, ("passingTight1DEta_"+channelName_).c_str(), "Tight leptons; #eta", 3, 0, 2.5);
     
-    AddObject<TH2D>(passingLoose2D_, ("passingLoose2D_"+channelName_).c_str(), "#eta; p_{T} [GeV]", 4, 10, 50, 3, 0, 2.5);
-    AddObject<TH1D>(passingLoose1DPt_, ("passingLoose1DPt_"+channelName_).c_str(), "Loose leptons; p_{T} [GeV]", 4, 10, 50);
+    AddObject<TH2D>(passingLoose2D_, ("passingLoose2D_"+channelName_).c_str(), "#eta; p_{T} [GeV]", nvarbins, variable_pt_bins, 3, 0, 2.5);
+    AddObject<TH1D>(passingLoose1DPt_, ("passingLoose1DPt_"+channelName_).c_str(), "Loose leptons; p_{T} [GeV]", nvarbins, variable_pt_bins);
     AddObject<TH1D>(passingLoose1DEta_, ("passingLoose1DEta_"+channelName_).c_str(), "Loose leptons; #eta", 3, 0, 2.5);
 }

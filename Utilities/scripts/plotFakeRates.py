@@ -1,7 +1,9 @@
-# coding: utf-8
+#!/usr/bin/env python
 import ROOT
 import datetime
 import os
+import makeSimpleHtml
+
 ROOT.gROOT.SetBatch(True)
 canvas = ROOT.TCanvas("canvas", "canvas")
 
@@ -77,11 +79,11 @@ def makeMCPlots(param, obj, outdir):
     canvas.Print("%s/ratio%s_all%s.png" % (outdir, param, obj))
     canvas.Print("%s/ratio%s_all%s.pdf" % (outdir, param, obj))
 
-frfile = ROOT.TFile("/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate02Oct2017-TightLepsFrom3LooseLeptons.root")
+frfile = ROOT.TFile("/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRateNov2017-TightLepsFrom3LooseLeptons_NoOverflow.root")
 
 
 data_folder_name = datetime.date.today().strftime("%Y%b") 
-data_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name
+data_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name 
 mc_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name + "-MC"
 
 for outdir in [data_outdir, mc_outdir]:
@@ -95,3 +97,5 @@ for param in ["1DPt", "1DEta", "2D"]:
     for obj in ["Mu", "E"]:
         makeDataPlots(param, obj, data_outdir)
         makeMCPlots(param, obj, mc_outdir)
+makeSimpleHtml.writeHTML(os.path.expanduser(data_outdir), "Fake Rates (from data)")
+makeSimpleHtml.writeHTML(os.path.expanduser(mc_outdir), "Fake Rates (from MC)")

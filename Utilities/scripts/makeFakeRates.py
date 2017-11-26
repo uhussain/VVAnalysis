@@ -41,7 +41,8 @@ def getHistNames(channels):
         return base_hists
     return [x+"_"+y for x in base_hists for y in channels]
 
-def makeCompositeHists(name, members, addRatios=True, overflow=True):
+# Turn off overflow for FR hists (> 50 is pretty much all EWK anyway)
+def makeCompositeHists(name, members, addRatios=True, overflow=False):
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:
