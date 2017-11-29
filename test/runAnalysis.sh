@@ -9,10 +9,8 @@ looselepsfile=3LooseLeptons
 
 input=Wselection${looselepsfile/3/}
 output=Wselection
-if [[ $1 == "VBSselection_Loose" ]]; then
-    output=VBSselection_Loose
-elif [[ $1 == "VBSselection_Tight" ]]; then
-    output=VBSselection_Tight
+if [[ $1 == VBS* ]]; then
+    output=$1
 elif [[ $1 == "3lDYControl" ]]; then
     if [[ $looselepsfile == "3MediumLeptons" ]]; then
         input=3lDYControl${looselepsfile/3/}
@@ -41,8 +39,8 @@ else
 fi
 
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_SvenjasFakeRates.root
-#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_SvenjasFakeRates.root
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
 if [ -f $frfile ] && [ "$2" != "RedoFakeRate" ]; then

@@ -119,6 +119,8 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = VBSselection_Loose;
     else if (selectionName_ == "VBSselection_Tight")
         selection_ = VBSselection_Tight;
+    else if (selectionName_ == "VBSBackgroundControl")
+        selection_ = VBSBackgroundControl;
     else if (selectionName_ == "VBSselection_mjj_400_detajj_2")
         selection_ = VBSselection_mjj_400_detajj_2;
     else if (selectionName_ == "VBSselection_mjj_400_detajj_2p5")
@@ -175,6 +177,7 @@ void WZSelectorBase::Init(TTree *tree)
     }
     isVBS_ = (selection_ == VBSselection_Loose || 
         selection_ == VBSselection_Tight || 
+        selection_ == VBSBackgroundControl || 
         selection_ == VBSselection_mjj_400_detajj_2 || 
         selection_ == VBSselection_mjj_400_detajj_2p5 || 
         selection_ == VBSselection_mjj_400_detajj_3 || 

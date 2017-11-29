@@ -30,6 +30,7 @@ public :
         FakeRateSelectionTight,
         VBSselection_Loose,
         VBSselection_Tight,
+        VBSBackgroundControl,
         VBSselection_mjj_400_detajj_2, 
         VBSselection_mjj_400_detajj_2p5, 
         VBSselection_mjj_400_detajj_3, 

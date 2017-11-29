@@ -9,6 +9,11 @@ import os
 import sys
 import math
 
+stat_variations = { "eee" : [],
+    "eem" : [],
+    "emm" : [],
+    "mmm" : [],
+}
 def writeOutputListItem(item, directory):
     if item.ClassName() == "TList":
         d = directory.Get(item.GetName())
@@ -144,17 +149,6 @@ card_info = {
         "AllData" : 0,
     },
 }
-def getStatHists(hist, name, chan):
-    statUp_hist = hist.Clone(hist.GetName().replace(
-        chan, "%s_statUp_%s" % (name, chan)))
-    statDown_hist = hist.Clone(hist.GetName().replace(
-        chan, "%s_statDown_%s" % (name, chan)))
-    for i in range(hist.GetNbinsX()):
-        up = hist.GetBinContent(i)+hist.GetBinErrorUp(i)
-        down = hist.GetBinContent(i)-hist.GetBinErrorLow(i)
-        statUp_hist.SetBinContent(i, up if up > 0 else 0) 
-        statDown_hist.SetBinContent(i, down if down > 0 else 0) 
-    return [statUp_hist, statDown_hist]
 
 def removeZeros(hist):
     for i in range(hist.GetNbinsX()+2):
@@ -166,9 +160,14 @@ def removeZeros(hist):
             else: 
                 hist.SetBinContent(i, 0.00005)
 
-def getStatHists(hist, name, chan):
+def getStatHists(hist, name, chan, signal):
     stat_hists = []
     for i in range(1, hist.GetNbinsX()+1):
+        if "data" in name:
+            continue
+        if not (signal  == "wzjj_ewk" and "wzjj-vbfnlo" in name) \
+                and not (signal  == "wzjj_vbfnlo" and "wzjj-ewk" in name):
+            stat_variations[chan].append("%s_statBin%i" % (name, i))
         statUp_hist = hist.Clone(hist.GetName().replace(
             chan, "%s_statBin%sUp_%s" % (name, i, chan)))
         statDown_hist = hist.Clone(hist.GetName().replace(
@@ -217,6 +216,8 @@ def getScaleHists(scale_hist2D, name, chan, underflow=True, overflow=True):
             )
     return [scale_histUp, scale_histDown]
 
+signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
+numvars = 18 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 variable = "mjj" if isVBS else "yield"
 alldata = makeCompositeHists(fIn, "AllData", 
@@ -229,7 +230,7 @@ for chan in chans:
     hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
     removeZeros(hist)
     card_info[chan]["nonprompt"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
-    stat_hists = getStatHists(hist, "nonprompt", chan)
+    stat_hists = getStatHists(hist, "nonprompt", chan, signal)
     nonprompt.extend(stat_hists[:])
 writeOutputListItem(nonprompt, fOut)
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
@@ -252,7 +253,7 @@ for plot_group in plot_groups:
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
         card_info[chan]["output_file"] = args['output_file']
-        stat_hists = getStatHists(hist, plot_group, chan)
+        stat_hists = getStatHists(hist, plot_group, chan, signal)
         group.extend(stat_hists)
         if "data" not in plot_group:
             scale_hists = getScaleHists(group.FindObject(variable+"_lheWeights_"+chan), plot_group, chan)
@@ -306,18 +307,19 @@ try:
 except OSError as e:
     print e
     pass
-with open("/".join([output_dir, "Yields.out"]), "w") as yields:
+
+signal_abv = "_vbfnlo" if args['vbfnlo'] else ""
+with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
     yields.write("\n" + " "*30 + "Event Yields")
     yields.write("\n" + str(output_info))
     yields.write("\n" + " "*30 + "S/sqrt(B)")
     yields.write("\n" + str(significance_info))
 
-signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
-signal_abv = "vbfnlo" if args['vbfnlo'] else "MG"
 for chan, chan_dict in card_info.iteritems():
     chan_dict["signal_name"] = signal.replace("_", "-")
     chan_dict["signal_yield"] = chan_dict[signal]
-    file_name = '%s/WZjj_%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
+    chan_dict["nuisances"] = numvars+len(stat_variations[chan]) -1*("Wselection" in args['selection'])
+    file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
             else '%s/WZ_%s.txt' % (output_dir, chan)
     template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
         (args['selection'].split("/")[-1], ("WZjj_EWK" if isVBS else "WZ"), chan)
@@ -325,8 +327,39 @@ for chan, chan_dict in card_info.iteritems():
         file_name,
         chan_dict
     )
+    with open(file_name, "a") as chan_file:
+        for hist_name in stat_variations[chan]:
+            if 'Wselection' in args['selection'] and "wzjj-ewk" in hist_name:
+                continue
+            if "VBS" in args['selection']:
+                chan_file.write(
+                    "%s     shape   %i               %i               %i           %i               %i           %i\n" \
+                        % (hist_name, 
+                            chan_dict["signal_name"] in hist_name,
+                            "wz-mgmlm" in hist_name,
+                            "vv" in hist_name,
+                            "top-ewk" in hist_name,
+                            "zg" in hist_name,
+                            "nonprompt" in hist_name,
+                        )
+            )
+            else:
+                chan_file.write(
+                    "%s     shape   %i               %i               %i           %i               %i\n" \
+                        % (hist_name, 
+                            "wz-powheg" in hist_name,
+                            "vv" in hist_name,
+                            "top-ewk" in hist_name,
+                            "zg" in hist_name,
+                            "nonprompt" in hist_name,
+                        )
+            )
+        chan_file.write("nonprompt_all group = nonprompt_norm %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
+        if "VBS" in args['selection']:
+            chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
+            chan_file.write("wz_qcd_all group = wz-mgmlm_scale WZjj_qcd_modeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
 ConfigureJobs.fillTemplatedFile(
     'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
-    '%s/runCombine_%s.sh' % (output_dir, signal_abv), 
+    '%s/runCombine%s.sh' % (output_dir, signal_abv), 
     {"sample" : signal_abv}
 )

@@ -1,6 +1,6 @@
 imax 1  number of channels
 jmax 4  number of backgrounds
-kmax 17 number of nuisance parameters (sources of systematical uncertainties)
+kmax ${nuisances} number of nuisance parameters (sources of systematical uncertainties)
 ------------
 
 shapes wz-powheg * ${output_file} wz-powheg/yield_$$CHANNEL       wz-powheg/yield_$$SYSTEMATIC_$$CHANNEL 
@@ -26,7 +26,7 @@ rate                              ${wz_powheg}    ${vv_powheg} ${top_ewk}     ${
 ------------                                                                                                                                                                                                   
 lumi                    lnN       1.025           1.025       1.025           1.025       -          
 PDF                     lnN       -               1.05        1.05            1.05        -          
-norm_nonprompt          lnN       -               -           -               -           1.3
+nonprompt_norm          lnN       -               -           -               -           1.3
 MET                     lnN       1.02            1.04        1.06            1.05        1.02     
 btag                    lnN       1.02            -           1.07            -           -
 eRes                    lnN       -               -           -               -           - 
@@ -37,9 +37,3 @@ mScale                  lnN       1.06            1.06        1.06            1.
 mEff                    lnN       1.06            1.06        1.06            1.06        -
 vv-powheg_scale         shape     -               1           -               -           -
 top-ewk_scale           shape     -               -           1               -           -
-vv-powheg_statBin1      shape     -               1           -               -           -
-top-ewk_statBin1        shape     -               -           1               -           -
-zg_statBin1             shape     -               -           -               1           -
-nonprompt_statBin1      shape     -               -           -               -           1
-
-nonprompt_all group = norm_nonprompt nonprompt_statBin1 

@@ -191,7 +191,7 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
             return false;
 
     // Use optimized point of pT(j1,j2) > 50 GeV
-    if (selection_ != VBSselection_Loose) { 
+    if (selection_ != VBSselection_Loose && selection_ != VBSBackgroundControl) { 
         if (jPt->at(0) < 50 || jPt->at(1) < 50)
             return false;
     }
@@ -283,10 +283,15 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
         //if (type1_pfMETEt < 50)
         //    return false;
 
-        //float zep3l = Eta - 0.5*(jEta->at(1) + jEta->at(0));
-        //if (std::abs(zep3l) > 2.5)
-        //    return false;
+        float zep3l = Eta - 0.5*(jEta->at(1) + jEta->at(0));
+        if (std::abs(zep3l) > 2.5)
+            return false;
         return dijetMass > 500 && deltaEtajj > 2.5;
+    }
+    // Backgournd control
+    else if (selection_ == VBSBackgroundControl) { 
+        return ((dijetMass > 500 && deltaEtajj < 2.5) ||
+                (dijetMass < 500 && deltaEtajj > 2.5));
     }
     return dijetMass > 500 && deltaEtajj > 2.5;
 }
@@ -574,8 +579,9 @@ Bool_t WZSelector::Process(Long64_t entry)
         genWeight *= pileupSF_->Evaluate1D(nTruePU);
     }
     
-    bool blindVBS = (selection_ != Wselection && !isVBS_);
-    FillHistograms(entry, genWeight, blindVBS);
+    bool blindVBS = (selection_ == Wselection || 
+            (isVBS_ && selection_ != VBSBackgroundControl));
+    FillHistograms(entry, genWeight, !blindVBS);
     
     return true;
 }
