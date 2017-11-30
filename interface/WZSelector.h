@@ -71,23 +71,10 @@ public :
     };
 
     std::map<std::string, TH2D*> weighthists_ = {
-        //{ "nTruePU",  {} },
-        //{ "nvtx",  {} },
-        //{ "ZMass",  {} },
-        //{ "ZPt",  {} },
-        //{ "Zlep1_Eta",  {} },
-        //{ "Zlep1_Pt",  {} },
-        //{ "Zlep2_Eta",  {} },
-        //{ "Zlep2_Pt",  {} },
-        //{ "Wlep_Eta",  {} },
-        //{ "Wlep_Pt",  {} },
-        //{ "Mass", {} },
-        //{ "Pt", {} },
-        //{ "MtW",  {} },
-        //{ "dEtajj",  {} },
         { "mjj",  {} },
         { "yield",  {} }
     };
+    TH2D* mjj_etajj_2Dhist_;
 
     std::vector<float>* scaleWeights = NULL;
     std::vector<float>* pdfWeights = NULL;

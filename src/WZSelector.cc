@@ -354,7 +354,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
             hists1D_["jetEta_jesUp[1]"]->Fill(jetEta_jesUp->at(1), weight);
         if (hists1D_["jetEta_jesUp[2]"] != nullptr && jetEta_jesUp->size() > 2)
             hists1D_["jetEta_jesUp[2]"]->Fill(jetEta_jesUp->at(2), weight);
-        
     }
     if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, mjj_jesDown, jetPt_jesDown, jetEta_jesDown))) {
         if (hists1D_["mjj_jesDown"] != nullptr) {
@@ -453,6 +452,8 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
         hists1D_["jetEta12"]->Fill(jetEta->at(0), weight);
         hists1D_["jetEta12"]->Fill(jetEta->at(1), weight);
     }
+
+    mjj_etajj_2Dhist_->Fill(mjj, dEtajj, weight*(isMC_ || noBlind));
 }
 
 void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) { 
@@ -639,4 +640,6 @@ void WZSelector::SetupNewDirectory()
     AddObject<TH1D>(hists1D_["yield"], ("yield_"+channelName_).c_str(), "yield", 1, 0, 10);
     AddObject<TH2D>(weighthists_["yield"], ("yield_lheWeights_"+channelName_).c_str(), "yield", 
         1, 0, 10, 1000, 0, 1000);
+    AddObject<TH2D>(mjj_etajj_2Dhist_, ("mjj_etajj_2D_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
+        50, 0, 2500, 28, 0, 7);
 }
