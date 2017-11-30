@@ -2,31 +2,14 @@
 import ROOT
 import glob
 import datetime
-import ConfigureJobs
-
-def writeOutputListItem(item, directory):
-    if item.ClassName() == "TList":
-        d = directory.Get(item.GetName())
-        if not d:
-            d = directory.mkdir(item.GetName())
-            ROOT.SetOwnership(d, False)
-        for subItem in item:
-            writeOutputListItem(subItem, d)
-    elif hasattr(item, 'Write'):
-        directory.cd()
-        item.Write()
-    else:
-        print "Couldn't write output item:"
-        print repr(item)
-    directory.cd()
+import ConfigureJobs, OutputTools
 
 def applySelector(filelist, selector_name, selection, 
         rootfile,
         analysis="WZxsec2016", channels=["eee", "eem", "emm", "mmm"], 
         extra_inputs = [],
         addsumweights=False, proof=False):
-    path = ConfigureJobs.getManagerPath()
-    for dataset in ConfigureJobs.getListOfFiles(filelist, path, selection):
+    for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
         for chan in channels:
             select = getattr(ROOT, selector_name)()
             inputs = ROOT.TList()
@@ -52,7 +35,7 @@ def applySelector(filelist, selector_name, selection,
                 meta_chain = ROOT.TChain("metaInfo/metaInfo")
                 try:
                     file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                        path, selection, analysis)
+                        selection, analysis)
                     print "File path is", file_path
                     chain.Add(file_path)
                     chain.Process(select, "")
@@ -75,7 +58,7 @@ def applySelector(filelist, selector_name, selection,
                 dataset_list = output_list.FindObject(dataset)
                 dataset_list.Add(sumweights_hist)
             for out in output_list:
-                writeOutputListItem(out, rootfile)
+                OutputTools.writeOutputListItem(out, rootfile)
                 if out.ClassName() == "TList":
                     out.SetOwner()
                     ROOT.SetOwnership(out, False)

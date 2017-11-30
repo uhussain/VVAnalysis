@@ -3,6 +3,7 @@ import ROOT
 import glob
 import datetime
 from python import UserInput
+from python import OutputTools
 from python import ConfigureJobs
 
 ROOT.gROOT.SetBatch(True)
@@ -17,22 +18,6 @@ def getComLineArgs():
     parser.add_argument("--output_file", "-o", type=str,
         default="", help="Output file name")
     return vars(parser.parse_args())
-
-def writeOutputListItem(item, directory):
-    if item.ClassName() == "TList":
-        d = directory.Get(item.GetName())
-        if not d:
-            d = directory.mkdir(item.GetName())
-            ROOT.SetOwnership(d, False)
-        for subItem in item:
-            writeOutputListItem(subItem, d)
-    elif hasattr(item, 'Write'):
-        directory.cd()
-        item.Write()
-    else:
-        print "Couldn't write output item:"
-        print repr(item)
-    directory.cd()
 
 def getHistNames(channels):
     base_hists = [x+y for x in ["passingLoose", "passingTight"] \
@@ -138,8 +123,7 @@ fileName = "data/fakeRate%s-%s.root" % (today, args['selection']) if args['outpu
         else args['output_file']
 fOut = ROOT.TFile(fileName, "recreate")
 selector_name = "FakeRateSelector"
-path = ConfigureJobs.getManagerPath()
-for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selection']):
+for dataset in ConfigureJobs.getListOfFiles(args['filenames'], args['selection']):
     for chan in channels: 
         select = getattr(ROOT, selector_name)()
         inputs = ROOT.TList()
@@ -163,7 +147,7 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selec
             meta_chain = ROOT.TChain("metaInfo/metaInfo")
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                    path, args['selection'], args['analysis'])
+                    args['selection'], args['analysis'])
                 print file_path
                 chain.Add(file_path)
                 chain.Process(select, "")
@@ -184,18 +168,18 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selec
         for item in output:
             if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
                 continue
-            writeOutputListItem(item, fOut)
+            OutputTools.writeOutputListItem(item, fOut)
             ROOT.SetOwnership(item, False)
             item.Delete()
         if hasattr(sumweights_hist, "Delete"):
             sumweights_hist.Delete()
-alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path))
-writeOutputListItem(alldata, fOut)
+alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"]))
+OutputTools.writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
-    ConfigureJobs.getListOfEWKFilenames(), path), False)
-writeOutputListItem(allewk, fOut)
+    ConfigureJobs.getListOfEWKFilenames()), False)
+OutputTools.writeOutputListItem(allewk, fOut)
 allnonprompt = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(
-    ConfigureJobs.getListOfNonpromptFilenames(), path))
-writeOutputListItem(allnonprompt, fOut)
+    ConfigureJobs.getListOfNonpromptFilenames()))
+OutputTools.writeOutputListItem(allnonprompt, fOut)
 final = getDifference("DataEWKCorrected", "AllData", "AllEWK")
-writeOutputListItem(final, fOut)
+OutputTools.writeOutputListItem(final, fOut)

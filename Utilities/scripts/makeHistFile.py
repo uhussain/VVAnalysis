@@ -2,25 +2,10 @@
 import ROOT
 from python import SelectorTools
 from python import UserInput
+from python import OutputTools
 from python import ConfigureJobs
 import os
 import sys
-
-def writeOutputListItem(item, directory):
-    if item.ClassName() == "TList":
-        d = directory.Get(item.GetName())
-        if not d:
-            d = directory.mkdir(item.GetName())
-            ROOT.SetOwnership(d, False)
-        for subItem in item:
-            writeOutputListItem(subItem, d)
-    elif hasattr(item, 'Write'):
-        directory.cd()
-        item.Write()
-    else:
-        print "Couldn't write output item:"
-        print repr(item)
-    directory.cd()
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
@@ -43,7 +28,6 @@ def getComLineArgs():
 def getDifference(name, dir1, dir2, addRatios=True):
     differences = ROOT.TList()
     differences.SetName(name)
-    channels = ["eee", "eem", "emm", "mmm"]
     for histname in [i.GetName() for i in fOut.Get(dir1).GetListOfKeys()]:
         if histname == "sumweights": continue
         hist1 = fOut.Get("/".join([dir1, histname]))
@@ -94,7 +78,7 @@ def getHistExpr(hist_names, selection):
     info = ROOT.TList()
     info.SetName("histinfo")
     for hist_name in hist_names:
-        bin_info = HistTools.getHistBinInfo(manager_path, selection, hist_name)
+        bin_info = ConfigHistTools.getHistBinInfo(manager_path, selection, hist_name)
         bin_expr = "{nbins}, {xmin}, {xmax}".format(**bin_info)
         info.Add(ROOT.TNamed(hist_name, "%s $ %s" % (hist_name, bin_expr))
         )
@@ -106,16 +90,18 @@ args = getComLineArgs()
 manager_path = ConfigureJobs.getManagerPath()
 sys.path.append("/".join([manager_path, 
     "AnalysisDatasetManager", "Utilities/python"]))
-import HistTools 
+import ConfigHistTools 
 
 tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
 fScales = ROOT.TFile('data/scaleFactors.root')
-#mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
-#eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
 mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
+useSvenjasFRs = False
+if useSvenjasFRs:
+    mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
+    eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
 # For medium muons
 #mCBMedFakeRate.SetName("fakeRate_allMu")
 mCBTightFakeRate.SetName("fakeRate_allMu")
@@ -131,7 +117,7 @@ sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
 selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
 analysis = "/".join([args['analysis'], selection])
-hists = HistTools.getAllHistNames(manager_path, analysis) \
+hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
     
 hist_inputs = [getHistExpr(hists, analysis)]
@@ -151,13 +137,13 @@ mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection']
 
 alldata = makeCompositeHists("AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
-writeOutputListItem(alldata, fOut)
+OutputTools.writeOutputListItem(alldata, fOut)
 nonpromptmc = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
     ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'])
-writeOutputListItem(nonpromptmc, fOut)
+OutputTools.writeOutputListItem(nonpromptmc, fOut)
 ewkmc = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'])
-writeOutputListItem(ewkmc, fOut)
+OutputTools.writeOutputListItem(ewkmc, fOut)
 ewkcorr = getDifference("DataEWKCorrected", "AllData", "AllEWK", False)
 
-writeOutputListItem(ewkcorr, fOut)
+OutputTools.writeOutputListItem(ewkcorr, fOut)

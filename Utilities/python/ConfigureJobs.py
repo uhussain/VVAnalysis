@@ -7,6 +7,9 @@ import os
 import json
 import string
 
+def getChannels(analysis='WZ'):
+    if analysis == 'WZ':
+        return ["eee", "eem", "emm", "mmm"]
 def getManagerPath():
     path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
             "/afs/cern.ch/user/k/kelong/work"
@@ -82,7 +85,9 @@ def getListOfHDFSFiles(file_path):
         elif "root" in split[1]:
             files.append("/"+split[1])
     return files
-def getListOfFiles(filelist, manager_path, selection):
+def getListOfFiles(filelist, selection, manager_path=""):
+    if manager_path is "":
+        manager_path = getManagerPath()
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
@@ -114,9 +119,11 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
         result = source.substitute(template_dict)
     with open(out_file_name, "w") as outFile:
         outFile.write(result)
-def getListOfFilesWithXSec(filelist, manager_path):
+def getListOfFilesWithXSec(filelist, manager_path=""):
+    if manager_path is "":
+        manager_path = getManagerPath()
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
-    files = getListOfFiles(filelist, manager_path, "ntuples")
+    files = getListOfFiles(filelist, "ntuples", manager_path)
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     info = {}
     for file_name in files:
@@ -161,7 +168,9 @@ def getPreviousStep(selection, analysis):
             raise ValueError("Invalid selection '%s'. Valid selections are:"
                 "%s" % (first_selection, selection_map.keys()))
     return selection_map[first_selection]
-def getInputFilesPath(sample_name, manager_path, selection, analysis):
+def getInputFilesPath(sample_name, selection, analysis, manager_path=""):
+    if manager_path is "":
+        manager_path = getManagerPath()
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
         selection])
