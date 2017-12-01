@@ -40,7 +40,7 @@ def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
 
     if name is "":
         name = init_2D_hist.GetName().replace("2D", "unrolled")
-    unrolled_hist = ROOT.TH1F(name, "Unrolled", nbins, 0, nbins)
+    unrolled_hist = ROOT.TH1D(name, "Unrolled", nbins, 0, nbins)
     unrolled_hist.SetDirectory(init_2D_hist.GetDirectory())
     for i, hist in enumerate(hists_half_rolled):
         for j in range(1, hist.GetNbinsX()+1):
@@ -55,13 +55,14 @@ def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
 def getTransformedHists(orig_file, folders, input_hists, transformation, transform_inputs):
     output_folders = []
     for folder in folders:
-        output_list = ROOT.gROOT.FindObject(folder)
-        if not output_list:
-            output_list = ROOT.TList()
-            output_list.SetName(folder)
+        output_list = ROOT.TList()
+        output_list.SetName(folder)
         ROOT.SetOwnership(output_list, False)
         for input_hist_name in input_hists:
             orig_hist = orig_file.Get("/".join([folder, input_hist_name]))
+            if not orig_hist:
+                print "WARNING: Histogram %s not found for dataset %s. Skipping." % (input_hist_name, folder)
+                continue
             new_hist = transformation(orig_hist, *transform_inputs)
             ROOT.SetOwnership(new_hist, False)
             output_list.Add(new_hist)
