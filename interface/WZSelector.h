@@ -4,6 +4,7 @@
 #include <vector>
 #include "Analysis/WZAnalysis/interface/ScaleFactor.h"
 #include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
+#include <TH3.h>
 
 class WZSelector : public WZSelectorBase {
 public :
@@ -75,6 +76,7 @@ public :
         { "yield",  {} }
     };
     TH2D* mjj_etajj_2Dhist_;
+    TH3D* mjj_etajj_lheWeights_3Dhist_;
 
     std::vector<float>* scaleWeights = NULL;
     std::vector<float>* pdfWeights = NULL;

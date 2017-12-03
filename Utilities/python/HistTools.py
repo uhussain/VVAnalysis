@@ -84,19 +84,22 @@ def getStatHists(hist, name, chan, signal):
     for hist in stat_hists:
         removeZeros(hist)
     return (stat_hists, variation_names)
-def getScaleHists(scale_hist2D, name, chan, underflow=True, overflow=True):
+def getScaleHists(scale_hist2D, name, chan):
     scale_hists = []
     for i in range(1,10):
         if i == 7 or i == 9: continue
         scale_hist = scale_hist2D.ProjectionX(name+"_weight%i"%i, i, i, "e")
-        addOverflowAndUnderflow(scale_hist, underflow, overflow)
         scale_hists.append(scale_hist)
-    scale_histCentral = scale_hist2D.ProjectionX(name+"_central", 1, 1, "e")
-    addOverflowAndUnderflow(scale_histCentral, underflow, overflow)
     hist_name = scale_hist2D.GetName().replace("lheWeights", name+"_scaleUp")
-    scale_histUp = scale_histCentral.Clone(hist_name)
-    scale_histDown = scale_histCentral.Clone(hist_name.replace("Up", "Down"))
-    for i in range(0, scale_hists[0].GetNbinsX()+1):
+    return getScaleVariationHists(scale_hists, hist_name, name)
+
+def getScaleVariationHists(scale_hists, scaleUp_name, process_name):
+    scale_histUp = scale_hists[0].Clone(scaleUp_name)
+    scale_histDown = scale_histUp.Clone(scaleUp_name.replace("Up", "Down"))
+    
+    scale_histCentral = scale_hists[0]
+    # Include overflow
+    for i in range(0, scale_hists[0].GetNbinsX()+2):
         for hist in scale_hists:
             if hist.GetBinContent(i) > scale_histUp.GetBinContent(i):
                 scale_histUp.SetBinContent(i, hist.GetBinContent(i))
@@ -107,16 +110,31 @@ def getScaleHists(scale_hist2D, name, chan, underflow=True, overflow=True):
                 " This shouldn't be possible.\n"
                 "scaleDown_hist: %0.4f\n" 
                 "central_hist: %0.4f\n" 
-                % (name, scale_histDown.GetBinContent(i), scale_histCentral.GetBinContent(i))
+                % (process_name, scale_histUp.GetBinContent(i), scale_histCentral.GetBinContent(i))
             )
         if scale_histUp.GetBinContent(i) <= scale_histCentral.GetBinContent(i) and hist.GetBinContent(i) != 0:
             raise RuntimeError("Up scale variation <= central value for %s."
                 " This shouldn't be possible.\n"
                 "scaleUp_hist: %0.2f\n" 
                 "central_hist: %0.2f\n" 
-                % (name, scale_histUp.GetBinContent(i), scale_histCentral.GetBinContent(i))
+                % (process_name, scale_histUp.GetBinContent(i), scale_histCentral.GetBinContent(i))
             )
     return [scale_histUp, scale_histDown]
+
+def getTransformed3DScaleHists(scale_hist, transformation, name, chan):
+    scale_hists = []
+    for i in range(1,10):
+        if i == 7 or i == 9: 
+            continue
+        hist.GetZaxis().SetRange(i,i)
+        scale_hist2D = scale_hist.Project3D("xye")
+        scale_hist2D.SetName(name+"_weight%i"%i)
+        scale_hist = HistTools.makeUnrolledHist(
+                array.array('d', [500, 1000,1500, 2000, 2500]),
+                [2.5, 4, 5.5, 20]
+        )
+        scale_hists.append(scale_hist)
+    return getScaleVariations(scale_hists)
 
 def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
     if not "TH1" in hist.ClassName():

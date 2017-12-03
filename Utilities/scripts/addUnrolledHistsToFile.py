@@ -1,9 +1,15 @@
-from Utilities.python import HistTools, OutputTools, ConfigureJobs
+from python import HistTools, OutputTools, ConfigureJobs
 import ROOT
 import array
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--input_file", "-i", type=str,
+    default="test.root", help="Output file name")
+args = parser.parse_args()
 
 saveToFile = True
-input_file_name = "/eos/user/k/kelong/WZAnalysisData/HistFiles/Wselection-30Nov2017-TightFrom3LooseLeptons.root"
+input_file_name = args.input_file
 input_file = ROOT.TFile(input_file_name, "update" if saveToFile else "read")
     
 transformed_hists = HistTools.getTransformedHists(input_file, 

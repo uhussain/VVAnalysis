@@ -99,6 +99,7 @@ signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 18 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 variable = "mjj" if isVBS else "yield"
+#variable = "mjj_etajj_unrolled" if isVBS else "yield"
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans])
@@ -123,7 +124,7 @@ if isVBS:
 for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
     variations = ["lheWeights"] if "data" not in plot_group else []
-    if variable == "mjj":
+    if isVBS:
         variations += ["jerUp", "jerDown", "jesUp", "jesDown"] 
     plots += ["_".join([variable, var, c]) for var in variations for c in chans]
 
@@ -138,6 +139,8 @@ for plot_group in plot_groups:
         group.extend(stat_hists)
         if "data" not in plot_group:
             scale_hists = HistTools.getScaleHists(group.FindObject(variable+"_lheWeights_"+chan), plot_group, chan)
+            for hist in scale_hists:
+                HistTools.addOverflowAndUnderflow(hist)
             group.extend(scale_hists)
     for hist in group:
         HistTools.removeZeros(hist)

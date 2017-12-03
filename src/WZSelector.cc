@@ -540,6 +540,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
             weighthists_["Mass"]->Fill(Mass, i, lheWeights[i]/lheWeights[0]*weight);
         if (weighthists_["MTWZ"] != nullptr)
             weighthists_["MTWZ"]->Fill(MtToMET, i, lheWeights[i]/lheWeights[0]*weight);
+
+        mjj_etajj_lheWeights_3Dhist_->Fill(mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
     }
 }
 
@@ -642,4 +644,6 @@ void WZSelector::SetupNewDirectory()
         1, 0, 10, 1000, 0, 1000);
     AddObject<TH2D>(mjj_etajj_2Dhist_, ("mjj_etajj_2D_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
         50, 0, 2500, 28, 0, 7);
+    AddObject<TH3D>(mjj_etajj_lheWeights_3Dhist_, ("mjj_etajj_2D_lheWeights_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
+        50, 0, 2500, 28, 0, 7, 1000, 0, 1000);
 }
