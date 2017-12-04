@@ -46,9 +46,12 @@ def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
         for j in range(1, hist.GetNbinsX()+1):
             entry = i*(hist.GetNbinsX()) + j
             content = hist.GetBinContent(j)
+            error = hist.GetBinError(j)
             if j == hist.GetNbinsX():
                 content += hist.GetBinContent(j+1)
+                error += hist.GetBinError(j)
             unrolled_hist.SetBinContent(entry, content)
+            unrolled_hist.SetBinError(entry, error)
 
     return unrolled_hist
 
@@ -84,11 +87,12 @@ def getStatHists(hist, name, chan, signal):
     for hist in stat_hists:
         removeZeros(hist)
     return (stat_hists, variation_names)
-def getScaleHists(scale_hist2D, name, chan):
+def getScaleHists(scale_hist2D, name):
     scale_hists = []
     for i in range(1,10):
         if i == 7 or i == 9: continue
-        scale_hist = scale_hist2D.ProjectionX(name+"_weight%i"%i, i, i, "e")
+        scale_hist_name = scale_hist2D.GetName().replace("lheWeights", name+"_weight%i" % i)
+        scale_hist = scale_hist2D.ProjectionX(scale_hist_name, i, i, "e")
         scale_hists.append(scale_hist)
     hist_name = scale_hist2D.GetName().replace("lheWeights", name+"_scaleUp")
     return getScaleVariationHists(scale_hists, hist_name, name)
@@ -121,20 +125,20 @@ def getScaleVariationHists(scale_hists, scaleUp_name, process_name):
             )
     return [scale_histUp, scale_histDown]
 
-def getTransformed3DScaleHists(scale_hist, transformation, name, chan):
+def getTransformed3DScaleHists(scale_hist3D, transformation, transform_args, name):
     scale_hists = []
     for i in range(1,10):
         if i == 7 or i == 9: 
             continue
-        hist.GetZaxis().SetRange(i,i)
-        scale_hist2D = scale_hist.Project3D("xye")
-        scale_hist2D.SetName(name+"_weight%i"%i)
-        scale_hist = HistTools.makeUnrolledHist(
-                array.array('d', [500, 1000,1500, 2000, 2500]),
-                [2.5, 4, 5.5, 20]
-        )
-        scale_hists.append(scale_hist)
-    return getScaleVariations(scale_hists)
+        scale_hist3D.GetZaxis().SetRange(i,i)
+        # Order yx matters to have consistent axes!
+        scale_hist2D = scale_hist3D.Project3D("yxe")
+        scale_hist_name = scale_hist3D.GetName().replace("lheWeights", name+"_weight%i" % i)
+        scale_hist2D.SetName(scale_hist_name)
+        scale_hist1D = transformation(scale_hist2D, *transform_args)
+        scale_hists.append(scale_hist1D)
+    hist_name = scale_hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled",name,"scaleUp"]))
+    return getScaleVariationHists(scale_hists, hist_name, name)
 
 def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
     if not "TH1" in hist.ClassName():

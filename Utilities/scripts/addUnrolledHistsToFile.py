@@ -16,7 +16,11 @@ transformed_hists = HistTools.getTransformedHists(input_file,
         ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),# + \
             #ConfigureJobs.getListOfFiles(['WZxsec2016data'], 'Wselection'),
         ["mjj_etajj_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
-            ["mjj_etajj_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()], 
+            ["mjj_etajj_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_etajj_2D_jesUp_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_etajj_2D_jesDown_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_etajj_2D_jerUp_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_etajj_2D_jerDown_%s" % c for c in ConfigureJobs.getChannels()], 
         HistTools.makeUnrolledHist, [
             array.array('d', [500, 1000,1500, 2000, 2500]),
             [2.5, 4, 5.5, 20]

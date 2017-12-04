@@ -68,6 +68,9 @@ if [ "$2" != "noCombine" ]; then
         combine_folder=${output/*_/}/${DATE}
     fi
 
+    if [ "$2" != "combineOnly" ]; then
+        python ./Utilities/scripts/addUnrolledHistsToFile.py -i $histfile
+    fi
     ./Utilities/scripts/prepareCombine.py \
         --input_file $histfile \
         -s $combine_selection \

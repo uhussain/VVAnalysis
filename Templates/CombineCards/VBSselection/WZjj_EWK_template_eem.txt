@@ -3,14 +3,14 @@ jmax 5  number of backgrounds
 kmax ${nuisances} number of nuisance parameters (sources of systematical uncertainties)
 ------------
 
-shapes WZjj_EWK  * ${output_file} ${signal_name}/mjj_$$CHANNEL  ${signal_name}/mjj_$$SYSTEMATIC_$$CHANNEL
-shapes WZjj_QCD  * ${output_file} wz-mgmlm/mjj_$$CHANNEL       wz-mgmlm/mjj_$$SYSTEMATIC_$$CHANNEL 
-shapes vv        * ${output_file} vv/mjj_$$CHANNEL             vv/mjj_$$SYSTEMATIC_$$CHANNEL 
-shapes top-ewk   * ${output_file} top-ewk/mjj_$$CHANNEL        top-ewk/mjj_$$SYSTEMATIC_$$CHANNEL 
-shapes zg        * ${output_file} zg/mjj_$$CHANNEL             zg/mjj_$$SYSTEMATIC_$$CHANNEL 
+shapes WZjj_EWK  * ${output_file} ${signal_name}/${fit_variable}_$$CHANNEL  ${signal_name}/${fit_variable}_$$SYSTEMATIC_$$CHANNEL
+shapes WZjj_QCD  * ${output_file} wz-mgmlm/${fit_variable}_$$CHANNEL       wz-mgmlm/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
+shapes vv        * ${output_file} vv/${fit_variable}_$$CHANNEL             vv/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
+shapes top-ewk   * ${output_file} top-ewk/${fit_variable}_$$CHANNEL        top-ewk/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
+shapes zg        * ${output_file} zg/${fit_variable}_$$CHANNEL             zg/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
 
-shapes nonprompt * ${output_file} DataEWKCorrected/mjj_Fakes_$$CHANNEL DataEWKCorrected/mjj_Fakes_$$SYSTEMATIC_$$CHANNEL
-shapes data_obs  *  ${output_file} AllData/mjj_$$CHANNEL
+shapes nonprompt * ${output_file} DataEWKCorrected/${fit_variable}_Fakes_$$CHANNEL DataEWKCorrected/${fit_variable}_Fakes_$$SYSTEMATIC_$$CHANNEL
+shapes data_obs  *  ${output_file} AllData/${fit_variable}_$$CHANNEL
 
 bin          eem   
 observation  -1.0 

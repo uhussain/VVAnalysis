@@ -76,6 +76,10 @@ public :
         { "yield",  {} }
     };
     TH2D* mjj_etajj_2Dhist_;
+    TH2D* mjj_etajj_2Dhist_jesUp_;
+    TH2D* mjj_etajj_2Dhist_jesDown_;
+    TH2D* mjj_etajj_2Dhist_jerUp_;
+    TH2D* mjj_etajj_2Dhist_jerDown_;
     TH3D* mjj_etajj_lheWeights_3Dhist_;
 
     std::vector<float>* scaleWeights = NULL;

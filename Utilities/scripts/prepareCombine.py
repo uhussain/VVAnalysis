@@ -7,6 +7,7 @@ import datetime
 import os
 import sys
 import math
+import array
 
 stat_variations = { "eee" : [],
     "eem" : [],
@@ -98,8 +99,8 @@ card_info = {
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 18 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
-variable = "mjj" if isVBS else "yield"
-#variable = "mjj_etajj_unrolled" if isVBS else "yield"
+#variable = "mjj" if isVBS else "yield"
+variable = "mjj_etajj_unrolled" if isVBS else "yield"
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans])
@@ -123,10 +124,11 @@ if isVBS:
 
 for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
-    variations = ["lheWeights"] if "data" not in plot_group else []
+    if "data" not in plot_group:
+        plots += ["_".join([variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
     if isVBS:
-        variations += ["jerUp", "jerDown", "jesUp", "jesDown"] 
-    plots += ["_".join([variable, var, c]) for var in variations for c in chans]
+        variations = ["jerUp", "jerDown", "jesUp", "jesDown"] 
+        plots += ["_".join([variable, var, c]) for var in variations for c in chans]
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots)
@@ -138,9 +140,23 @@ for plot_group in plot_groups:
         stat_variations[chan].extend(variation_names)
         group.extend(stat_hists)
         if "data" not in plot_group:
-            scale_hists = HistTools.getScaleHists(group.FindObject(variable+"_lheWeights_"+chan), plot_group, chan)
-            for hist in scale_hists:
-                HistTools.addOverflowAndUnderflow(hist)
+            weight_hist_name = variable.replace("unrolled", "2D")+"_lheWeights_"+chan
+            weight_hist = group.FindObject(weight_hist_name)
+            if "TH2" in weight_hist.ClassName():
+                scale_hists = HistTools.getScaleHists(weight_hist, plot_group, chan)
+                for hist in scale_hists:
+                    HistTools.addOverflowAndUnderflow(hist)
+            elif "TH3" in weight_hist.ClassName(): 
+                scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
+                    HistTools.makeUnrolledHist, [
+                        array.array('d', [500, 1000,1500, 2000, 2500]),
+                        [2.5, 4, 5.5, 20]
+                    ],
+                    plot_group
+                )
+            else:
+                raise RuntimeError("Invalid weight hist %s" % weight_hist_name +
+                        " for %s. Can't make scale variations" % plot_group)
             group.extend(scale_hists)
     for hist in group:
         HistTools.removeZeros(hist)
@@ -201,6 +217,7 @@ with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
 
 for chan, chan_dict in card_info.iteritems():
     chan_dict["signal_name"] = signal.replace("_", "-")
+    chan_dict["fit_variable"] = variable
     chan_dict["signal_yield"] = chan_dict[signal]
     chan_dict["nuisances"] = numvars+len(stat_variations[chan]) -1*("Wselection" in args['selection'])
     file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
