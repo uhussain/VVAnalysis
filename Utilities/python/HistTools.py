@@ -30,7 +30,7 @@ def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
     for i in range(len(ybins)-1):
         ylower = ybins[i]
         yupper = ybins[i+1]
-        hist_name = ("mjj_detajj_%0.1fTo%0.1f" % (ylower, yupper)).replace(".","p")
+        hist_name = ("%s_%0.1fTo%0.1f" % (name, ylower, yupper)).replace(".","p")
         # Global bin number = nbinx + nbinsx*nbiny
         lower_bin = init_2D_hist.FindBin(0,ylower)/init_2D_hist.GetNbinsX()
         upper_bin = init_2D_hist.FindBin(0,yupper)/init_2D_hist.GetNbinsX()
@@ -54,6 +54,23 @@ def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
             unrolled_hist.SetBinError(entry, error)
 
     return unrolled_hist
+
+def make1DaQGCHists(orig_file, input2D_hists, plot_info):
+    output_folders = []
+    for name, data in plot_info.iteritems():
+        entry = data["lheWeightEntry"]
+        file_name = str(data["Members"][0])
+
+        output_list = ROOT.TList()
+        output_list.SetName(name)
+
+        for init_2D_hist_name in input2D_hists:
+            init_2D_hist = orig_file.Get("/".join([file_name, init_2D_hist_name]))
+            hist1D = init_2D_hist.ProjectionX(init_2D_hist_name.replace("lheWeights_", ""), entry, entry, "e")
+            ROOT.SetOwnership(hist1D, False)
+            output_list.Add(hist1D)
+        output_folders.append(output_list)
+    return output_folders
 
 def removeZeros(hist):
     for i in range(hist.GetNbinsX()+2):

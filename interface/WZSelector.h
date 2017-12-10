@@ -73,6 +73,9 @@ public :
 
     std::map<std::string, TH2D*> weighthists_ = {
         { "mjj",  {} },
+        { "MTWZ",  {} },
+        { "ZPt",  {} },
+        { "Mass",  {} },
         { "yield",  {} }
     };
     TH2D* mjj_etajj_2Dhist_;
@@ -88,6 +91,9 @@ public :
     TH2D* mjj_mtwz_2Dhist_jerDown_;
     TH3D* mjj_mtwz_lheWeights_3Dhist_;
 
+    TH2D* mjj_zep3l_2Dhist_;
+    TH2D* etajj_zep3l_2Dhist_;
+
     std::vector<float>* scaleWeights = NULL;
     std::vector<float>* pdfWeights = NULL;
     std::vector<float> lheWeights;
@@ -97,6 +103,11 @@ public :
     float dEtajj_jesDown;
     float dEtajj_jerUp;
     float dEtajj_jerDown;
+    float zep3l;
+    float zep3l_jesUp;
+    float zep3l_jesDown;
+    float zep3l_jerUp;
+    float zep3l_jerDown;
     std::vector<float>* jetPt = NULL;
     std::vector<float>* jetEta = NULL;
     std::vector<float>* jetEta_jesUp = NULL;

@@ -100,7 +100,8 @@ signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 18 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
-variable = "mjj_etajj_unrolled" if isVBS else "yield"
+#variable = "mjj_etajj_unrolled" if isVBS else "yield"
+variable = "mjj_mtwz_unrolled" if isVBS else "yield"
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans])
@@ -143,7 +144,7 @@ for plot_group in plot_groups:
             weight_hist_name = variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
             if "TH2" in weight_hist.ClassName():
-                scale_hists = HistTools.getScaleHists(weight_hist, plot_group, chan)
+                scale_hists = HistTools.getScaleHists(weight_hist, plot_group)
                 for hist in scale_hists:
                     HistTools.addOverflowAndUnderflow(hist)
             elif "TH3" in weight_hist.ClassName(): 
@@ -200,7 +201,7 @@ for name in ["wzjj_ewk", "wzjj_vbfnlo"]:
 
 combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit"
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
-                datetime.date.today().strftime("%d%b%Y")
+                (datetime.date.today().strftime("%d%b%Y") + "MTWZ")
 output_dir = '/'.join([combine_dir,args['selection'], folder_name])
 try:
     os.makedirs(output_dir)

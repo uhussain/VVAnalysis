@@ -70,6 +70,7 @@ if [ "$2" != "noCombine" ]; then
 
     if [ "$2" != "combineOnly" ]; then
         python ./Utilities/scripts/addUnrolledHistsToFile.py -i $histfile
+        python ./Utilities/scripts/addaQGCHistsToFile.py -i $histfile
     fi
     ./Utilities/scripts/prepareCombine.py \
         --input_file $histfile \
