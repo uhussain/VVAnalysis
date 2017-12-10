@@ -12,9 +12,8 @@ saveToFile = True
 input_file_name = args.input_file
 input_file = ROOT.TFile(input_file_name, "update" if saveToFile else "read")
     
-transformed_hists = HistTools.getTransformedHists(input_file, 
-        ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),# + \
-            #ConfigureJobs.getListOfFiles(['WZxsec2016data'], 'Wselection'),
+transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file, 
+        ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),
         ["mjj_etajj_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
             ["mjj_etajj_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
             ["mjj_etajj_2D_jesUp_%s" % c for c in ConfigureJobs.getChannels()] + \
@@ -26,6 +25,32 @@ transformed_hists = HistTools.getTransformedHists(input_file,
             [2.5, 4, 5.5, 20]
         ]
 )
+
+transformed_mjj_mtwz_hists = HistTools.getTransformedHists(input_file, 
+        ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),
+        ["mjj_mtwz_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_mtwz_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_mtwz_2D_jesUp_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_mtwz_2D_jesDown_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_mtwz_2D_jerUp_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_mtwz_2D_jerDown_%s" % c for c in ConfigureJobs.getChannels()], 
+        HistTools.makeUnrolledHist, [
+            array.array('d', [500, 1000,1500, 2000, 2500]),
+            [0, 150, 300, 450]
+        ]
+)
+
+transformed_mjj_zep3l_hists = HistTools.getTransformedHists(input_file, 
+        ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),
+        ["mjj_zep3l_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_zep3l_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()],
+        HistTools.makeUnrolledHist, [
+            array.array('d', [500, 1000,1500, 2000, 2500]),
+            [1, 2, 3, 10]
+        ]
+)
+
+transformed_hists = transformed_mjj_etajj_hists+transformed_mjj_mtwz_hists#+transformed_mjj_zep3l_hists
 
 if saveToFile:
     for output in transformed_hists:
