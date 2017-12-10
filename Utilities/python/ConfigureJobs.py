@@ -11,9 +11,9 @@ def getChannels(analysis='WZ'):
     if analysis == 'WZ':
         return ["eee", "eem", "emm", "mmm"]
 def getManagerPath():
-    path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
-            "/afs/cern.ch/user/k/kelong/work"
-    return path
+    path = "/cms/{user}" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
+            "/afs/cern.ch/user/k/{user}/work"
+    return path.format(user=os.environ["USER"])
 def getListOfEWKFilenames():
     return [
     #    "wz3lnu-powheg",

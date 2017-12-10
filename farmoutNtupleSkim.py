@@ -59,18 +59,20 @@ def callFarmout(output_dir, script_name, noSubmit):
         print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     if noSubmit: status = -1
     return status
-def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs, noSubmit, extraArgs):
+def farmoutNtupleSkim(sample_name, selection, analysis, version, scaleFacs, noSubmit, extraArgs):
     farmout_dict = {}
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
         sample_name, 
-        path, 
         ConfigureJobs.getPreviousStep(selection, analysis), 
         analysis
     )
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
-    submission_dir = ('/data/kelong/%s' if "kelong" in path else "/nfs_scratch/kdlong/%s") \
-        % '{:%Y-%m-%d}_WZAnalysisJobs'.format(datetime.date.today())
+    submission_dir = '/{space}/{user}/{folder}'.format(
+        space="nfs_scratch" if "hep.wisc.edu" in os.environ['HOSTNAME'] else "data",
+        user=os.environ["USER"],
+        folder='{:%Y-%m-%d}_WZAnalysisJobs'.format(datetime.date.today())
+    )
     try:
         os.mkdir(submission_dir)
     except:
@@ -116,11 +118,9 @@ def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleF
 def main():
     #for selection in selection_map.iteritems():
     args = getComLineArgs()
-    path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
-            "/afs/cern.ch/user/k/kelong/work"
-    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selection']):
+    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], args['selection']):
         try:
-            farmoutNtupleSkim(file_name, path, args['selection'], 
+            farmoutNtupleSkim(file_name, args['selection'], 
                 args['analysis'], args['version'], args['scaleFacs'], 
                 args['noSubmit'], args['extraArgs'])
         except (ValueError, OSError) as error:

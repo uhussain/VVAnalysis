@@ -4,8 +4,8 @@ lumi=35.87
 lepid="Tight"
 DATE=$(date +%d%b%Y)
 DATE_MONTHONLY=$(date +%b%Y)
-#looselepsfile=3MediumLeptons
-looselepsfile=3LooseLeptons
+looselepsfile=3MediumLeptons
+#looselepsfile=3LooseLeptons
 
 input=Wselection${looselepsfile/3/}
 output=Wselection
