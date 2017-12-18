@@ -25,11 +25,9 @@ parser.add_argument("-c", "--channels", required=False, type=str,
 parser.add_argument("-o", "--output_dir", required=False, type=str,
                     default="/eos/user/k/kelong/WZAnalysisData/SyncWithSvenja")
 args = parser.parse_args()
-path = "/cms/kdlong" if "hep.wisc.edu" in os.environ['HOSTNAME'] else \
-        "/afs/cern.ch/user/k/kelong/work"
 isfile = any(os.path.isfile(name) or os.path.exists(name.rstrip("/*")) 
                 for name in args.filelist)
-filelist = ConfigureJobs.getListOfFiles(args.filelist, path, args.selection) if \
+filelist = ConfigureJobs.getListOfFiles(args.filelist, args.selection) if \
     not isfile else args.filelist
 states = [x.strip() for x in args.channels.split(",")]
 state_yields = dict((i,0) for i in ["eee", "emm", "eem", "mmm"])
@@ -52,7 +50,7 @@ event_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states", 
 for name in filelist:
     if not isfile:
         try:
-            file_path = ConfigureJobs.getInputFilesPath(name, path,
+            file_path = ConfigureJobs.getInputFilesPath(name, 
                 args.selection, "WZxsec2016")
         except ValueError as e:
             print e

@@ -337,9 +337,13 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
             return false;
         if (!tightZLeptons())
             return false;
-    if (selection == FakeRateSelectionLoose)
-        tightLeps = false;
+        if (selection == FakeRateSelectionLoose)
+            tightLeps = false;
     }
+    // For sync with Jakob
+    else if (l2Pt < 20)
+        return false;
+    
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
         return false;
     return true;

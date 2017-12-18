@@ -75,7 +75,9 @@ public :
     Float_t ZMass;
     Float_t type1_pfMETEt;
     UInt_t nCBVIDTightElec;
+    UInt_t nCBVIDLooseElec;
     UInt_t nWZTightMuon;
+    UInt_t nWZMediumMuon;
     Bool_t l1IsTight;
     Bool_t l2IsTight;
     Bool_t l3IsTight;
@@ -111,7 +113,9 @@ public :
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_nCBVIDTightElec;
+    TBranch* b_nCBVIDLooseElec;
     TBranch* b_nWZTightMuon;
+    TBranch* b_nWZMediumMuon;
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
     TBranch* b_l3IsTight;
