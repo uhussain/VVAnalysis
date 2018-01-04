@@ -207,7 +207,7 @@ void WZSelectorBase::Init(TTree *tree)
 
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
-    fChain->SetBranchAddress("nCBVIDLooseElec", &nCBVIDLooseElec, &b_nCBVIDLooseElec);
+    fChain->SetBranchAddress("nCBVIDHLTSafeElec", &nCBVIDHLTSafeElec, &b_nCBVIDHLTSafeElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
     fChain->SetBranchAddress("nWZMediumMuon", &nWZMediumMuon, &b_nWZMediumMuon);
     fChain->SetBranchAddress("Flag_BadChargedCandidateFilterPass", &Flag_BadChargedCandidateFilterPass, &b_Flag_BadChargedCandidateFilterPass);
@@ -245,7 +245,7 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_l3MtToMET->GetEntry(entry);
     b_type1_pfMETEt->GetEntry(entry);
     b_nCBVIDTightElec->GetEntry(entry);
-    b_nCBVIDLooseElec->GetEntry(entry);
+    b_nCBVIDHLTSafeElec->GetEntry(entry);
     b_nWZTightMuon->GetEntry(entry);
     b_nWZMediumMuon->GetEntry(entry);
     b_Flag_BadPFMuonFilterPass->GetEntry(entry);                    
@@ -258,9 +258,7 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_Flag_globalTightHalo2016FilterPass->GetEntry(entry);          
 
     //passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3;
-    passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDLooseElec - 3) < 0.1;
-    //std::cout << "nCBVIDLooseElec " <<  nCBVIDLooseElec;
-    //std::cout << " nWZLooseMuon " <<  nWZLooseMuon << std::endl ;
+    passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDHLTSafeElec - 3) < 0.1;
     
     return kTRUE;
 }

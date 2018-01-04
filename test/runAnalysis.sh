@@ -68,15 +68,17 @@ if [ "$2" != "noCombine" ]; then
         combine_folder=${output/*_/}/${DATE}
     fi
 
-    if [ "$2" != "combineOnly" ]; then
+    if [ "$2" != "combineOnly" && "$1" == "VBS"* ]; then
         python ./Utilities/scripts/addUnrolledHistsToFile.py -i $histfile
         python ./Utilities/scripts/addaQGCHistsToFile.py -i $histfile
     fi
-    ./Utilities/scripts/prepareCombine.py \
-        --input_file $histfile \
-        -s $combine_selection \
-        --folder_name $combine_folder \
-        -l 35.9 \
-        --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) $3
-    echo "Info: File /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename  $histfile) created"
+    if [ "$1" != "FakeRate"* ]; then
+        ./Utilities/scripts/prepareCombine.py \
+            --input_file $histfile \
+            -s $combine_selection \
+            --folder_name $combine_folder \
+            -l 35.9 \
+            --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) $3
+        echo "Info: File /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename  $histfile) created"
+    fi
 fi
