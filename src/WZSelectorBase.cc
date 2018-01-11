@@ -257,8 +257,13 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_Flag_eeBadScFilterPass->GetEntry(entry);                      
     b_Flag_globalTightHalo2016FilterPass->GetEntry(entry);          
 
-    //passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3;
+    // Make sure tight leptons also pass loose
+    //passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3 &&
+    //                      (nCBVIDMediumMuon + nCBVIDHLTSafeElec) >= (nCBVIDTightMuon+nCBVIDTightElec);
     passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDHLTSafeElec - 3) < 0.1;
+
+    // If tight isn't required to include loose
+    // passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDHLTSafeElec - (l1IsLoose +l2IsLoose +l3IsLoose)) < 0.1;
     
     return kTRUE;
 }
