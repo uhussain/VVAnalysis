@@ -259,7 +259,7 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
 
     // Make sure tight leptons also pass loose
     //passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3 &&
-    //                      (nCBVIDMediumMuon + nCBVIDHLTSafeElec) >= (nCBVIDTightMuon+nCBVIDTightElec);
+    //                      (nWZMediumMuon + nCBVIDHLTSafeElec) >= (nWZTightMuon+nCBVIDTightElec);
     passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDHLTSafeElec - 3) < 0.1;
 
     // If tight isn't required to include loose

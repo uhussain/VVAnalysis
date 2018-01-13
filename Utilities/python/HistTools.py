@@ -30,13 +30,14 @@ def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
     for i in range(len(ybins)-1):
         ylower = ybins[i]
         yupper = ybins[i+1]
-        hist_name = ("%s_%0.1fTo%0.1f" % (name, ylower, yupper)).replace(".","p")
+        hist_name = ("%s_%0.1fTo%0.1f" % (init_2D_hist.GetName(), ylower, yupper)).replace(".","p")
         # Global bin number = nbinx + nbinsx*nbiny
         lower_bin = init_2D_hist.FindBin(0,ylower)/init_2D_hist.GetNbinsX()
-        upper_bin = init_2D_hist.FindBin(0,yupper)/init_2D_hist.GetNbinsX()
-        mjj_hist = init_2D_hist.ProjectionX(hist_name, lower_bin, upper_bin, "e")
-        mjj_hist = mjj_hist.Rebin(len(xbins)-1, hist_name+"_rebin", xbins)
-        hists_half_rolled.append(mjj_hist)
+        # Range is inclusive, so don't count upper bin twice
+        upper_bin = init_2D_hist.FindBin(0,yupper*(1-0.0001))/init_2D_hist.GetNbinsX()
+        ybinned_hist = init_2D_hist.ProjectionX(hist_name, lower_bin, upper_bin, "e")
+        ybinned_hist = ybinned_hist.Rebin(len(xbins)-1, hist_name+"_rebin", xbins)
+        hists_half_rolled.append(ybinned_hist)
 
     if name is "":
         name = init_2D_hist.GetName().replace("2D", "unrolled")
@@ -49,7 +50,7 @@ def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
             error = hist.GetBinError(j)
             if j == hist.GetNbinsX():
                 content += hist.GetBinContent(j+1)
-                error += hist.GetBinError(j)
+                error += hist.GetBinError(j+1)
             unrolled_hist.SetBinContent(entry, content)
             unrolled_hist.SetBinError(entry, error)
 

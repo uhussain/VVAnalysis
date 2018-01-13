@@ -40,7 +40,7 @@ fi
 
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
 #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_SvenjasFakeRates.root
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_looseVeto.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
 if [ -f $frfile ] && [ "$2" != "RedoFakeRate" ]; then
@@ -68,7 +68,7 @@ if [ "$2" != "noCombine" ]; then
         combine_folder=${output/*_/}/${DATE}
     fi
 
-    if [ "$2" != "combineOnly" && "$1" == "VBS"* ]; then
+    if [[ "$2" != "combineOnly" && "$1" == "VBS"* ]]; then
         python ./Utilities/scripts/addUnrolledHistsToFile.py -i $histfile
         python ./Utilities/scripts/addaQGCHistsToFile.py -i $histfile
     fi

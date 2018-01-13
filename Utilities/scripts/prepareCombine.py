@@ -99,9 +99,9 @@ card_info = {
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 18 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
-#variable = "mjj" if isVBS else "yield"
+variable = "mjj" if isVBS else "yield"
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
-variable = "mjj_mtwz_unrolled" if isVBS else "yield"
+#variable = "mjj_mtwz_unrolled" if isVBS else "yield"
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans])
@@ -180,6 +180,8 @@ output_info.add_row(["nonprompt", card_info["eee"]["nonprompt"],
 background = {c : 0 for c in chans}
 for chan,yields in card_info.iteritems():
     for name,value in yields.iteritems():
+        if "data" in name:
+            continue
         if name not in ["wzjj_ewk", "wzjj_vbfnlo", "output_file"]:
             background[chan] += float(value)
 output_info.add_row(["Total background", 
