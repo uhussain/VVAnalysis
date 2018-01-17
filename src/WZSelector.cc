@@ -127,6 +127,7 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_ZPhi->GetEntry(entry);
     b_ZEta->GetEntry(entry);
     b_Mass->GetEntry(entry);
+    b_MtToMET->GetEntry(entry);
     b_l1Eta->GetEntry(entry);
     b_l1Phi->GetEntry(entry);
     b_l2Eta->GetEntry(entry);
@@ -205,10 +206,10 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
             return false;
 
     // Use optimized point of pT(j1,j2) > 50 GeV
-    if (selection_ != VBSselection_Loose && selection_ != VBSBackgroundControl) { 
-        if (jPt->at(0) < 50 || jPt->at(1) < 50)
-            return false;
-    }
+    //if (selection_ != VBSselection_Loose && selection_ != VBSBackgroundControl) { 
+    //    if (jPt->at(0) < 50 || jPt->at(1) < 50)
+    //        return false;
+    //}
 
     float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
 
@@ -343,6 +344,8 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
     // For sync with Jakob
     //else if (l2Pt < 20)
     //    return false;
+    if (selection == Inclusive2Jet && jetPt->size() < 2)
+        return false;
     
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
         return false;
@@ -548,6 +551,9 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     }
     if (hists1D_["MtW"] != nullptr) {
         hists1D_["MtW"]->Fill(l3MtToMET, weight);
+    }
+    if (hists1D_["MTWZ"] != nullptr) {
+        hists1D_["MTWZ"]->Fill(MtToMET, weight*(isMC_ || MtToMET < 300 || noBlind));
     }
     if (hists1D_["ZPt"] != nullptr) {
         b_ZPt->GetEntry(entry);

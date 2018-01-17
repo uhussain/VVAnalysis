@@ -23,7 +23,8 @@ parser.add_argument("-m", "--cut_string", required=False, type=str,
 parser.add_argument("-c", "--channels", required=False, type=str,
                     default="eee,eem,emm,mmm")
 parser.add_argument("-o", "--output_dir", required=False, type=str,
-                    default="/eos/user/k/kelong/WZAnalysisData/SyncWithJakob")
+                    #default="/eos/user/k/kelong/WZAnalysisData/SyncWithJakob")
+                    default="/eos/user/k/kelong/WZAnalysisData/SyncWithCarlos")
 args = parser.parse_args()
 isfile = any(os.path.isfile(name) or os.path.exists(name.rstrip("/*")) 
                 for name in args.filelist)

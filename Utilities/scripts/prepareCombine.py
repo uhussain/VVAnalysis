@@ -19,6 +19,10 @@ def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--vbfnlo",
         action='store_true', help="Use VBFNLO for signal")
+    parser.add_argument("--noCards",
+        action='store_true', help="Don't create cards for combine")
+    parser.add_argument("--aqgc",
+        action='store_true', help="Add aqgc files")
     parser.add_argument("--lumi", "-l", type=float,
         default=35.87, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
@@ -99,9 +103,9 @@ card_info = {
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 18 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
-variable = "mjj" if isVBS else "yield"
+#variable = "mjj" if isVBS else "yield"
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
-#variable = "mjj_mtwz_unrolled" if isVBS else "yield"
+variable = "mjj_mtwz_unrolled" if isVBS else "yield"
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans])
@@ -122,6 +126,12 @@ significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All st
 plot_groups = ["wz-powheg", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv-powheg", "data_2016"]
 if isVBS:
     plot_groups = ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
+if args['aqgc']:
+    import json
+    base_name = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/PlotGroups/"
+    for filename in ["WZxsec2016_aQGC-FM.json", "WZxsec2016_aQGC-FS.json", "WZxsec2016_aQGC-FT.json",]:
+        aqgc_names = json.load(open(base_name+filename))
+        plot_groups.extend(aqgc_names.keys())
 
 for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
@@ -151,7 +161,8 @@ for plot_group in plot_groups:
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
                     HistTools.makeUnrolledHist, [
                         array.array('d', [500, 1000,1500, 2000, 2500]),
-                        [2.5, 4, 5.5, 20]
+                        #[2.5, 4, 5.5, 20] # for deta(j1, j2)
+                        [0, 150, 300, 450] # for MT(WZ)
                     ],
                     plot_group
                 )
@@ -218,52 +229,53 @@ with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
     yields.write("\n" + " "*30 + "S/sqrt(B)")
     yields.write("\n" + str(significance_info))
 
-for chan, chan_dict in card_info.iteritems():
-    chan_dict["signal_name"] = signal.replace("_", "-")
-    chan_dict["fit_variable"] = variable
-    chan_dict["signal_yield"] = chan_dict[signal]
-    chan_dict["nuisances"] = numvars+len(stat_variations[chan]) -1*("Wselection" in args['selection'])
-    file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
-            else '%s/WZ_%s.txt' % (output_dir, chan)
-    template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
-        (args['selection'].split("/")[-1], ("WZjj_EWK" if isVBS else "WZ"), chan)
-    ConfigureJobs.fillTemplatedFile(template_name,
-        file_name,
-        chan_dict
-    )
-    with open(file_name, "a") as chan_file:
-        for hist_name in stat_variations[chan]:
-            if 'Wselection' in args['selection'] and "wzjj-ewk" in hist_name:
-                continue
+if not args['noCards']:
+    for chan, chan_dict in card_info.iteritems():
+        chan_dict["signal_name"] = signal.replace("_", "-")
+        chan_dict["fit_variable"] = variable
+        chan_dict["signal_yield"] = chan_dict[signal]
+        chan_dict["nuisances"] = numvars+len(stat_variations[chan]) -1*("Wselection" in args['selection'])
+        file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
+                else '%s/WZ_%s.txt' % (output_dir, chan)
+        template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
+            (args['selection'].split("/")[-1], ("WZjj_EWK" if isVBS else "WZ"), chan)
+        ConfigureJobs.fillTemplatedFile(template_name,
+            file_name,
+            chan_dict
+        )
+        with open(file_name, "a") as chan_file:
+            for hist_name in stat_variations[chan]:
+                if 'Wselection' in args['selection'] and "wzjj-ewk" in hist_name:
+                    continue
+                if "VBS" in args['selection']:
+                    chan_file.write(
+                        "%s     shape   %i               %i               %i           %i               %i           %i\n" \
+                            % (hist_name, 
+                                chan_dict["signal_name"] in hist_name,
+                                "wz-mgmlm" in hist_name,
+                                "vv" in hist_name,
+                                "top-ewk" in hist_name,
+                                "zg" in hist_name,
+                                "nonprompt" in hist_name,
+                            )
+                )
+                else:
+                    chan_file.write(
+                        "%s     shape   %i               %i               %i           %i               %i\n" \
+                            % (hist_name, 
+                                "wz-powheg" in hist_name,
+                                "vv" in hist_name,
+                                "top-ewk" in hist_name,
+                                "zg" in hist_name,
+                                "nonprompt" in hist_name,
+                            )
+                )
+            chan_file.write("nonprompt_all group = nonprompt_norm %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
             if "VBS" in args['selection']:
-                chan_file.write(
-                    "%s     shape   %i               %i               %i           %i               %i           %i\n" \
-                        % (hist_name, 
-                            chan_dict["signal_name"] in hist_name,
-                            "wz-mgmlm" in hist_name,
-                            "vv" in hist_name,
-                            "top-ewk" in hist_name,
-                            "zg" in hist_name,
-                            "nonprompt" in hist_name,
-                        )
-            )
-            else:
-                chan_file.write(
-                    "%s     shape   %i               %i               %i           %i               %i\n" \
-                        % (hist_name, 
-                            "wz-powheg" in hist_name,
-                            "vv" in hist_name,
-                            "top-ewk" in hist_name,
-                            "zg" in hist_name,
-                            "nonprompt" in hist_name,
-                        )
-            )
-        chan_file.write("nonprompt_all group = nonprompt_norm %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
-        if "VBS" in args['selection']:
-            chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
-            chan_file.write("wz_qcd_all group = wz-mgmlm_scale WZjj_qcd_modeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
-ConfigureJobs.fillTemplatedFile(
-    'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
-    '%s/runCombine%s.sh' % (output_dir, signal_abv), 
-    {"sample" : signal_abv}
-)
+                chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
+                chan_file.write("wz_qcd_all group = wz-mgmlm_scale WZjj_qcd_modeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
+    ConfigureJobs.fillTemplatedFile(
+        'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
+        '%s/runCombine%s.sh' % (output_dir, signal_abv), 
+        {"sample" : signal_abv}
+    )

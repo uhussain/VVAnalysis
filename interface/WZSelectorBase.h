@@ -31,6 +31,7 @@ public :
         VBSselection_Loose,
         VBSselection_Tight,
         VBSBackgroundControl,
+        Inclusive2Jet,
         VBSselection_mjj_400_detajj_2, 
         VBSselection_mjj_400_detajj_2p5, 
         VBSselection_mjj_400_detajj_3, 

@@ -121,6 +121,8 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = VBSselection_Tight;
     else if (selectionName_ == "VBSBackgroundControl")
         selection_ = VBSBackgroundControl;
+    else if (selectionName_ == "Inclusive2Jet")
+        selection_ = Inclusive2Jet;
     else if (selectionName_ == "VBSselection_mjj_400_detajj_2")
         selection_ = VBSselection_mjj_400_detajj_2;
     else if (selectionName_ == "VBSselection_mjj_400_detajj_2p5")
@@ -257,13 +259,15 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_Flag_eeBadScFilterPass->GetEntry(entry);                      
     b_Flag_globalTightHalo2016FilterPass->GetEntry(entry);          
 
+    // Veto on tight leptons
     // Make sure tight leptons also pass loose
-    //passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3 &&
+    // passesLeptonVeto = nWZTightMuon + nCBVIDTightElec <= 3 &&
     //                      (nWZMediumMuon + nCBVIDHLTSafeElec) >= (nWZTightMuon+nCBVIDTightElec);
-    passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDHLTSafeElec - 3) < 0.1;
-
     // If tight isn't required to include loose
     // passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDHLTSafeElec - (l1IsLoose +l2IsLoose +l3IsLoose)) < 0.1;
+
+    // Veto on loose leptons
+    passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDHLTSafeElec - 3) < 0.1;
     
     return kTRUE;
 }

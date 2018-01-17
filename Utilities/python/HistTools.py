@@ -67,7 +67,11 @@ def make1DaQGCHists(orig_file, input2D_hists, plot_info):
 
         for init_2D_hist_name in input2D_hists:
             init_2D_hist = orig_file.Get("/".join([file_name, init_2D_hist_name]))
-            hist1D = init_2D_hist.ProjectionX(init_2D_hist_name.replace("lheWeights_", ""), entry, entry, "e")
+            # If a histogram with the same name exisits, ROOT will return
+            # that instead of creating a new one. See:
+            # https://root.cern.ch/root/html532/src/TH2.cxx.html#2253
+            temp = init_2D_hist.ProjectionX("temphist", entry, entry, "e")
+            hist1D = temp.Clone(init_2D_hist_name.replace("lheWeights_", ""))
             ROOT.SetOwnership(hist1D, False)
             output_list.Add(hist1D)
         output_folders.append(output_list)
