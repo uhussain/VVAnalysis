@@ -15,6 +15,10 @@ public :
     
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
+        { "yield_jesUp",  {} },
+        { "yield_jesDown",  {} },
+        { "yield_jerUp",  {} },
+        { "yield_jerDown",  {} },
         { "nTruePU",  {} },
         { "nvtx",  {} },
         { "ZMass",  {} },
@@ -65,6 +69,10 @@ public :
         { "dEtajj_jesDown",  {} },
         { "dEtajj_jerUp",  {} },
         { "dEtajj_jerDown",  {} },
+        { "MTWZ_jesUp",  {} },
+        { "MTWZ_jesDown",  {} },
+        { "MTWZ_jerUp",  {} },
+        { "MTWZ_jerDown",  {} },
         { "MtW",  {} },
         { "dEtajj",  {} },
         { "zep3l",  {} },

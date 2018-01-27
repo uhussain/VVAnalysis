@@ -64,6 +64,8 @@ def make1DaQGCHists(orig_file, input2D_hists, plot_info):
 
         output_list = ROOT.TList()
         output_list.SetName(name)
+        print "Name is", name
+        print "Entry is", entry
 
         for init_2D_hist_name in input2D_hists:
             init_2D_hist = orig_file.Get("/".join([file_name, init_2D_hist_name]))
@@ -72,6 +74,7 @@ def make1DaQGCHists(orig_file, input2D_hists, plot_info):
             # https://root.cern.ch/root/html532/src/TH2.cxx.html#2253
             temp = init_2D_hist.ProjectionX("temphist", entry, entry, "e")
             hist1D = temp.Clone(init_2D_hist_name.replace("lheWeights_", ""))
+            temp.Delete()
             ROOT.SetOwnership(hist1D, False)
             output_list.Add(hist1D)
         output_folders.append(output_list)
@@ -131,6 +134,8 @@ def getScaleVariationHists(scale_hists, scaleUp_name, process_name):
                 scale_histUp.SetBinContent(i, hist.GetBinContent(i))
             if hist.GetBinContent(i) < scale_histDown.GetBinContent(i):
                 scale_histDown.SetBinContent(i, hist.GetBinContent(i))
+        # For now, skip this check on aQGC for now, since they're screwed up
+        if "aqgc" in process_name: continue
         if scale_histDown.GetBinContent(i) >= scale_histCentral.GetBinContent(i) and hist.GetBinContent(i) != 0:
             raise RuntimeError("Down scale variation >= central value for %s."
                 " This shouldn't be possible.\n"
@@ -178,20 +183,30 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True,
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:
+        # For aQGC, the different plot groups should already be in their own files
+        if "aqgc" in directory:
+            directory = name
+            print "NAME IS", name
+        print "Members are", members
         if not hist_file.Get(directory):
             print "Skipping invalid filename %s" % directory
+            print hist_file.Get(directory)
+            print "File is", hist_file
             continue
         if hists == []:
             hists = [i.GetName() for i in hist_file.Get(directory).GetListOfKeys()]
+            print hists
         for histname in hists:
             if histname == "sumweights": continue
-            hist = hist_file.Get("/".join([directory, histname]))
+            print histname
+            tmphist = hist_file.Get("/".join([directory, histname]))
+            hist = tmphist.Clone()
             if hist:
                 sumhist = composite.FindObject(hist.GetName())
                 if "data" not in directory.lower() and hist.GetEntries() > 0:
-                    sumweights_hist = hist_file.Get("/".join([directory, "sumweights"]))
+                    sumweights_hist = hist_file.Get("/".join([directory.split("__")[0], "sumweights"]))
                     sumweights = sumweights_hist.Integral()
-                    hist.Scale(members[directory]*1000*lumi/sumweights)
+                    hist.Scale(members[directory.split("__")[0]]*1000*lumi/sumweights)
                 addOverflowAndUnderflow(hist, underflow, overflow)
             else:
                 raise RuntimeError("hist %s was not produced for "

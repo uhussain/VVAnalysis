@@ -103,15 +103,26 @@ card_info = {
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 18 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
-#variable = "mjj" if isVBS else "yield"
+variable = "mjj" if isVBS else "yield"
+#variable = "yield"
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
-variable = "mjj_mtwz_unrolled" if isVBS else "yield"
+#variable = "mjj_mtwz_unrolled" if isVBS else "yield"
+if isVBS and args['aqgc']:
+    variable = "MTWZ"
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans])
 OutputTools.writeOutputListItem(alldata, fOut)
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans])
+for var in ["jesUp", "jesDown", "jerUp", "jerDown"]:
+    hists = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
+            ["_".join([variable, var, "Fakes", c]) for c in chans],)
+    for h in hists:
+        h.SetName(h.GetName().replace(var+"_Fakes", "Fakes_"+var))
+        HistTools.removeZeros(h)
+    nonprompt.extend(hists[:])
+
 for chan in chans:
     hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
     HistTools.removeZeros(hist)
@@ -131,13 +142,13 @@ if args['aqgc']:
     base_name = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/PlotGroups/"
     for filename in ["WZxsec2016_aQGC-FM.json", "WZxsec2016_aQGC-FS.json", "WZxsec2016_aQGC-FT.json",]:
         aqgc_names = json.load(open(base_name+filename))
-        plot_groups.extend(aqgc_names.keys())
+        plot_groups.extend([str(n) for n in aqgc_names.keys()])
 
 for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
-    if "data" not in plot_group:
+    if "data" not in plot_group and "aqgc" not in plot_group:
         plots += ["_".join([variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
-    if isVBS:
+    if isVBS and "aqgc" not in plot_group:
         variations = ["jerUp", "jerDown", "jesUp", "jesDown"] 
         plots += ["_".join([variable, var, c]) for var in variations for c in chans]
 
@@ -153,6 +164,9 @@ for plot_group in plot_groups:
         if "data" not in plot_group:
             weight_hist_name = variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
+            if not weight_hist:
+                print "WARNING: Failed to find %s. Skipping" % weight_hist_name
+                continue
             if "TH2" in weight_hist.ClassName():
                 scale_hists = HistTools.getScaleHists(weight_hist, plot_group)
                 for hist in scale_hists:
@@ -161,8 +175,8 @@ for plot_group in plot_groups:
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
                     HistTools.makeUnrolledHist, [
                         array.array('d', [500, 1000,1500, 2000, 2500]),
-                        #[2.5, 4, 5.5, 20] # for deta(j1, j2)
-                        [0, 150, 300, 450] # for MT(WZ)
+                        [2.5, 4, 5.5, 20] # for deta(j1, j2)
+                        # [0, 150, 300, 450] # for MT(WZ)
                     ],
                     plot_group
                 )
@@ -270,10 +284,13 @@ if not args['noCards']:
                                 "nonprompt" in hist_name,
                             )
                 )
-            chan_file.write("nonprompt_all group = nonprompt_norm %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
+            chan_file.write("\nnonprompt_all group = nonprompt_norm %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
+            chan_file.write("mc_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
+            chan_file.write("lepton_unc group = eRes eScale eEff mRes mScale mEff\n")
             if "VBS" in args['selection']:
-                chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
+                chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
                 chan_file.write("wz_qcd_all group = wz-mgmlm_scale WZjj_qcd_modeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
+                chan_file.write("theory group = PDF wz-mgmlm_scale vv_scale top-ewk_scale %s_scale" % chan_dict['signal_name'])
     ConfigureJobs.fillTemplatedFile(
         'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
         '%s/runCombine%s.sh' % (output_dir, signal_abv), 

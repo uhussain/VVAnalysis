@@ -41,5 +41,5 @@ ${signal_name}_scale    shape   1               -               -           -   
 wz-mgmlm_scale          shape   -               1               -           -               -           -
 vv_scale                shape   -               -               1           -               -           -
 top-ewk_scale           shape   -               -               -           1               -           -
-jes                     shape   1               1               1           1               0           -
-jer                     shape   1               1               1           1               0           -
+jes                     shape   1               1               1           1               0           1
+jer                     shape   1               1               1           1               0           1
