@@ -64,8 +64,6 @@ def make1DaQGCHists(orig_file, input2D_hists, plot_info):
 
         output_list = ROOT.TList()
         output_list.SetName(name)
-        print "Name is", name
-        print "Entry is", entry
 
         for init_2D_hist_name in input2D_hists:
             init_2D_hist = orig_file.Get("/".join([file_name, init_2D_hist_name]))
@@ -186,19 +184,13 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True,
         # For aQGC, the different plot groups should already be in their own files
         if "aqgc" in directory:
             directory = name
-            print "NAME IS", name
-        print "Members are", members
         if not hist_file.Get(directory):
             print "Skipping invalid filename %s" % directory
-            print hist_file.Get(directory)
-            print "File is", hist_file
             continue
         if hists == []:
             hists = [i.GetName() for i in hist_file.Get(directory).GetListOfKeys()]
-            print hists
         for histname in hists:
             if histname == "sumweights": continue
-            print histname
             tmphist = hist_file.Get("/".join([directory, histname]))
             hist = tmphist.Clone()
             if hist:
