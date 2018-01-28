@@ -81,6 +81,7 @@ card_info = {
     "emm" : {
         "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
+        "wz-mgmlm" : 0,
         "wz-powheg" : 0,
         "vv-powheg" : 0,
         "top-ewk" : 0,
@@ -91,6 +92,7 @@ card_info = {
     "mmm" : {
         "wzjj-vbfnlo" : 0,
         "wzjj-ewk" : 0,
+        "wz-mgmlm" : 0,
         "wz-powheg" : 0,
         "vv-powheg" : 0,
         "top-ewk" : 0,
@@ -98,6 +100,20 @@ card_info = {
         "vv" : 0,
         "AllData" : 0,
     },
+}
+
+pdf_entries = {
+    "wzjj-vbfnlo" : 0,
+    "wzjj-ewk" : range(111,122),
+    "wzjj-aqgcfm" : range(111,122),
+    "wzjj-aqgcfs" : range(111,122),
+    "wzjj-aqgcft" : range(111,122),
+    "wz-mgmlm" : range(11,112),
+    "vv-powheg" : range(11,112),
+    "top-ewk" : 0,
+    "zg" : 0,
+    "vv" : range(11,112),
+    "AllData" : 0,
 }
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
@@ -109,15 +125,16 @@ variable = "mjj" if isVBS else "yield"
 #variable = "mjj_mtwz_unrolled" if isVBS else "yield"
 if isVBS and args['aqgc']:
     variable = "MTWZ"
+rebin = array.array('d', [500, 1000,1500, 2000, 2500]) if variable == "mjj" else None
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
-    [variable +"_"+ c for c in chans])
+    [variable +"_"+ c for c in chans], rebin=rebin)
 OutputTools.writeOutputListItem(alldata, fOut)
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
-    [variable+"_Fakes_" + c for c in chans])
+    [variable+"_Fakes_" + c for c in chans], rebin=rebin)
 for var in ["jesUp", "jesDown", "jerUp", "jerDown"]:
     hists = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
-            ["_".join([variable, var, "Fakes", c]) for c in chans],)
+            ["_".join([variable, var, "Fakes", c]) for c in chans], rebin=rebin)
     for h in hists:
         h.SetName(h.GetName().replace(var+"_Fakes", "Fakes_"+var))
         HistTools.removeZeros(h)
@@ -153,7 +170,7 @@ for plot_group in plot_groups:
         plots += ["_".join([variable, var, c]) for var in variations for c in chans]
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
-        config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots)
+        config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots, rebin=rebin)
     name = plot_group.replace("-", "_")
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
@@ -167,9 +184,12 @@ for plot_group in plot_groups:
             if not weight_hist:
                 print "WARNING: Failed to find %s. Skipping" % weight_hist_name
                 continue
+            pdf_hists = []
             if "TH2" in weight_hist.ClassName():
-                scale_hists = HistTools.getScaleHists(weight_hist, plot_group)
-                for hist in scale_hists:
+                scale_hists = HistTools.getScaleHists(weight_hist, plot_group, rebin)
+                if pdf_entries[plot_group]:
+                    pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, rebin)
+                for hist in scale_hists+pdf_hists:
                     HistTools.addOverflowAndUnderflow(hist)
             elif "TH3" in weight_hist.ClassName(): 
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
@@ -184,6 +204,7 @@ for plot_group in plot_groups:
                 raise RuntimeError("Invalid weight hist %s" % weight_hist_name +
                         " for %s. Can't make scale variations" % plot_group)
             group.extend(scale_hists)
+            group.extend(pdf_hists)
     for hist in group:
         HistTools.removeZeros(hist)
     for chan in chans:

@@ -110,45 +110,66 @@ def getStatHists(hist, name, chan, signal):
     for hist in stat_hists:
         removeZeros(hist)
     return (stat_hists, variation_names)
-def getScaleHists(scale_hist2D, name):
-    scale_hists = []
-    for i in range(1,10):
-        if i == 7 or i == 9: continue
-        scale_hist_name = scale_hist2D.GetName().replace("lheWeights", name+"_weight%i" % i)
-        scale_hist = scale_hist2D.ProjectionX(scale_hist_name, i, i, "e")
-        scale_hists.append(scale_hist)
-    hist_name = scale_hist2D.GetName().replace("lheWeights", name+"_scaleUp")
-    return getScaleVariationHists(scale_hists, hist_name, name)
 
-def getScaleVariationHists(scale_hists, scaleUp_name, process_name):
-    scale_histUp = scale_hists[0].Clone(scaleUp_name)
-    scale_histDown = scale_histUp.Clone(scaleUp_name.replace("Up", "Down"))
+def getWeightHistProjection(init2D_hist, name, entry, rebin): 
+    hist_name = init2D_hist.GetName().replace("lheWeights", name+"_weight%i" % entry)
+    tmphist = init2D_hist.ProjectionX("temp", entry, entry, "e")
+    hist = tmphist.Clone(hist_name) if not rebin else tmphist.Rebin(len(rebin)-1, hist_name, rebin)
+    return hist
+
+def getLHEWeightHists(init2D_hist, entries, name, variation_name, rebin=None):
+    hists = []
+    for i in entries:
+        hist = getWeightHistProjection(init2D_hist, name, i, rebin)
+        hists.append(hist)
+    hist_name = init2D_hist.GetName().replace("lheWeights", name+"_%sUp" % variation_name)
+    return hists, hist_name
+
+def getPDFHists(init2D_hist, entries, name, rebin=None):
+    hists, hist_name = getLHEWeightHists(init2D_hist, entries, name, "pdf", rebin)
+    return getVariationHists(hists, name, hist_name, lambda x: x[21], lambda x: x[67])
+
+def getScaleHists(scale_hist2D, name, rebin=None):
+    entries = [i for i in range(1,10) if i not in [7, 9]]
+    hists, hist_name = getLHEWeightHists(scale_hist2D, entries, name, "scale", rebin)
+    return getVariationHists(hists, name, hist_name, lambda x: x[-1], lambda x: x[0])
+
+def getVariationHists(hists, process_name, histUp_name, up_action, down_action):
+    histUp = hists[0].Clone(histUp_name)
+    histDown = histUp.Clone(histUp_name.replace("Up", "Down"))
     
-    scale_histCentral = scale_hists[0]
+    histCentral = hists[0]
     # Include overflow
-    for i in range(0, scale_hists[0].GetNbinsX()+2):
-        for hist in scale_hists:
-            if hist.GetBinContent(i) > scale_histUp.GetBinContent(i):
-                scale_histUp.SetBinContent(i, hist.GetBinContent(i))
-            if hist.GetBinContent(i) < scale_histDown.GetBinContent(i):
-                scale_histDown.SetBinContent(i, hist.GetBinContent(i))
+    for i in range(0, hists[0].GetNbinsX()+2):
+        vals = []
+        for hist in hists:
+            vals.append(hist.GetBinContent(i))
+        vals.sort()
+        histUp.SetBinContent(i, vals[-1])
+        histDown.SetBinContent(i, vals[0])
         # For now, skip this check on aQGC for now, since they're screwed up
         if "aqgc" in process_name: continue
-        if scale_histDown.GetBinContent(i) >= scale_histCentral.GetBinContent(i) and hist.GetBinContent(i) != 0:
+    isValidVariation(process_name, histCentral, histUp, histDown)
+    return [histUp, histDown]
+
+def isValidVariation(process_name, histCentral, histUp, histDown):
+    for i in range(0, histCentral.GetNbinsX()+2):
+        if histDown.GetBinContent(i) >= histCentral.GetBinContent(i) and histCentral.GetBinContent(i) != 0:
             raise RuntimeError("Down scale variation >= central value for %s."
                 " This shouldn't be possible.\n"
                 "scaleDown_hist: %0.4f\n" 
                 "central_hist: %0.4f\n" 
-                % (process_name, scale_histUp.GetBinContent(i), scale_histCentral.GetBinContent(i))
+                "bin: %i\n" 
+                % (process_name, histUp.GetBinContent(i), histCentral.GetBinContent(i), i)
             )
-        if scale_histUp.GetBinContent(i) <= scale_histCentral.GetBinContent(i) and hist.GetBinContent(i) != 0:
+        if histUp.GetBinContent(i) <= histCentral.GetBinContent(i) and histCentral.GetBinContent(i) != 0:
             raise RuntimeError("Up scale variation <= central value for %s."
                 " This shouldn't be possible.\n"
                 "scaleUp_hist: %0.2f\n" 
                 "central_hist: %0.2f\n" 
-                % (process_name, scale_histUp.GetBinContent(i), scale_histCentral.GetBinContent(i))
+                "bin: %i\n" 
+                % (process_name, histUp.GetBinContent(i), histCentral.GetBinContent(i), i)
             )
-    return [scale_histUp, scale_histDown]
 
 def getTransformed3DScaleHists(scale_hist3D, transformation, transform_args, name):
     scale_hists = []
@@ -177,7 +198,7 @@ def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
         add_underflow = hist.GetBinContent(0) + hist.GetBinContent(1)
         hist.SetBinContent(1, add_underflow)
 
-def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True, overflow=True):
+def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True, overflow=True, rebin=None):
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:
@@ -192,7 +213,8 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True,
         for histname in hists:
             if histname == "sumweights": continue
             tmphist = hist_file.Get("/".join([directory, histname]))
-            hist = tmphist.Clone()
+            toRebin = rebin and not "TH2" in tmphist.ClassName()
+            hist = tmphist.Clone() if not toRebin else tmphist.Rebin(len(rebin)-1, histname, rebin)
             if hist:
                 sumhist = composite.FindObject(hist.GetName())
                 if "data" not in directory.lower() and hist.GetEntries() > 0:

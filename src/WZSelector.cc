@@ -92,9 +92,9 @@ unsigned int WZSelector::GetLheWeightInfo() {
     };
     std::vector<std::string> allLheWeights = {
         // PDF weights are saved in the ntuples but not really used at this point
-        //"wz3lnu-powheg", "wz3lnu-mg5amcnlo",
-        //"wz3lnu-mgmlm-0j", "wz3lnu-mgmlm-1j",
-        //"wz3lnu-mgmlm-2j", "wz3lnu-mgmlm-3j", "wlljj", 
+        "wz3lnu-powheg", "wz3lnu-mg5amcnlo",
+        "wz3lnu-mgmlm-0j", "wz3lnu-mgmlm-1j",
+        "wz3lnu-mgmlm-2j", "wz3lnu-mgmlm-3j", "wlljj-ewk", 
         "wzjj-aqgcft", "wzjj-aqgcfm", "wzjj-aqgcfs",
         "wz-atgc_pt0-200", "wz-atgc_pt200-300",
         "wz-atgc_pt300"
