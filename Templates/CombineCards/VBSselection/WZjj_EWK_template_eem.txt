@@ -26,7 +26,6 @@ process                         0               1               2           3   
 rate                            ${signal_yield} ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
 ------------                                                                                                                                                                                                                 
 lumi                    lnN     1.025           1.025           1.025       1.025           1.025       -          
-PDF                     lnN     1.05            1.05            1.05        1.05            1.05        -          
 WZjj_qcd_modeling       lnN     -               1.10            -           -               -           -          
 nonprompt_norm          lnN     -               -               -           -               -           1.3
 MET                     lnN     1.02            1.02            1.04        1.06            1.05        1.02     
@@ -41,5 +40,11 @@ ${signal_name}_scale    shape   1               -               -           -   
 wz-mgmlm_scale          shape   -               1               -           -               -           -
 vv_scale                shape   -               -               1           -               -           -
 top-ewk_scale           shape   -               -               -           1               -           -
+zg_scale                lnN     -               -               1           -               0.1         -
+${signal_name}_pdf      shape   1               -               -           -               -           -
+wz-mgmlm_pdf            shape   -               1               -           -               -           -
+vv_pdf                  shape   -               -               1           -               -           -
+top-ewk_pdf             lnN     -               -               -           1.05            -           -
+zg_pdf                  lnN     -               -               -           -               1.05           -
 jes                     shape   1               1               1           1               0           1
 jer                     shape   1               1               1           1               0           1

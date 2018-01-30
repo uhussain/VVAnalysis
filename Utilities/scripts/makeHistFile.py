@@ -99,9 +99,13 @@ fScales = ROOT.TFile('data/scaleFactors.root')
 mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
 useSvenjasFRs = False
+useJakobsFRs = True
 if useSvenjasFRs:
     mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
     eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
+elif useJakobsFRs:
+    mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Jakob")
+    eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Jakob")
 # For medium muons
 #mCBMedFakeRate.SetName("fakeRate_allMu")
 mCBTightFakeRate.SetName("fakeRate_allMu")
@@ -129,15 +133,16 @@ tselection = [ROOT.TNamed("selection", args['output_selection'])]
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
-if "FakeRate" not in args['output_selection']:
-    background = SelectorTools.applySelector(["WZxsec2016data"] +
-        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
-        ConfigureJobs.getListOfNonpromptFilenames(), 
-            "WZBackgroundSelector", args['selection'], fOut, 
-            extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
+##if "FakeRate" not in args['output_selection']:
+##    background = SelectorTools.applySelector(["WZxsec2016data"] +
+##        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
+##        ConfigureJobs.getListOfNonpromptFilenames(), 
+##            "WZBackgroundSelector", args['selection'], fOut, 
+##            extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
+#mc = SelectorTools.applySelector(["DYm50"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
-
+exit(0)
 alldata = makeCompositeHists("AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
 OutputTools.writeOutputListItem(alldata, fOut)

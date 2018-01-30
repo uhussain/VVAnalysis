@@ -127,7 +127,8 @@ def getLHEWeightHists(init2D_hist, entries, name, variation_name, rebin=None):
 
 def getPDFHists(init2D_hist, entries, name, rebin=None):
     hists, hist_name = getLHEWeightHists(init2D_hist, entries, name, "pdf", rebin)
-    return getVariationHists(hists, name, hist_name, lambda x: x[21], lambda x: x[67])
+    return getVariationHists(hists, name, hist_name, 
+            lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[63])/2)
 
 def getScaleHists(scale_hist2D, name, rebin=None):
     entries = [i for i in range(1,10) if i not in [7, 9]]

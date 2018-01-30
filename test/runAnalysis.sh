@@ -40,10 +40,10 @@ else
     echo "INFO: Using default selection 'Wselection'"
 fi
 
-frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
-#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_SvenjasFakeRates.root
+#frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
+frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}_fromJakob.root
 #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/j1Pt50-j2Pt50/${output}-${DATE}-${lepid}From${looselepsfile}.root
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+histfile=${output}-${DATE}-${lepid}From${looselepsfile}_jakobsFakeRates.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
 if [ -f $frfile ] && [ "$2" != "RedoFakeRate" ]; then

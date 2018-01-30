@@ -117,7 +117,7 @@ pdf_entries = {
 }
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
-numvars = 18 if "VBS" in args['selection'] else 13
+numvars = 23 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 variable = "mjj" if isVBS else "yield"
 #variable = "yield"
@@ -311,7 +311,8 @@ if not args['noCards']:
             if "VBS" in args['selection']:
                 chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
                 chan_file.write("wz_qcd_all group = wz-mgmlm_scale WZjj_qcd_modeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
-                chan_file.write("theory group = PDF wz-mgmlm_scale vv_scale top-ewk_scale %s_scale" % chan_dict['signal_name'])
+                chan_file.write(("theory group = wz-mgmlm_scale vv_scale top-ewk_scale {signal_name}_scale " +
+                                                "wz-mgmlm_pdf vv_pdf top-ewk_pdf {signal_name}_pdf").format(signal_name=chan_dict['signal_name']))
     ConfigureJobs.fillTemplatedFile(
         'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
         '%s/runCombine%s.sh' % (output_dir, signal_abv), 

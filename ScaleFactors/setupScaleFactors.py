@@ -12,7 +12,9 @@ ROOT.gROOT.SetBatch(True)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 def float2double(hist):
-    if hist.ClassName() == 'TH1F':
+    if hist.ClassName() == 'TH1D' or hist.ClassName() == 'TH2D':
+        return hist
+    elif hist.ClassName() == 'TH1F':
         new = ROOT.TH1D()
         hist.Copy(new)
     elif hist.ClassName() == 'TH2F':
@@ -21,6 +23,17 @@ def float2double(hist):
     else:
         raise Exception("Bad hist, dummy")
     return new
+
+def invert2DHist(hist):
+    new_hist = hist.Clone()
+    ROOT.SetOwnership(new_hist, False)
+    for x in range(hist.GetNbinsX()+1):
+        for y in range(hist.GetNbinsY()+1):
+            value = hist.GetBinContent(x, y)
+            new_hist.SetBinContent(y, x, value)
+    new_hist.GetXaxis().SetTitle(hist.GetXaxis().GetTitle())
+    new_hist.GetYaxis().SetTitle(hist.GetYaxis().GetTitle())
+    return new_hist
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", "--tightfr_file", type=str,
@@ -89,6 +102,21 @@ for xbin in range(muIso_ptetaratio1.GetNbinsX()+2):
 muonIsoSF.Set2DHist(muIso_allratio)
 fScales.cd()
 muonIsoSF.Write()
+
+efakeRateFile = ROOT.TFile.Open('/eos/user/k/kelong/WZAnalysisData/FakeRates/fromJakob/eFakeRates.root')
+jakob_etight = efakeRateFile.Get('eFakeRates')
+jakob_etight = invert2DHist(jakob_etight)
+mfakeRateFile = ROOT.TFile.Open('/eos/user/k/kelong/WZAnalysisData/FakeRates/fromJakob/muFakeRates.root')
+jakob_mtight = mfakeRateFile.Get('muFakeRates')
+jakob_mtight = invert2DHist(jakob_mtight)
+
+eCBTightFakeRate = ROOT.ScaleFactor("eCBTightFakeRate_Jakob", "Fake rate from dijet control, via Jakob")
+eCBTightFakeRate.Set2DHist(jakob_etight, 0, 0, ROOT.ScaleFactor.AsInHist)
+mCBTightFakeRate = ROOT.ScaleFactor("mCBTightFakeRate_Jakob", "Fake rate from dijet control, via Jakob")
+mCBTightFakeRate.Set2DHist(jakob_mtight, 0, 0, ROOT.ScaleFactor.AsInHist)
+fScales.cd()
+mCBTightFakeRate.Write()
+eCBTightFakeRate.Write()
 
 fakeRateFile = ROOT.TFile.Open('/eos/user/k/kelong/WZAnalysisData/FakeRates/CutBasedFakeRate_fromSvenja_final.root')
 eCBMedFakeRate = ROOT.ScaleFactor("eCBMedFakeRate_Svenja", "Fake rate from dijet control, by Svenja")
