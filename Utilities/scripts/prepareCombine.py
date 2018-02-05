@@ -119,9 +119,9 @@ pdf_entries = {
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 23 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
-variable = "mjj" if isVBS else "yield"
+#variable = "mjj" if isVBS else "yield"
 #variable = "yield"
-#variable = "mjj_etajj_unrolled" if isVBS else "yield"
+variable = "mjj_etajj_unrolled" if isVBS else "yield"
 #variable = "mjj_mtwz_unrolled" if isVBS else "yield"
 if isVBS and args['aqgc']:
     variable = "MTWZ"
@@ -200,6 +200,16 @@ for plot_group in plot_groups:
                     ],
                     plot_group
                 )
+                if pdf_entries[plot_group]:
+                    scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
+                        HistTools.makeUnrolledHist, [
+                            array.array('d', [500, 1000,1500, 2000, 2500]),
+                            [2.5, 4, 5.5, 20] # for deta(j1, j2)
+                            # [0, 150, 300, 450] # for MT(WZ)
+                        ],
+                        pdf_entries[plot_group],
+                        plot_group
+                    )
             else:
                 raise RuntimeError("Invalid weight hist %s" % weight_hist_name +
                         " for %s. Can't make scale variations" % plot_group)

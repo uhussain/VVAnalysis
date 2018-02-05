@@ -128,7 +128,7 @@ def getLHEWeightHists(init2D_hist, entries, name, variation_name, rebin=None):
 def getPDFHists(init2D_hist, entries, name, rebin=None):
     hists, hist_name = getLHEWeightHists(init2D_hist, entries, name, "pdf", rebin)
     return getVariationHists(hists, name, hist_name, 
-            lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[63])/2)
+            lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[83])/2)
 
 def getScaleHists(scale_hist2D, name, rebin=None):
     entries = [i for i in range(1,10) if i not in [7, 9]]
@@ -185,7 +185,21 @@ def getTransformed3DScaleHists(scale_hist3D, transformation, transform_args, nam
         scale_hist1D = transformation(scale_hist2D, *transform_args)
         scale_hists.append(scale_hist1D)
     hist_name = scale_hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled",name,"scaleUp"]))
-    return getScaleVariationHists(scale_hists, hist_name, name)
+    return getVariationHists(scale_hists, name, hist_name, lambda x: x[-1], lambda x: x[0])
+
+def getTransformed3DPDFHists(hist3D, transformation, transform_args, entries, name):
+    hists = []
+    for i in entries:
+        hist3D.GetZaxis().SetRange(i,i)
+        # Order yx matters to have consistent axes!
+        hist2D = hist3D.Project3D("yxe")
+        hist_name = hist3D.GetName().replace("lheWeights", name+"_weight%i" % i)
+        hist2D.SetName(hist_name)
+        hist1D = transformation(hist2D, *transform_args)
+        hists.append(hist1D)
+    hist_name = hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled",name,"pdfUp"]))
+    return getVariationHists(hists, name, hist_name, 
+            lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[83])/2)
 
 def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
     if not "TH1" in hist.ClassName():
