@@ -35,6 +35,8 @@ def getDifference(name, dir1, dir2, addRatios=True):
         if hist1 and hist2:
             diff = hist1.Clone()
             diff.Add(hist2, -1)
+            hist1.Delete()
+            hist2.Delete()
         elif not hist1:
             print "WARNING: Hist %s was not produced for " \
                 "dataset(s) %s" % (histname, dir1)
@@ -55,14 +57,17 @@ def makeCompositeHists(name, members, lumi):
         if not fOut.Get(directory):
             print "Skipping invalid filename %s" % directory
             continue
+        sumweights = 0
         for histname in [i.GetName() for i in fOut.Get(directory).GetListOfKeys()]:
             if histname == "sumweights": continue
             hist = fOut.Get("/".join([directory, histname]))
             if hist:
                 sumhist = composite.FindObject(hist.GetName())
                 if "data" not in directory and hist.GetEntries() > 0:
-                    sumweights_hist = fOut.Get("/".join([directory, "sumweights"]))
-                    sumweights = sumweights_hist.Integral()
+                    if sumweights == 0:
+                        sumweights_hist = fOut.Get("/".join([directory, "sumweights"]))
+                        sumweights = sumweights_hist.Integral()
+                        sumweights_hist.Delete()
                     hist.Scale(members[directory]*1000*lumi/sumweights)
             else:
                 raise RuntimeError("hist %s was not produced for "
@@ -72,6 +77,7 @@ def makeCompositeHists(name, members, lumi):
                 composite.Add(sumhist)
             else:
                 sumhist.Add(hist)
+            hist.Delete()
     return composite
 
 def getHistExpr(hist_names, selection):
@@ -93,13 +99,14 @@ sys.path.append("/".join([manager_path,
 import ConfigHistTools 
 
 tmpFileName = args['output_file']
+#fOut = ROOT.TFile(tmpFileName, "recreate")
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
 fScales = ROOT.TFile('data/scaleFactors.root')
 mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
 eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
 useSvenjasFRs = False
-useJakobsFRs = True
+useJakobsFRs = False
 if useSvenjasFRs:
     mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
     eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
@@ -133,25 +140,26 @@ tselection = [ROOT.TNamed("selection", args['output_selection'])]
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
-##if "FakeRate" not in args['output_selection']:
-##    background = SelectorTools.applySelector(["WZxsec2016data"] +
-##        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
-##        ConfigureJobs.getListOfNonpromptFilenames(), 
-##            "WZBackgroundSelector", args['selection'], fOut, 
-##            extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
+if "FakeRate" not in args['output_selection']:
+    background = SelectorTools.applySelector(["WZxsec2016data"] +
+        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
+        ConfigureJobs.getListOfNonpromptFilenames(), 
+            "WZBackgroundSelector", args['selection'], fOut, 
+            extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
-#mc = SelectorTools.applySelector(["DYm50"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
-exit(0)
 alldata = makeCompositeHists("AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
+tempOut = ROOT.TFile(tmpFileName.replace(".root", "_temp.root"), "recreate")
 OutputTools.writeOutputListItem(alldata, fOut)
+
 nonpromptmc = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
     ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'])
 OutputTools.writeOutputListItem(nonpromptmc, fOut)
+
 ewkmc = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'])
 OutputTools.writeOutputListItem(ewkmc, fOut)
-ewkcorr = getDifference("DataEWKCorrected", "AllData", "AllEWK", False)
 
+ewkcorr = getDifference("DataEWKCorrected", "AllData", "AllEWK", False)
 OutputTools.writeOutputListItem(ewkcorr, fOut)
