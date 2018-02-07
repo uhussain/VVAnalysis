@@ -1,4 +1,5 @@
 #include "Analysis/WZAnalysis/interface/WZSelector.h"
+#include "TLorentzVector.h"
 #include <boost/algorithm/string.hpp>
 
 void WZSelector::Init(TTree *tree)
@@ -600,6 +601,19 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     if (hists1D_["MTWZ"] != nullptr) {
         hists1D_["MTWZ"]->Fill(MtToMET, weight*(isMC_ || MtToMET < 300 || noBlind));
     }
+    float m3lmet = 0;
+    if (hists1D_["M3lMET"] != nullptr) {
+        TLorentzVector l1 = TLorentzVector();
+        l1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, 0);
+        TLorentzVector l2 = TLorentzVector();
+        l2.SetPtEtaPhiM(l2Pt, l2Eta, l2Phi, 0);
+        TLorentzVector l3 = TLorentzVector();
+        l3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, 0);
+        TLorentzVector met = TLorentzVector();
+        l3.SetPtEtaPhiM(type1_pfMETEt, 0, type1_pfMETPhi, 0);
+        m3lmet= (l1+l2+l3+met).M();
+        hists1D_["M3lMET"]->Fill(m3lmet, weight*(isMC_ || m3lmet < 400 || noBlind));
+    }
     if (hists1D_["ZPt"] != nullptr) {
         b_ZPt->GetEntry(entry);
         hists1D_["ZPt"]->Fill(ZPt, weight);
@@ -613,6 +627,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
             weighthists_["Mass"]->Fill(Mass, i, lheWeights[i]/lheWeights[0]*weight);
         if (weighthists_["MTWZ"] != nullptr)
             weighthists_["MTWZ"]->Fill(MtToMET, i, lheWeights[i]/lheWeights[0]*weight);
+        if (weighthists_["M3lMET"] != nullptr)
+            weighthists_["M3lMET"]->Fill(m3lmet, i, lheWeights[i]/lheWeights[0]*weight);
 
         mjj_etajj_lheWeights_3Dhist_->Fill(mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
         mjj_mtwz_lheWeights_3Dhist_->Fill(mjj, MtToMET, i, lheWeights[i]/lheWeights[0]*weight);

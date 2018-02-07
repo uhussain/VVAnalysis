@@ -75,6 +75,7 @@ public :
     Float_t genWeight;
     Float_t ZMass;
     Float_t type1_pfMETEt;
+    Float_t type1_pfMETPhi;
     UInt_t nCBVIDTightElec;
     UInt_t nCBVIDHLTSafeElec;
     UInt_t nWZTightMuon;
@@ -113,6 +114,7 @@ public :
     TBranch* b_genWeight;
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
+    TBranch* b_type1_pfMETPhi;
     TBranch* b_nCBVIDTightElec;
     TBranch* b_nCBVIDHLTSafeElec;
     TBranch* b_nWZTightMuon;

@@ -21,7 +21,8 @@ for file_name in ["WZxsec2016_aQGC-" + i for i in ["FT", "FM", "FS"]]:
 aqgc_hists = HistTools.make1DaQGCHists(input_file, 
         ["mjj_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
             ["MTWZ_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
-            ["Mass_lheWeights_%s" % c for c in ConfigureJobs.getChannels()],
+            ["Mass_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["M3lMET_lheWeights_%s" % c for c in ConfigureJobs.getChannels()],
         plot_group_info,
 )
 

@@ -5,8 +5,6 @@ rtfile = ROOT.TFile("/eos/user/k/kelong/DibosonAnalysisData/PlottingResults/WZxs
 canvas = rtfile.Get("MTWZ_canvas")
 pad = canvas.GetListOfPrimitives().FindObject("stackPad")
 stack = pad.GetListOfPrimitives().FindObject("stack_MTWZ")
-hist = stack.GetHists().FindObject("wzjj-aqgcfm__fm0-16_fm1-m8_WZxsec2016_VBSselection_MTWZ")
-hist.Integral()
 
 hist2D = ROOT.TH2D("hist", "hist", 5, -2, 18, 5, -2, 18)
 

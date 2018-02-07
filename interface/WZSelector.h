@@ -37,6 +37,7 @@ public :
         { "Wlep_Phi",  {} },
         { "MET", {} },
         { "MTWZ", {} },
+        { "M3lMET", {} },
         { "Mass", {} },
         { "Pt", {} },
         { "nJets", {} },
@@ -82,6 +83,7 @@ public :
     std::map<std::string, TH2D*> weighthists_ = {
         { "mjj",  {} },
         { "MTWZ",  {} },
+        { "M3lMET", {} },
         { "ZPt",  {} },
         { "Mass",  {} },
         { "yield",  {} }

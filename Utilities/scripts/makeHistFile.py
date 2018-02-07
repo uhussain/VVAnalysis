@@ -150,7 +150,6 @@ mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection']
         extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
 alldata = makeCompositeHists("AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
-tempOut = ROOT.TFile(tmpFileName.replace(".root", "_temp.root"), "recreate")
 OutputTools.writeOutputListItem(alldata, fOut)
 
 nonpromptmc = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
