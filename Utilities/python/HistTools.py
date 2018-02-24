@@ -228,6 +228,7 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True,
         for histname in hists:
             if histname == "sumweights": continue
             tmphist = hist_file.Get("/".join([directory, histname]))
+            if not tmphist: print "/".join([directory, histname])
             toRebin = rebin and not "TH2" in tmphist.ClassName()
             hist = tmphist.Clone() if not toRebin else tmphist.Rebin(len(rebin)-1, histname, rebin)
             if hist:

@@ -85,7 +85,11 @@ public :
         { "MTWZ",  {} },
         { "M3lMET", {} },
         { "ZPt",  {} },
+        { "l1Pt",  {} },
+        { "l2Pt",  {} },
+        { "l3Pt",  {} },
         { "Mass",  {} },
+        { "Pt",  {} },
         { "yield",  {} }
     };
     TH2D* mjj_etajj_2Dhist_;

@@ -629,6 +629,18 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
             weighthists_["MTWZ"]->Fill(MtToMET, i, lheWeights[i]/lheWeights[0]*weight);
         if (weighthists_["M3lMET"] != nullptr)
             weighthists_["M3lMET"]->Fill(m3lmet, i, lheWeights[i]/lheWeights[0]*weight);
+        if (weighthists_["l1Pt"] != nullptr)
+            weighthists_["l1Pt"]->Fill(l1Pt, i, lheWeights[i]/lheWeights[0]*weight);
+        if (weighthists_["l2Pt"] != nullptr)
+            weighthists_["l2Pt"]->Fill(l2Pt, i, lheWeights[i]/lheWeights[0]*weight);
+        if (weighthists_["l3Pt"] != nullptr)
+            weighthists_["l3Pt"]->Fill(l3Pt, i, lheWeights[i]/lheWeights[0]*weight);
+        if (weighthists_["ZPt"] != nullptr)
+            weighthists_["ZPt"]->Fill(ZPt, i, lheWeights[i]/lheWeights[0]*weight);
+        if (weighthists_["Pt"] != nullptr)
+            weighthists_["Pt"]->Fill(ZPt, i, lheWeights[i]/lheWeights[0]*weight);
+        if (weighthists_["Mass"] != nullptr)
+            weighthists_["Mass"]->Fill(ZPt, i, lheWeights[i]/lheWeights[0]*weight);
 
         mjj_etajj_lheWeights_3Dhist_->Fill(mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
         mjj_mtwz_lheWeights_3Dhist_->Fill(mjj, MtToMET, i, lheWeights[i]/lheWeights[0]*weight);

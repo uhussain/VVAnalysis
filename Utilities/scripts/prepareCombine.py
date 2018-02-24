@@ -109,12 +109,30 @@ pdf_entries = {
     "wzjj-aqgcfs" : range(111,122),
     "wzjj-aqgcft" : range(111,122),
     "wz-mgmlm" : range(11,112),
+    "wz-powheg" : range(11,112),
+    "wz" : range(11,112),
     "vv-powheg" : range(11,112),
     "top-ewk" : 0,
     "zg" : 0,
     "vv" : range(11,112),
     "AllData" : 0,
 }
+
+wz_scalefacs = {
+    "wz-mgmlm" : 0.813,
+    "wz" : 0.643,
+    "wz-powheg" : 0.845,
+}
+# All to the same integral in the signal region
+#wz_scalefacs = {
+#    "wz-mgmlm" : 0.813,
+#    "wz" : 0.58342,
+#    "wz-powheg" : 0.77856,
+#}
+
+
+
+scaleWZ = True
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 23 if "VBS" in args['selection'] else 13
@@ -153,7 +171,7 @@ significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All st
 
 plot_groups = ["wz-powheg", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv-powheg", "data_2016"]
 if isVBS:
-    plot_groups = ["wz-mgmlm", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
+    plot_groups = ["wz-mgmlm", "wz-powheg", "wz", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
 if args['aqgc']:
     import json
     base_name = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/PlotGroups/"
@@ -161,6 +179,7 @@ if args['aqgc']:
         aqgc_names = json.load(open(base_name+filename))
         plot_groups.extend([str(n) for n in aqgc_names.keys()])
 
+wz_qcd_theory_hists = ROOT.TList()
 for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
     if "data" not in plot_group and "aqgc" not in plot_group:
@@ -171,13 +190,18 @@ for plot_group in plot_groups:
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots, rebin=rebin)
+    if scaleWZ and plot_group in wz_scalefacs.keys():
+        for h in group:
+            if h.InheritsFrom("TH1"):
+                h.Scale(wz_scalefacs[plot_group])
     name = plot_group.replace("-", "_")
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
         card_info[chan]["output_file"] = args['output_file']
-        stat_hists,variation_names = HistTools.getStatHists(hist, plot_group, chan, signal)
-        stat_variations[chan].extend(variation_names)
-        group.extend(stat_hists)
+        if plot_group not in ["wz", "wz-powheg"]:
+            stat_hists,variation_names = HistTools.getStatHists(hist, plot_group, chan, signal)
+            stat_variations[chan].extend(variation_names)
+            group.extend(stat_hists)
         if "data" not in plot_group:
             weight_hist_name = variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
@@ -201,7 +225,7 @@ for plot_group in plot_groups:
                     plot_group
                 )
                 if pdf_entries[plot_group]:
-                    scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
+                    pdf_hists = HistTools.getTransformed3DPDFHists(weight_hist, 
                         HistTools.makeUnrolledHist, [
                             array.array('d', [500, 1000,1500, 2000, 2500]),
                             [2.5, 4, 5.5, 20] # for deta(j1, j2)
@@ -213,6 +237,9 @@ for plot_group in plot_groups:
             else:
                 raise RuntimeError("Invalid weight hist %s" % weight_hist_name +
                         " for %s. Can't make scale variations" % plot_group)
+            if plot_group in ["wz", "wz-mgmlm", "wz-powheg"]:
+                wz_qcd_theory_hists.append(hist.Clone(hist.GetName().replace(chan, "_".join([plot_group, chan]))))
+                wz_qcd_theory_hists.extend(scale_hists+pdf_hists)
             group.extend(scale_hists)
             group.extend(pdf_hists)
     for hist in group:
@@ -227,6 +254,48 @@ for plot_group in plot_groups:
         card_info["mmm"][name], 
         sum([card_info[c][name] for c in chans])]
     )
+
+addWZModelingUnc = True
+if addWZModelingUnc:
+    central_hist = "wz-mgmlm"
+    theoryvar = "wz"
+    theoryUnc = ROOT.TList()
+    theoryUnc.SetName(central_hist)
+    for chan in chans:
+        wzqcd_central = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, chan]))
+        wzqcd_scaleUp = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, "scaleUp", chan]))
+        wzqcd_scaleDown = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, "scaleDown", chan]))
+
+        wzqcd_pdfUp = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, "pdfUp", chan]))
+        wzqcd_pdfDown = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, "pdfDown", chan]))
+        wzqcd_modelvar = wz_qcd_theory_hists.FindObject("_".join([variable, theoryvar, chan]))
+        addTheoryUp = wzqcd_central.Clone("_".join([variable, "wzQCDModelingUp", chan]))
+        addTheoryDown = wzqcd_central.Clone("_".join([variable, "wzQCDModelingDown", chan]))
+        for i in range(addTheoryUp.GetNbinsX()+1):
+            central = wzqcd_central.GetBinContent(i)
+            scale_uncUp = wzqcd_scaleUp.GetBinContent(i) - central
+            pdf_uncUp = wzqcd_pdfUp.GetBinContent(i) - central
+            scale_uncDown = wzqcd_scaleDown.GetBinContent(i) - central
+            pdf_uncDown = wzqcd_pdfDown.GetBinContent(i) - central
+            modeling = wzqcd_modelvar.GetBinContent(i) - central
+            modelDiffUpsq = modeling**2 - scale_uncUp**2 - pdf_uncUp**2
+            modelDiffDownsq = modeling**2 - scale_uncDown**2 - pdf_uncDown**2
+            if modeling > 0 and modelDiffUpsq > 0:
+                addTheoryUp.SetBinContent(i, central+math.sqrt(modelDiffUpsq))
+            elif modeling < 0 and modelDiffDownsq > 0:
+                addTheoryDown.SetBinContent(i, central - math.sqrt(modelDiffDownsq))
+            if addTheoryUp.GetBinContent(i) != central \
+                and addTheoryDown.GetBinContent(i) != central:
+                raise RuntimeError("Additional theory modeling uncertainty MUST"
+                    "be one sided. For bin %i, Found:"
+                    "\n addTheoryUp: %0.2f"
+                    "\n addTheoryDown: %0.2f" % 
+                        (i, addTheoryUp.GetBinContent(i), addTheoryDown.GetBinContent(i))
+                )
+        theoryUnc.Add(addTheoryUp)
+        theoryUnc.Add(addTheoryDown)
+    OutputTools.writeOutputListItem(theoryUnc, fOut)
+
 output_info.add_row(["nonprompt", card_info["eee"]["nonprompt"], 
     card_info["eem"]["nonprompt"], 
     card_info["emm"]["nonprompt"], 
@@ -259,7 +328,7 @@ for name in ["wzjj_ewk", "wzjj_vbfnlo"]:
 
 combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit"
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
-                (datetime.date.today().strftime("%d%b%Y") + "MTWZ")
+                datetime.date.today().strftime("%d%b%Y") 
 output_dir = '/'.join([combine_dir,args['selection'], folder_name])
 try:
     os.makedirs(output_dir)

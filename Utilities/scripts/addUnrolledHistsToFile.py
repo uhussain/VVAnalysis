@@ -16,6 +16,8 @@ jeVariations = ["jesUp", "jesDown", "jerUp", "jerDown"]
 
 transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),
+        ["mjj_etajj_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
+        ["mjj_etajj_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
         ["mjj_etajj_2D_%s_%s" % (var, c) for c in ConfigureJobs.getChannels()
                 for var in jeVariations] + \
         ["mjj_etajj_2D_%s_Fakes_%s" % (var, c) for c in ConfigureJobs.getChannels()
@@ -28,6 +30,8 @@ transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file,
 
 transformed_mjj_mtwz_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),
+        ["mjj_mtwz_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
+        ["mjj_mtwz_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
         ["mjj_mtwz_2D_%s_%s" % (var, c) for c in ConfigureJobs.getChannels()
                 for var in jeVariations] + \
         ["mjj_mtwz_2D_%s_Fakes_%s" % (var, c) for c in ConfigureJobs.getChannels()
