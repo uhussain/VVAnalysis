@@ -26,7 +26,6 @@ farmoutAnalysisJobs \
     --input-file-list=${job_dir}/input_file_list.txt \
     --submit-dir=${job_dir}/submit \
     --input-files-per-job=${files_per_job} \
-    --input-dir=root://cmsxrootd.hep.wisc.edu/ \
     --assume-input-files-exist \
     --extra-inputs=${job_dir}/analysis_code.tar.gz \
     --input-basenames-not-unique \
