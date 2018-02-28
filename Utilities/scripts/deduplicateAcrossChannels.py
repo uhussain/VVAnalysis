@@ -164,6 +164,7 @@ def addDuplicationFlag(original_file,state,FlaggedEvents):
             else:
                 Flag[0]=0
                 Flag_branch.Fill()
+    tree.SetBranchStatus("*", 1)
     original_file.cd(state)
     tree.Write("", ROOT.TObject.kOverwrite)
 
