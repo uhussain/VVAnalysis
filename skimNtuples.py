@@ -4,9 +4,7 @@ import argparse
 import os
 import json
 import sys
-#from pprint import pprint
 from Utilities.python import ApplySelection
-#from Utilities.python import ApplyAllSelections
 from Utilities.python.prettytable import PrettyTable
 
 def getComLineArgs():
@@ -40,17 +38,6 @@ def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
     output_file.Purge()
     ROOT.gROOT.cd()
     return save_tree.GetEntries()
-#def calculateTreeEntries(tree, state, cut_string):
-#    #state_dir = output_file.mkdir(state)
-#    #state_dir.cd()
-#    save_tree = tree.CopyTree(cut_string) 
-#    #if cut_string != "deduplicate" else \
-#    #    getDeduplicatedTree(tree, state, cut_string).CopyTree("")
-#    #save_tree.Write()
-#    # Remove AutoSaved trees
-#    #output_file.Purge()
-#    #ROOT.gROOT.cd()
-#    return save_tree.GetEntries()
 def getDeduplicatedTree(tree, state, cut_string):
     selector = ROOT.disambiguateFinalStates()
     if state.count('e') > 2:
@@ -74,7 +61,6 @@ def getDeduplicatedTree(tree, state, cut_string):
         l3_l4_cand_mass = "m1_m2_Mass"
         l3_cand_pt = "m1Pt"
         l4_cand_pt = "m2Pt"
-    #zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
     selector.setZCandidateBranchName(l1_l2_cand_mass,l1_cand_pt,l2_cand_pt,l3_l4_cand_mass,l3_cand_pt,l4_cand_pt)
     new_tree = tree.CopyTree(cut_string)
     new_tree.Process(selector)#, cut_string)
