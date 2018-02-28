@@ -16,6 +16,11 @@ def getComLineArgs():
     parser.add_argument("--scaleFacs", action='store_true',
                         help="Add lepton and pilup scale factors to "
                         "ntuple (by default they are not added)")
+    parser.add_argument("--deduplicateAcrossChannels", action='store_true',
+                        help="Add a flag deduplicated==1 to ntuple for an event" 
+                        "in a channel (eeee/eemm/mmmm) that does not belong to that"
+                        "channel. This deduplication across channels only needs to happen"
+                        "in MC samples")
     parser.add_argument("-e", "--extraArgs", type=str, default='',
                         help="Extra arguments to pass to skimNtuples script")
     parser.add_argument("--noSubmit", action='store_true',
@@ -24,11 +29,19 @@ def getComLineArgs():
 
 def getFilesPerJob(path_to_files):
     file_type = "Local" if "store" not in path_to_files else "HDFS"
-    num, tot_size = getattr(ConfigureJobs, "getNumberAndSizeOf%sFiles" % file_type)(path_to_files)
-    if num == 0:
-        raise ValueError("Size of file list is zero for path: %s" % path_to_files)
-    average_size = tot_size/num
-    return int(math.ceil(200./average_size))
+    if file_type=="Local":
+        num, tot_size = getattr(ConfigureJobs, "getNumberAndSizeOf%sFiles" % file_type)(path_to_files)
+        if num == 0:
+            raise ValueError("Size of file list is zero for path: %s" % path_to_files)
+        print "Number: ",num
+        print "TotSize: ",tot_size
+        return 1
+    else:
+        num, tot_size = getattr(ConfigureJobs, "getNumberAndSizeOf%sFiles" % file_type)(path_to_files)
+        if num == 0:
+            raise ValueError("Size of file list is zero for path: %s" % path_to_files)
+        average_size = tot_size/num
+        return int(math.ceil(200./average_size))
 # The intention here was to make sure the output order isn't jumbled together,
 # as it is when subprocess outputs are written together. This is an admittedly
 # sloppy solution, however
@@ -59,7 +72,7 @@ def callFarmout(output_dir, script_name, noSubmit):
         print "Error in submitting files to condor. Check the log file: %s" % log_file_name
     if noSubmit: status = -1
     return status
-def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs, noSubmit, extraArgs):
+def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs, deduplicateAcrossChannels, noSubmit, extraArgs):
     farmout_dict = {}
     farmout_dict['input_files_path'] = ConfigureJobs.getInputFilesPath(
         sample_name, 
@@ -91,7 +104,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
         farmout_dict['job_dir'],
         selection,
         analysis,
-        ConfigureJobs.getTriggerName(sample_name, analysis, selection),
+        ConfigureJobs.getTriggerName(sample_name,analysis, selection),
         scaleFacs and ("Run" not in sample_name),
         extraArgs
     )
@@ -121,7 +134,7 @@ def main():
     for file_name in ConfigureJobs.getListOfFiles(args['filenames'], path):
         try:
             farmoutNtupleSkim(file_name, path, args['selection'], 
-                args['analysis'], args['version'], args['scaleFacs'], 
+                args['analysis'], args['version'], args['scaleFacs'], args['deduplicateAcrossChannels'], 
                 args['noSubmit'], args['extraArgs'])
         except (ValueError, OSError) as error:
             logging.warning(error)
