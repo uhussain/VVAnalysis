@@ -9,10 +9,10 @@
 tar -xvzf analysis_code.tar.gz
 ./skimNtuples.py -s ${selection} -a ${analysis} ${trigger} -f $$INPUT -o $$OUTPUT ${extraArgs}
 
-addscalefacs=${addscalefacs}
-if [ $$addscalefacs == "true" ]; then
+addScaleFacs=${addScaleFacs}
+if [ $$addScaleFacs == "true" ]; then
     echo "adding lepton id and pilupe scale factors"
-    ./utilities/scripts/addscalefactors.py -f $$output
+    ./utilities/scripts/addScaleFactors.py -f $$output
 fi
 
 addDuplicatedFlag=${addDuplicatedFlag}
