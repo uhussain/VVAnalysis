@@ -9,8 +9,14 @@
 tar -xvzf analysis_code.tar.gz
 ./skimNtuples.py -s ${selection} -a ${analysis} ${trigger} -f $$INPUT -o $$OUTPUT ${extraArgs}
 
-addScaleFacs=${addScaleFacs}
-if [ $$addScaleFacs == "True" ]; then
-    echo "Adding lepton ID and pilupe scale factors"
-    ./Utilities/scripts/addScaleFactors.py -f $$OUTPUT
+addscalefacs=${addscalefacs}
+if [ $$addscalefacs == "true" ]; then
+    echo "adding lepton id and pilupe scale factors"
+    ./utilities/scripts/addscalefactors.py -f $$output
+fi
+
+addDuplicatedFlag=${addDuplicatedFlag}
+if [ $$addDuplicatedFlag == "true" ]; then
+    echo "adding a duplicated flag if an event is in more than one final state"
+    ./utilities/scripts/addDuplicatedFlag.py -f $$output
 fi
