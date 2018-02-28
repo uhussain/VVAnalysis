@@ -83,7 +83,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
     submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
-        % '{:%Y-%m-%d}_ZZAnalysisJobs'.format(datetime.date.today())
+        % '{:%Y-%m-%d}_ZZ2018AnalysisJobs'.format(datetime.date.today())
     try:
         os.mkdir(submission_dir)
     except:
@@ -106,6 +106,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
         analysis,
         ConfigureJobs.getTriggerName(sample_name,analysis, selection),
         scaleFacs and ("Run" not in sample_name),
+        deduplicateAcrossChannels and ("Run" not in sample_name), 
         extraArgs
     )
     status = callFarmout(farmout_dict['job_dir'], script_name, noSubmit)
@@ -115,7 +116,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
         print "Test run: submit directory created but not submitted"
     else:
         print "Jobs not submitted"
-def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleFacs, extraArgs):
+def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleFacs, addDuplicatedFlag, extraArgs):
     fill_dict = {'selection' : selection,
         'analysis' : analysis,
         'time' : datetime.datetime.now(),
@@ -123,6 +124,7 @@ def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleF
         'command' : ' '.join(sys.argv),
         'extraArgs' : extraArgs,
         'addScaleFacs' : addScaleFacs,
+        'addDuplicatedFlag': addDuplicatedFlag,
     }
     ConfigureJobs.fillTemplatedFile('/'.join([base_dir, 'Templates/skim_template.sh']),
         '/'.join([job_dir, 'skim.sh']), fill_dict)
