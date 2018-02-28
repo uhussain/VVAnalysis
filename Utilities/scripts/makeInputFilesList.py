@@ -12,7 +12,8 @@
 import glob
 import argparse
 import subprocess
-
+from os import listdir
+from os.path import isfile, join
 def getComLineArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output_file", type=str,
@@ -23,7 +24,7 @@ def getComLineArgs():
     parser.add_argument("-r", "--only_root_files", action='store_true',
                         help="Only list .root files")
     return vars(parser.parse_args())
-def makeFileList(output_file, file_path, only_root_files):
+def makeHDFSFileList(output_file, file_path, only_root_files):
     out = subprocess.check_output(["hdfs", "dfs", "-ls", file_path.replace("/hdfs", "")])
     files = []
     for line in out.splitlines():
@@ -37,8 +38,30 @@ def makeFileList(output_file, file_path, only_root_files):
             if only_root_files and ".root" not in file_name:
                 continue
             file_list.write(file_name+"\n")
+def makeLocalFileList(output_file, file_path, only_root_files):
+    files = [f for f in listdir(file_path) if isfile(join(file_path, f))]
+    print file_path
+    #out = subprocess.check_output(["ls", file_path.replace("","")])
+    #print out
+   # files = []
+   # for line in out.splitlines():
+   #     split = line.split("/", 1)
+   #     if len(split) != 2:
+   #         continue
+   #     else:
+   #         files.append("/"+split[1])
+    with open(output_file, "w") as file_list:
+        for file_name in files:
+            if only_root_files and ".root" not in file_name:
+                continue
+            file_name=file_path+file_name
+            file_list.write(file_name+"\n")
+
 def main():
     args = getComLineArgs()
-    makeFileList(args['output_file'], args['file_path'], args['only_root_files'])
+    if "store" in args['file_path'][:7] or "hdfs" in args['file_path'][:7]: 
+        makeHDFSFileList(args['output_file'], args['file_path'], args['only_root_files'])
+    else:
+        makeLocalFileList(args['output_file'], args['file_path'], args['only_root_files'])
 if __name__ == "__main__":
     main()
