@@ -17,9 +17,11 @@ void disambiguateFinalStates::Init(TTree *tree)
   fChain = tree;
 
   fChain->SetBranchAddress(l1_l2_Cand_mass, &l1_l2_Mass, &b_l1_l2_Mass);
-  fChain->SetBranchAddress(l1_l2_Cand_pt, &l1_l2_Pt, &b_l1_l2_Pt);
+  fChain->SetBranchAddress(l1_Cand_pt, &l1_Pt, &b_l1_Pt);
+  fChain->SetBranchAddress(l2_Cand_pt, &l2_Pt, &b_l2_Pt);
   fChain->SetBranchAddress(l3_l4_Cand_mass, &l3_l4_Mass, &b_l3_l4_Mass);
-  fChain->SetBranchAddress(l3_l4_Cand_pt, &l3_l4_Pt, &b_l3_l4_Pt);
+  fChain->SetBranchAddress(l3_Cand_pt, &l3_Pt, &b_l3_Pt); 
+  fChain->SetBranchAddress(l4_Cand_pt, &l4_Pt, &b_l4_Pt);
   fChain->SetBranchAddress("evt", &evt, &b_evt);
   fChain->SetBranchAddress("run", &run, &b_run);
 
@@ -62,19 +64,21 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
   //if ( fCutFormula && fCutFormula->EvalInstance() > 0. )
   //{
     b_l1_l2_Mass->GetEntry(entry);
-    b_l1_l2_Pt->GetEntry(entry);
+    b_l1_Pt->GetEntry(entry);
+    b_l2_Pt->GetEntry(entry);
     b_l3_l4_Mass->GetEntry(entry);
-    b_l3_l4_Pt->GetEntry(entry);
+    b_l3_Pt->GetEntry(entry); 
+    b_l4_Pt->GetEntry(entry);
     
     float mass_discriminant,Z2ptSum; 
     //This condition identifies the Z1 candidate
     //Required for the 2e2mu state but redundant for the 4e,4mu state however it should be quick comparison
     if(fabs(l1_l2_Mass-91.1876) < fabs(l3_l4_Mass-91.1876)){
       mass_discriminant = fabs(l1_l2_Mass-91.1876);
-      Z2ptSum = l3_l4_Pt;}
+      Z2ptSum = l3_Pt+l4_Pt;}
     else{ 
       mass_discriminant = fabs(l3_l4_Mass-91.1876);
-      Z2ptSum = l1_l2_Pt;}  
+      Z2ptSum = l1_Pt+l2_Pt;}  
     
     fEntriesToCompare.push_back(entry);
     fEntryDiscriminants.push_back(mass_discriminant);

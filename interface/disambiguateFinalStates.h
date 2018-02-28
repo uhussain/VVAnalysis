@@ -25,16 +25,20 @@ public :
   TTree          *fChain;
 
   float           l1_l2_Mass;
-  float           l1_l2_Pt;
+  float           l1_Pt;
+  float           l2_Pt;
   float           l3_l4_Mass;
-  float           l3_l4_Pt;
+  float           l3_Pt;
+  float           l4_Pt;
   ULong64_t        evt;
   UInt_t           run;
 
   TBranch        *b_l1_l2_Mass;
-  TBranch        *b_l1_l2_Pt;
+  TBranch        *b_l1_Pt; 
+  TBranch        *b_l2_Pt;
   TBranch        *b_l3_l4_Mass;
-  TBranch        *b_l3_l4_Pt;
+  TBranch        *b_l3_Pt;
+  TBranch        *b_l4_Pt;
 
   TBranch        *b_evt;
   TBranch        *b_run;
@@ -60,11 +64,13 @@ public :
   virtual TList  *GetOutputList() const { return fOutput; }
   virtual void    SlaveTerminate();
   virtual void    Terminate();
-  void setZCandidateBranchName(const char* name1,const char* name2,const char* name3,const char* name4) { 
+  void setZCandidateBranchName(const char* name1,const char* name2, const char* name3,const char* name4,const char* name5,const char* name6) { 
     l1_l2_Cand_mass = const_cast<char*>(name1);  
-    l1_l2_Cand_pt = const_cast<char*>(name2); 
-    l3_l4_Cand_mass = const_cast<char*>(name3); 
-    l3_l4_Cand_pt = const_cast<char*>(name4); 
+    l1_Cand_pt = const_cast<char*>(name2);  
+    l2_Cand_pt = const_cast<char*>(name3); 
+    l3_l4_Cand_mass = const_cast<char*>(name4); 
+    l3_Cand_pt = const_cast<char*>(name5);
+    l4_Cand_pt = const_cast<char*>(name6); 
   }
 
   ClassDef(disambiguateFinalStates,0);
@@ -77,9 +83,11 @@ private :
   std::vector<float> fEntryDiscriminants; 
   std::vector<float> fEntryZ2PtSum;
   char* l1_l2_Cand_mass; 
-  char* l1_l2_Cand_pt; 
+  char* l1_Cand_pt;
+  char* l2_Cand_pt; 
   char* l3_l4_Cand_mass; 
-  char* l3_l4_Cand_pt; 
+  char* l3_Cand_pt;
+  char* l4_Cand_pt; 
 };
 
 #endif
