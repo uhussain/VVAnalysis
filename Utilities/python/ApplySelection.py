@@ -25,7 +25,7 @@ def buildCutString(state, selections, analysis, trigger):
         cuts = UserInput.readJson(selection_json)
         cut_string.append(cuts["Event"])
         cut_string.append(cuts["State"][state])
-        if (trigger != "" and selection == 'trigger'):
+        if trigger != "":
             trigger_string = getTriggerCutString(trigger, analysis)
             if not cut_string.contains(trigger_string):
                 cut_string.append(trigger_string)

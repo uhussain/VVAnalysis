@@ -86,21 +86,9 @@ def getListOfFiles(filelist, manager_path):
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
-        if "ZZ4l2017" in name:
+        if "ZZ4l2018" in name:
             dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2017/%s.json" % "ntuples"
-            allnames = json.load(open(dataset_file)).keys()
-            print allnames
-            if "nodata" in name:
-                nodata = [x for x in allnames if "Run" not in x]
-                names += nodata
-            elif "Run" in name:
-                names += [x for x in allnames if "Run" in x]
-            else:
-                names += allnames
-        elif "NateFiles" in name:
-            dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2017/%s.json" % "nate"
+                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2018/%s.json" % "ntuples"
             allnames = json.load(open(dataset_file)).keys()
             print allnames
             if "nodata" in name:
@@ -139,14 +127,10 @@ def getListOfFilesWithXSec(filelist, manager_path):
     return info
 def getPreviousStep(selection, analysis):
     selection_map = {}
-    if analysis == "ZZ4l2017":
-        selection_map = { "nate": "nate",
-                "preselection" : "nate"
+    if analysis == "ZZ4l2018":
+        selection_map = { "ntuples": "ntuples",
+                "preselection" : "ntuples"
         }
-    #elif analysis == "ZZ4l2017-nate":
-    #    selection_map = { "nate": "nate",
-    #            "preselection" : "nate"
-    #    }
     elif analysis == "WZDecemberAnalysis":
         selection_map = { "ntuples" : "ntuples",
                 "loosepreselection" : "ntuples",
@@ -177,7 +161,7 @@ def getCutsJsonName(selection, analysis):
     return "/".join(["Cuts", analysis, selection + ".json"]) 
 def getTriggerName(sample_name,analysis, selection):
     trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG", "SingleMuon", "SingleElectron"]
-    if ("Run" in sample_name and (getPreviousStep(selection, analysis) == "ntuples" or getPreviousStep(selection, analysis) == "nate")):
+    if "Run" in sample_name and getPreviousStep(selection, analysis) == "ntuples":
         for name in trigger_names:
             if name in sample_name:
                 return "-t " + name

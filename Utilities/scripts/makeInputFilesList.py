@@ -41,15 +41,6 @@ def makeHDFSFileList(output_file, file_path, only_root_files):
 def makeLocalFileList(output_file, file_path, only_root_files):
     files = [f for f in listdir(file_path) if isfile(join(file_path, f))]
     print file_path
-    #out = subprocess.check_output(["ls", file_path.replace("","")])
-    #print out
-   # files = []
-   # for line in out.splitlines():
-   #     split = line.split("/", 1)
-   #     if len(split) != 2:
-   #         continue
-   #     else:
-   #         files.append("/"+split[1])
     with open(output_file, "w") as file_list:
         for file_name in files:
             if only_root_files and ".root" not in file_name:
