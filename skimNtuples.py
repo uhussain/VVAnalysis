@@ -98,6 +98,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
            selections.split(","), analysis, trigger).getString())
         cuts_string = cuts.getString()
         print "Cut string is %s " % cuts_string
+        ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
         event_counts["selected"][state] = writeNtupleToFile(output_file, tree, state, cuts_string,deduplicate)
     writeMetaTreeToFile(output_file, metaTree)
     event_info = PrettyTable(["Selection", "eeee", "eemm","mmmm"])
