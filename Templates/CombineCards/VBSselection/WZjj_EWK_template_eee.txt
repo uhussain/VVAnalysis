@@ -26,7 +26,7 @@ process                         0               1               2           3   
 rate                            ${signal_yield} ${wz_mgmlm}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
 ------------                                                                                                                                                                                                                 
 lumi                    lnN     1.025           1.025           1.025       1.025           1.025       -          
-WZjj_qcd_modeling       lnN     -               1.10            -           -               -           -          
+WZjjQCD_norm            lnN     -               1.10            -           -               -           -          
 nonprompt_norm          lnN     -               -               -           -               -           1.3
 MET                     lnN     1.02            1.02            1.04        1.06            1.05        1.02     
 btag                    lnN     1.02            1.02            -           1.07            -           -
@@ -38,6 +38,7 @@ mScale                  lnN     -               -               -           -   
 mEff                    lnN     -               -               -           -               -           -
 ${signal_name}_scale    shape   1               -               -           -               -           -
 wz-mgmlm_scale          shape   -               1               -           -               -           -
+wzQCDModeling           shape   -               1               -           -               -           -
 vv_scale                shape   -               -               1           -               -           -
 top-ewk_scale           shape   -               -               -           1               -           -
 zg_scale                lnN     -               -               1           -               0.1         -

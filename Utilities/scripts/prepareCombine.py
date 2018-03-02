@@ -135,7 +135,7 @@ wz_scalefacs = {
 scaleWZ = True
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
-numvars = 23 if "VBS" in args['selection'] else 13
+numvars = 24 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
 #variable = "yield"
@@ -143,7 +143,9 @@ variable = "mjj_etajj_unrolled" if isVBS else "yield"
 #variable = "mjj_mtwz_unrolled" if isVBS else "yield"
 if isVBS and args['aqgc']:
     variable = "MTWZ"
-rebin = array.array('d', [500, 1000,1500, 2000, 2500]) if variable == "mjj" else None
+mjj_binning = ConfigureJobs.get2DBinning()[0]
+#mjj_binning = array.array('d', [500, 1000,1500, 2000, 2500]) 
+rebin = mjj_binning if variable == "mjj" else None
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans], rebin=rebin)
@@ -217,20 +219,14 @@ for plot_group in plot_groups:
                     HistTools.addOverflowAndUnderflow(hist)
             elif "TH3" in weight_hist.ClassName(): 
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
-                    HistTools.makeUnrolledHist, [
-                        array.array('d', [500, 1000,1500, 2000, 2500]),
-                        [2.5, 4, 5.5, 20] # for deta(j1, j2)
-                        # [0, 150, 300, 450] # for MT(WZ)
-                    ],
+                    HistTools.makeUnrolledHist,
+                    ConfigureJobs.get2DBinning(),
                     plot_group
                 )
                 if pdf_entries[plot_group]:
                     pdf_hists = HistTools.getTransformed3DPDFHists(weight_hist, 
-                        HistTools.makeUnrolledHist, [
-                            array.array('d', [500, 1000,1500, 2000, 2500]),
-                            [2.5, 4, 5.5, 20] # for deta(j1, j2)
-                            # [0, 150, 300, 450] # for MT(WZ)
-                        ],
+                        HistTools.makeUnrolledHist, 
+                        ConfigureJobs.get2DBinning(),
                         pdf_entries[plot_group],
                         plot_group
                     )
@@ -348,7 +344,7 @@ if not args['noCards']:
         chan_dict["signal_name"] = signal.replace("_", "-")
         chan_dict["fit_variable"] = variable
         chan_dict["signal_yield"] = chan_dict[signal]
-        chan_dict["nuisances"] = numvars+len(stat_variations[chan]) -1*("Wselection" in args['selection'])
+        chan_dict["nuisances"] = numvars+len(chans)*len(stat_variations[chan]) -1*("Wselection" in args['selection'])
         file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
                 else '%s/WZ_%s.txt' % (output_dir, chan)
         template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
@@ -358,38 +354,42 @@ if not args['noCards']:
             chan_dict
         )
         with open(file_name, "a") as chan_file:
-            for hist_name in stat_variations[chan]:
-                if 'Wselection' in args['selection'] and "wzjj-ewk" in hist_name:
-                    continue
-                if "VBS" in args['selection']:
-                    chan_file.write(
-                        "%s     shape   %i               %i               %i           %i               %i           %i\n" \
-                            % (hist_name, 
-                                chan_dict["signal_name"] in hist_name,
-                                "wz-mgmlm" in hist_name,
-                                "vv" in hist_name,
-                                "top-ewk" in hist_name,
-                                "zg" in hist_name,
-                                "nonprompt" in hist_name,
-                            )
-                )
-                else:
-                    chan_file.write(
-                        "%s     shape   %i               %i               %i           %i               %i\n" \
-                            % (hist_name, 
-                                "wz-powheg" in hist_name,
-                                "vv" in hist_name,
-                                "top-ewk" in hist_name,
-                                "zg" in hist_name,
-                                "nonprompt" in hist_name,
-                            )
-                )
+            for c in chans:
+                for hist_name in stat_variations[c]:
+                    if 'Wselection' in args['selection'] and "wzjj-ewk" in hist_name:
+                        continue
+                    if "VBS" in args['selection'] and chan == c:
+                        chan_file.write(
+                            "%s     shape   %i               %i               %i           %i               %i           %i\n" \
+                                % (hist_name, 
+                                    chan_dict["signal_name"] in hist_name,
+                                    "wz-mgmlm" in hist_name,
+                                    "vv" in hist_name,
+                                    "top-ewk" in hist_name,
+                                    "zg" in hist_name,
+                                    "nonprompt" in hist_name,
+                                )
+                    )
+                    elif "VBS" in args['selection']:
+                        chan_file.write(
+                            "%s     shape   0               0               0           0               0           0\n" % hist_name)
+                    else:
+                        chan_file.write(
+                            "%s     shape   %i               %i               %i           %i               %i\n" \
+                                % (hist_name, 
+                                    "wz-powheg" in hist_name,
+                                    "vv" in hist_name,
+                                    "top-ewk" in hist_name,
+                                    "zg" in hist_name,
+                                    "nonprompt" in hist_name,
+                                )
+                    )
             chan_file.write("\nnonprompt_all group = nonprompt_norm %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
             chan_file.write("mc_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
             chan_file.write("lepton_unc group = eRes eScale eEff mRes mScale mEff\n")
             if "VBS" in args['selection']:
                 chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
-                chan_file.write("wz_qcd_all group = wz-mgmlm_scale WZjj_qcd_modeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
+                chan_file.write("wz_qcd_all group = wz-mgmlm_scale wz-mgmlm_pdf WZjjQCD_norm wzQCDModeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
                 chan_file.write(("theory group = wz-mgmlm_scale vv_scale top-ewk_scale {signal_name}_scale " +
                                                 "wz-mgmlm_pdf vv_pdf top-ewk_pdf {signal_name}_pdf").format(signal_name=chan_dict['signal_name']))
     ConfigureJobs.fillTemplatedFile(

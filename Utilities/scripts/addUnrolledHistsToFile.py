@@ -22,11 +22,9 @@ transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file,
                 for var in jeVariations] + \
         ["mjj_etajj_2D_%s_Fakes_%s" % (var, c) for c in ConfigureJobs.getChannels()
                 for var in jeVariations],
-        HistTools.makeUnrolledHist, [
-            array.array('d', [500, 1000,1500, 2000, 2500]),
-            [2.5, 4, 5.5, 20]
-        ]
+        HistTools.makeUnrolledHist, ConfigureJobs.get2DBinning()
 )
+print ConfigureJobs.get2DBinning()
 
 transformed_mjj_mtwz_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),

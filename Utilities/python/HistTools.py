@@ -96,11 +96,11 @@ def getStatHists(hist, name, chan, signal):
             continue
         if not (signal  == "wzjj_ewk" and "wzjj-vbfnlo" in name) \
                 and not (signal  == "wzjj_vbfnlo" and "wzjj-ewk" in name):
-            variation_names.append("%s_statBin%i" % (name, i))
+            variation_names.append("%s_%s_statBin%i" % (name, chan, i))
         statUp_hist = hist.Clone(hist.GetName().replace(
-            chan, "%s_statBin%sUp_%s" % (name, i, chan)))
+            chan, "%s_%s_statBin%sUp_%s" % (name, chan, i, chan)))
         statDown_hist = hist.Clone(hist.GetName().replace(
-            chan, "%s_statBin%iDown_%s" % (name, i, chan)))
+            chan, "%s_%s_statBin%iDown_%s" % (name, chan, i, chan)))
         up = hist.GetBinContent(i)+hist.GetBinErrorUp(i) if \
                 hist.GetBinContent(i) > 0 else hist.GetBinErrorUp(i)
         down = hist.GetBinContent(i)-hist.GetBinErrorLow(i)

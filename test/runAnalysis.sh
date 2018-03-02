@@ -2,7 +2,7 @@
 
 lumi=35.87
 lepid="Tight"
-DATE=$(date +%d%b%Y)
+#DATE=$(date +%d%b%Y)
 DATE=19Feb2018
 DATE_MONTHONLY=$(date +%b%Y)
 looselepsfile=3MediumLeptons
@@ -44,7 +44,7 @@ fi
 #frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}_fromJakob.root
 #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_jakobsFakeRates.root
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/j1Pt50-j2Pt50/${output}-${DATE}-${lepid}From${looselepsfile}.root
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
 if [ -f $frfile ] && [ "$2" != "RedoFakeRate" ]; then

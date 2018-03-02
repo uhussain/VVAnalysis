@@ -3,7 +3,8 @@ import subprocess
 import math
 
 def getMuAndErr(arg):
-    subprocess.call(["bash", "runCombine.sh", "mu", arg])
+    if subprocess.call(["bash", "runCombine.sh", "mu", arg]):
+        return (0, 0, 0)
     rtfile = ROOT.TFile("mlfit.root")
     tree = rtfile.Get("tree_fit_sb")
     row = tree.__iter__().next()
@@ -15,17 +16,18 @@ muCentral, muCentralErrDown, muCentralErrUp = getMuAndErr("")
 results = {}
 
 nuisances = {"jes" : "simple",
-    "jer" : "simple",
-    "lumi" : "simple",
-    "MET" : "simple",
-    "btag" : "simple",
-    "wzjj-ewk_scale" : "simple",
-    "nonprompt_all" : "group" ,
-    "mc_stat" : "group" ,
-    "mu_unc" : "group" ,
-    "e_unc" : "group" ,
-    "wz_qcd_all": "group" ,
-    "other_theory" : "group",
+    #"jer" : "simple",
+    #"lumi" : "simple",
+    #"MET" : "simple",
+    #"btag" : "simple",
+    "wzjj-ewk_scale,wzjj-ewk_pdf" : "simple",
+    "wzQCDModeling" : "simple",
+    #"nonprompt_all" : "group" ,
+    #"mc_stat" : "group" ,
+    #"mu_unc" : "group" ,
+    #"e_unc" : "group" ,
+    #"wz_qcd_all": "group" ,
+    #"background_theory" : "group",
 }
 for nuisance, nutype in nuisances.iteritems():
     if nutype == "simple":
