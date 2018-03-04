@@ -38,7 +38,7 @@ mScale                  lnN     1.04            1.04            1.04        1.04
 mEff                    lnN     1.04            1.04            1.04        1.04            1.04        -  
 ${signal_name}_scale    shape   1               -               -           -               -           -
 wz-mgmlm_scale          shape   -               1               -           -               -           -
-wzQCDModeling           shape   -               1               -           -               -           -
+#wzQCDModeling           shape   -               1               -           -               -           -
 vv_scale                shape   -               -               1           -               -           -
 top-ewk_scale           shape   -               -               -           1               -           -
 zg_scale                lnN     -               -               1           -               0.1         -

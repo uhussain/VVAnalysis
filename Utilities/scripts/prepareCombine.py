@@ -8,11 +8,13 @@ import os
 import sys
 import math
 import array
+import logging
 
 stat_variations = { "eee" : [],
     "eem" : [],
     "emm" : [],
     "mmm" : [],
+    "all" : [],
 }
 
 def getComLineArgs():
@@ -31,12 +33,30 @@ def getComLineArgs():
         default="test.root", help="Output file name")
     parser.add_argument("--folder_name", type=str,
         default="", help="Name for combine folder (date by default)")
+    parser.add_argument("--combineChannels", action='store_true',
+        help="Don't fit channels independently")
     parser.add_argument("-b", "--hist_names", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["all"], help="List of histograms, "
                         "as defined in AnalysisDatasetManager, separated "
                         "by commas")
     return vars(parser.parse_args())
+
+def combineChannels(group, chans, variations=[], central=True):
+    if central:
+        variations.append("")
+    for var in variations:
+        name = variable if var is "" else "_".join([variable, var])
+        hist = group.FindObject(name + "_" + chans[0])
+        if not hist:
+            logging.warning("Failed to find hist %s in group %s. Skipping" % (name, group.GetName()))
+            continue
+        hist = hist.Clone(name)
+        ROOT.SetOwnership(hist, False)
+        group.Add(hist) 
+        for chan in chans[1:]:
+            chan_hist = group.FindObject(name + "_" + chan)
+            hist.Add(chan_hist)
 
 ROOT.gROOT.SetBatch(True)
 chans = ConfigureJobs.getChannels()
@@ -57,45 +77,45 @@ fIn = ROOT.TFile(args['input_file'])
 
 card_info = {
     "eee" : { 
-        "wzjj-vbfnlo" : 0,
-        "wzjj-ewk" : 0,
-        "wz-mgmlm" : 0,
-        "wz-powheg" : 0,
-        "vv-powheg" : 0,
-        "top-ewk" : 0,
+        "wzjj_vbfnlo" : 0,
+        "wzjj_ewk" : 0,
+        "wz_mgmlm" : 0,
+        "wz_powheg" : 0,
+        "vv_powheg" : 0,
+        "top_ewk" : 0,
         "zg" : 0,
         "vv" : 0,
         "AllData" : 0,
     },
     "eem" : {
-        "wzjj-vbfnlo" : 0,
-        "wzjj-ewk" : 0,
-        "wz-powheg" : 0,
-        "vv-powheg" : 0,
-        "top-ewk" : 0,
+        "wzjj_vbfnlo" : 0,
+        "wzjj_ewk" : 0,
+        "wz_powheg" : 0,
+        "vv_powheg" : 0,
+        "top_ewk" : 0,
         "zg" : 0,
         "vv" : 0,
         "AllData" : 0,
         "AllData" : 0,
     },
     "emm" : {
-        "wzjj-vbfnlo" : 0,
-        "wzjj-ewk" : 0,
-        "wz-mgmlm" : 0,
-        "wz-powheg" : 0,
-        "vv-powheg" : 0,
-        "top-ewk" : 0,
+        "wzjj_vbfnlo" : 0,
+        "wzjj_ewk" : 0,
+        "wz_mgmlm" : 0,
+        "wz_powheg" : 0,
+        "vv_powheg" : 0,
+        "top_ewk" : 0,
         "zg" : 0,
         "vv" : 0,
         "AllData" : 0,
     },
     "mmm" : {
-        "wzjj-vbfnlo" : 0,
-        "wzjj-ewk" : 0,
-        "wz-mgmlm" : 0,
-        "wz-powheg" : 0,
-        "vv-powheg" : 0,
-        "top-ewk" : 0,
+        "wzjj_vbfnlo" : 0,
+        "wzjj_ewk" : 0,
+        "wz_mgmlm" : 0,
+        "wz_powheg" : 0,
+        "vv_powheg" : 0,
+        "top_ewk" : 0,
         "zg" : 0,
         "vv" : 0,
         "AllData" : 0,
@@ -133,9 +153,11 @@ wz_scalefacs = {
 
 
 scaleWZ = True
+manualStatUnc = False
+variations = ["jerUp", "jerDown", "jesUp", "jesDown"] 
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
-numvars = 24 if "VBS" in args['selection'] else 13
+numvars = 23 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
 #variable = "yield"
@@ -149,10 +171,12 @@ rebin = mjj_binning if variable == "mjj" else None
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans], rebin=rebin)
+
+combineChannels(alldata, chans)
 OutputTools.writeOutputListItem(alldata, fOut)
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans], rebin=rebin)
-for var in ["jesUp", "jesDown", "jerUp", "jerDown"]:
+for var in variations:
     hists = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
             ["_".join([variable, var, "Fakes", c]) for c in chans], rebin=rebin)
     for h in hists:
@@ -164,9 +188,12 @@ for chan in chans:
     hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
     HistTools.removeZeros(hist)
     card_info[chan]["nonprompt"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
-    stat_hists,variation_names = HistTools.getStatHists(hist, "nonprompt", chan, signal)
-    stat_variations[chan].extend(variation_names)
-    nonprompt.extend(stat_hists[:])
+    if manualStatUnc:
+        stat_hists,variation_names = HistTools.getStatHists(hist, "nonprompt", chan, signal)
+        stat_variations[chan].extend(variation_names)
+        nonprompt.extend(stat_hists[:])
+
+combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in variations], False)
 OutputTools.writeOutputListItem(nonprompt, fOut)
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
@@ -187,7 +214,6 @@ for plot_group in plot_groups:
     if "data" not in plot_group and "aqgc" not in plot_group:
         plots += ["_".join([variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
     if isVBS and "aqgc" not in plot_group:
-        variations = ["jerUp", "jerDown", "jesUp", "jesDown"] 
         plots += ["_".join([variable, var, c]) for var in variations for c in chans]
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
@@ -201,14 +227,15 @@ for plot_group in plot_groups:
         hist = group.FindObject(variable+"_"+chan)
         card_info[chan]["output_file"] = args['output_file']
         if plot_group not in ["wz", "wz-powheg"]:
-            stat_hists,variation_names = HistTools.getStatHists(hist, plot_group, chan, signal)
-            stat_variations[chan].extend(variation_names)
-            group.extend(stat_hists)
+            if manualStatUnc:
+                stat_hists,variation_names = HistTools.getStatHists(hist, plot_group, chan, signal)
+                stat_variations[chan].extend(variation_names)
+                group.extend(stat_hists)
         if "data" not in plot_group:
             weight_hist_name = variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
             if not weight_hist:
-                print "WARNING: Failed to find %s. Skipping" % weight_hist_name
+                logging.warning("Failed to find %s. Skipping" % weight_hist_name)
                 continue
             pdf_hists = []
             if "TH2" in weight_hist.ClassName():
@@ -243,15 +270,14 @@ for plot_group in plot_groups:
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
         card_info[chan][name] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
+    theory_vars = [plot_group+"_%s" % var for var in ["scaleUp", "scaleDown", "pdfUp", "pdfDown"]]
+    combineChannels(group, chans, variations + theory_vars, True)
     OutputTools.writeOutputListItem(group, fOut)
-    output_info.add_row([plot_group, card_info["eee"][name], 
-        card_info["eem"][name], 
-        card_info["emm"][name], 
-        card_info["mmm"][name], 
-        sum([card_info[c][name] for c in chans])]
-    )
+    yields = [card_info[chan][name] for c in chans]
+    yields.append(sum([card_info[c][name] for c in chans]))
+    output_info.add_row([plot_group] + yields)
 
-addWZModelingUnc = True
+addWZModelingUnc = False
 if addWZModelingUnc:
     central_hist = "wz-mgmlm"
     theoryvar = "wz"
@@ -290,6 +316,7 @@ if addWZModelingUnc:
                 )
         theoryUnc.Add(addTheoryUp)
         theoryUnc.Add(addTheoryDown)
+    combineChannels(theoryUnc)
     OutputTools.writeOutputListItem(theoryUnc, fOut)
 
 output_info.add_row(["nonprompt", card_info["eee"]["nonprompt"], 
@@ -322,14 +349,14 @@ for name in ["wzjj_ewk", "wzjj_vbfnlo"]:
             /math.sqrt(sum([background[c] for c in chans])), 4), 
     ])
 
-combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_7_4_7/src/HiggsAnalysis/CombinedLimit"
+combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_8_1_0/src/HiggsAnalysis/CombinedLimit"
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
                 datetime.date.today().strftime("%d%b%Y") 
 output_dir = '/'.join([combine_dir,args['selection'], folder_name])
 try:
     os.makedirs(output_dir)
 except OSError as e:
-    print e
+    logging.warning(e)
     pass
 
 signal_abv = "_vbfnlo" if args['vbfnlo'] else ""
@@ -340,11 +367,18 @@ with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
     yields.write("\n" + str(significance_info))
 
 if not args['noCards']:
+    if args['combineChannels']:
+        card_info["all"] = dict(card_info[chans[0]])
+        for chan in chans[1:]:
+            for process, rate in card_info[chan].iteritems():
+                if type(rate) is float:
+                    card_info["all"][process] += rate
     for chan, chan_dict in card_info.iteritems():
         chan_dict["signal_name"] = signal.replace("_", "-")
         chan_dict["fit_variable"] = variable
         chan_dict["signal_yield"] = chan_dict[signal]
-        chan_dict["nuisances"] = numvars+len(chans)*len(stat_variations[chan]) -1*("Wselection" in args['selection'])
+        numvars = numvars+len(chans)*(chan != "all")*len(stat_variations[chan]) -1*("Wselection" in args['selection'])
+        chan_dict["nuisances"] = numvars
         file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
                 else '%s/WZ_%s.txt' % (output_dir, chan)
         template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
@@ -354,6 +388,8 @@ if not args['noCards']:
             chan_dict
         )
         with open(file_name, "a") as chan_file:
+            if not manualStatUnc:
+                chan_file.write("* autoMCStats 0.5\n")
             for c in chans:
                 for hist_name in stat_variations[c]:
                     if 'Wselection' in args['selection'] and "wzjj-ewk" in hist_name:
@@ -389,7 +425,8 @@ if not args['noCards']:
             chan_file.write("lepton_unc group = eRes eScale eEff mRes mScale mEff\n")
             if "VBS" in args['selection']:
                 chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
-                chan_file.write("wz_qcd_all group = wz-mgmlm_scale wz-mgmlm_pdf WZjjQCD_norm wzQCDModeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
+                chan_file.write("wz_qcd_all group = wz-mgmlm_scale wz-mgmlm_pdf WZjjQCD_norm %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
+                #chan_file.write("wz_qcd_all group = wz-mgmlm_scale wz-mgmlm_pdf WZjjQCD_norm wzQCDModeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
                 chan_file.write(("theory group = wz-mgmlm_scale vv_scale top-ewk_scale {signal_name}_scale " +
                                                 "wz-mgmlm_pdf vv_pdf top-ewk_pdf {signal_name}_pdf").format(signal_name=chan_dict['signal_name']))
     ConfigureJobs.fillTemplatedFile(

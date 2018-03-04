@@ -14,5 +14,5 @@ elif [[ $$1 == "impacts" ]]; then
     plotImpacts.py -i impacts.json -o impacts
     popd
 else
-    combine -M ProfileLikelihood --significance -t -1 --expectSignal 1 -d $$card $$1
+    combine -M Significance -t -1 --expectSignal 1 -d $$card $$1
 fi

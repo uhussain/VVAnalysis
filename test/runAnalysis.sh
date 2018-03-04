@@ -2,8 +2,8 @@
 
 lumi=35.87
 lepid="Tight"
-#DATE=$(date +%d%b%Y)
-DATE=19Feb2018
+DATE=$(date +%d%b%Y)
+DATE=04Mar2018
 DATE_MONTHONLY=$(date +%b%Y)
 looselepsfile=3MediumLeptons
 #looselepsfile=3LooseLeptons
@@ -56,7 +56,7 @@ else
 fi
 
 if [ "$2" != "combineOnly" ]; then
-    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output
+    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output 
     if [ -f $histfile ]; then
         echo "Histogram file $histfile produced"
     else
@@ -82,6 +82,7 @@ if [ "$2" != "noCombine" ]; then
             -s $combine_selection \
             --folder_name $combine_folder \
             -l 35.9 \
+            --combineChannels \
             --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) $3
         echo "Info: File /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename  $histfile) created"
     fi
