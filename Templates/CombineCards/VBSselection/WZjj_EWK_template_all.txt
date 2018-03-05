@@ -33,9 +33,9 @@ btag                    lnN     1.02            1.02            -           1.07
 eRes                    lnN     1.04            1.04            1.04        1.04            1.04        -
 eScale                  lnN     1.06            1.06            1.06        1.06            1.06        -
 eEff                    lnN     1.07            1.07            1.07        1.07            1.07        -
-mRes                    lnN     -               -               -           -               -           -
-mScale                  lnN     -               -               -           -               -           -
-mEff                    lnN     -               -               -           -               -           -
+mRes                    lnN     1.04            1.04            1.04        1.04            1.04        -
+mScale                  lnN     1.06            1.06            1.06        1.06            1.06        -
+mEff                    lnN     1.07            1.07            1.07        1.07            1.07        -
 ${signal_name}_scale    shape   1               -               -           -               -           -
 wz-mgmlm_scale          shape   -               1               -           -               -           -
 #wzQCDModeling           shape   -               1               -           -               -           -
