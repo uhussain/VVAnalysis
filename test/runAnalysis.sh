@@ -3,7 +3,6 @@
 lumi=35.87
 lepid="Tight"
 DATE=$(date +%d%b%Y)
-DATE=04Mar2018
 DATE_MONTHONLY=$(date +%b%Y)
 looselepsfile=3MediumLeptons
 #looselepsfile=3LooseLeptons

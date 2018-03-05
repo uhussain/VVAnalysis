@@ -204,7 +204,7 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
     if (!(isMC_ || noBlind))
         return false;
     if (jPt->size() != jEta->size() || jPt->size() < 2)
-            return false;
+        return false;
 
     // Use optimized point of pT(j1,j2) > 50 GeV
     if (selection_ != VBSselection_Loose && selection_ != VBSBackgroundControl) { 
@@ -301,6 +301,8 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
 
         if (std::abs(zep3l) > 2.5)
             return false;
+        if (dijetMass == -1)
+            return true;
         return dijetMass > 500 && deltaEtajj > 2.5;
     }
     // Backgournd control
@@ -308,6 +310,9 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
         return ((dijetMass > 500 && deltaEtajj < 2.5) ||
                 (dijetMass < 500 && deltaEtajj > 2.5));
     }
+    // Make selection with no mjj and etajj conditions
+    if (dijetMass == -1)
+        return true;
     return dijetMass > 500 && deltaEtajj > 2.5;
 }
 
@@ -356,10 +361,34 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
 void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) { 
     // JES/JER uncertainties
     // Need to separate check VBS cuts using JER/JES variations
+    if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt, jetEta))) {
+        mjj_etajj_2Dhist_->Fill(mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
+    }
+
+    if (isMC_) {
+        if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jesUp, jetEta_jesUp))) {
+            mjj_etajj_2Dhist_jesUp_->Fill(mjj_jesUp, dEtajj_jesUp, weight);
+        }
+        if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jesDown, jetEta_jesDown))) {
+            mjj_etajj_2Dhist_jesDown_->Fill(mjj_jesDown, dEtajj_jesDown, weight);
+        }
+        if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jerUp, jetEta_jerUp))) {
+            mjj_etajj_2Dhist_jerUp_->Fill(mjj_jerUp, dEtajj_jerUp, weight);
+        }
+        if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jerDown, jetEta_jerDown))) {
+            mjj_etajj_2Dhist_jerDown_->Fill(mjj_jerDown, dEtajj_jerDown, weight);
+        }
+    }
+    else if (noBlind && (!isVBS_ || PassesVBSSelection(noBlind, -1, jetPt, jetEta))) {
+        mjj_etajj_2Dhist_jesUp_->Fill(mjj,dEtajj, weight);
+        mjj_etajj_2Dhist_jesDown_->Fill(mjj, dEtajj, weight);
+        mjj_etajj_2Dhist_jerUp_->Fill(mjj, dEtajj, weight);
+        mjj_etajj_2Dhist_jerDown_->Fill(mjj, dEtajj, weight);
+    }
+
     if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, mjj_jesUp, jetPt_jesUp, jetEta_jesUp))) {
-        mjj_etajj_2Dhist_jesUp_->Fill(mjj_jesUp, dEtajj_jesUp, weight);
-        mjj_mtwz_2Dhist_jesUp_->Fill(mjj_jesUp, MtToMET, weight);
         hists1D_["yield_jesUp"]->Fill(1, weight);
+        mjj_mtwz_2Dhist_jesUp_->Fill(mjj_jesUp, MtToMET, weight);
         if (hists1D_["mjj_jesUp"] != nullptr) {
             hists1D_["mjj_jesUp"]->Fill(mjj_jesUp, weight);
         }
@@ -383,7 +412,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
             hists1D_["jetEta_jesUp[2]"]->Fill(jetEta_jesUp->at(2), weight);
     }
     if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, mjj_jesDown, jetPt_jesDown, jetEta_jesDown))) {
-        mjj_etajj_2Dhist_jesDown_->Fill(mjj_jesDown, dEtajj_jesDown, weight);
         mjj_mtwz_2Dhist_jesDown_->Fill(mjj_jesDown, MtToMET, weight);
         hists1D_["yield_jesDown"]->Fill(1, weight);
 
@@ -410,7 +438,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
             hists1D_["jetEta_jesDown[2]"]->Fill(jetEta_jesDown->at(2), weight);
     }   
     if (isMC_&& (!isVBS_|| PassesVBSSelection(noBlind, mjj_jerUp, jetPt_jerUp, jetEta_jerUp))) {
-        mjj_etajj_2Dhist_jerUp_->Fill(mjj_jerUp, dEtajj_jerUp, weight);
         mjj_mtwz_2Dhist_jerUp_->Fill(mjj_jerUp, MtToMET, weight);
         hists1D_["yield_jerUp"]->Fill(1, weight);
 
@@ -437,7 +464,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
             hists1D_["jetEta_jerUp[2]"]->Fill(jetEta_jerUp->at(2), weight);
     }
     if (isMC_ && (!isVBS_ || PassesVBSSelection(noBlind, mjj_jerDown, jetPt_jerDown, jetEta_jerDown))) {
-        mjj_etajj_2Dhist_jerDown_->Fill(mjj_jerDown, dEtajj_jerDown, weight);
         mjj_mtwz_2Dhist_jerDown_->Fill(mjj_jerDown, MtToMET, weight);
         hists1D_["yield_jerDown"]->Fill(1, weight);
 
@@ -466,18 +492,16 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
     
     if (isVBS_ && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
         return;
+    mjj_mtwz_2Dhist_->Fill(mjj, MtToMET, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
+    mjj_zep3l_2Dhist_->Fill(mjj, std::abs(zep3l), weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
+    etajj_zep3l_2Dhist_->Fill(dEtajj, std::abs(zep3l), weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
     // Useful for the nonprompt estimation
     if (!isMC_ && noBlind) {
-        mjj_etajj_2Dhist_jesUp_->Fill(mjj,dEtajj, weight);
-        mjj_etajj_2Dhist_jesDown_->Fill(mjj, dEtajj, weight);
-        mjj_etajj_2Dhist_jerUp_->Fill(mjj, dEtajj, weight);
-        mjj_etajj_2Dhist_jerDown_->Fill(mjj, dEtajj, weight);
+        mjj_mtwz_2Dhist_jesUp_->Fill(mjj, MtToMET, weight);
+        mjj_mtwz_2Dhist_jerUp_->Fill(mjj, MtToMET, weight);
+        mjj_mtwz_2Dhist_jesUp_->Fill(mjj, MtToMET, weight);
+        mjj_mtwz_2Dhist_jerUp_->Fill(mjj, MtToMET, weight);
 
-        mjj_mtwz_2Dhist_jesUp_->Fill(mjj, MtToMET, weight);
-        mjj_mtwz_2Dhist_jerUp_->Fill(mjj, MtToMET, weight);
-        mjj_mtwz_2Dhist_jesUp_->Fill(mjj, MtToMET, weight);
-        mjj_mtwz_2Dhist_jerUp_->Fill(mjj, MtToMET, weight);
-        
         std::vector<std::string> vars = {"jesUp", "jesDown", "jerUp", "jerDown"};
         
         for (auto& var : vars) { 
@@ -524,11 +548,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
         hists1D_["jetEta12"]->Fill(jetEta->at(0), weight);
         hists1D_["jetEta12"]->Fill(jetEta->at(1), weight);
     }
-
-    mjj_etajj_2Dhist_->Fill(mjj, dEtajj, weight*(isMC_ || noBlind));
-    mjj_mtwz_2Dhist_->Fill(mjj, MtToMET, weight*(isMC_ || noBlind));
-    mjj_zep3l_2Dhist_->Fill(mjj, std::abs(zep3l), weight*(isMC_ || noBlind));
-    etajj_zep3l_2Dhist_->Fill(dEtajj, std::abs(zep3l), weight*(isMC_ || noBlind));
 }
 
 void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) { 
