@@ -201,6 +201,20 @@ def getTransformed3DPDFHists(hist3D, transformation, transform_args, entries, na
     return getVariationHists(hists, name, hist_name, 
             lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[83])/2)
 
+def addControlRegionToFitHist(control_hist, unrolled_hist):
+    hist = ROOT.TH1D("tmp", unrolled_hist.GetTitle(), 
+            unrolled_hist.GetNbinsX()+1, 0, unrolled_hist.GetNbinsX()+1)
+    hist.SetName(unrolled_hist.GetName().replace("unrolled", "unrolled_wCR"))
+    control_err = array.array('d', [0])
+    control_yield = control_hist.IntegralAndError(0, control_hist.GetNbinsX()+1, control_err)
+    hist.SetBinContent(1, control_yield) 
+    hist.SetBinError(1, control_err[0])
+    for i in range(1, unrolled_hist.GetNbinsX()+1):
+        hist.SetBinContent(i+1, unrolled_hist.GetBinContent(i))
+        hist.SetBinError(i+1, unrolled_hist.GetBinError(i))
+    ROOT.SetOwnership(hist, False)
+    return hist
+
 def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
     if not "TH1" in hist.ClassName():
         return

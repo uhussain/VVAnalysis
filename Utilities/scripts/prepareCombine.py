@@ -152,7 +152,8 @@ wz_scalefacs = {
 
 
 
-scaleWZ = True
+addControlRegionToFit = True
+scaleWZ = False
 manualStatUnc = False
 variations = ["jerUp", "jerDown", "jesUp", "jesDown"] 
 
@@ -161,8 +162,13 @@ numvars = 23 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
 #variable = "yield"
+#variable = "mjj_etajj_unrolled" if isVBS else "yield"
 variable = "mjj_etajj_unrolled" if isVBS else "yield"
 #variable = "mjj_mtwz_unrolled" if isVBS else "yield"
+base_variable = variable
+if addControlRegionToFit:
+    base_variable = variable
+    variable = base_variable + "_wCR"
 if isVBS and args['aqgc']:
     variable = "MTWZ"
 mjj_binning = ConfigureJobs.get2DBinning()[0]
@@ -212,9 +218,11 @@ wz_qcd_theory_hists = ROOT.TList()
 for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
     if "data" not in plot_group and "aqgc" not in plot_group:
-        plots += ["_".join([variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
+        plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
     if isVBS and "aqgc" not in plot_group:
         plots += ["_".join([variable, var, c]) for var in variations for c in chans]
+        if addControlRegionToFit:
+            plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots, rebin=rebin)
@@ -232,7 +240,7 @@ for plot_group in plot_groups:
                 stat_variations[chan].extend(variation_names)
                 group.extend(stat_hists)
         if "data" not in plot_group:
-            weight_hist_name = variable.replace("unrolled", "2D")+"_lheWeights_"+chan
+            weight_hist_name = base_variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
             if not weight_hist:
                 logging.warning("Failed to find %s. Skipping" % weight_hist_name)
@@ -260,11 +268,29 @@ for plot_group in plot_groups:
             else:
                 raise RuntimeError("Invalid weight hist %s" % weight_hist_name +
                         " for %s. Can't make scale variations" % plot_group)
+
             if plot_group in ["wz", "wz-mgmlm", "wz-powheg"]:
                 wz_qcd_theory_hists.append(hist.Clone(hist.GetName().replace(chan, "_".join([plot_group, chan]))))
                 wz_qcd_theory_hists.extend(scale_hists+pdf_hists)
-            group.extend(scale_hists)
-            group.extend(pdf_hists)
+            
+            theory_hists = []
+            if addControlRegionToFit:
+                control_hist2D = group.FindObject("backgroundControlYield_lheWeights_" + chan)
+                control_hists = ROOT.TList()
+                unrolled_theory = HistTools.getScaleHists(control_hist2D, plot_group, rebin) 
+                if pdf_entries[plot_group]:
+                    unrolled_theory += HistTools.getPDFHists(control_hist2D, pdf_entries[plot_group], plot_group, rebin)
+                for h in unrolled_theory:
+                    control_hists.Add(h)
+                for h in scale_hists+pdf_hists:
+                    control_hist_name = "_".join(["backgroundControlYield"] + h.GetName().split("_")[-3:])
+                    control_hist = control_hists.FindObject(control_hist_name)
+                    hist = HistTools.addControlRegionToFitHist(control_hist, h)
+                    theory_hists.append(hist)
+            else: 
+                theory_hists = scale_hists + pdf_hists
+            group.extend(theory_hists)
+
     for hist in group:
         HistTools.removeZeros(hist)
     for chan in chans:

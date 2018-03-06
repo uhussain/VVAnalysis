@@ -155,7 +155,6 @@ OutputTools.writeOutputListItem(alldata, fOut)
 nonpromptmc = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
     ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'])
 OutputTools.writeOutputListItem(nonpromptmc, fOut)
-
 ewkmc = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'])
 OutputTools.writeOutputListItem(ewkmc, fOut)

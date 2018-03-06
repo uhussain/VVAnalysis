@@ -198,6 +198,16 @@ void WZSelector::LoadBranches(Long64_t entry) {
         zep3l = Eta - 0.5*(jetEta->at(1) + jetEta->at(0));
     }
 }
+bool WZSelector::PassesVBSBackgroundControlSelection(float dijetMass, 
+        std::vector<float>* jPt, std::vector<float>* jEta) { 
+    if (jPt->size() != jEta->size() || jPt->size() < 2)
+        return false;
+    if (selection_ != VBSselection_Loose && 
+            (jPt->at(0) < 50 || jPt->at(1) < 50)
+        return false;
+    float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
+    return (dijetMass > 100 && (dijetMass < 500 || deltaEtajj < 2.5));
+}
 
 bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass, 
         std::vector<float>* jPt, std::vector<float>* jEta) { 
@@ -207,7 +217,9 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
         return false;
 
     // Use optimized point of pT(j1,j2) > 50 GeV
-    if (selection_ != VBSselection_Loose && selection_ != VBSBackgroundControl) { 
+    if (selection_ != VBSselection_Loose && 
+            selection_ != VBSBackgroundControl &&
+            selection_ != VBSBackgroundControlLoose) { 
         if (jPt->at(0) < 50 || jPt->at(1) < 50)
             return false;
     }
@@ -310,6 +322,9 @@ bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass,
         return ((dijetMass > 500 && deltaEtajj < 2.5) ||
                 (dijetMass < 500 && deltaEtajj > 2.5));
     }
+    else if (selection_ == VBSBackgroundControlLoose) { 
+        return PassesVBSBackgroundControlSelection(mjj, jetPt, jetEta);
+    }
     // Make selection with no mjj and etajj conditions
     if (dijetMass == -1)
         return true;
@@ -358,10 +373,43 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
     return true;
 }
 
+void WZSelector::FillVBSBackgroundControlHistograms(float weight, bool noBlind) { 
+    if (PassesVBSBackgroundControlSelection(mjj, jetPt, jetEta)) {
+        hists1D_["backgroundControlYield"]->Fill(1, weight);
+        if (isMC_)
+            for (size_t i = 0; i < lheWeights.size(); i++) {
+                weighthists_["backgroundControlYield"]->Fill(1, i, lheWeights[i]/lheWeights[0]*weight);
+            }
+        // Useful nonprompt estimation
+        if (!isMC_ && noBlind) {
+            hists1D_["backgroundControlYield_jesUp"]->Fill(1, weight);
+            hists1D_["backgroundControlYield_jesDown"]->Fill(1, weight);
+            hists1D_["backgroundControlYield_jerUp"]->Fill(1, weight);
+            hists1D_["backgroundControlYield_jerDown"]->Fill(1, weight);
+            return;
+        }
+    }
+    if (!isMC_)
+        return;
+    if (PassesVBSBackgroundControlSelection(mjj_jesUp, jetPt_jesUp, jetEta_jesUp)) {
+        hists1D_["backgroundControlYield_jesUp"]->Fill(1, weight);
+    }
+    if (PassesVBSBackgroundControlSelection(mjj_jesDown, jetPt_jesDown, jetEta_jesDown)) {
+        hists1D_["backgroundControlYield_jesDown"]->Fill(1, weight);
+    }
+    if (PassesVBSBackgroundControlSelection(mjj_jerUp, jetPt_jerUp, jetEta_jerUp)) {
+        hists1D_["backgroundControlYield_jerUp"]->Fill(1, weight);
+    }
+    if (PassesVBSBackgroundControlSelection(mjj_jerDown, jetPt_jerDown, jetEta_jerDown)) {
+        hists1D_["backgroundControlYield_jerDown"]->Fill(1, weight);
+    }
+}
+
 void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) { 
     // JES/JER uncertainties
     // Need to separate check VBS cuts using JER/JES variations
-    if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt, jetEta))) {
+    FillVBSBackgroundControlHistograms(weight, noBlind);
+    if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt, jetEta)) {
         mjj_etajj_2Dhist_->Fill(mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
     }
 
@@ -704,7 +752,9 @@ Bool_t WZSelector::Process(Long64_t entry)
     }
     
     bool blindVBS = (selection_ == Wselection || 
-            (isVBS_ && selection_ != VBSBackgroundControl));
+            (isVBS_ && 
+                selection_ != VBSBackgroundControl && 
+                selection_ != VBSBackgroundControlLoose));
     FillHistograms(entry, genWeight, !blindVBS);
     
     return true;
@@ -766,6 +816,13 @@ void WZSelector::SetupNewDirectory()
     AddObject<TH1D>(hists1D_["yield_jerUp"], ("yield_jerUp_"+channelName_).c_str(), "yield_jerUp", 1, 0, 10);
     AddObject<TH1D>(hists1D_["yield_jerDown"], ("yield_jerDown_"+channelName_).c_str(), "yield_jerDown", 1, 0, 10);
     AddObject<TH2D>(weighthists_["yield"], ("yield_lheWeights_"+channelName_).c_str(), "yield_lheWeights", 
+        1, 0, 10, 1000, 0, 1000);
+    AddObject<TH1D>(hists1D_["backgroundControlYield"], ("backgroundControlYield_"+channelName_).c_str(), "backgroundControlYield", 1, 0, 10);
+    AddObject<TH1D>(hists1D_["backgroundControlYield_jesUp"], ("backgroundControlYield_jesUp_"+channelName_).c_str(), "backgroundControlYield_jesUp", 1, 0, 10);
+    AddObject<TH1D>(hists1D_["backgroundControlYield_jesDown"], ("backgroundControlYield_jesDown_"+channelName_).c_str(), "backgroundControlYield_jesDown", 1, 0, 10);
+    AddObject<TH1D>(hists1D_["backgroundControlYield_jerUp"], ("backgroundControlYield_jerUp_"+channelName_).c_str(), "backgroundControlYield_jerUp", 1, 0, 10);
+    AddObject<TH1D>(hists1D_["backgroundControlYield_jerDown"], ("backgroundControlYield_jerDown_"+channelName_).c_str(), "backgroundControlYield_jerDown", 1, 0, 10);
+    AddObject<TH2D>(weighthists_["backgroundControlYield"], ("backgroundControlYield_lheWeights_"+channelName_).c_str(), "backgroundControlYield_lheWeights", 
         1, 0, 10, 1000, 0, 1000);
     AddObject<TH2D>(mjj_etajj_2Dhist_, ("mjj_etajj_2D_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
         50, 0, 2500, 28, 0, 7);

@@ -19,6 +19,11 @@ public :
         { "yield_jesDown",  {} },
         { "yield_jerUp",  {} },
         { "yield_jerDown",  {} },
+        { "backgroundControlYield",  {} },
+        { "backgroundControlYield_jesUp",  {} },
+        { "backgroundControlYield_jesDown",  {} },
+        { "backgroundControlYield_jerUp",  {} },
+        { "backgroundControlYield_jerDown",  {} },
         { "nTruePU",  {} },
         { "nvtx",  {} },
         { "ZMass",  {} },
@@ -202,8 +207,11 @@ protected:
     void LoadBranches(Long64_t entry);
     void FillHistograms(Long64_t entry, float weight, bool noBlind);
     void FillVBSHistograms(Long64_t entry, float weight, bool noBlind);
+    void FillVBSBackgroundControlHistograms(float weight, bool noBlind);
     bool PassesBaseSelection(bool tightLeps, Selection selection);
     bool PassesVBSSelection(bool noBlind, float dijetMass, 
+            std::vector<float>* jPt, std::vector<float>* jEta);
+    bool PassesVBSBackgroundControlSelection(float dijetMass, 
             std::vector<float>* jPt, std::vector<float>* jEta);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
