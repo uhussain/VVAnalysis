@@ -33,8 +33,12 @@ def getComLineArgs():
         default="test.root", help="Output file name")
     parser.add_argument("--folder_name", type=str,
         default="", help="Name for combine folder (date by default)")
+    parser.add_argument("--fit_variable", type=str,
+        default="", help="Variable to use in the shape based fit")
     parser.add_argument("--combineChannels", action='store_true',
         help="Don't fit channels independently")
+    parser.add_argument("--addControlRegion", action='store_true',
+        help="Add control region to fit distribution")
     parser.add_argument("-b", "--hist_names", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["all"], help="List of histograms, "
@@ -96,7 +100,6 @@ card_info = {
         "zg" : 0,
         "vv" : 0,
         "AllData" : 0,
-        "AllData" : 0,
     },
     "emm" : {
         "wzjj_vbfnlo" : 0,
@@ -131,10 +134,10 @@ pdf_entries = {
     "wz-mgmlm" : range(11,112),
     "wz-powheg" : range(11,112),
     "wz" : range(11,112),
-    "vv-powheg" : range(11,112),
+    "vv-powheg" : 0,
     "top-ewk" : 0,
     "zg" : 0,
-    "vv" : range(11,112),
+    "vv" : 0,
     "AllData" : 0,
 }
 
@@ -151,11 +154,10 @@ wz_scalefacs = {
 #}
 
 
-
-addControlRegionToFit = True
 scaleWZ = False
 manualStatUnc = False
 variations = ["jerUp", "jerDown", "jesUp", "jesDown"] 
+output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
 numvars = 23 if "VBS" in args['selection'] else 13
@@ -163,22 +165,29 @@ isVBS = "VBS" in args['selection']
 #variable = "mjj" if isVBS else "yield"
 #variable = "yield"
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
-variable = "mjj_etajj_unrolled" if isVBS else "yield"
-#variable = "mjj_mtwz_unrolled" if isVBS else "yield"
+if args['fit_variable'] is "":
+    variable = "mjj_etajj_unrolled" if isVBS else "yield"
+    if isVBS and args['aqgc']:
+        variable = "MTWZ"
+else:
+    variable = args['fit_variable']
+
 base_variable = variable
-if addControlRegionToFit:
+if args['addControlRegion']:
     base_variable = variable
     variable = base_variable + "_wCR"
-if isVBS and args['aqgc']:
-    variable = "MTWZ"
+
 mjj_binning = ConfigureJobs.get2DBinning()[0]
 #mjj_binning = array.array('d', [500, 1000,1500, 2000, 2500]) 
 rebin = mjj_binning if variable == "mjj" else None
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans], rebin=rebin)
-
+for chan in chans:
+    hist = alldata.FindObject(variable+"_"+chan)
+    card_info[chan]["AllData"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
 combineChannels(alldata, chans)
+
 OutputTools.writeOutputListItem(alldata, fOut)
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans], rebin=rebin)
@@ -201,7 +210,6 @@ for chan in chans:
 
 combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in variations], False)
 OutputTools.writeOutputListItem(nonprompt, fOut)
-output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
 plot_groups = ["wz-powheg", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv-powheg", "data_2016"]
@@ -221,7 +229,7 @@ for plot_group in plot_groups:
         plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
     if isVBS and "aqgc" not in plot_group:
         plots += ["_".join([variable, var, c]) for var in variations for c in chans]
-        if addControlRegionToFit:
+        if args['addControlRegion']:
             plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
@@ -274,7 +282,7 @@ for plot_group in plot_groups:
                 wz_qcd_theory_hists.extend(scale_hists+pdf_hists)
             
             theory_hists = []
-            if addControlRegionToFit:
+            if args['addControlRegion']:
                 control_hist2D = group.FindObject("backgroundControlYield_lheWeights_" + chan)
                 control_hists = ROOT.TList()
                 unrolled_theory = HistTools.getScaleHists(control_hist2D, plot_group, rebin) 
@@ -299,7 +307,7 @@ for plot_group in plot_groups:
     theory_vars = [plot_group+"_%s" % var for var in ["scaleUp", "scaleDown", "pdfUp", "pdfDown"]]
     combineChannels(group, chans, variations + theory_vars, True)
     OutputTools.writeOutputListItem(group, fOut)
-    yields = [card_info[chan][name] for c in chans]
+    yields = [card_info[c][name] for c in chans]
     yields.append(sum([card_info[c][name] for c in chans]))
     output_info.add_row([plot_group] + yields)
 
@@ -356,7 +364,8 @@ for chan,yields in card_info.iteritems():
     for name,value in yields.iteritems():
         if "data" in name:
             continue
-        if name not in ["wzjj_ewk", "wzjj_vbfnlo", "output_file"]:
+        if name not in ["wzjj_ewk", "wz", 
+                "AllData", "wz_powheg", "wzjj_vbfnlo", "output_file"]:
             background[chan] += float(value)
 output_info.add_row(["Total background", 
     round(background["eee"], 4), 
@@ -365,6 +374,11 @@ output_info.add_row(["Total background",
     round(background["mmm"], 4),
     round(sum([background[c] for c in chans]), 4), 
 ])
+
+yields = [card_info[c]["AllData"] for c in chans]
+yields.append(sum([card_info[c]["AllData"] for c in chans]))
+output_info.add_row(["Data"] + yields)
+
 for name in ["wzjj_ewk", "wzjj_vbfnlo"]:
     significance_info.add_row([name, 
         round(card_info["eee"][name]/math.sqrt(background["eee"]), 4), 

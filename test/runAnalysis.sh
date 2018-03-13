@@ -43,10 +43,14 @@ fi
 #frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}_fromJakob.root
 #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_jakobsFakeRates.root
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/j1Pt50-j2Pt50/${output}-${DATE}-${lepid}From${looselepsfile}.root
+if [[ "$4" != "" ]]; then 
+    histfile=${histfile/.root/_${4}.root}
+fi
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
-if [ -f $frfile ] && [ "$2" != "RedoFakeRate" ]; then
+if [ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
     echo "INFO: Fake rate file $frfile exists! Using exisiting file."
 else
     echo "INFO: Fake rate file $frfile not found. It will be created."
@@ -66,9 +70,12 @@ fi
 if [ "$2" != "noCombine" ]; then
     combine_selection=WZxsec2016/${output}
     combine_folder=${DATE}
+    if [[ "$4" != "" ]]; then 
+        combine_folder=${combine_folder}_${4}
+    fi
     if [[ $output == *_* ]]; then
         combine_selection=WZxsec2016/${output/_*/}
-        combine_folder=${output/*_/}/${DATE}
+        combine_folder=${output/*_/}/$combine_folder
     fi
 
     if [[ "$2" != "combineOnly" && "$1" == "VBSselection"* ]]; then
@@ -82,6 +89,7 @@ if [ "$2" != "noCombine" ]; then
             --folder_name $combine_folder \
             -l 35.9 \
             --combineChannels \
+            --addControlRegion \
             --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) $3
         echo "Info: File /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename  $histfile) created"
     fi

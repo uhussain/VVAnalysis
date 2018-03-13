@@ -202,11 +202,11 @@ bool WZSelector::PassesVBSBackgroundControlSelection(float dijetMass,
         std::vector<float>* jPt, std::vector<float>* jEta) { 
     if (jPt->size() != jEta->size() || jPt->size() < 2)
         return false;
-    if (selection_ != VBSselection_Loose && 
-            (jPt->at(0) < 50 || jPt->at(1) < 50)
-        return false;
+    //if (selection_ != VBSselection_Loose && (jPt->at(0) < 50 || jPt->at(1) < 50))
+    //    return false;
     float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
     return (dijetMass > 100 && (dijetMass < 500 || deltaEtajj < 2.5));
+    //return ((dijetMass > 500 && deltaEtajj < 2.5) || (dijetMass < 500 && deltaEtajj > 2.5));
 }
 
 bool WZSelector::PassesVBSSelection(bool noBlind, float dijetMass, 

@@ -16,7 +16,7 @@ jeVariations = ["jesUp", "jesDown", "jerUp", "jerDown"]
 
 transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
-            ['wlljj-ewk', 'wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
+            ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
                 ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \
                 ['AllData', 'WZxsec2016data', 'DataEWKCorrected'], 
             'Wselection'),
@@ -47,7 +47,7 @@ if addControlRegion:
 
 transformed_mjj_mtwz_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
-            ['wlljj-ewk', 'wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
+            ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
                 ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \
                 ['AllData', 'WZxsec2016data', 'DataEWKCorrected'], 
              'Wselection'),
@@ -76,5 +76,3 @@ transformed_hists = transformed_mjj_etajj_hists+transformed_mjj_mtwz_hists#+tran
 if saveToFile:
     for output in transformed_hists:
         OutputTools.writeOutputListItem(output, input_file)
-        for i in output:
-            print "    Writing", i.GetName(), "For folder", output.GetName()
