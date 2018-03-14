@@ -45,8 +45,8 @@ fi
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
 #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
 histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
-if [[ "$4" != "" ]]; then 
-    histfile=${histfile/.root/_${4}.root}
+if [[ "$3" != "" ]]; then 
+    histfile=${histfile/.root/_${3}.root}
 fi
 
 cd $CMSSW_BASE/src/Analysis/WZAnalysis
@@ -70,8 +70,8 @@ fi
 if [ "$2" != "noCombine" ]; then
     combine_selection=WZxsec2016/${output}
     combine_folder=${DATE}
-    if [[ "$4" != "" ]]; then 
-        combine_folder=${combine_folder}_${4}
+    if [[ "$3" != "" ]]; then 
+        combine_folder=${combine_folder}_${3}
     fi
     if [[ $output == *_* ]]; then
         combine_selection=WZxsec2016/${output/_*/}
@@ -90,7 +90,7 @@ if [ "$2" != "noCombine" ]; then
             -l 35.9 \
             --combineChannels \
             --addControlRegion \
-            --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) $3
+            --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) 
         echo "Info: File /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename  $histfile) created"
     fi
 fi

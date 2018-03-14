@@ -327,6 +327,7 @@ bool WZSelectorBase::lepton3IsTight() {
 }
 
 bool WZSelectorBase::IsGenMatched3l() {
+    //return true;
     return (!isMC_ || isNonpromptMC_ || 
         (isZgamma_ && l1GenPt > 0 && l2GenPt > 0) ||
         (l1GenPt > 0 && l2GenPt > 0 && l3GenPt > 0));

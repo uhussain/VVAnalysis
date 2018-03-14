@@ -43,6 +43,9 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
     if (!PassesBaseSelection(false, selection_))
         return true;
     float evtwgt = 0;
+    if (!IsGenMatched3l())
+        return true;
+
     if (IsFPPRegion()) {
         if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta))
             mjjHistFPP_->Fill(mjj, genWeight);
@@ -129,43 +132,29 @@ float WZBackgroundSelector::getl3FakeRate() {
 }
 
 bool WZBackgroundSelector::IsFPPRegion() {
-    if (!IsGenMatched3l())
-        return false;
     return !zlep1IsTight() && zlep2IsTight() && lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsPFPRegion() {
-    if (!IsGenMatched3l())
-        return false;
     return zlep1IsTight() && !zlep2IsTight() && lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsPPFRegion() {
-    if (!IsGenMatched3l())
-        return false;
     return zlep1IsTight() && zlep2IsTight() && !lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsFPFRegion() {
-    if (!IsGenMatched3l())
-        return false;
     return !zlep1IsTight() && zlep2IsTight() && !lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsFFPRegion() {
-    if (!IsGenMatched3l())
-        return false;
     return !zlep1IsTight() && !zlep2IsTight() && lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsPFFRegion() {
-    if (!IsGenMatched3l())
-        return false;
     return zlep1IsTight() && !zlep2IsTight() && !lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsFFFRegion() {
-    if (!IsGenMatched3l())
-        return false;
     return !zlep1IsTight() && !zlep2IsTight() && !lepton3IsTight();
 }

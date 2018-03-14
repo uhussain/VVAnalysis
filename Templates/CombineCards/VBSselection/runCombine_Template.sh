@@ -24,7 +24,7 @@ elif [[ $$1 == "impacts" ]]; then
     plotImpacts.py -i impacts.json -o impacts
     popd
 elif [[ "$$1" == "all" ]]; then
-    combine -M Significance -t -1 --expectSignal $$blind $$card 
+    combine -M Significance $$blind $$card 
 else
-    combine -M Significance -t -1 --expectSignal $$card $$1
+    combine -M Significance $$blind $$card $$1
 fi
