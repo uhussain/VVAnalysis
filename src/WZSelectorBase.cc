@@ -35,13 +35,20 @@ void WZSelectorBase::Init(TTree *tree)
     isMC_ = false;
     if (name_.find("data") == std::string::npos){
         isMC_ = true;
+        isNonpromptMC_ = false;
+        isZgamma_ = false;
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+        if (std::find(nonprompt3l_.begin(), nonprompt3l_.end(), name_) != nonprompt3l_.end()) {
+            isNonpromptMC_ = true;
+        }
+        else if (name_ == "zg") {
+            isZgamma_ = true;
+        }
     }
     else {
         fChain->SetBranchAddress("Flag_duplicateMuonsPass", &Flag_duplicateMuonsPass, &b_Flag_duplicateMuonsPass);
         fChain->SetBranchAddress("Flag_badMuonsPass", &Flag_badMuonsPass, &b_Flag_badMuonsPass);
     }
-
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
     if ( currentHistDir_ == nullptr ) {
         currentHistDir_ = new TList();
@@ -67,6 +74,11 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
+        if (isMC_) {
+            fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
+            fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
+            fChain->SetBranchAddress("e3GenPt", &l3GenPt, &b_l3GenPt);
+        }
     }
     else if (channelName_ == "eem") { 
         channel_ = eem;
@@ -79,6 +91,11 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
+        if (isMC_) {
+            fChain->SetBranchAddress("mGenPt", &l3GenPt, &b_l3GenPt);
+            fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
+            fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
+        }
     }
     else if (channelName_ == "emm") { 
         channel_ = emm;
@@ -91,6 +108,11 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
+        if (isMC_) {
+            fChain->SetBranchAddress("eGenPt", &l3GenPt, &b_l3GenPt);
+            fChain->SetBranchAddress("m1GenPt", &l1GenPt, &b_l1GenPt);
+            fChain->SetBranchAddress("m2GenPt", &l2GenPt, &b_l2GenPt);
+        }
     }
     else if (channelName_ == "mmm") { 
         channel_ = mmm;
@@ -103,6 +125,11 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("m3Eta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
+        if (isMC_) {
+            fChain->SetBranchAddress("m1GenPt", &l1GenPt, &b_l1GenPt);
+            fChain->SetBranchAddress("m2GenPt", &l2GenPt, &b_l2GenPt);
+            fChain->SetBranchAddress("m3GenPt", &l3GenPt, &b_l3GenPt);
+        }
     }
     else
         throw std::invalid_argument("Invalid channel choice!");
@@ -226,6 +253,7 @@ void WZSelectorBase::Init(TTree *tree)
     fChain->SetBranchAddress("Flag_globalTightHalo2016FilterPass", &Flag_globalTightHalo2016FilterPass, &b_Flag_globalTightHalo2016FilterPass);
 }
 
+
 Bool_t WZSelectorBase::Notify()
 {
     return kTRUE;
@@ -234,8 +262,12 @@ Bool_t WZSelectorBase::Notify()
 Bool_t WZSelectorBase::Process(Long64_t entry)
 {
     genWeight = 1;
-    if (isMC_)
+    if (isMC_) {
         b_genWeight->GetEntry(entry);
+        b_l1GenPt->GetEntry(entry);
+        b_l2GenPt->GetEntry(entry);
+        b_l3GenPt->GetEntry(entry);
+    }
     else {
         b_Flag_duplicateMuonsPass->GetEntry(entry);          
         b_Flag_badMuonsPass->GetEntry(entry);          
@@ -292,6 +324,12 @@ bool WZSelectorBase::tightZLeptons() {
 
 bool WZSelectorBase::lepton3IsTight() {
     return l3IsTight;
+}
+
+bool WZSelectorBase::IsGenMatched3l() {
+    return (!isMC_ || isNonpromptMC_ || 
+        (isZgamma_ && l1GenPt > 0 && l2GenPt > 0) ||
+        (l1GenPt > 0 && l2GenPt > 0 && l3GenPt > 0));
 }
 
 void WZSelectorBase::Terminate()

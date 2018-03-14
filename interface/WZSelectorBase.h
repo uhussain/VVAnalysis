@@ -84,6 +84,9 @@ public :
     Bool_t l1IsTight;
     Bool_t l2IsTight;
     Bool_t l3IsTight;
+    Float_t l1GenPt;
+    Float_t l2GenPt;
+    Float_t l3GenPt;
     Bool_t e1IsEB;
     Bool_t e2IsEB;
     Bool_t e3IsEB;
@@ -123,6 +126,9 @@ public :
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
     TBranch* b_l3IsTight;
+    TBranch* b_l1GenPt;
+    TBranch* b_l2GenPt;
+    TBranch* b_l3GenPt;
     TBranch* b_e1IsEB;
     TBranch* b_e2IsEB;
     TBranch* b_e3IsEB;
@@ -189,18 +195,27 @@ public :
     ClassDef(WZSelectorBase,0);
 
 protected:
+    std::vector<std::string> nonprompt3l_ = {
+        "tt-lep", "st-schan", "st-tchan-t", "st-tchan-tbar",
+        "st-tw", "st-tbarw", "DYm50", "DYm50-1j",
+        "DYm50-2j","DYm50-3j","DYm50-4j", "DYm50__LO",
+    };
+
     std::string name_ = "Unnamed";
     std::string channelName_ = "Unnamed";
     Channel channel_ = Unknown;
     std::string selectionName_ = "tightleptons";
     Selection selection_ = tightleptons;
     bool isMC_;
+    bool isNonpromptMC_;
+    bool isZgamma_;
     const float FR_MAX_PT_ = 50;
     const float FR_MAX_ETA_ = 2.5;
     bool zlep1IsTight();
     bool zlep2IsTight();
     bool lepton3IsTight();
     bool tightZLeptons();
+    bool IsGenMatched3l();
 };
 
 #endif

@@ -3,6 +3,7 @@ import ROOT
 import datetime
 import os
 import makeSimpleHtml
+import array
 
 ROOT.gROOT.SetBatch(True)
 canvas = ROOT.TCanvas("canvas", "canvas")
@@ -26,13 +27,29 @@ def getTextBox(obj, extra_text=""):
     ROOT.SetOwnership(text_box, False)
     return text_box
 
+def invert2DHist(hist):
+    new_hist = ROOT.TH2D(hist.GetName(), hist.GetTitle(), 
+            3, 0, 2.5,
+            3, array.array('d', [10,20,30,50]))
+    ROOT.SetOwnership(new_hist, False)
+    for x in range(hist.GetNbinsX()+1):
+        for y in range(hist.GetNbinsY()+1):
+            value = hist.GetBinContent(x, y)
+            new_hist.SetBinContent(y, x, value)
+    new_hist.GetXaxis().SetTitle(hist.GetXaxis().GetTitle())
+    new_hist.GetYaxis().SetTitle(hist.GetYaxis().GetTitle())
+    return new_hist
+
 def makeDataPlots(param, obj, outdir):
     data_ewkcorr_graph = frfile.Get("DataEWKCorrected/ratio%s_all%s" % (param, obj)) \
         if "2D" in param else getTGraphAsymmErrors(frfile, "DataEWKCorrected", param, obj)
     data_ewkcorr_graph.SetLineColor(ROOT.kRed)
     draw_opt = "PA" if "2D" not in param else "colz text"
     if "2D" in param:
-        data_ewkcorr_graph.GetYaxis().SetTitle("#eta")
+        data_ewkcorr_graph = invert2DHist(data_ewkcorr_graph)
+        #data_ewkcorr_graph.GetYaxis().SetTitle("#eta")
+        data_ewkcorr_graph.GetYaxis().SetTitle("p_{T} [GeV]")
+        data_ewkcorr_graph.GetXaxis().SetTitle("#eta")
     else:
         data_ewkcorr_graph.GetYaxis().SetTitle("Passing Tight / Passing Loose")
         xlabel = "p_{T} [GeV]" if "Pt" in param else "#eta"
@@ -79,16 +96,16 @@ def makeMCPlots(param, obj, outdir):
     canvas.Print("%s/ratio%s_all%s.png" % (outdir, param, obj))
     canvas.Print("%s/ratio%s_all%s.pdf" % (outdir, param, obj))
 
-frfile = ROOT.TFile("/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRateNov2017-TightLepsFrom3LooseLeptons_NoOverflow.root")
+frfile = ROOT.TFile("/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRateMar2018-TightLepsFrom3MediumLeptons.root")
 
 
 data_folder_name = datetime.date.today().strftime("%Y%b") 
-data_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name 
-mc_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name + "-MC"
+data_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name + "/plots"
+mc_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name + "-MC/plots"
 
 for outdir in [data_outdir, mc_outdir]:
     try:
-        os.mkdir(os.path.expanduser(outdir))
+        os.makedirs(os.path.expanduser(outdir))
     except OSError as e:
         print e
         pass
@@ -97,5 +114,5 @@ for param in ["1DPt", "1DEta", "2D"]:
     for obj in ["Mu", "E"]:
         makeDataPlots(param, obj, data_outdir)
         makeMCPlots(param, obj, mc_outdir)
-makeSimpleHtml.writeHTML(os.path.expanduser(data_outdir), "Fake Rates (from data)")
-makeSimpleHtml.writeHTML(os.path.expanduser(mc_outdir), "Fake Rates (from MC)")
+makeSimpleHtml.writeHTML(os.path.expanduser(data_outdir.replace("/plots", "")), "Fake Rates (from data)")
+makeSimpleHtml.writeHTML(os.path.expanduser(mc_outdir.replace("/plots", "")), "Fake Rates (from MC)")

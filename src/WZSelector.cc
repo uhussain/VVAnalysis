@@ -370,6 +370,10 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
     
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
         return false;
+    if (!IsGenMatched3l()) {
+        return false;
+    }
+
     return true;
 }
 

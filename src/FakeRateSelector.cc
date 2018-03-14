@@ -19,6 +19,8 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
         return true;
     float pt_fillval = l3Pt;
     float eta_fillval = std::abs(l3Eta);
+    if (!IsGenMatched3l())
+        return true;
     passingLoose2D_->Fill(pt_fillval, eta_fillval, genWeight);
     passingLoose1DPt_->Fill(pt_fillval, genWeight);
     passingLoose1DEta_->Fill(eta_fillval, genWeight);

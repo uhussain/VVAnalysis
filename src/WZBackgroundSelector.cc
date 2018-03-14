@@ -129,28 +129,43 @@ float WZBackgroundSelector::getl3FakeRate() {
 }
 
 bool WZBackgroundSelector::IsFPPRegion() {
+    if (!IsGenMatched3l())
+        return false;
     return !zlep1IsTight() && zlep2IsTight() && lepton3IsTight();
 }
+
 bool WZBackgroundSelector::IsPFPRegion() {
+    if (!IsGenMatched3l())
+        return false;
     return zlep1IsTight() && !zlep2IsTight() && lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsPPFRegion() {
+    if (!IsGenMatched3l())
+        return false;
     return zlep1IsTight() && zlep2IsTight() && !lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsFPFRegion() {
+    if (!IsGenMatched3l())
+        return false;
     return !zlep1IsTight() && zlep2IsTight() && !lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsFFPRegion() {
+    if (!IsGenMatched3l())
+        return false;
     return !zlep1IsTight() && !zlep2IsTight() && lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsPFFRegion() {
+    if (!IsGenMatched3l())
+        return false;
     return zlep1IsTight() && !zlep2IsTight() && !lepton3IsTight();
 }
 
 bool WZBackgroundSelector::IsFFFRegion() {
+    if (!IsGenMatched3l())
+        return false;
     return !zlep1IsTight() && !zlep2IsTight() && !lepton3IsTight();
 }
