@@ -60,7 +60,7 @@ else
 fi
 
 if [ "$2" != "combineOnly" ]; then
-    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output #--proof
+    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output --proof
     exit 1
     if [ -f $histfile ]; then
         echo "Histogram file $histfile produced"

@@ -2,10 +2,9 @@
 import ROOT
 import glob
 import datetime
-from python import UserInput
-from python import OutputTools
+from python import UserInput,OutputTools
 from python import ConfigureJobs
-from python import SelectorTools
+from python import SelectorTools,HistTools
 
 ROOT.gROOT.SetBatch(True)
 
@@ -115,6 +114,7 @@ SelectorTools.applySelector(args["filenames"],
         "FakeRateSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs, proof=args['proof'],
         addsumweights=True)
+proof.Close()
 
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"]))
 OutputTools.writeOutputListItem(alldata, fOut)
