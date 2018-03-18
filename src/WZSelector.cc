@@ -44,9 +44,7 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("e1_e2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("e1_e2_Phi", &ZPhi, &b_ZPhi);
-        fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
-        fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
         fChain->SetBranchAddress("e3Phi", &l3Phi, &b_l3Phi);
     }
@@ -56,9 +54,7 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e1_e2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("e1_e2_Phi", &ZPhi, &b_ZPhi);
         fChain->SetBranchAddress("mPhi", &l3Phi, &b_l3Phi);
-        fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
-        fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
     }
     else if (channel_ == emm) { 
@@ -67,9 +63,7 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m1_m2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("m1_m2_Phi", &ZPhi, &b_ZPhi);
         fChain->SetBranchAddress("ePhi", &l3Phi, &b_l3Phi);
-        fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("m1Phi", &l1Phi, &b_l1Phi);
-        fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("m2Phi", &l2Phi, &b_l2Phi);
     }
     else if (channel_ == mmm) { 
@@ -77,11 +71,8 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("m1_m2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("m1_m2_Phi", &ZPhi, &b_ZPhi);
-        fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
         fChain->SetBranchAddress("m1Phi", &l1Phi, &b_l1Phi);
-        fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("m2Phi", &l2Phi, &b_l2Phi);
-        fChain->SetBranchAddress("m3Eta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("m3Phi", &l3Phi, &b_l3Phi);
     }
 }
@@ -107,21 +98,6 @@ unsigned int WZSelector::GetLheWeightInfo() {
     return 1;
 }
 
-void WZSelector::SlaveBegin(TTree * /*tree*/)
-{
-    pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
-    if (pileupSF_ == nullptr ) 
-        Abort("Must pass pileup weights SF");
-    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronTightIdSF");
-    if (eIdSF_ == nullptr ) 
-        Abort("Must pass electron ID SF");
-    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonTightIdSF");
-    if (mIdSF_ == nullptr ) 
-        Abort("Must pass muon ID SF");
-    mIsoSF_ = (ScaleFactor *) GetInputList()->FindObject("muonIsoSF");
-    if (mIsoSF_ == nullptr ) 
-        Abort("Must pass muon Iso SF");
-}
 void WZSelector::LoadBranches(Long64_t entry) { 
     WZSelectorBase::Process(entry);
     
@@ -205,7 +181,7 @@ bool WZSelector::PassesVBSBackgroundControlSelection(float dijetMass,
     //if (selection_ != VBSselection_Loose && (jPt->at(0) < 50 || jPt->at(1) < 50))
     //    return false;
     float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
-    return (dijetMass > 100 && (dijetMass < 500 || deltaEtajj < 2.5));
+    return (dijetMass > 100 && (dijetMass < 500 || deltaEtajj < 2.5 || std::abs(zep3l) > 2.5));
     //return ((dijetMass > 500 && deltaEtajj < 2.5) || (dijetMass < 500 && deltaEtajj > 2.5));
 }
 
@@ -724,42 +700,12 @@ Bool_t WZSelector::Process(Long64_t entry)
     if (!PassesBaseSelection(true, selection_))
         return true;
 
-    //TODO This should really be properly applied to MC in background estimation
-    if (isMC_) {
-        if (channel_ == eee) {
-            genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            genWeight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            genWeight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        }
-        else if (channel_ == eem) {
-            genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            genWeight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            genWeight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            genWeight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        }
-        else if (channel_ == emm) {
-            genWeight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            genWeight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            genWeight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            genWeight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            genWeight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        }
-        else {
-            genWeight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            genWeight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            genWeight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            genWeight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            genWeight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            genWeight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        }
-        genWeight *= pileupSF_->Evaluate1D(nTruePU);
-    }
-    
     bool blindVBS = (selection_ == Wselection || 
             (isVBS_ && 
                 selection_ != VBSBackgroundControl && 
                 selection_ != VBSBackgroundControlLoose));
-    FillHistograms(entry, genWeight, !blindVBS);
+
+    FillHistograms(entry, weight, !blindVBS);
     
     return true;
 }

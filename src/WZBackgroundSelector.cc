@@ -3,6 +3,7 @@
 
 void WZBackgroundSelector::SlaveBegin(TTree * /*tree*/)
 {
+    WZSelector::SlaveBegin(0);
     fakeRate_allE_ = (ScaleFactor *) GetInputList()->FindObject("fakeRate_allE");
     if (fakeRate_allE_ == nullptr ) Abort("Must pass electron fake rate to input list!");
     fakeRate_allMu_ = (ScaleFactor *) GetInputList()->FindObject("fakeRate_allMu");
@@ -48,50 +49,50 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
 
     if (IsFPPRegion()) {
         if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta))
-            mjjHistFPP_->Fill(mjj, genWeight);
-        evtwgt = getl1FakeRate()*genWeight;
+            mjjHistFPP_->Fill(mjj, weight);
+        evtwgt = getl1FakeRate()*weight;
     }
     else if (IsPFPRegion()) {
         if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
-            mjjHistPFP_->Fill(mjj, genWeight);
-            ZMassHistPFP_->Fill(ZMass, genWeight);
+            mjjHistPFP_->Fill(mjj, weight);
+            ZMassHistPFP_->Fill(ZMass, weight);
         }
-        evtwgt = getl2FakeRate()*genWeight;
+        evtwgt = getl2FakeRate()*weight;
     }
     else if (IsPPFRegion()) {
         if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
-            mjjHistPPF_->Fill(mjj, genWeight);
-            ZMassHistPPF_->Fill(ZMass, genWeight);
+            mjjHistPPF_->Fill(mjj, weight);
+            ZMassHistPPF_->Fill(ZMass, weight);
         }
-        evtwgt = getl3FakeRate()*genWeight;
+        evtwgt = getl3FakeRate()*weight;
     }
     else if (IsFFFRegion()) {
         if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
-            mjjHistFFF_->Fill(mjj, genWeight);
-            ZMassHistFFF_->Fill(ZMass, genWeight);
+            mjjHistFFF_->Fill(mjj, weight);
+            ZMassHistFFF_->Fill(ZMass, weight);
         }
-        evtwgt = getl1FakeRate()*getl2FakeRate()*getl3FakeRate()*genWeight;
+        evtwgt = getl1FakeRate()*getl2FakeRate()*getl3FakeRate()*weight;
     }
     else if (IsFPFRegion()) {
         if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
-            mjjHistFPF_->Fill(mjj, genWeight);
-            ZMassHistFPF_->Fill(ZMass, genWeight);
+            mjjHistFPF_->Fill(mjj, weight);
+            ZMassHistFPF_->Fill(ZMass, weight);
         }
-        evtwgt = -1*getl1FakeRate()*getl3FakeRate()*genWeight;
+        evtwgt = -1*getl1FakeRate()*getl3FakeRate()*weight;
     }
     else if (IsFFPRegion()) {
         if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
-            mjjHistFFP_->Fill(mjj, genWeight);
-            ZMassHistFFP_->Fill(ZMass, genWeight);
+            mjjHistFFP_->Fill(mjj, weight);
+            ZMassHistFFP_->Fill(ZMass, weight);
         }
-        evtwgt = -1*getl1FakeRate()*getl2FakeRate()*genWeight;
+        evtwgt = -1*getl1FakeRate()*getl2FakeRate()*weight;
     }
     else if (IsPFFRegion()) {
         if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
-            mjjHistPFF_->Fill(mjj, genWeight);
-            ZMassHistPFF_->Fill(ZMass, genWeight);
+            mjjHistPFF_->Fill(mjj, weight);
+            ZMassHistPFF_->Fill(ZMass, weight);
         }
-        evtwgt = -1*getl2FakeRate()*getl3FakeRate()*genWeight;
+        evtwgt = -1*getl2FakeRate()*getl3FakeRate()*weight;
     }
     else
         return true;

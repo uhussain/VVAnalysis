@@ -2,17 +2,11 @@
 #define WZSelector_h
 
 #include <vector>
-#include "Analysis/WZAnalysis/interface/ScaleFactor.h"
 #include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
 #include <TH3.h>
 
 class WZSelector : public WZSelectorBase {
 public :
-    ScaleFactor* pileupSF_;
-    ScaleFactor* eIdSF_;
-    ScaleFactor* mIdSF_;
-    ScaleFactor* mIsoSF_;
-    
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
         { "yield_jesUp",  {} },
@@ -138,7 +132,6 @@ public :
     std::vector<float>* jetPt_jerUp = NULL;
     std::vector<float>* jetPt_jerDown = NULL;
     std::vector<float>* jetCSVv2 = NULL;
-    Float_t nTruePU;
     UInt_t nvtx;
     Int_t nJets;
     Float_t Mass;
@@ -152,9 +145,7 @@ public :
     Float_t mjj_jesDown;
     Float_t mjj_jerUp;
     Float_t mjj_jerDown;
-    Float_t l1Eta;
     Float_t l1Phi;
-    Float_t l2Eta;
     Float_t l2Phi;
     Float_t l3Phi;
     Float_t MtToMET;
@@ -175,7 +166,6 @@ public :
     TBranch* b_jetPt_jesDown;
     TBranch* b_jetPt_jerUp;
     TBranch* b_jetPt_jerDown;
-    TBranch* b_nTruePU;
     TBranch* b_nvtx;
     TBranch* b_Mass;
     TBranch* b_Eta;
@@ -188,9 +178,7 @@ public :
     TBranch* b_mjj_jesDown;
     TBranch* b_mjj_jerUp;
     TBranch* b_mjj_jerDown;
-    TBranch* b_l1Eta;
     TBranch* b_l1Phi;
-    TBranch* b_l2Eta;
     TBranch* b_l2Phi;
     TBranch* b_l3Phi;
 
@@ -200,7 +188,6 @@ public :
     virtual void    Init(TTree *tree) override;
     virtual Bool_t  Process(Long64_t entry) override;
     virtual void    SetupNewDirectory() override;
-    virtual void    SlaveBegin(TTree *tree) override;
 
     ClassDefOverride(WZSelector,0);
 protected:

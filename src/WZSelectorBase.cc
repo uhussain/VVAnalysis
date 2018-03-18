@@ -8,6 +8,21 @@ void WZSelectorBase::Begin(TTree * /*tree*/)
 
 void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
 {
+    pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
+    if (pileupSF_ == nullptr ) 
+        Abort("Must pass pileup weights SF");
+    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronTightIdSF");
+    if (eIdSF_ == nullptr ) 
+        Abort("Must pass electron ID SF");
+    eGsfSF_ = (ScaleFactor *) GetInputList()->FindObject("electronGsfSF");
+    if (eGsfSF_ == nullptr ) 
+        Abort("Must pass electron GSF SF");
+    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonTightIdSF");
+    if (mIdSF_ == nullptr ) 
+        Abort("Must pass muon ID SF");
+    mIsoSF_ = (ScaleFactor *) GetInputList()->FindObject("muonIsoSF");
+    if (mIsoSF_ == nullptr ) 
+        Abort("Must pass muon Iso SF");
 }
 void WZSelectorBase::Init(TTree *tree)
 {
@@ -72,6 +87,8 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("e3Eta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
         if (isMC_) {
@@ -89,6 +106,8 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
         if (isMC_) {
@@ -106,6 +125,8 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
         if (isMC_) {
@@ -123,6 +144,8 @@ void WZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
         fChain->SetBranchAddress("m3Eta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
         if (isMC_) {
@@ -261,12 +284,46 @@ Bool_t WZSelectorBase::Notify()
 
 Bool_t WZSelectorBase::Process(Long64_t entry)
 {
-    genWeight = 1;
+    weight = 1;
     if (isMC_) {
         b_genWeight->GetEntry(entry);
         b_l1GenPt->GetEntry(entry);
         b_l2GenPt->GetEntry(entry);
         b_l3GenPt->GetEntry(entry);
+        weight = genWeight;
+        if (channel_ == eee) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        else if (channel_ == eem) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        else if (channel_ == emm) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        else {
+            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        weight *= pileupSF_->Evaluate1D(nTruePU);
     }
     else {
         b_Flag_duplicateMuonsPass->GetEntry(entry);          

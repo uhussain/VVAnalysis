@@ -12,9 +12,16 @@
 
 // Headers needed by this particular selector
 #include <vector>
+#include "Analysis/WZAnalysis/interface/ScaleFactor.h"
 
 class WZSelectorBase : public TSelector {
 public :
+    ScaleFactor* pileupSF_;
+    ScaleFactor* eIdSF_;
+    ScaleFactor* eGsfSF_;
+    ScaleFactor* mIdSF_;
+    ScaleFactor* mIsoSF_;
+    
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
     enum Channel {
         eee,
@@ -73,7 +80,9 @@ public :
 
     bool isVBS_;
     bool passesLeptonVeto;
+    Float_t weight;
     Float_t genWeight;
+    Float_t nTruePU;
     Float_t ZMass;
     Float_t type1_pfMETEt;
     Float_t type1_pfMETPhi;
@@ -99,6 +108,8 @@ public :
     Float_t m1RelPFIsoDBR04;
     Float_t m2RelPFIsoDBR04;
     Float_t m3RelPFIsoDBR04;
+    Float_t l1Eta;
+    Float_t l2Eta;
     Float_t l3Eta;
     Float_t l1Pt;
     Float_t l2Pt;
@@ -116,6 +127,7 @@ public :
     Bool_t Flag_globalTightHalo2016FilterPass;
     
     TBranch* b_genWeight;
+    TBranch* b_nTruePU;
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
     TBranch* b_type1_pfMETPhi;
@@ -141,11 +153,13 @@ public :
     TBranch* b_m1RelPFIsoDBR04;
     TBranch* b_m2RelPFIsoDBR04;
     TBranch* b_m3RelPFIsoDBR04;
+    TBranch* b_l1Eta;
+    TBranch* b_l2Eta;
     TBranch* b_l3Eta;
     TBranch* b_l1Pt;
-    TBranch* b_ZMass;
     TBranch* b_l2Pt;
     TBranch* b_l3Pt;
+    TBranch* b_ZMass;
     TBranch* b_l3MtToMET;
     TBranch* b_Flag_BadChargedCandidateFilterPass;
     TBranch* b_Flag_BadPFMuonFilterPass;

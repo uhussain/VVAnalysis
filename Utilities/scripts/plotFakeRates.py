@@ -99,7 +99,7 @@ def makeMCPlots(param, obj, outdir):
 frfile = ROOT.TFile("/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRateMar2018-TightLepsFrom3MediumLeptons.root")
 
 
-data_folder_name = datetime.date.today().strftime("%Y%b") 
+data_folder_name = datetime.date.today().strftime("%Y%b"+"_ScaleFacs") 
 data_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name + "/plots"
 mc_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name + "-MC/plots"
 

@@ -8,8 +8,6 @@ if ROOT.gSystem.ClassName() == 'TMacOSXSystem':
     # ld: library not found for -lRint -lCore -L/Applications/root_v6.06.08/lib
     ROOT.gSystem.SetLinkedLibs("{0}/lib/libRint.so {0}/lib/libCore.so".format(ROOT.gRootDir))
 
-ROOT.gROOT.LoadMacro("ScaleFactor.C+")
-
 dummyTree = ROOT.TTree("dummy", "test")
 import array
 randVal = array.array('f', [0.])

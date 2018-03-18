@@ -24,13 +24,13 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
     float pt_fillval = l3Pt;
     float eta_fillval = std::abs(l3Eta);
 
-    passingLoose2D_->Fill(pt_fillval, eta_fillval, genWeight);
-    passingLoose1DPt_->Fill(pt_fillval, genWeight);
-    passingLoose1DEta_->Fill(eta_fillval, genWeight);
+    passingLoose2D_->Fill(pt_fillval, eta_fillval, weight);
+    passingLoose1DPt_->Fill(pt_fillval, weight);
+    passingLoose1DEta_->Fill(eta_fillval, weight);
     if (lepton3IsTight()) {
-        passingTight2D_->Fill(pt_fillval, eta_fillval, genWeight);
-        passingTight1DPt_->Fill(pt_fillval, genWeight);
-        passingTight1DEta_->Fill(eta_fillval, genWeight);
+        passingTight2D_->Fill(pt_fillval, eta_fillval, weight);
+        passingTight1DPt_->Fill(pt_fillval, weight);
+        passingTight1DEta_->Fill(eta_fillval, weight);
     }
     return kTRUE;
 }

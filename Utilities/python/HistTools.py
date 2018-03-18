@@ -1,6 +1,19 @@
 import array
 import ROOT
 
+def getRatios(hists):
+    ratios = []
+    for hist in hists:
+        if "Tight" not in hist.GetName():
+            continue
+        ratio = hist.Clone()
+        ratio.SetName(hist.GetName().replace("passingTight", "ratio"))
+        if not ratio.GetSumw2():
+            ratio.Sumw2()
+        ratio.Divide(hists.FindObject(hist.GetName().replace("Tight", "Loose")))
+        ratios.append(ratio)
+    return ratios
+
 def getDifference(name, dir1, dir2, addRatios=True):
     differences = ROOT.TList()
     differences.SetName(name)

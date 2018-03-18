@@ -5,6 +5,7 @@ import datetime
 from python import UserInput
 from python import OutputTools
 from python import ConfigureJobs
+from python import SelectorTools
 
 ROOT.gROOT.SetBatch(True)
 
@@ -122,57 +123,20 @@ today = datetime.date.today().strftime("%d%b%Y")
 fileName = "data/fakeRate%s-%s.root" % (today, args['selection']) if args['output_file'] == "" \
         else args['output_file']
 fOut = ROOT.TFile(fileName, "recreate")
-selector_name = "FakeRateSelector"
-for dataset in ConfigureJobs.getListOfFiles(args['filenames'], args['selection']):
-    for chan in channels: 
-        select = getattr(ROOT, selector_name)()
-        inputs = ROOT.TList()
-        select.SetInputList(inputs)
-        tchan = ROOT.TNamed("channel", chan)
-        tname = ROOT.TNamed("name", dataset)
-        inputs.Add(tname)
-        inputs.Add(tchan)
-        ROOT.gROOT.cd()
-        sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1,0,100)
-        if proof:
-            proof_path = "_".join([dataset, args['analysis'], 
-                args['selection']+("#/%s/ntuple" % chan)])
-            proof.Process(proof_path, select, "")
-            proof_meta_path = "_".join([dataset, args['analysis'], 
-                args['selection']+"#/metaInfo/metaInfo"])
-            ## TODO proof draw command for meta tree
-            #proof.DrawSelect(proof_path, "1>>sumweights", "")
-        else: 
-            chain = ROOT.TChain("%s/ntuple" % chan)
-            meta_chain = ROOT.TChain("metaInfo/metaInfo")
-            try:
-                file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                    args['selection'], args['analysis'])
-                print file_path
-                chain.Add(file_path)
-                chain.Process(select, "")
-                if "data" not in dataset and chan == "eee":
-                    meta_chain.Add(file_path)
-                    meta_chain.Draw("1>>sumweights", "summedWeights")
-                    sumweights_hist.SetDirectory(0)
-            except ValueError as e:
-                print e
-                sumweights_hist.Delete()
-                continue
-        output = select.GetOutputList()
-        if chan == "eee":
-            outputlist = output.FindObject(dataset)
-            outputlist.Add(sumweights_hist)
-            ROOT.SetOwnership(sumweights_hist, False)
-            outputlist.SetOwner()
-        for item in output:
-            if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
-                continue
-            OutputTools.writeOutputListItem(item, fOut)
-            ROOT.SetOwnership(item, False)
-            item.Delete()
-        if hasattr(sumweights_hist, "Delete"):
-            sumweights_hist.Delete()
+
+fScales = ROOT.TFile('data/scaleFactors.root')
+muonIsoSF = fScales.Get('muonIsoSF')
+muonIdSF = fScales.Get('muonTightIdSF')
+electronTightIdSF = fScales.Get('electronTightIdSF')
+electronGsfSF = fScales.Get('electronGsfSF')
+pileupSF = fScales.Get('pileupSF')
+sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
+
+SelectorTools.applySelector(args["filenames"],
+        "FakeRateSelector", args['selection'], fOut, 
+        extra_inputs=sf_inputs, proof=args['proof'],
+        addsumweights=True)
+
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"]))
 OutputTools.writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(

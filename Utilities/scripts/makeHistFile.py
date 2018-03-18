@@ -25,61 +25,6 @@ def getComLineArgs():
                         "by commas")
     return vars(parser.parse_args())
 
-def getDifference(name, dir1, dir2, addRatios=True):
-    differences = ROOT.TList()
-    differences.SetName(name)
-    for histname in [i.GetName() for i in fOut.Get(dir1).GetListOfKeys()]:
-        if histname == "sumweights": continue
-        hist1 = fOut.Get("/".join([dir1, histname]))
-        hist2 = fOut.Get("/".join([dir2, histname]))
-        if hist1 and hist2:
-            diff = hist1.Clone()
-            diff.Add(hist2, -1)
-            hist1.Delete()
-            hist2.Delete()
-        elif not hist1:
-            print "WARNING: Hist %s was not produced for " \
-                "dataset(s) %s" % (histname, dir1)
-        elif not hist2:
-            print "WARNING: Hist %s was not produced for " \
-                "dataset(s) %s" % (histname, dir2)
-        differences.Add(diff)
-    if addRatios:
-        ratios = getRatios(differences)
-        for ratio in ratios:
-            differences.Add(ratio) 
-    return differences
-
-def makeCompositeHists(name, members, lumi):
-    composite = ROOT.TList()
-    composite.SetName(name)
-    for directory in [str(i) for i in members.keys()]:
-        if not fOut.Get(directory):
-            print "Skipping invalid filename %s" % directory
-            continue
-        sumweights = 0
-        for histname in [i.GetName() for i in fOut.Get(directory).GetListOfKeys()]:
-            if histname == "sumweights": continue
-            hist = fOut.Get("/".join([directory, histname]))
-            if hist:
-                sumhist = composite.FindObject(hist.GetName())
-                if "data" not in directory and hist.GetEntries() > 0:
-                    if sumweights == 0:
-                        sumweights_hist = fOut.Get("/".join([directory, "sumweights"]))
-                        sumweights = sumweights_hist.Integral()
-                        sumweights_hist.Delete()
-                    hist.Scale(members[directory]*1000*lumi/sumweights)
-            else:
-                raise RuntimeError("hist %s was not produced for "
-                    "dataset %s!" % (histname, directory))
-            if not sumhist:
-                sumhist = hist.Clone()
-                composite.Add(sumhist)
-            else:
-                sumhist.Add(hist)
-            hist.Delete()
-    return composite
-
 def getHistExpr(hist_names, selection):
     info = ROOT.TList()
     info.SetName("histinfo")
@@ -99,7 +44,6 @@ sys.path.append("/".join([manager_path,
 import ConfigHistTools 
 
 tmpFileName = args['output_file']
-#fOut = ROOT.TFile(tmpFileName, "recreate")
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
 fScales = ROOT.TFile('data/scaleFactors.root')
@@ -121,10 +65,11 @@ eCBTightFakeRate.SetName("fakeRate_allE")
 muonIsoSF = fScales.Get('muonIsoSF')
 muonIdSF = fScales.Get('muonTightIdSF')
 electronTightIdSF = fScales.Get('electronTightIdSF')
+electronGsfSF = fScales.Get('electronGsfSF')
 pileupSF = fScales.Get('pileupSF')
 
 fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
-sf_inputs = [electronTightIdSF, muonIsoSF, muonIdSF, pileupSF]
+sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
 selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
 if selection == "Inclusive2Jet":
@@ -145,19 +90,19 @@ if "FakeRate" not in args['output_selection']:
         ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
         ConfigureJobs.getListOfNonpromptFilenames(), 
             "WZBackgroundSelector", args['selection'], fOut, 
-            extra_inputs=fr_inputs+hist_inputs+tselection, proof=args['proof'])
+            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
-alldata = makeCompositeHists("AllData", 
+alldata = HistTools.makeCompositeHists("AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
 OutputTools.writeOutputListItem(alldata, fOut)
 
-nonpromptmc = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
+nonpromptmc = HistTools.makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
     ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'])
 OutputTools.writeOutputListItem(nonpromptmc, fOut)
-ewkmc = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
+ewkmc = HistTools.makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'])
 OutputTools.writeOutputListItem(ewkmc, fOut)
 
-ewkcorr = getDifference("DataEWKCorrected", "AllData", "AllEWK", False)
+ewkcorr = HistTools.getDifference("DataEWKCorrected", "AllData", "AllEWK", False)
 OutputTools.writeOutputListItem(ewkcorr, fOut)
