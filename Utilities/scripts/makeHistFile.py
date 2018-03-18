@@ -4,6 +4,7 @@ from python import SelectorTools
 from python import UserInput
 from python import OutputTools
 from python import ConfigureJobs
+from python import HistTools
 import os
 import sys
 
@@ -90,19 +91,25 @@ if "FakeRate" not in args['output_selection']:
         ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
         ConfigureJobs.getListOfNonpromptFilenames(), 
             "WZBackgroundSelector", args['selection'], fOut, 
-            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, proof=args['proof'])
+            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
+            proof=args['proof'])
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
-alldata = HistTools.makeCompositeHists("AllData", 
+alldata = HistTools.makeCompositeHists(fOut,"AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
 OutputTools.writeOutputListItem(alldata, fOut)
+alldata.Delete()
 
-nonpromptmc = HistTools.makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
+nonpromptmc = HistTools.makeCompositeHists(fOut, "NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
     ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'])
+nonpromptmc.Delete()
+
 OutputTools.writeOutputListItem(nonpromptmc, fOut)
-ewkmc = HistTools.makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
+ewkmc = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'])
 OutputTools.writeOutputListItem(ewkmc, fOut)
+ewkmc.Delete()
 
-ewkcorr = HistTools.getDifference("DataEWKCorrected", "AllData", "AllEWK", False)
+ewkcorr = HistTools.getDifference(fOut, "DataEWKCorrected", "AllData", "AllEWK")
 OutputTools.writeOutputListItem(ewkcorr, fOut)
+ewkcorr.Delete()

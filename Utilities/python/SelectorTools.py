@@ -3,6 +3,7 @@ import ROOT
 import glob
 import datetime
 import ConfigureJobs, OutputTools
+import sys
 
 def applySelector(filelist, selector_name, selection, 
         rootfile,
@@ -22,45 +23,41 @@ def applySelector(filelist, selector_name, selection,
                 inputs.Add(inp)
             ROOT.gROOT.cd()
             sumweights_hist = 0
-            if proof:
-                proof_path = "_".join([dataset, analysis, 
-                    selection+("#/%s/ntuple" % chan)])
-                ROOT.gProof.Process(proof_path, select, "")
-                proof_meta_path = "_".join([dataset, analysis, 
-                    selection+"#/metaInfo/metaInfo"])
-                ## TODO proof draw command for meta tree
-                #proof.DrawSelect(proof_path, "1>>sumweights", "")
-            else: 
-                chain = ROOT.TChain("%s/ntuple" % chan)
-                meta_chain = ROOT.TChain("metaInfo/metaInfo")
-                try:
-                    file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                        selection, analysis)
-                    print "File path is", file_path
-                    chain.Add(file_path)
+            chain = ROOT.TChain("%s/ntuple" % chan)
+            meta_chain = ROOT.TChain("metaInfo/metaInfo")
+            try:
+                file_path = ConfigureJobs.getInputFilesPath(dataset, 
+                    selection, analysis)
+                print "File path is", file_path
+                chain.Add(file_path)
+                if chain.GetEntries() != 0 and proof:
+                    proof_path = "_".join([dataset, analysis, 
+                        selection+("#/%s/ntuple" % chan)])
+                    ROOT.gProof.Process(proof_path, select, "")
+                else: 
                     chain.Process(select, "")
-                    if "data" not in dataset and addsumweights and chan == "eee":
-                        sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1,0,100)
-                        meta_chain.Add(file_path)
-                        print file_path
-                        meta_chain.Draw("1>>sumweights", "summedWeights")
-                        if sumweights_hist.Integral() <= 0:
-                            raise ValueError("Sum of weights <= 0 found for file"
-                                    "%s. Probably the file is empty." % dataset)
-                        sumweights_hist.SetDirectory(0)
-                except ValueError as e:
-                    print e
-                    if sumweights_hist:
-                        sumweights_hist.Delete()
-                    continue
+                if "data" not in dataset and addsumweights and chan == "eee":
+                    sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1,0,100)
+                    meta_chain.Add(file_path)
+                    meta_chain.Draw("1>>sumweights", "summedWeights")
+                    if sumweights_hist.Integral() <= 0:
+                        raise ValueError("Sum of weights <= 0 found for file"
+                                "%s. Probably the file is empty." % dataset)
+                    sumweights_hist.SetDirectory(0)
+            except ValueError as e:
+                print e
+                if sumweights_hist:
+                    sumweights_hist.Delete()
+                continue
             output_list = select.GetOutputList()
-            if  sumweights_hist:
-                dataset_list = output_list.FindObject(dataset)
+            dataset_list = output_list.FindObject(dataset)
+            if not dataset_list or dataset_list.ClassName() != "TList":
+                print "WARNING: No output found for dataset %s" % dataset
+                continue
+            if sumweights_hist:
                 dataset_list.Add(sumweights_hist)
-            for out in output_list:
-                OutputTools.writeOutputListItem(out, rootfile)
-                if out.ClassName() == "TList":
-                    out.SetOwner()
-                    ROOT.SetOwnership(out, False)
-                    out.Delete()
+            OutputTools.writeOutputListItem(dataset_list, rootfile)
+            for obj in ROOT.gROOT.GetList():
+                obj.Delete()
+            select.Delete()
 

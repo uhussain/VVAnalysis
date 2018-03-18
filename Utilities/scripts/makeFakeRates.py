@@ -80,27 +80,6 @@ def makeCompositeHists(name, members, addRatios=True, overflow=False):
             composite.Add(ratio) 
     return composite
 
-def getDifference(name, dir1, dir2, addRatios=True, composite=True):
-    differences = ROOT.TList()
-    differences.SetName(name)
-    if composite:
-        channels.extend(["allE", "allMu"])
-    for histname in getHistNames(channels):
-        hist1 = fOut.Get("/".join([dir1, histname]))
-        hist2 = fOut.Get("/".join([dir2, histname]))
-        if hist1 and hist2:
-            diff = hist1.Clone()
-            diff.Add(hist2, -1)
-        else:
-            raise RuntimeError("hist %s was not produced for "
-                "dataset(s) %s and/or %s!" % (histname, dir1, dir2))
-        differences.Add(diff)
-    if addRatios:
-        ratios = getRatios(differences)
-        for ratio in ratios:
-            differences.Add(ratio) 
-    return differences
-
 def getRatios(hists):
     ratios = []
     for hist in hists:
@@ -145,5 +124,5 @@ OutputTools.writeOutputListItem(allewk, fOut)
 allnonprompt = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfNonpromptFilenames()))
 OutputTools.writeOutputListItem(allnonprompt, fOut)
-final = getDifference("DataEWKCorrected", "AllData", "AllEWK")
+final = HistTools.getDifference(fOut, "DataEWKCorrected", "AllData", "AllEWK")
 OutputTools.writeOutputListItem(final, fOut)

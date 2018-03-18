@@ -54,12 +54,14 @@ if [ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
     echo "INFO: Fake rate file $frfile exists! Using exisiting file."
 else
     echo "INFO: Fake rate file $frfile not found. It will be created."
-    ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile
+    ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile --proof
+    exit 1
     python ScaleFactors/setupScaleFactors.py -t $frfile 
 fi
 
 if [ "$2" != "combineOnly" ]; then
-    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output 
+    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output #--proof
+    exit 1
     if [ -f $histfile ]; then
         echo "Histogram file $histfile produced"
     else

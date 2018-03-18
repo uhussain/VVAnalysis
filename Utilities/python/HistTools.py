@@ -1,20 +1,7 @@
 import array
 import ROOT
 
-def getRatios(hists):
-    ratios = []
-    for hist in hists:
-        if "Tight" not in hist.GetName():
-            continue
-        ratio = hist.Clone()
-        ratio.SetName(hist.GetName().replace("passingTight", "ratio"))
-        if not ratio.GetSumw2():
-            ratio.Sumw2()
-        ratio.Divide(hists.FindObject(hist.GetName().replace("Tight", "Loose")))
-        ratios.append(ratio)
-    return ratios
-
-def getDifference(name, dir1, dir2, addRatios=True):
+def getDifference(fOut, name, dir1, dir2, addRatios=[]):
     differences = ROOT.TList()
     differences.SetName(name)
     for histname in [i.GetName() for i in fOut.Get(dir1).GetListOfKeys()]:
@@ -31,10 +18,8 @@ def getDifference(name, dir1, dir2, addRatios=True):
             print "WARNING: Hist %s was not produced for " \
                 "dataset(s) %s" % (histname, dir2)
         differences.Add(diff)
-    if addRatios:
-        ratios = getRatios(differences)
-        for ratio in ratios:
-            differences.Add(ratio) 
+    for ratio in addRatios:
+        differences.Add(ratio) 
     return differences
 
 def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
@@ -258,11 +243,13 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True,
             if not tmphist: print "/".join([directory, histname])
             toRebin = rebin and not "TH2" in tmphist.ClassName()
             hist = tmphist.Clone() if not toRebin else tmphist.Rebin(len(rebin)-1, histname, rebin)
+            tmphist.Delete()
             if hist:
                 sumhist = composite.FindObject(hist.GetName())
                 if "data" not in directory.lower() and hist.GetEntries() > 0:
                     sumweights_hist = hist_file.Get("/".join([directory.split("__")[0], "sumweights"]))
                     sumweights = sumweights_hist.Integral()
+                    sumweights_hist.Delete()
                     hist.Scale(members[directory.split("__")[0]]*1000*lumi/sumweights)
                 addOverflowAndUnderflow(hist, underflow, overflow)
             else:
@@ -273,6 +260,7 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True,
                 composite.Add(sumhist)
             else:
                 sumhist.Add(hist)
+            hist.Delete()
     return composite
 
 def getTransformedHists(orig_file, folders, input_hists, transformation, transform_inputs):

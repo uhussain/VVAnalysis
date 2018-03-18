@@ -15,5 +15,3 @@ def writeOutputListItem(item, directory):
         print "Couldn't write output item:"
         print repr(item)
     directory.cd()
-
-
