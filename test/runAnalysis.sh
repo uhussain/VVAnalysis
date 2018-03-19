@@ -54,7 +54,7 @@ if [ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
     echo "INFO: Fake rate file $frfile exists! Using exisiting file."
 else
     echo "INFO: Fake rate file $frfile not found. It will be created."
-    ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile --proof
+    ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile 
     exit 1
     python ScaleFactors/setupScaleFactors.py -t $frfile 
 fi

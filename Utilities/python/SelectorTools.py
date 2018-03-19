@@ -16,8 +16,8 @@ def applySelector(filelist, selector_name, selection,
             inputs = ROOT.TList()
             select.SetInputList(inputs)
             tchan = ROOT.TNamed("channel", chan)
-            tname = ROOT.TNamed("name", dataset)
-            inputs.Add(tname)
+            #tname = ROOT.TNamed("name", dataset)
+            #inputs.Add(tname)
             inputs.Add(tchan)
             for inp in extra_inputs:
                 inputs.Add(inp)
@@ -57,7 +57,6 @@ def applySelector(filelist, selector_name, selection,
             if sumweights_hist:
                 dataset_list.Add(sumweights_hist)
             OutputTools.writeOutputListItem(dataset_list, rootfile)
-            for obj in ROOT.gROOT.GetList():
-                obj.Delete()
-            select.Delete()
+            output_list.Delete()
+            ROOT.gROOT.GetList().Delete()
 

@@ -1,5 +1,6 @@
 #include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
 #include <TStyle.h>
+#include <regex>
 
 void WZSelectorBase::Begin(TTree * /*tree*/)
 {
@@ -24,10 +25,22 @@ void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
     if (mIsoSF_ == nullptr ) 
         Abort("Must pass muon Iso SF");
 }
+
+std::string WZSelectorBase::GetNameFromFile() {
+    std::regex expr = std::regex("201[0-9]-[0-9][0-2]-[0-9][0-9]-(.*)-WZxsec2016");
+    std::smatch matches;
+    std::string fileName = fChain->GetTree()->GetDirectory()->GetFile()->GetName(); 
+
+    std::regex_search(fileName, matches, expr);
+    return std::string(matches.str(1));
+}
+
 void WZSelectorBase::Init(TTree *tree)
 {
     if (!tree) return;
     fChain = tree;
+    for (auto& obj : allObjects_)
+        SafeDelete(*obj);
     
     TString option = GetOption();
 
@@ -38,6 +51,11 @@ void WZSelectorBase::Init(TTree *tree)
         if (name != nullptr) {
             name_ = name->GetTitle();
         }
+        else {
+            std::cout << "NAME NOT FOUND!" << std::endl;
+            name_ = GetNameFromFile();
+        }
+        std::cout << "Name is " << name_ << std::endl;
         if (chan != nullptr) {
             channelName_ = chan->GetTitle();
         }
@@ -67,7 +85,7 @@ void WZSelectorBase::Init(TTree *tree)
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
     if ( currentHistDir_ == nullptr ) {
         currentHistDir_ = new TList();
-        currentHistDir_->SetName(name_.c_str());
+        //currentHistDir_->SetName(name_.c_str());
         fOutput->Add(currentHistDir_);
         // Watch for something that I hope never happens,
         size_t existingObjectPtrsSize = allObjects_.size();

@@ -234,6 +234,7 @@ protected:
     bool lepton3IsTight();
     bool tightZLeptons();
     bool IsGenMatched3l();
+    std::string GetNameFromFile();
 };
 
 #endif
