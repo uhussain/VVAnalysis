@@ -121,8 +121,8 @@ def addDuplicationFlag(original_file,state,FlaggedEvents):
     Flag = array('i',[0])
     Flag_branch = tree.Branch('duplicated', Flag, 'duplicated/I')
     tree.SetBranchStatus("duplicated",1)
-    print "No.of events flagged from eeee: ",len(FlaggedEventList[0])
-    print FlaggedEventList[0]
+    #print "No.of events flagged from eeee: ",len(FlaggedEventList[0])
+    #print FlaggedEventList[0]
     if (state == "eeee" and len(FlaggedEvents[0])>0):
         tree.SetBranchStatus("run",1)
         tree.SetBranchStatus("lumi",1)
@@ -136,8 +136,8 @@ def addDuplicationFlag(original_file,state,FlaggedEvents):
             else:
                 Flag[0]=0
                 Flag_branch.Fill()
-    print "No.of events flagged from eemm: ",len(FlaggedEventList[1])
-    print FlaggedEventList[1]
+    #print "No.of events flagged from eemm: ",len(FlaggedEventList[1])
+    #print FlaggedEventList[1]
     if (state == "eemm" and len(FlaggedEvents[1])>0):
         tree.SetBranchStatus("run",1)
         tree.SetBranchStatus("lumi",1)
@@ -150,8 +150,8 @@ def addDuplicationFlag(original_file,state,FlaggedEvents):
             else:
                 Flag[0]=0
                 Flag_branch.Fill()
-    print "No.of events flagged from mmmm: ",len(FlaggedEventList[2])
-    print FlaggedEventList[2]
+    #print "No.of events flagged from mmmm: ",len(FlaggedEventList[2])
+    #print FlaggedEventList[2]
     if (state == "mmmm" and len(FlaggedEvents[2])>0):
         tree.SetBranchStatus("run",1)
         tree.SetBranchStatus("lumi",1)
@@ -180,18 +180,18 @@ events,events_score = getEventScore(original_file)
 #eeee_eemm,eemm_mmmm,eeee_mmmm => SetIntersectionList[0],[1],[2] respectively
 IntersectionList = getSetIntersections(events) 
 eventsbyChannel(events)
-print "No.of events in eeee_eemm intersection: ",len(IntersectionList[0])
-print "No.of events in eemm_mmmm intersection: ",len(IntersectionList[1])
-print "No.of events in eeee_mmmm intersection: ",len(IntersectionList[2])
+#print "No.of events in eeee_eemm intersection: ",len(IntersectionList[0])
+#print "No.of events in eemm_mmmm intersection: ",len(IntersectionList[1])
+#print "No.of events in eeee_mmmm intersection: ",len(IntersectionList[2])
 #Apply flagduplicates function
 #FinalEventList is a list of 3 sets containining unique events corresponding to the three states
 FlaggedEventList = flagduplicates(IntersectionList,events_score)
-#print "No.of events flagged from eeee: ",len(FlaggedEventList[0])
-#print FlaggedEventList[0]
-#print "No.of events flagged from eemm: ",len(FlaggedEventList[1])
-##print FlaggedEventList[1]
-#print "No.of events flagged from mmmm: ",len(FlaggedEventList[2])
-#print FlaggedEventList[2]
+print "No.of events flagged from eeee: ",len(FlaggedEventList[0])
+print FlaggedEventList[0]
+print "No.of events flagged from eemm: ",len(FlaggedEventList[1])
+#print FlaggedEventList[1]
+print "No.of events flagged from mmmm: ",len(FlaggedEventList[2])
+print FlaggedEventList[2]
 
 states = ['eeee', 'eemm','mmmm']
 for state in states:
