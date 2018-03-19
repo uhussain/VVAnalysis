@@ -197,12 +197,14 @@ public :
     // With AddObject<Type>(localPtr, ...);
     virtual void SetupNewDirectory();
 
+    //void AddObject(T* &ptr, const char* name, Args... args) {
+        //ptr = (T*) gROOT->FindObject(name);
+        //SafeDelete(ptr);
+        //ptr = new T(name, args...);
     template<typename T, typename... Args>
-    void AddObject(T* &ptr, const char* name, Args... args) {
+    void AddObject(T* &ptr, Args... args) {
         static_assert(std::is_base_of<TNamed, T>::value, "Objects must inheirit from ROOT TNamed to be streamable from PROOF sessions");
-        ptr = (T*) gROOT->FindObject(name);
-        SafeDelete(ptr);
-        ptr = new T(name, args...);
+        ptr = new T(args...);
         ptr->SetDirectory(gROOT);
         currentHistDir_->Add(ptr);
         allObjects_.insert((TNamed**) &ptr);
