@@ -12,11 +12,11 @@ tar -xvzf analysis_code.tar.gz
 addScaleFacs=${addScaleFacs}
 if [ $$addScaleFacs == "true" ]; then
     echo "adding lepton id and pilupe scale factors"
-    ./utilities/scripts/addScaleFactors.py -f $$output
+    ./Utilities/scripts/addScaleFactors.py -f $$output
 fi
 
 addDuplicatedFlag=${addDuplicatedFlag}
-if [ $$addDuplicatedFlag == "true" ]; then
+if [ $$addDuplicatedFlag == "True" ]; then
     echo "adding a duplicated flag if an event is in more than one final state"
-    ./utilities/scripts/addDuplicatedFlag.py -f $$output
+    ./Utilities/scripts/addDuplicatedFlag.py -f $$OUTPUT
 fi
