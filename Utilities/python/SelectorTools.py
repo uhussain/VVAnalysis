@@ -4,6 +4,7 @@ import glob
 import datetime
 import ConfigureJobs, OutputTools
 import sys
+import os
 
 def applySelector(filelist, selector_name, selection, 
         rootfile,
@@ -15,10 +16,6 @@ def applySelector(filelist, selector_name, selection,
             select = getattr(ROOT, selector_name)()
             inputs = ROOT.TList()
             select.SetInputList(inputs)
-            tchan = ROOT.TNamed("channel", chan)
-            #tname = ROOT.TNamed("name", dataset)
-            #inputs.Add(tname)
-            inputs.Add(tchan)
             for inp in extra_inputs:
                 inputs.Add(inp)
             ROOT.gROOT.cd()
@@ -28,7 +25,9 @@ def applySelector(filelist, selector_name, selection,
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     selection, analysis)
-                print "File path is", file_path
+                if not os.path.isdir(file_path.rsplit("/", 1)[0]):
+                    raise ValueError("Invalid path for dataset"
+                        "%s. Path was %s" % (dataset, file_path))
                 chain.Add(file_path)
                 if chain.GetEntries() != 0 and proof:
                     proof_path = "_".join([dataset, analysis, 

@@ -114,7 +114,6 @@ SelectorTools.applySelector(args["filenames"],
         "FakeRateSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs, proof=args['proof'],
         addsumweights=True)
-proof.Close()
 
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"]))
 OutputTools.writeOutputListItem(alldata, fOut)
@@ -124,5 +123,5 @@ OutputTools.writeOutputListItem(allewk, fOut)
 allnonprompt = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfNonpromptFilenames()))
 OutputTools.writeOutputListItem(allnonprompt, fOut)
-final = HistTools.getDifference(fOut, "DataEWKCorrected", "AllData", "AllEWK")
+final = HistTools.getDifference(fOut, "DataEWKCorrected", "AllData", "AllEWK", getRatios)
 OutputTools.writeOutputListItem(final, fOut)

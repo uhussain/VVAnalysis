@@ -646,7 +646,20 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         hists1D_["MtW"]->Fill(l3MtToMET, weight);
     }
     if (hists1D_["MTWZ"] != nullptr) {
-        hists1D_["MTWZ"]->Fill(MtToMET, weight*(isMC_ || MtToMET < 300 || noBlind));
+        TLorentzVector l1 = TLorentzVector();
+        l1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, 0);
+        TLorentzVector l2 = TLorentzVector();
+        l2.SetPtEtaPhiM(l2Pt, l2Eta, l2Phi, 0);
+        TLorentzVector l3 = TLorentzVector();
+        l3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, 0);
+        TLorentzVector met = TLorentzVector();
+        met.SetPtEtaPhiM(type1_pfMETEt, 0, type1_pfMETPhi, 0);
+        TLorentzVector zp4 = l1+l2;
+        TLorentzVector wp4 = l3+met;
+        TLorentzVector wzp4 = l1+l2+l3+met;
+        float sumEt = zp4.Et() + wp4.Et();
+        float mtwz = std::sqrt(sumEt*sumEt - wzp4.Pt()*wzp4.Pt());
+        hists1D_["MTWZ"]->Fill(mtwz, weight*(isMC_ || MtToMET < 300 || noBlind));
     }
     float m3lmet = 0;
     if (hists1D_["M3lMET"] != nullptr) {
@@ -657,7 +670,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         TLorentzVector l3 = TLorentzVector();
         l3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, 0);
         TLorentzVector met = TLorentzVector();
-        l3.SetPtEtaPhiM(type1_pfMETEt, 0, type1_pfMETPhi, 0);
+        met.SetPtEtaPhiM(type1_pfMETEt, 0, type1_pfMETPhi, 0);
         m3lmet= (l1+l2+l3+met).M();
         hists1D_["M3lMET"]->Fill(m3lmet, weight*(isMC_ || m3lmet < 400 || noBlind));
     }

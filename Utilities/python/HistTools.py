@@ -1,7 +1,7 @@
 import array
 import ROOT
 
-def getDifference(fOut, name, dir1, dir2, addRatios=[]):
+def getDifference(fOut, name, dir1, dir2, ratioFunc=None):
     differences = ROOT.TList()
     differences.SetName(name)
     for histname in [i.GetName() for i in fOut.Get(dir1).GetListOfKeys()]:
@@ -18,8 +18,10 @@ def getDifference(fOut, name, dir1, dir2, addRatios=[]):
             print "WARNING: Hist %s was not produced for " \
                 "dataset(s) %s" % (histname, dir2)
         differences.Add(diff)
-    for ratio in addRatios:
-        differences.Add(ratio) 
+    if ratioFunc:
+        ratios = ratioFunc(differences)
+        for ratio in ratios:
+            differences.Add(ratio) 
     return differences
 
 def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):

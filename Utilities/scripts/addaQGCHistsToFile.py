@@ -19,13 +19,13 @@ for file_name in ["WZxsec2016_aQGC-" + i for i in ["FT", "FM", "FS"]]:
         plot_group_info.update(json.load(plot_file))
 
 aqgc_hists = HistTools.make1DaQGCHists(input_file, 
-        ["mjj_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+        #["mjj_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+        #    ["Mass_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+        #    ["Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+        #    ["llPt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+        #    ["l2Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+        #    ["l3Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
             ["MTWZ_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
-            ["Mass_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
-            ["Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
-            ["llPt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
-            ["l2Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
-            ["l3Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
             ["M3lMET_lheWeights_%s" % c for c in ConfigureJobs.getChannels()],
         plot_group_info,
 )

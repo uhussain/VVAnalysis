@@ -39,8 +39,6 @@ void WZSelectorBase::Init(TTree *tree)
 {
     if (!tree) return;
     fChain = tree;
-    for (auto& obj : allObjects_)
-        SafeDelete(*obj);
     
     TString option = GetOption();
 
@@ -52,13 +50,13 @@ void WZSelectorBase::Init(TTree *tree)
             name_ = name->GetTitle();
         }
         else {
-            std::cout << "NAME NOT FOUND!" << std::endl;
             name_ = GetNameFromFile();
         }
-        std::cout << "Name is " << name_ << std::endl;
         if (chan != nullptr) {
             channelName_ = chan->GetTitle();
         }
+        else
+            channelName_ = fChain->GetTree()->GetDirectory()->GetName();
         if (selection != nullptr) {
             selectionName_ = selection->GetTitle();
         }
@@ -85,7 +83,7 @@ void WZSelectorBase::Init(TTree *tree)
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
     if ( currentHistDir_ == nullptr ) {
         currentHistDir_ = new TList();
-        //currentHistDir_->SetName(name_.c_str());
+        currentHistDir_->SetName(name_.c_str());
         fOutput->Add(currentHistDir_);
         // Watch for something that I hope never happens,
         size_t existingObjectPtrsSize = allObjects_.size();
