@@ -338,9 +338,6 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
         if (selection == FakeRateSelectionLoose)
             tightLeps = false;
     }
-    // For sync with Jakob
-    //else if (l2Pt < 20)
-    //    return false;
     if (selection == Inclusive2Jet && jetPt->size() < 2)
         return false;
     
@@ -530,9 +527,7 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
         mjj_mtwz_2Dhist_jesUp_->Fill(mjj, MtToMET, weight);
         mjj_mtwz_2Dhist_jerUp_->Fill(mjj, MtToMET, weight);
 
-        std::vector<std::string> vars = {"jesUp", "jesDown", "jerUp", "jerDown"};
-        
-        for (auto& var : vars) { 
+        for (auto& var : systematicNames_) { 
             hists1D_["yield_"+var]->Fill(1, weight);
             if (hists1D_["mjj_"+var] != nullptr) {
                 hists1D_["mjj_"+var ]->Fill(mjj, weight);
@@ -759,9 +754,19 @@ void WZSelector::SetupNewDirectory()
                           << std::endl;
                 exit(1);
             }
-            AddObject<TH1D>(hists1D_[name], 
-                (name+"_"+channelName_).c_str(), histData[0].c_str(),
-                std::stoi(histData[1]), std::stof(histData[2]), std::stof(histData[3]));
+            std::string hist_name = name+"_"+channelName_;
+            int nbins = std::stoi(histData[1]);
+            float xmin = std::stof(histData[2]);
+            float xmax = std::stof(histData[3]);
+            AddObject<TH1D>(hists1D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax);
+            if (std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
+                for (auto& syst : systematicNames_) {
+                    std::string syst_hist_name = name+"_"+syst;
+                    hists1D_[syst_hist_name] = {};
+                    AddObject<TH1D>(hists1D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
+                        histData[0].c_str(),nbins, xmin, xmax);
+                }
+            }
         }
         else
             std::cerr << "Skipping invalid histogram " << name << std::endl;
@@ -773,20 +778,6 @@ void WZSelector::SetupNewDirectory()
                 1000, 0, 1000);
         }
     }
-    AddObject<TH1D>(hists1D_["yield"], ("yield_"+channelName_).c_str(), "yield", 1, 0, 10);
-    AddObject<TH1D>(hists1D_["yield_jesUp"], ("yield_jesUp_"+channelName_).c_str(), "yield_jesUp", 1, 0, 10);
-    AddObject<TH1D>(hists1D_["yield_jesDown"], ("yield_jesDown_"+channelName_).c_str(), "yield_jesDown", 1, 0, 10);
-    AddObject<TH1D>(hists1D_["yield_jerUp"], ("yield_jerUp_"+channelName_).c_str(), "yield_jerUp", 1, 0, 10);
-    AddObject<TH1D>(hists1D_["yield_jerDown"], ("yield_jerDown_"+channelName_).c_str(), "yield_jerDown", 1, 0, 10);
-    AddObject<TH2D>(weighthists_["yield"], ("yield_lheWeights_"+channelName_).c_str(), "yield_lheWeights", 
-        1, 0, 10, 1000, 0, 1000);
-    AddObject<TH1D>(hists1D_["backgroundControlYield"], ("backgroundControlYield_"+channelName_).c_str(), "backgroundControlYield", 1, 0, 10);
-    AddObject<TH1D>(hists1D_["backgroundControlYield_jesUp"], ("backgroundControlYield_jesUp_"+channelName_).c_str(), "backgroundControlYield_jesUp", 1, 0, 10);
-    AddObject<TH1D>(hists1D_["backgroundControlYield_jesDown"], ("backgroundControlYield_jesDown_"+channelName_).c_str(), "backgroundControlYield_jesDown", 1, 0, 10);
-    AddObject<TH1D>(hists1D_["backgroundControlYield_jerUp"], ("backgroundControlYield_jerUp_"+channelName_).c_str(), "backgroundControlYield_jerUp", 1, 0, 10);
-    AddObject<TH1D>(hists1D_["backgroundControlYield_jerDown"], ("backgroundControlYield_jerDown_"+channelName_).c_str(), "backgroundControlYield_jerDown", 1, 0, 10);
-    AddObject<TH2D>(weighthists_["backgroundControlYield"], ("backgroundControlYield_lheWeights_"+channelName_).c_str(), "backgroundControlYield_lheWeights", 
-        1, 0, 10, 1000, 0, 1000);
     AddObject<TH2D>(mjj_etajj_2Dhist_, ("mjj_etajj_2D_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
         50, 0, 2500, 28, 0, 7);
     AddObject<TH2D>(mjj_etajj_2Dhist_jesUp_, ("mjj_etajj_2D_jesUp_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 

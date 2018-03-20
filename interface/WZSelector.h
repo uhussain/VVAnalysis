@@ -7,17 +7,29 @@
 
 class WZSelector : public WZSelectorBase {
 public :
+    bool doSystematics_;
+
+    std::vector<std::string> systHists_ = {
+        "yield",
+        "backgroundControlYield",
+        "mjj",
+        "dEtajj",
+        "MTWZ"
+    };
+
+    //std::vector<std::string> jeSystematicNames_ = {
+    std::vector<std::string> systematicNames_ = {
+        "jesUp", "jesDown", "jerUp", "jerDown"
+    };
+
+    //std::vector<std::string> systematicNames_ = {
+    //    "mEffUp", "mEffDown", "eEffUp", "eEffDown",
+    //    "pileupUp", "pileupDown"
+    //};
+
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
-        { "yield_jesUp",  {} },
-        { "yield_jesDown",  {} },
-        { "yield_jerUp",  {} },
-        { "yield_jerDown",  {} },
         { "backgroundControlYield",  {} },
-        { "backgroundControlYield_jesUp",  {} },
-        { "backgroundControlYield_jesDown",  {} },
-        { "backgroundControlYield_jerUp",  {} },
-        { "backgroundControlYield_jerDown",  {} },
         { "nTruePU",  {} },
         { "nvtx",  {} },
         { "ZMass",  {} },
@@ -42,37 +54,13 @@ public :
         { "nJets", {} },
         { "nJetCSVv2T", {} },
         { "jetPt[0]", {} },
-        { "jetPt_jesUp[0]",  {} },
-        { "jetPt_jesDown[0]",  {} },
         { "jetPt[1]", {} },
-        { "jetPt_jesUp[1]",  {} },
-        { "jetPt_jesDown[1]",  {} },
         { "jetPt[2]", {} },
-        { "jetPt_jesUp[2]",  {} },
-        { "jetPt_jesDown[2]",  {} },
         { "jetEta12", {} },
         { "jetEta[0]", {} },
-        { "jetEta_jesUp[0]",  {} },
-        { "jetEta_jesDown[0]",  {} },
         { "jetEta[1]", {} },
-        { "jetEta_jesUp[1]",  {} },
-        { "jetEta_jesDown[1]",  {} },
         { "jetEta[2]", {} },
-        { "jetEta_jesUp[2]",  {} },
-        { "jetEta_jesDown[2]",  {} },
         { "mjj",  {} },
-        { "mjj_jesUp",  {} },
-        { "mjj_jesDown",  {} },
-        { "mjj_jerUp",  {} },
-        { "mjj_jerDown",  {} },
-        { "dEtajj_jesUp",  {} },
-        { "dEtajj_jesDown",  {} },
-        { "dEtajj_jerUp",  {} },
-        { "dEtajj_jerDown",  {} },
-        { "MTWZ_jesUp",  {} },
-        { "MTWZ_jesDown",  {} },
-        { "MTWZ_jerUp",  {} },
-        { "MTWZ_jerDown",  {} },
         { "MtW",  {} },
         { "dEtajj",  {} },
         { "zep3l",  {} },
@@ -80,15 +68,9 @@ public :
     };
 
     std::map<std::string, TH2D*> weighthists_ = {
-        { "mjj",  {} },
+        { "backgroundControlYield",  {} },
         { "MTWZ",  {} },
         { "M3lMET", {} },
-        { "ZPt",  {} },
-        { "l1Pt",  {} },
-        { "l2Pt",  {} },
-        { "l3Pt",  {} },
-        { "Mass",  {} },
-        { "Pt",  {} },
         { "yield",  {} }
     };
     TH2D* mjj_etajj_2Dhist_;
