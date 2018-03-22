@@ -118,7 +118,8 @@ def createRunJob(base_dir, job_dir, selection, analysis, trigger_name, addScaleF
 def main():
     #for selection in selection_map.iteritems():
     args = getComLineArgs()
-    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], args['selection']):
+    first_selection = ConfigureJobs.getPreviousStep(args['selection'], args['analysis'])
+    for file_name in ConfigureJobs.getListOfFiles(args['filenames'], first_selection):
         try:
             farmoutNtupleSkim(file_name, args['selection'], 
                 args['analysis'], args['version'], args['scaleFacs'], 

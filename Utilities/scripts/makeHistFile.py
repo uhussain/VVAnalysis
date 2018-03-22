@@ -99,6 +99,7 @@ alldata = HistTools.makeCompositeHists(fOut,"AllData",
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
 OutputTools.writeOutputListItem(alldata, fOut)
 alldata.Delete()
+exit(0)
 
 nonpromptmc = HistTools.makeCompositeHists(fOut, "NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
     ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'])

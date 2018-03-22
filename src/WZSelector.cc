@@ -178,10 +178,9 @@ bool WZSelector::PassesVBSBackgroundControlSelection(float dijetMass,
         std::vector<float>* jPt, std::vector<float>* jEta) { 
     if (jPt->size() != jEta->size() || jPt->size() < 2)
         return false;
-    //if (selection_ != VBSselection_Loose && (jPt->at(0) < 50 || jPt->at(1) < 50))
-    //    return false;
     float deltaEtajj = std::abs(jEta->at(0) - jEta->at(1));
-    return (dijetMass > 100 && (dijetMass < 500 || deltaEtajj < 2.5 || std::abs(zep3l) > 2.5));
+    //return (dijetMass > 100 && (dijetMass < 500 || deltaEtajj < 2.5 || std::abs(zep3l) > 2.5));
+    return (dijetMass > 100 && (dijetMass < 500 || deltaEtajj < 2.5 ));
     //return ((dijetMass > 500 && deltaEtajj < 2.5) || (dijetMass < 500 && deltaEtajj > 2.5));
 }
 
@@ -356,7 +355,7 @@ void WZSelector::FillVBSBackgroundControlHistograms(float weight, bool noBlind) 
         if (isMC_)
             for (size_t i = 0; i < lheWeights.size(); i++) {
                 weighthists_["backgroundControlYield"]->Fill(1, i, lheWeights[i]/lheWeights[0]*weight);
-            }
+        }
         // Useful nonprompt estimation
         if (!isMC_ && noBlind) {
             hists1D_["backgroundControlYield_jesUp"]->Fill(1, weight);
@@ -385,7 +384,8 @@ void WZSelector::FillVBSBackgroundControlHistograms(float weight, bool noBlind) 
 void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) { 
     // JES/JER uncertainties
     // Need to separate check VBS cuts using JER/JES variations
-    FillVBSBackgroundControlHistograms(weight, noBlind);
+    if (hists1D_["backgroundControlYield"] != nullptr)
+        FillVBSBackgroundControlHistograms(weight, noBlind);
     if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt, jetEta)) {
         mjj_etajj_2Dhist_->Fill(mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
     }
@@ -578,6 +578,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     if (isVBS_ && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
         return;
 
+    if (hists1D_["yield"] == nullptr)
+        throw std::invalid_argument("Yield histogram is required!");
     hists1D_["yield"]->Fill(1, weight);
     if (hists1D_["Mass"] != nullptr)
         hists1D_["Mass"]->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
