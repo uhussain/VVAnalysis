@@ -737,6 +737,46 @@ std::vector<std::string> WZSelector::ReadHistData(std::string histDataString) {
     return histData;
 }
 
+void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> histData) {
+    if (histData.size() != 4 && histData.size() != 7) {
+        std::cerr << "Malformed data string for histogram '" << name
+                    << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'"
+                    << "\n   OR form: 'Title; (optional info) $ nbins, xmin, xmax nbinsy ymin ymax'"
+                    << std::endl;
+        exit(1);
+    }
+    std::string hist_name = name+"_"+channelName_;
+    int nbins = std::stoi(histData[1]);
+    float xmin = std::stof(histData[2]);
+    float xmax = std::stof(histData[3]);
+    if (histData.size() == 4) {
+        AddObject<TH1D>(hists1D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax);
+        if (std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
+            for (auto& syst : systematicNames_) {
+                std::string syst_hist_name = name+"_"+syst;
+                hists1D_[syst_hist_name] = {};
+                AddObject<TH1D>(hists1D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
+                    histData[0].c_str(),nbins, xmin, xmax);
+            }
+        }
+    }
+    else {
+        int nbinsy = std::stoi(histData[4]);
+        float ymin = std::stof(histData[5]);
+        float ymax = std::stof(histData[6]);
+        AddObject<TH2D>(hists2D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax,
+                nbinsy, ymin, ymax);
+        if (std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
+            for (auto& syst : systematicNames_) {
+                std::string syst_hist_name = name+"_"+syst;
+                hists2D_[syst_hist_name] = {};
+                AddObject<TH2D>(hists2D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
+                        histData[0].c_str(),nbins, xmin, xmax, nbinsy, ymin, ymax);
+            }
+        }
+    }
+}
+
 void WZSelector::SetupNewDirectory()
 {
     WZSelectorBase::SetupNewDirectory();
@@ -748,27 +788,9 @@ void WZSelector::SetupNewDirectory()
     for (auto && entry : *histInfo) {  
         TNamed* currentHistInfo = dynamic_cast<TNamed*>(entry);
         std::string name = currentHistInfo->GetName();
-        if (hists1D_.find(name) != hists1D_.end()) { 
-            std::vector<std::string> histData = ReadHistData(currentHistInfo->GetTitle());
-            if (histData.size() != 4) {
-                std::cerr << "Malformed data string for histogram '" << name
-                          << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'"
-                          << std::endl;
-                exit(1);
-            }
-            std::string hist_name = name+"_"+channelName_;
-            int nbins = std::stoi(histData[1]);
-            float xmin = std::stof(histData[2]);
-            float xmax = std::stof(histData[3]);
-            AddObject<TH1D>(hists1D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax);
-            if (std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
-                for (auto& syst : systematicNames_) {
-                    std::string syst_hist_name = name+"_"+syst;
-                    hists1D_[syst_hist_name] = {};
-                    AddObject<TH1D>(hists1D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
-                        histData[0].c_str(),nbins, xmin, xmax);
-                }
-            }
+        std::vector<std::string> histData = ReadHistData(currentHistInfo->GetTitle());
+        if (hists2D_.find(name) != hists2D_.end() || hists1D_.find(name) != hists1D_.end()) { 
+            InitialzeHistogram(name, histData);
         }
         else
             std::cerr << "Skipping invalid histogram " << name << std::endl;

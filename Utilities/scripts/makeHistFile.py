@@ -32,8 +32,7 @@ def getHistExpr(hist_names, selection):
     for hist_name in hist_names:
         bin_info = ConfigHistTools.getHistBinInfo(manager_path, selection, hist_name)
         bin_expr = "{nbins}, {xmin}, {xmax}".format(**bin_info)
-        info.Add(ROOT.TNamed(hist_name, "%s $ %s" % (hist_name, bin_expr))
-        )
+        info.Add(ROOT.TNamed(hist_name, " $ ".join([hist_name, bin_expr])))
     return info
 
 ROOT.gROOT.SetBatch(True)

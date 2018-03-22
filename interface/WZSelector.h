@@ -73,6 +73,14 @@ public :
         { "M3lMET", {} },
         { "yield",  {} }
     };
+    
+    std::map<std::string, TH2D*> hists2D_ = {
+        {"mjj_etajj_2D", {}}
+    };
+    std::map<std::string, TH3D*> weighthists2D_ {
+        {"mjj_etajj_2D", {}}
+    };
+
     TH2D* mjj_etajj_2Dhist_;
     TH2D* mjj_etajj_2Dhist_jesUp_;
     TH2D* mjj_etajj_2Dhist_jesDown_;
@@ -182,6 +190,7 @@ protected:
             std::vector<float>* jPt, std::vector<float>* jEta);
     bool PassesVBSBackgroundControlSelection(float dijetMass, 
             std::vector<float>* jPt, std::vector<float>* jEta);
+    void InitialzeHistogram(std::string name, std::vector<std::string> histData);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
 };
