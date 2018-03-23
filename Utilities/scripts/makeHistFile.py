@@ -31,7 +31,10 @@ def getHistExpr(hist_names, selection):
     info.SetName("histinfo")
     for hist_name in hist_names:
         bin_info = ConfigHistTools.getHistBinInfo(manager_path, selection, hist_name)
-        bin_expr = "{nbins}, {xmin}, {xmax}".format(**bin_info)
+        if "TH1" in ConfigHistTools.getHistType(manager_path, selection, hist_name):
+            bin_expr = "{nbins}, {xmin}, {xmax}".format(**bin_info)
+        else:
+            bin_expr = "{nbinsx}, {xmin}, {xmax}, {nbinsy}, {ymin}, {ymax}".format(**bin_info)
         info.Add(ROOT.TNamed(hist_name, " $ ".join([hist_name, bin_expr])))
     return info
 
@@ -92,8 +95,10 @@ if "FakeRate" not in args['output_selection']:
             "WZBackgroundSelector", args['selection'], fOut, 
             extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
             proof=args['proof'])
+#mc = SelectorTools.applySelector(["wlljj-ewk"], "WZSelector", args['selection'], fOut, 
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
+exit(1)
 alldata = HistTools.makeCompositeHists(fOut,"AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
 OutputTools.writeOutputListItem(alldata, fOut)

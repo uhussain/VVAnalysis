@@ -29,9 +29,10 @@ void WZSelector::Init(TTree *tree)
     }
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
+    fChain->SetBranchAddress("jetPhi", &jetPhi, &b_jetPhi);
+    fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
     fChain->SetBranchAddress("nJets", &nJets, &b_nJets);
     fChain->SetBranchAddress("jetCSVv2", &jetCSVv2, &b_jetCSVv2);
-    fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("Eta", &Eta, &b_Eta);
     fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
@@ -112,6 +113,7 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_l3Phi->GetEntry(entry);
     b_jetPt->GetEntry(entry);
     b_jetEta->GetEntry(entry);
+    b_jetPhi->GetEntry(entry);
     b_Eta->GetEntry(entry);
     b_mjj->GetEntry(entry);
     if (isMC_) {
@@ -129,33 +131,46 @@ void WZSelector::LoadBranches(Long64_t entry) {
         b_jetPt_jerUp->GetEntry(entry);
         b_jetPt_jerDown->GetEntry(entry);
 
-        dEtajj_jesUp = -1;
-        zep3l_jesUp = -1;
-        if (jetEta_jesUp->size() >= 2) {
-            dEtajj_jesUp = std::abs(jetEta_jesUp->at(0) - jetEta_jesUp->at(1));
-            zep3l_jesUp = Eta - 0.5*(jetEta_jesUp->at(1) + jetEta_jesUp->at(0));
-        }
+        auto deltaRjj = [](std::vector<float>* jEta, std::vector<float>* jPhi) {
+            if (jEta->size() != jPhi->size() || jEta->size() < 2)
+                return -1.;
+            double etaDiff = jEta->at(0) - jEta->at(1);
+            double phiDiff = jPhi->at(0) - jPhi->at(1);
+            return std::sqrt(etaDiff*etaDiff - phiDiff*phiDiff);
+        };
 
-        dEtajj_jesDown = -1;
-        zep3l_jesDown = -1;
-        if (jetEta_jesDown->size() >= 2) {
-            dEtajj_jesDown = std::abs(jetEta_jesDown->at(0) - jetEta_jesDown->at(1));
-            zep3l_jesDown = Eta - 0.5*(jetEta_jesDown->at(1) + jetEta_jesDown->at(0));
-        }
+        auto deltaEtajj = [](std::vector<float>* jEta) {
+            if (jEta->size() < 2)
+                return -1.;
+            double etaDiff = jEta->at(0) - jEta->at(1);
+            return etaDiff;
+        };
 
-        dEtajj_jerUp = -1;
-        zep3l_jerUp = -1;
-        if (jetEta_jerUp->size() >= 2) {
-            dEtajj_jerUp = std::abs(jetEta_jerUp->at(0) - jetEta_jerUp->at(1));
-            zep3l_jerUp = Eta - 0.5*(jetEta_jerUp->at(1) + jetEta_jerUp->at(0));
-        }
+        auto zeppenfeld = [](std::vector<float>* jEta, float objEta) {
+            if (jEta->size() < 2)
+                return -999.;
+            return objEta - 0.5*(jEta->at(1) + jEta->at(0));
+        };
 
-        dEtajj_jerDown = -1;
-        zep3l_jerDown = -1;
-        if (jetEta_jerDown->size() >= 2) {
-            dEtajj_jerDown = std::abs(jetEta_jerDown->at(0) - jetEta_jerDown->at(1));
-            zep3l_jerDown = Eta - 0.5*(jetEta_jerDown->at(1) + jetEta_jerDown->at(0));
-        }
+        dEtajj = deltaEtajj(jetEta);
+        zep3l = zeppenfeld(jetEta, Eta);
+        dRjj = deltaRjj(jetEta, jetPhi);
+
+        dEtajj_jesUp = deltaEtajj(jetEta_jesUp);
+        zep3l_jesUp = zeppenfeld(jetEta_jesUp, Eta);
+        dRjj = deltaRjj(jetEta_jesUp, jetPhi);
+
+        dEtajj_jesDown = deltaEtajj(jetEta_jesDown);
+        zep3l_jesDown = zeppenfeld(jetEta_jesDown, Eta);
+        dRjj = deltaRjj(jetEta_jesDown, jetPhi);
+
+        dEtajj_jerUp = deltaEtajj(jetEta_jerUp);
+        zep3l_jerUp = zeppenfeld(jetEta_jerUp, Eta);
+        dRjj = deltaRjj(jetEta_jerUp, jetPhi);
+
+        dEtajj_jerDown = deltaEtajj(jetEta_jerDown);
+        zep3l_jerDown = zeppenfeld(jetEta_jerDown, Eta);
+        dRjj = deltaRjj(jetEta_jerDown, jetPhi);
     }
     
     if (isMC_ && weight_info_ > 0) {
@@ -165,13 +180,6 @@ void WZSelector::LoadBranches(Long64_t entry) {
             b_pdfWeights->GetEntry(entry);
             lheWeights.insert(lheWeights.end(), pdfWeights->begin(), pdfWeights->end());
         }
-    }
-    dEtajj = -1;
-    zep3l = -1;
-
-    if (jetEta->size() >= 2) {
-        dEtajj = std::abs(jetEta->at(0) - jetEta->at(1));
-        zep3l = Eta - 0.5*(jetEta->at(1) + jetEta->at(0));
     }
 }
 bool WZSelector::PassesVBSBackgroundControlSelection(float dijetMass, 
@@ -387,33 +395,60 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
     if (hists1D_["backgroundControlYield"] != nullptr)
         FillVBSBackgroundControlHistograms(weight, noBlind);
     if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt, jetEta)) {
-        mjj_etajj_2Dhist_->Fill(mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
+        if (hists2D_["mjj_etajj_2D"]) 
+            hists2D_["mjj_etajj_2D"]->Fill(mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
+        //if (hists2D_["mjj_dRjj_2D"]) 
+        //    hists2D_["mjj_dRjj_2D"]->Fill(mjj, dRjj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
     }
 
     if (isMC_) {
         if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jesUp, jetEta_jesUp))) {
-            mjj_etajj_2Dhist_jesUp_->Fill(mjj_jesUp, dEtajj_jesUp, weight);
+            if (hists2D_["mjj_etajj_2D_jesUp"]) 
+                hists2D_["mjj_etajj_2D_jesUp"]->Fill(mjj_jesUp, dEtajj_jesUp, weight);
+            if (hists2D_["mjj_dRjj_2D_jesUp"]) 
+                hists2D_["mjj_dRjj_2D_jesUp"]->Fill(mjj_jesUp, dRjj_jesUp, weight);
         }
         if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jesDown, jetEta_jesDown))) {
-            mjj_etajj_2Dhist_jesDown_->Fill(mjj_jesDown, dEtajj_jesDown, weight);
+            if (hists2D_["mjj_etajj_2D_jesDown"]) 
+                hists2D_["mjj_etajj_2D_jesDown"]->Fill(mjj_jesDown, dEtajj_jesDown, weight);
+            if (hists2D_["mjj_dRjj_2D_jesDown"]) 
+                hists2D_["mjj_dRjj_2D_jesDown"]->Fill(mjj_jesDown, dRjj_jesDown, weight);
         }
         if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jerUp, jetEta_jerUp))) {
-            mjj_etajj_2Dhist_jerUp_->Fill(mjj_jerUp, dEtajj_jerUp, weight);
+            if (hists2D_["mjj_etajj_2D_jesUp"]) 
+                hists2D_["mjj_etajj_2D_jerUp"]->Fill(mjj_jerUp, dEtajj_jerUp, weight);
+            if (hists2D_["mjj_dRjj_2D_jerUp"]) 
+                hists2D_["mjj_dRjj_2D_jerUp"]->Fill(mjj_jerUp, dRjj_jerUp, weight);
         }
         if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jerDown, jetEta_jerDown))) {
-            mjj_etajj_2Dhist_jerDown_->Fill(mjj_jerDown, dEtajj_jerDown, weight);
+            if (hists2D_["mjj_etajj_2D_jerDown"]) 
+                hists2D_["mjj_etajj_2D_jerDown"]->Fill(mjj_jerDown, dEtajj_jerDown, weight);
+            if (hists2D_["mjj_dRjj_2D_jerDown"]) 
+                hists2D_["mjj_dRjj_2D_jerDown"]->Fill(mjj_jerDown, dRjj_jerDown, weight);
         }
     }
     else if (noBlind && (!isVBS_ || PassesVBSSelection(noBlind, -1, jetPt, jetEta))) {
-        mjj_etajj_2Dhist_jesUp_->Fill(mjj,dEtajj, weight);
-        mjj_etajj_2Dhist_jesDown_->Fill(mjj, dEtajj, weight);
-        mjj_etajj_2Dhist_jerUp_->Fill(mjj, dEtajj, weight);
-        mjj_etajj_2Dhist_jerDown_->Fill(mjj, dEtajj, weight);
+        if (hists2D_["mjj_etajj_2D_jesUp"]) 
+            hists2D_["mjj_etajj_2D_jesUp"]->Fill(mjj,dEtajj, weight);
+        if (hists2D_["mjj_etajj_2D_jesDown"]) 
+            hists2D_["mjj_etajj_2D_jesDown"]->Fill(mjj, dEtajj, weight);
+        if (hists2D_["mjj_etajj_2D_jerUp"]) 
+            hists2D_["mjj_etajj_2D_jerUp"]->Fill(mjj, dEtajj, weight);
+        if (hists2D_["mjj_etajj_2D_jerDown"]) 
+            hists2D_["mjj_etajj_2D_jerDown"]->Fill(mjj, dEtajj, weight);
+
+        if (hists2D_["mjj_dRjj_2D_jesUp"]) 
+            hists2D_["mjj_dRjj_2D_jesUp"]->Fill(mjj, dRjj, weight);
+        if (hists2D_["mjj_dRjj_2D_jesDown"]) 
+            hists2D_["mjj_dRjj_2D_jesDown"]->Fill(mjj, dRjj, weight);
+        if (hists2D_["mjj_dRjj_2D_jerUp"]) 
+            hists2D_["mjj_dRjj_2D_jerUp"]->Fill(mjj, dRjj, weight);
+        if (hists2D_["mjj_dRjj_2D_jerDown"]) 
+            hists2D_["mjj_dRjj_2D_jerDown"]->Fill(mjj, dRjj, weight);
     }
 
     if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, mjj_jesUp, jetPt_jesUp, jetEta_jesUp))) {
         hists1D_["yield_jesUp"]->Fill(1, weight);
-        mjj_mtwz_2Dhist_jesUp_->Fill(mjj_jesUp, MtToMET, weight);
         if (hists1D_["mjj_jesUp"] != nullptr) {
             hists1D_["mjj_jesUp"]->Fill(mjj_jesUp, weight);
         }
@@ -437,7 +472,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
             hists1D_["jetEta_jesUp[2]"]->Fill(jetEta_jesUp->at(2), weight);
     }
     if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, mjj_jesDown, jetPt_jesDown, jetEta_jesDown))) {
-        mjj_mtwz_2Dhist_jesDown_->Fill(mjj_jesDown, MtToMET, weight);
         hists1D_["yield_jesDown"]->Fill(1, weight);
 
         if (hists1D_["mjj_jesDown"] != nullptr) {
@@ -463,7 +497,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
             hists1D_["jetEta_jesDown[2]"]->Fill(jetEta_jesDown->at(2), weight);
     }   
     if (isMC_&& (!isVBS_|| PassesVBSSelection(noBlind, mjj_jerUp, jetPt_jerUp, jetEta_jerUp))) {
-        mjj_mtwz_2Dhist_jerUp_->Fill(mjj_jerUp, MtToMET, weight);
         hists1D_["yield_jerUp"]->Fill(1, weight);
 
         if (hists1D_["mjj_jerUp"] != nullptr) {
@@ -489,7 +522,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
             hists1D_["jetEta_jerUp[2]"]->Fill(jetEta_jerUp->at(2), weight);
     }
     if (isMC_ && (!isVBS_ || PassesVBSSelection(noBlind, mjj_jerDown, jetPt_jerDown, jetEta_jerDown))) {
-        mjj_mtwz_2Dhist_jerDown_->Fill(mjj_jerDown, MtToMET, weight);
         hists1D_["yield_jerDown"]->Fill(1, weight);
 
         if (hists1D_["mjj_jerDown"] != nullptr) {
@@ -517,16 +549,8 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
     
     if (isVBS_ && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
         return;
-    mjj_mtwz_2Dhist_->Fill(mjj, MtToMET, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
-    mjj_zep3l_2Dhist_->Fill(mjj, std::abs(zep3l), weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
-    etajj_zep3l_2Dhist_->Fill(dEtajj, std::abs(zep3l), weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
     // Useful for the nonprompt estimation
     if (!isMC_ && noBlind) {
-        mjj_mtwz_2Dhist_jesUp_->Fill(mjj, MtToMET, weight);
-        mjj_mtwz_2Dhist_jerUp_->Fill(mjj, MtToMET, weight);
-        mjj_mtwz_2Dhist_jesUp_->Fill(mjj, MtToMET, weight);
-        mjj_mtwz_2Dhist_jerUp_->Fill(mjj, MtToMET, weight);
-
         for (auto& var : systematicNames_) { 
             hists1D_["yield_"+var]->Fill(1, weight);
             if (hists1D_["mjj_"+var] != nullptr) {
@@ -699,8 +723,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         if (weighthists_["Mass"] != nullptr)
             weighthists_["Mass"]->Fill(ZPt, i, lheWeights[i]/lheWeights[0]*weight);
 
-        mjj_etajj_lheWeights_3Dhist_->Fill(mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
-        mjj_mtwz_lheWeights_3Dhist_->Fill(mjj, MtToMET, i, lheWeights[i]/lheWeights[0]*weight);
+        if (weighthists2D_["mjj_etajj_2D"] != nullptr)
+            weighthists2D_["mjj_etajj_2D"]->Fill(mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
     }
 }
 
@@ -759,6 +783,12 @@ void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> h
                     histData[0].c_str(),nbins, xmin, xmax);
             }
         }
+        // Weight hists must be subset of 1D hists!
+        if (isMC_ && (weighthists_.find(name) != weighthists_.end())) { 
+            AddObject<TH2D>(weighthists_[name], 
+                (name+"_lheWeights_"+channelName_).c_str(), histData[0].c_str(),
+                nbins, xmin, xmax, 1000, 0, 1000);
+        }
     }
     else {
         int nbinsy = std::stoi(histData[4]);
@@ -771,8 +801,14 @@ void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> h
                 std::string syst_hist_name = name+"_"+syst;
                 hists2D_[syst_hist_name] = {};
                 AddObject<TH2D>(hists2D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
-                        histData[0].c_str(),nbins, xmin, xmax, nbinsy, ymin, ymax);
+                    histData[0].c_str(),nbins, xmin, xmax, nbinsy, ymin, ymax);
             }
+        }
+        // 3D weight hists must be subset of 2D hists!
+        if (isMC_ && (weighthists2D_.find(name) != weighthists2D_.end())) { 
+            AddObject<TH3D>(weighthists2D_[name], 
+                (name+"_lheWeights_"+channelName_).c_str(), histData[0].c_str(),
+                nbins, xmin, xmax, nbinsy, ymin, ymax, 1000, 0, 1000);
         }
     }
 }
@@ -794,42 +830,5 @@ void WZSelector::SetupNewDirectory()
         }
         else
             std::cerr << "Skipping invalid histogram " << name << std::endl;
-        if (isMC_ && (weighthists_.find(name) != weighthists_.end())) { 
-            std::vector<std::string> histData = ReadHistData(currentHistInfo->GetTitle());
-            AddObject<TH2D>(weighthists_[name], 
-                (name+"_lheWeights_"+channelName_).c_str(), histData[0].c_str(),
-                std::stoi(histData[1]), std::stof(histData[2]), std::stof(histData[3]),
-                1000, 0, 1000);
-        }
     }
-    AddObject<TH2D>(mjj_etajj_2Dhist_, ("mjj_etajj_2D_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
-        50, 0, 2500, 28, 0, 7);
-    AddObject<TH2D>(mjj_etajj_2Dhist_jesUp_, ("mjj_etajj_2D_jesUp_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
-        50, 0, 2500, 28, 0, 7);
-    AddObject<TH2D>(mjj_etajj_2Dhist_jesDown_, ("mjj_etajj_2D_jesDown_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
-        50, 0, 2500, 28, 0, 7);
-    AddObject<TH2D>(mjj_etajj_2Dhist_jerUp_, ("mjj_etajj_2D_jerUp_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
-        50, 0, 2500, 28, 0, 7);
-    AddObject<TH2D>(mjj_etajj_2Dhist_jerDown_, ("mjj_etajj_2D_jerDown_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
-        50, 0, 2500, 28, 0, 7);
-    AddObject<TH3D>(mjj_etajj_lheWeights_3Dhist_, ("mjj_etajj_2D_lheWeights_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs. m_{jj}" , 
-        50, 0, 2500, 28, 0, 7, 1000, 0, 1000);
-
-    AddObject<TH2D>(mjj_mtwz_2Dhist_, ("mjj_mtwz_2D_"+channelName_).c_str(), "m_{T}(3\\ell, p_{T}^{miss}) vs. m_{jj}" , 
-        50, 0, 2500, 200, 0, 1000);
-    AddObject<TH2D>(mjj_mtwz_2Dhist_jesUp_, ("mjj_mtwz_2D_jesUp_"+channelName_).c_str(), "m_{T}(3\\ell, p_{T}^{miss}) vs. m_{jj}" ,
-        50, 0, 2500, 200, 0, 1000);
-    AddObject<TH2D>(mjj_mtwz_2Dhist_jesDown_, ("mjj_mtwz_2D_jesDown_"+channelName_).c_str(),"m_{T}(3\\ell, p_{T}^{miss}) vs. m_{jj}" ,
-        50, 0, 2500, 200, 0, 1000);
-    AddObject<TH2D>(mjj_mtwz_2Dhist_jerUp_, ("mjj_mtwz_2D_jerUp_"+channelName_).c_str(),"m_{T}(3\\ell, p_{T}^{miss}) vs. m_{jj}" ,
-        50, 0, 2500, 200, 0, 1000);
-    AddObject<TH2D>(mjj_mtwz_2Dhist_jerDown_, ("mjj_mtwz_2D_jerDown_"+channelName_).c_str(),"m_{T}(3\\ell, p_{T}^{miss}) vs. m_{jj}" ,
-        50, 0, 2500, 200, 0, 1000);
-    AddObject<TH3D>(mjj_mtwz_lheWeights_3Dhist_, ("mjj_mtwz_2D_lheWeights_"+channelName_).c_str(),"m_{T}(3\\ell, p_{T}^{miss}) vs. m_{jj}" ,
-        50, 0, 2500, 200, 0, 1000, 1000, 0, 1000);
-
-    AddObject<TH2D>(mjj_zep3l_2Dhist_, ("mjj_zep3l_2D_"+channelName_).c_str(), "zep(3\\ell) vs. m_{jj}" , 
-        50, 0, 2500, 20, 0, 5);
-    AddObject<TH2D>(etajj_zep3l_2Dhist_, ("etajj_zep3l_2D_"+channelName_).c_str(), "#Delta#eta(j_{1}, j_{2}) vs zep(3\\ell)" , 
-        28, 0, 7, 20, 0, 5);
 }
