@@ -195,6 +195,12 @@ protected:
     void InitialzeHistogram(std::string name, std::vector<std::string> histData);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
+    template<typename T, typename... Args>
+    void SafeHistFill(std::map<std::string, T*> container, 
+            std::string histname, Args... args) {
+        if (container[histname] != nullptr)
+            container[histname]->Fill(args...);
+    };
 };
 
 #endif

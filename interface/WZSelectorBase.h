@@ -68,15 +68,7 @@ public :
     };
 
     TList *currentHistDir_{nullptr};
-    TH2D* passingTight2D_;
-    TH1D* passingTight1DPt_;
-    TH1D* passingTight1DEta_;
-    TH2D* passingLoose2D_;
-    TH1D* passingLoose1DPt_;
-    TH1D* passingLoose1DEta_;
-    TH2D* ratio2D_;
-    TH1D* ratio1DPt_;
-    TH1D* ratio1DEta_;
+    TH1D* sumWeightsHist;
 
     bool isVBS_;
     bool passesLeptonVeto;

@@ -18,7 +18,8 @@ void WZBackgroundSelector::SetupNewDirectory()
     for (const auto && obj : *currentHistDir_) {
         std::string name = obj->GetName();
         TNamed* named = dynamic_cast<TNamed*>(obj);
-        named->SetName(name.insert(name.length()-3, "Fakes_").c_str());
+        if (name != "sumweights")
+            named->SetName(name.insert(name.length()-3, "Fakes_").c_str());
     }
     
     AddObject<TH1D>(mjjHistPPF_, ("mjj_PPF_"+channelName_).c_str(), "mjj; m_{jj} [GeV]; Events;", 15, 0, 1500);

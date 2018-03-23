@@ -111,6 +111,12 @@ void WZSelectorBase::Init(TTree *tree)
             fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
             fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
             fChain->SetBranchAddress("e3GenPt", &l3GenPt, &b_l3GenPt);
+            TFile* file = fChain->GetTree()->GetDirectory()->GetFile(); 
+            TTree* metaInfo = dynamic_cast<TTree*>(file->Get("metaInfo/metaInfo"));
+            if (metaInfo == nullptr)
+                std::cerr << "WARNING: Failed to add sumWeights histogram" << std::endl;
+            else
+                metaInfo->Draw("1>>sumweights", "summedWeights");
         }
     }
     else if (channelName_ == "eem") { 
@@ -424,4 +430,6 @@ void WZSelectorBase::UpdateDirectory()
 
 void WZSelectorBase::SetupNewDirectory()
 {
+    if (channel_ == eee && isMC_)
+        AddObject<TH1D>(sumWeightsHist, "sumweights", "sumweights", 1, 0, 10);
 }

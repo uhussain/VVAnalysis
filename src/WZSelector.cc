@@ -395,156 +395,113 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
     if (hists1D_["backgroundControlYield"] != nullptr)
         FillVBSBackgroundControlHistograms(weight, noBlind);
     if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt, jetEta)) {
-        if (hists2D_["mjj_etajj_2D"]) 
-            hists2D_["mjj_etajj_2D"]->Fill(mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
-        //if (hists2D_["mjj_dRjj_2D"]) 
-        //    hists2D_["mjj_dRjj_2D"]->Fill(mjj, dRjj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
+        SafeHistFill(hists2D_, "mjj_etajj_2D", mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
+        //SafeHistFill(hists2D_, "mjj_dRjj_2D", mjj, dRjj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
     }
 
+    // Make 2D plots without cuts on eta and mjj
     if (isMC_) {
-        if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jesUp, jetEta_jesUp))) {
-            if (hists2D_["mjj_etajj_2D_jesUp"]) 
-                hists2D_["mjj_etajj_2D_jesUp"]->Fill(mjj_jesUp, dEtajj_jesUp, weight);
-            if (hists2D_["mjj_dRjj_2D_jesUp"]) 
-                hists2D_["mjj_dRjj_2D_jesUp"]->Fill(mjj_jesUp, dRjj_jesUp, weight);
+        if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jesUp, jetEta_jesUp)) {
+            SafeHistFill(hists2D_, "mjj_etajj_2D_jesUp", mjj_jesUp, dEtajj_jesUp, weight);
+            SafeHistFill(hists2D_, "mjj_dRjj_2D_jesUp", mjj_jesUp, dRjj_jesUp, weight);
         }
-        if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jesDown, jetEta_jesDown))) {
-            if (hists2D_["mjj_etajj_2D_jesDown"]) 
-                hists2D_["mjj_etajj_2D_jesDown"]->Fill(mjj_jesDown, dEtajj_jesDown, weight);
-            if (hists2D_["mjj_dRjj_2D_jesDown"]) 
-                hists2D_["mjj_dRjj_2D_jesDown"]->Fill(mjj_jesDown, dRjj_jesDown, weight);
+        if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jesDown, jetEta_jesDown)) {
+            SafeHistFill(hists2D_, "mjj_etajj_2D_jesDown", mjj_jesDown, dEtajj_jesDown, weight);
+            SafeHistFill(hists2D_, "mjj_dRjj_2D_jesDown", mjj_jesDown, dRjj_jesDown, weight);
         }
-        if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jerUp, jetEta_jerUp))) {
-            if (hists2D_["mjj_etajj_2D_jesUp"]) 
-                hists2D_["mjj_etajj_2D_jerUp"]->Fill(mjj_jerUp, dEtajj_jerUp, weight);
-            if (hists2D_["mjj_dRjj_2D_jerUp"]) 
-                hists2D_["mjj_dRjj_2D_jerUp"]->Fill(mjj_jerUp, dRjj_jerUp, weight);
+        if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jerUp, jetEta_jerUp)) {
+            SafeHistFill(hists2D_, "mjj_etajj_2D_jerUp", mjj_jerUp, dEtajj_jerUp, weight);
+            SafeHistFill(hists2D_, "mjj_dRjj_2D_jerUp", mjj_jerUp, dRjj_jerUp, weight);
         }
-        if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jerDown, jetEta_jerDown))) {
-            if (hists2D_["mjj_etajj_2D_jerDown"]) 
-                hists2D_["mjj_etajj_2D_jerDown"]->Fill(mjj_jerDown, dEtajj_jerDown, weight);
-            if (hists2D_["mjj_dRjj_2D_jerDown"]) 
-                hists2D_["mjj_dRjj_2D_jerDown"]->Fill(mjj_jerDown, dRjj_jerDown, weight);
+        if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt_jerDown, jetEta_jerDown)) {
+            SafeHistFill(hists2D_, "mjj_etajj_2D_jerDown", mjj_jerDown, dEtajj_jerDown, weight);
+            SafeHistFill(hists2D_, "mjj_dRjj_2D_jerDown", mjj_jerDown, dRjj_jerDown, weight);
         }
     }
     else if (noBlind && (!isVBS_ || PassesVBSSelection(noBlind, -1, jetPt, jetEta))) {
-        if (hists2D_["mjj_etajj_2D_jesUp"]) 
-            hists2D_["mjj_etajj_2D_jesUp"]->Fill(mjj,dEtajj, weight);
-        if (hists2D_["mjj_etajj_2D_jesDown"]) 
-            hists2D_["mjj_etajj_2D_jesDown"]->Fill(mjj, dEtajj, weight);
-        if (hists2D_["mjj_etajj_2D_jerUp"]) 
-            hists2D_["mjj_etajj_2D_jerUp"]->Fill(mjj, dEtajj, weight);
-        if (hists2D_["mjj_etajj_2D_jerDown"]) 
-            hists2D_["mjj_etajj_2D_jerDown"]->Fill(mjj, dEtajj, weight);
+        SafeHistFill(hists2D_, "mjj_etajj_2D_jesUp", mjj,dEtajj, weight);
+        SafeHistFill(hists2D_, "mjj_etajj_2D_jesDown", mjj, dEtajj, weight);
+        SafeHistFill(hists2D_, "mjj_etajj_2D_jerUp", mjj, dEtajj, weight);
+        SafeHistFill(hists2D_, "mjj_etajj_2D_jerDown", mjj, dEtajj, weight);
 
-        if (hists2D_["mjj_dRjj_2D_jesUp"]) 
-            hists2D_["mjj_dRjj_2D_jesUp"]->Fill(mjj, dRjj, weight);
-        if (hists2D_["mjj_dRjj_2D_jesDown"]) 
-            hists2D_["mjj_dRjj_2D_jesDown"]->Fill(mjj, dRjj, weight);
-        if (hists2D_["mjj_dRjj_2D_jerUp"]) 
-            hists2D_["mjj_dRjj_2D_jerUp"]->Fill(mjj, dRjj, weight);
-        if (hists2D_["mjj_dRjj_2D_jerDown"]) 
-            hists2D_["mjj_dRjj_2D_jerDown"]->Fill(mjj, dRjj, weight);
+        SafeHistFill(hists2D_, "mjj_dRjj_2D_jesUp", mjj, dRjj, weight);
+        SafeHistFill(hists2D_, "mjj_dRjj_2D_jesDown", mjj, dRjj, weight);
+        SafeHistFill(hists2D_, "mjj_dRjj_2D_jerUp", mjj, dRjj, weight);
+        SafeHistFill(hists2D_, "mjj_dRjj_2D_jerDown", mjj, dRjj, weight);
     }
 
     if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, mjj_jesUp, jetPt_jesUp, jetEta_jesUp))) {
-        hists1D_["yield_jesUp"]->Fill(1, weight);
-        if (hists1D_["mjj_jesUp"] != nullptr) {
-            hists1D_["mjj_jesUp"]->Fill(mjj_jesUp, weight);
+        SafeHistFill(hists1D_, "yield_jesUp", 1, weight);
+        SafeHistFill(hists1D_, "mjj_jesUp", mjj_jesUp, weight);
+        SafeHistFill(hists1D_, "MTWZ_jesUp", MtToMET, weight);
+        SafeHistFill(hists1D_, "dEtajj_jesUp", dEtajj_jesUp, weight);
+        if (jetPt_jesUp->size() > 0 && jetPt_jesUp->size() == jetEta_jesUp->size()) {
+            SafeHistFill(hists1D_, "jetPt_jesUp[0]", jetPt_jesUp->at(0), weight);
+            SafeHistFill(hists1D_, "jetEta_jesUp[0]", jetEta_jesUp->at(0), weight);
         }
-        if (hists1D_["MTWZ_jesUp"] != nullptr) {
-            hists1D_["MTWZ_jesUp"]->Fill(MtToMET, weight);
+        if (jetPt_jesUp->size() > 1 && jetPt_jesUp->size() == jetEta_jesUp->size()) {
+            SafeHistFill(hists1D_, "jetPt_jesUp[1]", jetPt_jesUp->at(1), weight);
+            SafeHistFill(hists1D_, "jetEta_jesUp[1]", jetEta_jesUp->at(1), weight);
         }
-        if (hists1D_["dEtajj_jesUp"] != nullptr) {
-            hists1D_["dEtajj_jesUp"]->Fill(dEtajj_jesUp, weight);
+        if (jetPt_jesUp->size() > 2 && jetPt_jesUp->size() == jetEta_jesUp->size()) {
+            SafeHistFill(hists1D_, "jetPt_jesUp[2]", jetPt_jesUp->at(2), weight);
+            SafeHistFill(hists1D_, "jetEta_jesUp[2]", jetEta_jesUp->at(2), weight);
         }
-        if (hists1D_["jetPt_jesUp[0]"] != nullptr && jetPt_jesUp->size() > 0)
-            hists1D_["jetPt_jesUp[0]"]->Fill(jetPt_jesUp->at(0), weight);
-        if (hists1D_["jetPt_jesUp[1]"] != nullptr && jetPt_jesUp->size() > 1)
-            hists1D_["jetPt_jesUp[1]"]->Fill(jetPt_jesUp->at(1), weight);
-        if (hists1D_["jetPt_jesUp[2]"] != nullptr && jetPt_jesUp->size() > 2)
-            hists1D_["jetPt_jesUp[2]"]->Fill(jetPt_jesUp->at(2), weight);
-        if (hists1D_["jetEta_jesUp[0]"] != nullptr && jetEta_jesUp->size() > 0)
-            hists1D_["jetEta_jesUp[0]"]->Fill(jetEta_jesUp->at(0), weight);
-        if (hists1D_["jetEta_jesUp[1]"] != nullptr && jetEta_jesUp->size() > 1)
-            hists1D_["jetEta_jesUp[1]"]->Fill(jetEta_jesUp->at(1), weight);
-        if (hists1D_["jetEta_jesUp[2]"] != nullptr && jetEta_jesUp->size() > 2)
-            hists1D_["jetEta_jesUp[2]"]->Fill(jetEta_jesUp->at(2), weight);
     }
     if (isMC_ && (!isVBS_|| PassesVBSSelection(noBlind, mjj_jesDown, jetPt_jesDown, jetEta_jesDown))) {
-        hists1D_["yield_jesDown"]->Fill(1, weight);
-
-        if (hists1D_["mjj_jesDown"] != nullptr) {
-            hists1D_["mjj_jesDown"]->Fill(mjj_jesDown, weight);
+        SafeHistFill(hists1D_, "yield_jesDown", 1, weight);
+        SafeHistFill(hists1D_, "mjj_jesDown", mjj_jesDown, weight);
+        SafeHistFill(hists1D_, "MTWZ_jesDown", MtToMET, weight);
+        SafeHistFill(hists1D_, "dEtajj_jesDown", dEtajj_jesDown, weight);
+        if (jetPt_jesDown->size() > 0 && jetPt_jesDown->size() == jetEta_jesDown->size()) {
+            SafeHistFill(hists1D_, "jetPt_jesDown[0]", jetPt_jesDown->at(0), weight);
+            SafeHistFill(hists1D_, "jetEta_jesDown[0]", jetEta_jesDown->at(0), weight);
         }
-        if (hists1D_["MTWZ_jesDown"] != nullptr) {
-            hists1D_["MTWZ_jesDown"]->Fill(MtToMET, weight);
+        if (jetPt_jesDown->size() > 1 && jetPt_jesDown->size() == jetEta_jesDown->size()) {
+            SafeHistFill(hists1D_, "jetPt_jesDown[1]", jetPt_jesDown->at(1), weight);
+            SafeHistFill(hists1D_, "jetEta_jesDown[1]", jetEta_jesDown->at(1), weight);
         }
-        if (hists1D_["dEtajj_jesDown"] != nullptr) {
-            hists1D_["dEtajj_jesDown"]->Fill(dEtajj_jesDown, weight);
+        if (jetPt_jesDown->size() > 2 && jetPt_jesDown->size() == jetEta_jesDown->size()) {
+            SafeHistFill(hists1D_, "jetPt_jesDown[2]", jetPt_jesDown->at(2), weight);
+            SafeHistFill(hists1D_, "jetEta_jesDown[2]", jetEta_jesDown->at(2), weight);
         }
-        if (hists1D_["jetPt_jesDown[0]"] != nullptr && jetPt_jesDown->size() > 0)
-            hists1D_["jetPt_jesDown[0]"]->Fill(jetPt_jesDown->at(0), weight);
-        if (hists1D_["jetPt_jesDown[1]"] != nullptr && jetPt_jesDown->size() > 1)
-            hists1D_["jetPt_jesDown[1]"]->Fill(jetPt_jesDown->at(1), weight);
-        if (hists1D_["jetPt_jesDown[2]"] != nullptr && jetPt_jesDown->size() > 2)
-            hists1D_["jetPt_jesDown[2]"]->Fill(jetPt_jesDown->at(2), weight);
-        if (hists1D_["jetEta_jesDown[0]"] != nullptr && jetEta_jesDown->size() > 0)
-            hists1D_["jetEta_jesDown[0]"]->Fill(jetEta_jesDown->at(0), weight);
-        if (hists1D_["jetEta_jesDown[1]"] != nullptr && jetEta_jesDown->size() > 1)
-            hists1D_["jetEta_jesDown[1]"]->Fill(jetEta_jesDown->at(1), weight);
-        if (hists1D_["jetEta_jesDown[2]"] != nullptr && jetEta_jesDown->size() > 2)
-            hists1D_["jetEta_jesDown[2]"]->Fill(jetEta_jesDown->at(2), weight);
     }   
     if (isMC_&& (!isVBS_|| PassesVBSSelection(noBlind, mjj_jerUp, jetPt_jerUp, jetEta_jerUp))) {
-        hists1D_["yield_jerUp"]->Fill(1, weight);
-
-        if (hists1D_["mjj_jerUp"] != nullptr) {
-            hists1D_["mjj_jerUp"]->Fill(mjj_jerUp, weight);
+        SafeHistFill(hists1D_, "yield_jerUp", 1, weight);
+        SafeHistFill(hists1D_, "mjj_jerUp", mjj_jerUp, weight);
+        SafeHistFill(hists1D_, "MTWZ_jerUp", MtToMET, weight);
+        SafeHistFill(hists1D_, "dEtajj_jerUp", dEtajj_jerUp, weight);
+        if (jetPt_jerUp->size() > 0 && jetPt_jerUp->size() == jetEta_jerUp->size()) {
+            SafeHistFill(hists1D_, "jetPt_jerUp[0]", jetPt_jerUp->at(0), weight);
+            SafeHistFill(hists1D_, "jetEta_jerUp[0]", jetEta_jerUp->at(0), weight);
         }
-        if (hists1D_["MTWZ_jerUp"] != nullptr) {
-            hists1D_["MTWZ_jerUp"]->Fill(MtToMET, weight);
+        if (jetPt_jerUp->size() > 1 && jetPt_jerUp->size() == jetEta_jerUp->size()) {
+            SafeHistFill(hists1D_, "jetPt_jerUp[1]", jetPt_jerUp->at(1), weight);
+            SafeHistFill(hists1D_, "jetEta_jerUp[1]", jetEta_jerUp->at(1), weight);
         }
-        if (hists1D_["dEtajj_jerUp"] != nullptr) {
-            hists1D_["dEtajj_jerUp"]->Fill(dEtajj_jerUp, weight);
+        if (jetPt_jerUp->size() > 2 && jetPt_jerUp->size() == jetEta_jerUp->size()) {
+            SafeHistFill(hists1D_, "jetPt_jerUp[2]", jetPt_jerUp->at(2), weight);
+            SafeHistFill(hists1D_, "jetEta_jerUp[2]", jetEta_jerUp->at(2), weight);
         }
-        if (hists1D_["jetPt_jerUp[0]"] != nullptr && jetPt_jerUp->size() > 0)
-            hists1D_["jetPt_jerUp[0]"]->Fill(jetPt_jerUp->at(0), weight);
-        if (hists1D_["jetPt_jerUp[1]"] != nullptr && jetPt_jerUp->size() > 1)
-            hists1D_["jetPt_jerUp[1]"]->Fill(jetPt_jerUp->at(1), weight);
-        if (hists1D_["jetPt_jerUp[2]"] != nullptr && jetPt_jerUp->size() > 2)
-            hists1D_["jetPt_jerUp[2]"]->Fill(jetPt_jerUp->at(2), weight);
-        if (hists1D_["jetEta_jerUp[0]"] != nullptr && jetEta_jerUp->size() > 0)
-            hists1D_["jetEta_jerUp[0]"]->Fill(jetEta_jerUp->at(0), weight);
-        if (hists1D_["jetEta_jerUp[1]"] != nullptr && jetEta_jerUp->size() > 1)
-            hists1D_["jetEta_jerUp[1]"]->Fill(jetEta_jerUp->at(1), weight);
-        if (hists1D_["jetEta_jerUp[2]"] != nullptr && jetEta_jerUp->size() > 2)
-            hists1D_["jetEta_jerUp[2]"]->Fill(jetEta_jerUp->at(2), weight);
     }
     if (isMC_ && (!isVBS_ || PassesVBSSelection(noBlind, mjj_jerDown, jetPt_jerDown, jetEta_jerDown))) {
-        hists1D_["yield_jerDown"]->Fill(1, weight);
-
-        if (hists1D_["mjj_jerDown"] != nullptr) {
-            hists1D_["mjj_jerDown"]->Fill(mjj_jerDown, weight);
+        SafeHistFill(hists1D_, "yield_jerDown", 1, weight);
+        SafeHistFill(hists1D_, "jetPt_jerDown[0]", jetPt_jerDown->at(0), weight);
+        SafeHistFill(hists1D_, "mjj_jerDown", mjj_jerDown, weight);
+        SafeHistFill(hists1D_, "MTWZ_jerDown", MtToMET, weight);
+        SafeHistFill(hists1D_, "dEtajj_jerDown", dEtajj_jerDown, weight);
+        if (jetPt_jerDown->size() > 0 && jetPt_jerDown->size() == jetEta_jerDown->size()) {
+            SafeHistFill(hists1D_, "jetPt_jerDown[0]", jetPt_jerDown->at(0), weight);
+            SafeHistFill(hists1D_, "jetEta_jerDown[0]", jetEta_jerDown->at(0), weight);
         }
-        if (hists1D_["MTWZ_jerDown"] != nullptr) {
-            hists1D_["MTWZ_jerDown"]->Fill(MtToMET, weight);
+        if (jetPt_jerDown->size() > 1 && jetPt_jerDown->size() == jetEta_jerDown->size()) {
+            SafeHistFill(hists1D_, "jetPt_jerDown[1]", jetPt_jerDown->at(1), weight);
+            SafeHistFill(hists1D_, "jetEta_jerDown[1]", jetEta_jerDown->at(1), weight);
         }
-        if (hists1D_["dEtajj_jerDown"] != nullptr) {
-            hists1D_["dEtajj_jerDown"]->Fill(dEtajj_jerDown, weight);
+        if (jetPt_jerDown->size() > 2 && jetPt_jerDown->size() == jetEta_jerDown->size()) {
+            SafeHistFill(hists1D_, "jetPt_jerDown[2]", jetPt_jerDown->at(2), weight);
+            SafeHistFill(hists1D_, "jetEta_jerDown[2]", jetEta_jerDown->at(2), weight);
         }
-        if (hists1D_["jetPt_jerDown[0]"] != nullptr && jetPt_jerDown->size() > 0)
-            hists1D_["jetPt_jerDown[0]"]->Fill(jetPt_jerDown->at(0), weight);
-        if (hists1D_["jetPt_jerDown[1]"] != nullptr && jetPt_jerDown->size() > 1)
-            hists1D_["jetPt_jerDown[1]"]->Fill(jetPt_jerDown->at(1), weight);
-        if (hists1D_["jetPt_jerDown[2]"] != nullptr && jetPt_jerDown->size() > 2)
-            hists1D_["jetPt_jerDown[2]"]->Fill(jetPt_jerDown->at(2), weight);
-        if (hists1D_["jetEta_jerDown[0]"] != nullptr && jetEta_jerDown->size() > 0)
-            hists1D_["jetEta_jerDown[0]"]->Fill(jetEta_jerDown->at(0), weight);
-        if (hists1D_["jetEta_jerDown[1]"] != nullptr && jetEta_jerDown->size() > 1)
-            hists1D_["jetEta_jerDown[1]"]->Fill(jetEta_jerDown->at(1), weight);
-        if (hists1D_["jetEta_jerDown[2]"] != nullptr && jetEta_jerDown->size() > 2)
-            hists1D_["jetEta_jerDown[2]"]->Fill(jetEta_jerDown->at(2), weight);
     }
     
     if (isVBS_ && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
@@ -564,31 +521,26 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
             }
         }
     }
-    if (hists1D_["mjj"] != nullptr)
-        hists1D_["mjj"]->Fill(mjj, weight*(isMC_ || (mjj < 500) || noBlind));
-    if (hists1D_["dEtajj"] != nullptr)
-        hists1D_["dEtajj"]->Fill(dEtajj, weight*(isMC_ || (dEtajj < 2.5) || noBlind));
+    SafeHistFill(hists1D_, "mjj", mjj, weight*(isMC_ || (mjj < 500) || noBlind));
+    SafeHistFill(hists1D_, "dEtajj", dEtajj, weight*(isMC_ || (dEtajj < 2.5) || noBlind));
 
-    if (hists1D_["jetPt[0]"] != nullptr && jetPt->size() > 0)
-        hists1D_["jetPt[0]"]->Fill(jetPt->at(0), weight);
-    if (hists1D_["jetPt[1]"] != nullptr && jetPt->size() > 1)
-        hists1D_["jetPt[1]"]->Fill(jetPt->at(1), weight);
-    if (hists1D_["jetPt[2]"] != nullptr && jetPt->size() > 2)
-        hists1D_["jetPt[2]"]->Fill(jetPt->at(2), weight);
-    if (hists1D_["jetEta[0]"] != nullptr && jetEta->size() > 0)
-        hists1D_["jetEta[0]"]->Fill(jetEta->at(0), weight);
-    if (hists1D_["jetEta[1]"] != nullptr && jetEta->size() > 1)
-        hists1D_["jetEta[1]"]->Fill(jetEta->at(1), weight);
-    if (hists1D_["jetEta[2]"] != nullptr && jetEta->size() > 2)
-        hists1D_["jetEta[2]"]->Fill(jetEta->at(2), weight);
+    if (jetPt->size() > 0 && jetPt->size() == jetEta->size()) {
+        SafeHistFill(hists1D_, "jetPt[0]", jetPt->at(0), weight);
+        SafeHistFill(hists1D_, "jetEta[0]", jetEta->at(0), weight);
+    }
+    if (jetPt->size() > 1 && jetPt->size() == jetEta->size()) {
+        SafeHistFill(hists1D_, "jetPt[1]", jetPt->at(1), weight);
+        SafeHistFill(hists1D_, "jetEta[1]", jetEta->at(1), weight);
+    }
+    if (jetPt->size() > 2 && jetPt->size() == jetEta->size()) {
+        SafeHistFill(hists1D_, "jetPt[2]", jetPt->at(2), weight);
+        SafeHistFill(hists1D_, "jetEta[2]", jetEta->at(2), weight);
+    }
      
     // VBS Variables
-    if (hists1D_["zep3l"] != nullptr && jetEta->size() >= 2) {
-        hists1D_["zep3l"]->Fill(Eta - 0.5*(jetEta->at(1) + jetEta->at(0)), weight);
-    }
-    if (hists1D_["zepj3"] != nullptr && jetEta->size() > 2)
-        hists1D_["zepj3"]->Fill(jetEta->at(2) - 0.5*(jetEta->at(1) + jetEta->at(0)), weight);
-    
+    SafeHistFill(hists1D_, "zep3l", zep3l, weight);
+    if (jetEta->size() > 3)
+        SafeHistFill(hists1D_, "zepj3", jetEta->at(2) - 0.5*(jetEta->at(1) + jetEta->at(0)), weight);
     
     // VBS Variables for cut optimization
     if (hists1D_["jetEta12"] != nullptr && jetEta->size() > 1) {
@@ -605,37 +557,23 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     if (hists1D_["yield"] == nullptr)
         throw std::invalid_argument("Yield histogram is required!");
     hists1D_["yield"]->Fill(1, weight);
-    if (hists1D_["Mass"] != nullptr)
-        hists1D_["Mass"]->Fill(Mass, weight*(isMC_ || Mass < 400 || noBlind));
-    if (hists1D_["ZMass"] != nullptr)
-        hists1D_["ZMass"]->Fill(ZMass, weight);
-    if (hists1D_["ZPhi"] != nullptr)
-        hists1D_["ZPhi"]->Fill(ZPhi, weight);
-    if (hists1D_["ZEta"] != nullptr)
-        hists1D_["ZEta"]->Fill(ZEta, weight);
-    if (hists1D_["Zlep1_Pt"] != nullptr)
-        hists1D_["Zlep1_Pt"]->Fill(l1Pt, weight);
-    if (hists1D_["Zlep1_Eta"] != nullptr)
-        hists1D_["Zlep1_Eta"]->Fill(l1Eta, weight);
-    if (hists1D_["Zlep1_Phi"] != nullptr)
-        hists1D_["Zlep1_Phi"]->Fill(l1Phi, weight);
-    if (hists1D_["Zlep2_Pt"] != nullptr)
-        hists1D_["Zlep2_Pt"]->Fill(l2Pt, weight);
-    if (hists1D_["Zlep2_Eta"] != nullptr)
-        hists1D_["Zlep2_Eta"]->Fill(l2Eta, weight);
-    if (hists1D_["Zlep2_Phi"] != nullptr)
-        hists1D_["Zlep2_Phi"]->Fill(l2Phi, weight);
-    if (hists1D_["Wlep_Pt"] != nullptr)
-        hists1D_["Wlep_Pt"]->Fill(l3Pt, weight);
-    if (hists1D_["WlepRelPFIsoDBR04"] != nullptr)
-        hists1D_["WlepRelPFIsoDBR04"]->Fill(l3Pt, weight);
-    if (hists1D_["Wlep_Eta"] != nullptr)
-        hists1D_["Wlep_Eta"]->Fill(l3Eta, weight);
-    if (hists1D_["Wlep_Phi"] != nullptr)
-        hists1D_["Wlep_Phi"]->Fill(l3Phi, weight);
-    if (hists1D_["MET"] != nullptr) {
-        hists1D_["MET"]->Fill(type1_pfMETEt, weight);
-    }
+    SafeHistFill(hists1D_, "Mass", Mass, weight*(isMC_ || Mass < 400 || noBlind));
+    SafeHistFill(hists1D_, "ZMass", ZMass, weight);
+    SafeHistFill(hists1D_, "ZPhi", ZPhi, weight);
+    SafeHistFill(hists1D_, "ZEta", ZEta, weight);
+    SafeHistFill(hists1D_, "Zlep1_Pt", l1Pt, weight);
+    SafeHistFill(hists1D_, "Zlep1_Eta", l1Eta, weight);
+    SafeHistFill(hists1D_, "Zlep1_Phi", l1Phi, weight);
+    SafeHistFill(hists1D_, "Zlep2_Pt", l2Pt, weight);
+    SafeHistFill(hists1D_, "Zlep2_Eta", l2Eta, weight);
+    SafeHistFill(hists1D_, "Zlep2_Phi", l2Phi, weight);
+    SafeHistFill(hists1D_, "Wlep_Pt", l3Pt, weight);
+    SafeHistFill(hists1D_, "WlepRelPFIsoDBR04", l3Pt, weight);
+    SafeHistFill(hists1D_, "Wlep_Eta", l3Eta, weight);
+    SafeHistFill(hists1D_, "Wlep_Phi", l3Phi, weight);
+    SafeHistFill(hists1D_, "MET", type1_pfMETEt, weight);
+    SafeHistFill(hists1D_, "MtW", l3MtToMET, weight);
+
     if (hists1D_["dR_lW_Z"] != nullptr) {
         float dPhi_lW_Z = ZPhi - l3Phi;
         float dEta_lW_Z = ZEta - l3Eta;
@@ -662,9 +600,6 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     if (hists1D_["nvtx"] != nullptr) {
         b_nvtx->GetEntry(entry);
         hists1D_["nvtx"]->Fill(nvtx, weight);
-    }
-    if (hists1D_["MtW"] != nullptr) {
-        hists1D_["MtW"]->Fill(l3MtToMET, weight);
     }
     if (hists1D_["MTWZ"] != nullptr) {
         TLorentzVector l1 = TLorentzVector();
@@ -702,29 +637,17 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     
     for (size_t i = 0; i < lheWeights.size(); i++) {
         weighthists_["yield"]->Fill(1, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["mjj"] != nullptr)
-            weighthists_["mjj"]->Fill(mjj, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["Mass"] != nullptr)
-            weighthists_["Mass"]->Fill(Mass, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["MTWZ"] != nullptr)
-            weighthists_["MTWZ"]->Fill(MtToMET, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["M3lMET"] != nullptr)
-            weighthists_["M3lMET"]->Fill(m3lmet, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["l1Pt"] != nullptr)
-            weighthists_["l1Pt"]->Fill(l1Pt, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["l2Pt"] != nullptr)
-            weighthists_["l2Pt"]->Fill(l2Pt, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["l3Pt"] != nullptr)
-            weighthists_["l3Pt"]->Fill(l3Pt, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["ZPt"] != nullptr)
-            weighthists_["ZPt"]->Fill(ZPt, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["Pt"] != nullptr)
-            weighthists_["Pt"]->Fill(ZPt, i, lheWeights[i]/lheWeights[0]*weight);
-        if (weighthists_["Mass"] != nullptr)
-            weighthists_["Mass"]->Fill(ZPt, i, lheWeights[i]/lheWeights[0]*weight);
-
-        if (weighthists2D_["mjj_etajj_2D"] != nullptr)
-            weighthists2D_["mjj_etajj_2D"]->Fill(mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "mjj", mjj, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "Mass", Mass, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "MTWZ", MtToMET, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "M3lMET", m3lmet, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "l1Pt", l1Pt, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "l2Pt", l2Pt, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "l3Pt", l3Pt, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "ZPt", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "Pt", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists_, "Mass", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
+        SafeHistFill(weighthists2D_, "mjj_etajj_2D", mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
     }
 }
 

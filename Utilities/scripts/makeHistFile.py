@@ -88,16 +88,16 @@ tselection = [ROOT.TNamed("selection", args['output_selection'])]
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
-if "FakeRate" not in args['output_selection']:
-    background = SelectorTools.applySelector(["WZxsec2016data"] +
-        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
-        ConfigureJobs.getListOfNonpromptFilenames(), 
-            "WZBackgroundSelector", args['selection'], fOut, 
-            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
-            proof=args['proof'])
-#mc = SelectorTools.applySelector(["wlljj-ewk"], "WZSelector", args['selection'], fOut, 
-mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
-        extra_inputs=sf_inputs+hist_inputs+tselection, addsumweights=True, proof=args['proof'])
+#if "FakeRate" not in args['output_selection']:
+#    background = SelectorTools.applySelector(["WZxsec2016data"] +
+#        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
+#        ConfigureJobs.getListOfNonpromptFilenames(), 
+#            "WZBackgroundSelector", args['selection'], fOut, 
+#            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
+#            proof=args['proof'])
+mc = SelectorTools.applySelector(ConfigureJobs.getListOfEWKFilenames() , "WZSelector", args['selection'], fOut, 
+#mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
+        extra_inputs=sf_inputs+hist_inputs+tselection, proof=args['proof'])
 exit(1)
 alldata = HistTools.makeCompositeHists(fOut,"AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
