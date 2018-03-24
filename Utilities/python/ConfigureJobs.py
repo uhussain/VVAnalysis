@@ -8,13 +8,21 @@ import json
 import array
 import string
 
-def get2DBinning(analysis='WZ', dist='mjjVsetajj'):
+def get2DBinning(xvar="mjj", yvar="etajj", analysis='WZ'):
     #return (array.array('d', [500, 1000,1500, 2000, 2500]),
     # [0, 150, 300, 450] # for MT(WZ)
 #    return (array.array('d', [500, 1000, 1350, 1750, 2000, 2500]),
-    if dist == 'mjjVsetajj':    
-        return (array.array('d', [500, 1000,1500, 2000, 2500]),
-                [2.5, 4, 5.5, 20])
+    xbinning = []
+    ybinning = []
+    if xvar == "mjj":
+        xbinning = array.array('d', [500, 1000,1500, 2000, 2500])
+
+    if yvar == 'etajj':    
+        ybinning = [2.5, 4, 5.5, 20]
+    elif yvar == 'dRjj':
+        ybinning = [0, 4, 6, 20]
+    return (xbinning, ybinning)
+
 def getChannels(analysis='WZ'):
     if analysis == 'WZ':
         return ["eee", "eem", "emm", "mmm"]

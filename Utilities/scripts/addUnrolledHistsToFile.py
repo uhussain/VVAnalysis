@@ -28,12 +28,30 @@ transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file,
                 for var in jeVariations],
         HistTools.makeUnrolledHist, ConfigureJobs.get2DBinning()
 )
+
+transformed_mjj_dRjj_hists = HistTools.getTransformedHists(input_file, 
+        ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
+            ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
+                ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \
+                ['AllData', 'WZxsec2016data', 'DataEWKCorrected'], 
+            'Wselection'),
+        ["mjj_dRjj_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
+        ["mjj_dRjj_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
+        ["mjj_dRjj_2D_%s_%s" % (var, c) for c in ConfigureJobs.getChannels()
+                for var in jeVariations] + \
+        ["mjj_dRjj_2D_%s_Fakes_%s" % (var, c) for c in ConfigureJobs.getChannels()
+                for var in jeVariations],
+        HistTools.makeUnrolledHist, ConfigureJobs.get2DBinning("mjj", "dRjj")
+)
+
+
+transformed_hists = transformed_mjj_etajj_hists+transformed_mjj_dRjj_hists
 addControlRegion=True
-mjj_etajj_hists_wcontrol = []
+unrolled_hists_wcontrol = []
 if addControlRegion:
-    for folder in transformed_mjj_etajj_hists:
+    for folder in transformed_hists:
         new_folder = folder.Clone()
-        mjj_etajj_hists_wcontrol.append(new_folder)
+        unrolled_hists_wcontrol.append(new_folder)
         for h in folder:
             append = h.GetName().split("_")
             append = append[-1:] if "Fakes" not in h.GetName() else append[-2:]
@@ -43,7 +61,7 @@ if addControlRegion:
                 raise RuntimeError("failed to find hist %s for folder %s" % (hist_name, folder))
             hist = HistTools.addControlRegionToFitHist(control_hist, h)
             new_folder.Add(hist)
-    transformed_mjj_etajj_hists += mjj_etajj_hists_wcontrol
+    transformed_hists += unrolled_hists_wcontrol
 
 #transformed_mjj_mtwz_hists = HistTools.getTransformedHists(input_file, 
 #        ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
@@ -58,20 +76,6 @@ if addControlRegion:
 #            [0, 150, 300, 450]
 #        ]
 #)
-
-#transformed_mjj_zep3l_hists = HistTools.getTransformedHists(input_file, 
-#        ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),
-#        ["mjj_zep3l_2D_%s_%s" % (var, c) for c in ConfigureJobs.getChannels()
-#                for var in jeVariations] + \
-#        ["mjj_zep3l_2D_%s_Fakes_%s" % (var, c) for c in ConfigureJobs.getChannels()
-#                for var in jeVariations],
-#        HistTools.makeUnrolledHist, [
-#            array.array('d', [500, 1000,1500, 2000, 2500]),
-#            [1, 2, 3, 10]
-#        ]
-#)
-
-transformed_hists = transformed_mjj_etajj_hists#+transformed_mjj_mtwz_hists+transformed_mjj_zep3l_hists
 
 if saveToFile:
     for output in transformed_hists:

@@ -166,7 +166,8 @@ isVBS = "VBS" in args['selection']
 #variable = "yield"
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
 if args['fit_variable'] is "":
-    variable = "mjj_etajj_unrolled" if isVBS else "yield"
+    #variable = "mjj_etajj_unrolled" if isVBS else "yield"
+    variable = "mjj_dRjj_unrolled" if isVBS else "yield"
     if isVBS and args['aqgc']:
         variable = "MTWZ"
 else:
@@ -263,13 +264,13 @@ for plot_group in plot_groups:
             elif "TH3" in weight_hist.ClassName(): 
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
                     HistTools.makeUnrolledHist,
-                    ConfigureJobs.get2DBinning(),
+                    ConfigureJobs.get2DBinning(yvar="etajj" if "dRjj" not in variable else "dRjj"),
                     plot_group
                 )
                 if pdf_entries[plot_group]:
                     pdf_hists = HistTools.getTransformed3DPDFHists(weight_hist, 
                         HistTools.makeUnrolledHist, 
-                        ConfigureJobs.get2DBinning(),
+                        ConfigureJobs.get2DBinning(yvar="etajj" if "dRjj" not in variable else "dRjj"),
                         pdf_entries[plot_group],
                         plot_group
                     )
