@@ -68,8 +68,9 @@ public :
     };
 
     TList *currentHistDir_{nullptr};
-    TH1D* sumWeightsHist;
+    TH1D* sumWeightsHist_;
 
+    bool addSumweights_;
     bool isVBS_;
     bool passesLeptonVeto;
     Float_t weight;

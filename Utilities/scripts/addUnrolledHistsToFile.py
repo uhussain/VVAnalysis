@@ -45,19 +45,19 @@ if addControlRegion:
             new_folder.Add(hist)
     transformed_mjj_etajj_hists += mjj_etajj_hists_wcontrol
 
-transformed_mjj_mtwz_hists = HistTools.getTransformedHists(input_file, 
-        ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
-            ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
-                ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \
-                ['AllData', 'WZxsec2016data', 'DataEWKCorrected'], 
-             'Wselection'),
-        ["mjj_mtwz_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
-            ["mjj_mtwz_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()],
-        HistTools.makeUnrolledHist, [
-            array.array('d', [500, 1000,1500, 2000, 2500]),
-            [0, 150, 300, 450]
-        ]
-)
+#transformed_mjj_mtwz_hists = HistTools.getTransformedHists(input_file, 
+#        ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
+#            ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
+#                ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \
+#                ['AllData', 'WZxsec2016data', 'DataEWKCorrected'], 
+#             'Wselection'),
+#        ["mjj_mtwz_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
+#            ["mjj_mtwz_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()],
+#        HistTools.makeUnrolledHist, [
+#            array.array('d', [500, 1000,1500, 2000, 2500]),
+#            [0, 150, 300, 450]
+#        ]
+#)
 
 #transformed_mjj_zep3l_hists = HistTools.getTransformedHists(input_file, 
 #        ConfigureJobs.getListOfFiles(['WZxsec2016'], 'Wselection'),
@@ -71,7 +71,7 @@ transformed_mjj_mtwz_hists = HistTools.getTransformedHists(input_file,
 #        ]
 #)
 
-transformed_hists = transformed_mjj_etajj_hists+transformed_mjj_mtwz_hists#+transformed_mjj_zep3l_hists
+transformed_hists = transformed_mjj_etajj_hists#+transformed_mjj_mtwz_hists+transformed_mjj_zep3l_hists
 
 if saveToFile:
     for output in transformed_hists:

@@ -79,6 +79,11 @@ public :
         {"mjj_etajj_2D", {}},
         {"mjj_dRjj_2D", {}}
     };
+
+    std::vector<std::string> systHists2D_ = {
+        "mjj_etajj_2D", "mjj_dRjj_2D"
+    };
+
     std::map<std::string, TH3D*> weighthists2D_ {
         {"mjj_etajj_2D", {}},
         {"mjj_dRjj_2D", {}}

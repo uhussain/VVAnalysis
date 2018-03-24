@@ -113,7 +113,7 @@ sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
 SelectorTools.applySelector(args["filenames"],
         "FakeRateSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs, proof=args['proof'],
-        addsumweights=True)
+        addSumweights=True)
 
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"]))
 OutputTools.writeOutputListItem(alldata, fOut)

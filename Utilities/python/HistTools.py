@@ -239,6 +239,13 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True,
             continue
         if hists == []:
             hists = [i.GetName() for i in hist_file.Get(directory).GetListOfKeys()]
+        sumweights = 0
+        if "data" not in directory.lower():
+            sumweights_hist = hist_file.Get("/".join([directory.split("__")[0], "sumweights"]))
+            if not sumweights_hist:
+                raise RuntimeError("Failed to find sumWeights for dataset %s" % directory)
+            sumweights = sumweights_hist.Integral()
+            sumweights_hist.Delete()
         for histname in hists:
             if histname == "sumweights": continue
             tmphist = hist_file.Get("/".join([directory, histname]))
@@ -249,10 +256,7 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True,
             tmphist.Delete()
             if hist:
                 sumhist = composite.FindObject(hist.GetName())
-                if "data" not in directory.lower() and hist.GetEntries() > 0:
-                    sumweights_hist = hist_file.Get("/".join([directory.split("__")[0], "sumweights"]))
-                    sumweights = sumweights_hist.Integral()
-                    sumweights_hist.Delete()
+                if sumweights:
                     hist.Scale(members[directory.split("__")[0]]*1000*lumi/sumweights)
                 addOverflowAndUnderflow(hist, underflow, overflow)
             else:

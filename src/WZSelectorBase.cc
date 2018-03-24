@@ -1,6 +1,7 @@
 #include "Analysis/WZAnalysis/interface/WZSelectorBase.h"
 #include <TStyle.h>
 #include <regex>
+#include "TParameter.h"
 
 void WZSelectorBase::Begin(TTree * /*tree*/)
 {
@@ -24,6 +25,11 @@ void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
     mIsoSF_ = (ScaleFactor *) GetInputList()->FindObject("muonIsoSF");
     if (mIsoSF_ == nullptr ) 
         Abort("Must pass muon Iso SF");
+    TParameter<bool>* addSum = (TParameter<bool>*) GetInputList()->FindObject("addSumweights");
+    if (addSum != nullptr) 
+        addSumweights_ = addSum->GetVal();
+    else
+        addSumweights_ = false;
 }
 
 std::string WZSelectorBase::GetNameFromFile() {
@@ -61,7 +67,7 @@ void WZSelectorBase::Init(TTree *tree)
             selectionName_ = selection->GetTitle();
         }
     }
-    std::cout << "Processing " << name_ << std::endl;
+    //std::cout << "Processing " << name_ << std::endl;
     
     isMC_ = false;
     if (name_.find("data") == std::string::npos){
@@ -74,6 +80,15 @@ void WZSelectorBase::Init(TTree *tree)
         }
         else if (name_ == "zg") {
             isZgamma_ = true;
+        }
+        if (addSumweights_) {
+            TFile* file = fChain->GetTree()->GetDirectory()->GetFile(); 
+            TTree* metaInfo = dynamic_cast<TTree*>(file->Get("metaInfo/metaInfo"));
+            if (metaInfo == nullptr)
+                std::cerr << "WARNING: Failed to add sumWeights histogram" << std::endl;
+            else {
+                metaInfo->Draw("1>>sumweights", "summedWeights");
+            }
         }
     }
     else {
@@ -111,12 +126,6 @@ void WZSelectorBase::Init(TTree *tree)
             fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
             fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
             fChain->SetBranchAddress("e3GenPt", &l3GenPt, &b_l3GenPt);
-            TFile* file = fChain->GetTree()->GetDirectory()->GetFile(); 
-            TTree* metaInfo = dynamic_cast<TTree*>(file->Get("metaInfo/metaInfo"));
-            if (metaInfo == nullptr)
-                std::cerr << "WARNING: Failed to add sumWeights histogram" << std::endl;
-            else
-                metaInfo->Draw("1>>sumweights", "summedWeights");
         }
     }
     else if (channelName_ == "eem") { 
@@ -430,6 +439,6 @@ void WZSelectorBase::UpdateDirectory()
 
 void WZSelectorBase::SetupNewDirectory()
 {
-    if (channel_ == eee && isMC_)
-        AddObject<TH1D>(sumWeightsHist, "sumweights", "sumweights", 1, 0, 10);
+    if (addSumweights_)
+        AddObject<TH1D>(sumWeightsHist_, "sumweights", "sumweights", 1, 0, 10);
 }
