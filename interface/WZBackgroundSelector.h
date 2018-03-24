@@ -43,6 +43,7 @@ private:
     bool IsFFPRegion();
     bool IsPFFRegion();
     bool IsFFFRegion();
+    float getEventWeight();
 };
 
 #endif

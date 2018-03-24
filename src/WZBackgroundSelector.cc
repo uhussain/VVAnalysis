@@ -3,6 +3,7 @@
 
 void WZBackgroundSelector::SlaveBegin(TTree * /*tree*/)
 {
+    isNonpromptEstimate_ = true;
     WZSelector::SlaveBegin(0);
     fakeRate_allE_ = (ScaleFactor *) GetInputList()->FindObject("fakeRate_allE");
     if (fakeRate_allE_ == nullptr ) Abort("Must pass electron fake rate to input list!");
@@ -36,68 +37,78 @@ void WZBackgroundSelector::SetupNewDirectory()
     AddObject<TH1D>(ZMassHistPFF_, ("ZMass_PFF_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
     AddObject<TH1D>(ZMassHistFFF_, ("ZMass_FFF_"+channelName_).c_str(), "ZMass; m_{Z} [GeV]; Events;", 15, 76, 116);
 }
-
-Bool_t WZBackgroundSelector::Process(Long64_t entry)
-{
-    LoadBranches(entry);
-    
-    if (!PassesBaseSelection(false, selection_))
-        return true;
+float WZBackgroundSelector::getEventWeight() {
     float evtwgt = 0;
     if (!IsGenMatched3l())
         return true;
 
     if (IsFPPRegion()) {
-        if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta))
+        if (!isVBS_ || PassesVBSSelection(true))
             mjjHistFPP_->Fill(mjj, weight);
         evtwgt = getl1FakeRate()*weight;
     }
     else if (IsPFPRegion()) {
-        if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
+        if (!isVBS_ || PassesVBSSelection(true)) {
             mjjHistPFP_->Fill(mjj, weight);
             ZMassHistPFP_->Fill(ZMass, weight);
         }
         evtwgt = getl2FakeRate()*weight;
     }
     else if (IsPPFRegion()) {
-        if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
+        if (!isVBS_ || PassesVBSSelection(true)) {
             mjjHistPPF_->Fill(mjj, weight);
             ZMassHistPPF_->Fill(ZMass, weight);
         }
         evtwgt = getl3FakeRate()*weight;
     }
     else if (IsFFFRegion()) {
-        if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
+        if (!isVBS_ || PassesVBSSelection(true)) {
             mjjHistFFF_->Fill(mjj, weight);
             ZMassHistFFF_->Fill(ZMass, weight);
         }
         evtwgt = getl1FakeRate()*getl2FakeRate()*getl3FakeRate()*weight;
     }
     else if (IsFPFRegion()) {
-        if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
+        if (!isVBS_ || PassesVBSSelection(true)) {
             mjjHistFPF_->Fill(mjj, weight);
             ZMassHistFPF_->Fill(ZMass, weight);
         }
         evtwgt = -1*getl1FakeRate()*getl3FakeRate()*weight;
     }
     else if (IsFFPRegion()) {
-        if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
+        if (!isVBS_ || PassesVBSSelection(true)) {
             mjjHistFFP_->Fill(mjj, weight);
             ZMassHistFFP_->Fill(ZMass, weight);
         }
         evtwgt = -1*getl1FakeRate()*getl2FakeRate()*weight;
     }
     else if (IsPFFRegion()) {
-        if (!isVBS_ || PassesVBSSelection(true, mjj, jetPt, jetEta)) {
+        if (!isVBS_ || PassesVBSSelection(true)) {
             mjjHistPFF_->Fill(mjj, weight);
             ZMassHistPFF_->Fill(ZMass, weight);
         }
         evtwgt = -1*getl2FakeRate()*getl3FakeRate()*weight;
     }
-    else
+    return evtwgt;
+}
+
+Bool_t WZBackgroundSelector::Process(Long64_t entry)
+{
+    std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
+
+    LoadBranches(entry, central_var);
+    if (!PassesBaseSelection(false, selection_))
         return true;
-       
-    FillHistograms(entry, evtwgt, true);
+    FillHistograms(entry, getEventWeight(), true, central_var);
+
+    if (doSystematics_) {
+        for (const auto& systematic : systematics_) {
+            LoadBranches(entry, systematic);
+            if (!PassesBaseSelection(false, selection_))
+                return true;
+            FillHistograms(entry, getEventWeight(), true, systematic);
+        }
+    }
 
     return true;
 }

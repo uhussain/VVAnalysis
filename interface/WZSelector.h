@@ -9,6 +9,18 @@ class WZSelector : public WZSelectorBase {
 public :
     bool doSystematics_;
 
+    enum Systematic {
+        Central,
+        jetEnergyScaleUp,
+        jetEnergyScaleDown,
+        jetEnergyResolutionUp,
+        jetEnergyResolutionDown,
+        muonEfficiencyUp,
+        muonEfficiencyDown,
+        electronEfficiencyUp,
+        electronEfficiencyDown,
+    }; 
+
     std::vector<std::string> systHists_ = {
         "yield",
         "backgroundControlYield",
@@ -17,9 +29,11 @@ public :
         "MTWZ"
     };
 
-    //std::vector<std::string> jeSystematicNames_ = {
-    std::vector<std::string> systematicNames_ = {
-        "jesUp", "jesDown", "jerUp", "jerDown"
+    std::map<Systematic, std::string> systematics_ = {
+        {jetEnergyScaleUp, "jesUp"}, 
+        {jetEnergyScaleDown, "jesDown"}, 
+        {jetEnergyResolutionUp, "jerUp"},
+        {jetEnergyResolutionDown, "jerDown"},
     };
 
     //std::vector<std::string> systematicNames_ = {
@@ -140,6 +154,8 @@ public :
     Float_t l2Phi;
     Float_t l3Phi;
     Float_t MtToMET;
+    Float_t MtWZ;
+    Float_t M3lMET;
     
     TBranch* b_l3MtToMET;
     TBranch* b_MtToMET;
@@ -186,18 +202,20 @@ public :
 
     ClassDefOverride(WZSelector,0);
 protected:
-    void LoadBranches(Long64_t entry);
-    void FillHistograms(Long64_t entry, float weight, bool noBlind);
-    void FillVBSHistograms(Long64_t entry, float weight, bool noBlind);
-    void FillVBSBackgroundControlHistograms(float weight, bool noBlind);
+    void LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation);
+    void FillHistograms(Long64_t entry, float weight, bool noBlind,
+            std::pair<Systematic, std::string> variation);
+    void FillVBSHistograms(float weight, bool noBlind, 
+            std::pair<Systematic, std::string> variation);
+    void FillVBSBackgroundControlHistograms(float weight, bool noBlind,
+            std::pair<Systematic, std::string> variation);
     bool PassesBaseSelection(bool tightLeps, Selection selection);
-    bool PassesVBSSelection(bool noBlind, float dijetMass, 
-            std::vector<float>* jPt, std::vector<float>* jEta);
-    bool PassesVBSBackgroundControlSelection(float dijetMass, 
-            std::vector<float>* jPt, std::vector<float>* jEta);
+    bool PassesVBSSelection(bool noBlind);
+    bool PassesVBSBackgroundControlSelection();
     void InitialzeHistogram(std::string name, std::vector<std::string> histData);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
+    std::string getHistName(std::string histName, std::string variationName);
     template<typename T, typename... Args>
     void SafeHistFill(std::map<std::string, T*> container, 
             std::string histname, Args... args) {

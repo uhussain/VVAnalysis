@@ -67,8 +67,8 @@ void WZSelectorBase::Init(TTree *tree)
             selectionName_ = selection->GetTitle();
         }
     }
-    //std::cout << "Processing " << name_ << std::endl;
     
+    isNonpromptEstimate_ = false;
     isMC_ = false;
     if (name_.find("data") == std::string::npos){
         isMC_ = true;

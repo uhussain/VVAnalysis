@@ -167,7 +167,7 @@ isVBS = "VBS" in args['selection']
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
 if args['fit_variable'] is "":
     #variable = "mjj_etajj_unrolled" if isVBS else "yield"
-    variable = "mjj_dRjj_unrolled" if isVBS else "yield"
+    variable = "mjj_etajj_unrolled" if isVBS else "yield"
     if isVBS and args['aqgc']:
         variable = "MTWZ"
 else:

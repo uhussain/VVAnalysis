@@ -218,6 +218,7 @@ protected:
     std::string selectionName_ = "tightleptons";
     Selection selection_ = tightleptons;
     bool isMC_;
+    bool isNonpromptEstimate_;
     bool isNonpromptMC_;
     bool isZgamma_;
     const float FR_MAX_PT_ = 50;
