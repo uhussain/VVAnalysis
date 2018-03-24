@@ -31,7 +31,6 @@ void WZSelector::Init(TTree *tree)
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
     fChain->SetBranchAddress("jetPhi", &jetPhi, &b_jetPhi);
     fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
-    fChain->SetBranchAddress("nJets", &nJets, &b_nJets);
     fChain->SetBranchAddress("jetCSVv2", &jetCSVv2, &b_jetCSVv2);
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("Eta", &Eta, &b_Eta);
@@ -116,6 +115,32 @@ void WZSelector::LoadBranches(Long64_t entry) {
     b_jetPhi->GetEntry(entry);
     b_Eta->GetEntry(entry);
     b_mjj->GetEntry(entry);
+ 
+    auto deltaRjj = [](std::vector<float>* jEta, std::vector<float>* jPhi) {
+        if (jEta->size() != jPhi->size() || jEta->size() < 2)
+            return -1.;
+        double etaDiff = jEta->at(0) - jEta->at(1);
+        double phiDiff = jPhi->at(0) - jPhi->at(1);
+        return std::sqrt(etaDiff*etaDiff - phiDiff*phiDiff);
+    };
+
+    auto deltaEtajj = [](std::vector<float>* jEta) {
+        if (jEta->size() < 2)
+            return -1.;
+        double etaDiff = jEta->at(0) - jEta->at(1);
+        return std::abs(etaDiff);
+    };
+
+    auto zeppenfeld = [](std::vector<float>* jEta, float objEta) {
+        if (jEta->size() < 2)
+            return -999.;
+        return objEta - 0.5*(jEta->at(1) + jEta->at(0));
+    };
+
+    dEtajj = deltaEtajj(jetEta);
+    zep3l = zeppenfeld(jetEta, Eta);
+    dRjj = deltaRjj(jetEta, jetPhi);
+
     if (isMC_) {
         b_nTruePU->GetEntry(entry);
         b_mjj_jesUp->GetEntry(entry);
@@ -130,31 +155,6 @@ void WZSelector::LoadBranches(Long64_t entry) {
         b_jetPt_jesDown->GetEntry(entry);
         b_jetPt_jerUp->GetEntry(entry);
         b_jetPt_jerDown->GetEntry(entry);
-
-        auto deltaRjj = [](std::vector<float>* jEta, std::vector<float>* jPhi) {
-            if (jEta->size() != jPhi->size() || jEta->size() < 2)
-                return -1.;
-            double etaDiff = jEta->at(0) - jEta->at(1);
-            double phiDiff = jPhi->at(0) - jPhi->at(1);
-            return std::sqrt(etaDiff*etaDiff - phiDiff*phiDiff);
-        };
-
-        auto deltaEtajj = [](std::vector<float>* jEta) {
-            if (jEta->size() < 2)
-                return -1.;
-            double etaDiff = jEta->at(0) - jEta->at(1);
-            return etaDiff;
-        };
-
-        auto zeppenfeld = [](std::vector<float>* jEta, float objEta) {
-            if (jEta->size() < 2)
-                return -999.;
-            return objEta - 0.5*(jEta->at(1) + jEta->at(0));
-        };
-
-        dEtajj = deltaEtajj(jetEta);
-        zep3l = zeppenfeld(jetEta, Eta);
-        dRjj = deltaRjj(jetEta, jetPhi);
 
         dEtajj_jesUp = deltaEtajj(jetEta_jesUp);
         zep3l_jesUp = zeppenfeld(jetEta_jesUp, Eta);
@@ -396,8 +396,6 @@ void WZSelector::FillVBSHistograms(Long64_t entry, float weight, bool noBlind) {
         FillVBSBackgroundControlHistograms(weight, noBlind);
     if (!isVBS_|| PassesVBSSelection(noBlind, -1, jetPt, jetEta)) {
         SafeHistFill(hists2D_, "mjj_etajj_2D", mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
-        if (noBlind)
-            std::cout << weight;
     }
 
     // Make 2D plots without cuts on eta and mjj
@@ -546,7 +544,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     if (isVBS_ && !PassesVBSSelection(noBlind, mjj, jetPt, jetEta))
         return;
 
-    SafeHistFill(hists1D_, "yield", 1, weight);
+    //SafeHistFill(hists1D_, "yield", 1, weight);
+    hists1D_["yield"]->Fill(1, weight);
     SafeHistFill(hists1D_, "Mass", Mass, weight*(isMC_ || Mass < 400 || noBlind));
     SafeHistFill(hists1D_, "ZMass", ZMass, weight);
     SafeHistFill(hists1D_, "ZPhi", ZPhi, weight);
@@ -563,6 +562,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
     SafeHistFill(hists1D_, "Wlep_Phi", l3Phi, weight);
     SafeHistFill(hists1D_, "MET", type1_pfMETEt, weight);
     SafeHistFill(hists1D_, "MtW", l3MtToMET, weight);
+    SafeHistFill(hists1D_, "nJets", jetPt->size(), weight);
 
     if (hists1D_["dR_lW_Z"] != nullptr) {
         float dPhi_lW_Z = ZPhi - l3Phi;
@@ -570,10 +570,6 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind) {
         float dR_lW_Z = std::sqrt(dPhi_lW_Z*dPhi_lW_Z + dEta_lW_Z*dEta_lW_Z);
         hists1D_["dR_lW_Z"]->Fill(dR_lW_Z, weight);
     }
-    //if (hists1D_["nJets"] != nullptr) {
-    //    b_nJets->GetEntry(entry);
-    //    hists1D_["nJets"]->Fill(nJets, weight);
-    //}
     if (hists1D_["nJetCSVv2T"] != nullptr) {
         b_jetCSVv2->GetEntry(entry);
         unsigned int bjets = 0;

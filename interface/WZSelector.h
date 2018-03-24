@@ -125,7 +125,6 @@ public :
     std::vector<float>* jetPt_jerDown = NULL;
     std::vector<float>* jetCSVv2 = NULL;
     UInt_t nvtx;
-    Int_t nJets;
     Float_t Mass;
     Float_t Eta;
     Float_t Pt;
@@ -146,7 +145,6 @@ public :
     TBranch* b_MtToMET;
     TBranch* b_pdfWeights;
     TBranch* b_scaleWeights;
-    TBranch* b_nJets;
     TBranch* b_jetCSVv2;
     TBranch* b_jetPt;
     TBranch* b_jetEta;
