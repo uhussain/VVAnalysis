@@ -5,14 +5,15 @@
 void WZSelector::Init(TTree *tree)
 {
     WZSelectorBase::Init(tree);
-    
+
+    doSystematics_ = true;
     weight_info_ = 0;
     if (isMC_) {
         fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
         weight_info_ = GetLheWeightInfo();
         if (weight_info_ > 0)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
-        if (weight_info_ == 2)
+        if (weight_info_ == 2 || weight_info_ == 3)
             fChain->SetBranchAddress("pdfWeights", &pdfWeights, &b_pdfWeights);
         fChain->SetBranchAddress("mjj_jesUp", &mjj_jesUp, &b_mjj_jesUp);
         fChain->SetBranchAddress("mjj_jesDown", &mjj_jesDown, &b_mjj_jesDown);
@@ -82,81 +83,81 @@ unsigned int WZSelector::GetLheWeightInfo() {
         "ggZZ2e2mu", "ggZZ4e", "ggZZ4m", "wzjj-vbfnlo-of",
         "wzjj-vbfnlo-sf", "st-schan", "st-tchan", "st-tchan-t", "st-tchan-tbar"
     };
-    std::vector<std::string> allLheWeights = {
-        // PDF weights are saved in the ntuples but not really used at this point
+    std::vector<std::string> scaleAndPdfWeights = {
         "wz3lnu-powheg", "wz3lnu-mg5amcnlo",
         "wz3lnu-mgmlm-0j", "wz3lnu-mgmlm-1j",
         "wz3lnu-mgmlm-2j", "wz3lnu-mgmlm-3j", "wlljj-ewk", 
-        "wzjj-aqgcft", "wzjj-aqgcfm", "wzjj-aqgcfs",
-        "wz-atgc_pt0-200", "wz-atgc_pt200-300",
-        "wz-atgc_pt300"
     };
+    std::vector<std::string> allLheWeights = {
+        "wzjj-aqgcft", "wzjj-aqgcfm", "wzjj-aqgcfs",
+        //"wz-atgc_pt0-200", "wz-atgc_pt200-300",
+        //"wz-atgc_pt300"
+    };
+
     if (std::find(noLheWeights.begin(), noLheWeights.end(), name_) != noLheWeights.end())
         return 0;
-    if (std::find(allLheWeights.begin(), allLheWeights.end(), name_) != allLheWeights.end())
+    if (std::find(scaleAndPdfWeights.begin(), scaleAndPdfWeights.end(), name_) != scaleAndPdfWeights.end())
         return 2;
+    if (std::find(allLheWeights.begin(), allLheWeights.end(), name_) != allLheWeights.end())
+        return 3;
     return 1;
 }
 
 void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     WZSelectorBase::Process(entry);
     
-    b_ZPhi->GetEntry(entry);
-    b_ZEta->GetEntry(entry);
-    b_Mass->GetEntry(entry);
-    //b_MtToMET->GetEntry(entry);
-    b_l1Eta->GetEntry(entry);
-    b_l1Phi->GetEntry(entry);
-    b_l2Eta->GetEntry(entry);
-    b_l2Phi->GetEntry(entry);
-    b_l3Phi->GetEntry(entry);
-    b_jetPt->GetEntry(entry);
-    b_jetEta->GetEntry(entry);
-    b_jetPhi->GetEntry(entry);
-    b_Eta->GetEntry(entry);
-    b_mjj->GetEntry(entry);
- 
-    auto deltaRjj = [](std::vector<float>* jEta, std::vector<float>* jPhi) {
-        if (jEta->size() != jPhi->size() || jEta->size() < 2)
-            return -1.;
-        double etaDiff = jEta->at(0) - jEta->at(1);
-        double phiDiff = jPhi->at(0) - jPhi->at(1);
-        return std::sqrt(etaDiff*etaDiff - phiDiff*phiDiff);
-    };
+    if (variation.first == Central) {
+        b_ZPhi->GetEntry(entry);
+        b_ZEta->GetEntry(entry);
+        b_Mass->GetEntry(entry);
+        //b_MtToMET->GetEntry(entry);
+        b_l1Eta->GetEntry(entry);
+        b_l1Phi->GetEntry(entry);
+        b_l2Eta->GetEntry(entry);
+        b_l2Phi->GetEntry(entry);
+        b_l3Phi->GetEntry(entry);
+        b_jetPt->GetEntry(entry);
+        b_jetEta->GetEntry(entry);
+        b_jetPhi->GetEntry(entry);
+        b_Eta->GetEntry(entry);
+        b_mjj->GetEntry(entry);
+    
+        if (isMC_) {
+            b_nTruePU->GetEntry(entry);
+            if (isMC_ && weight_info_ > 0) {
+                b_scaleWeights->GetEntry(entry);
+                lheWeights = *scaleWeights;
+                if (weight_info_ == 2) {
+                    b_pdfWeights->GetEntry(entry);
+                    // Only keep NNPDF weights
+                    lheWeights.insert(lheWeights.end(), pdfWeights->begin(), 
+                        pdfWeights->begin()+std::min(static_cast<size_t>(103), pdfWeights->size()));
+                }
+                else if (weight_info_ == 3) {
+                    b_pdfWeights->GetEntry(entry);
+                    lheWeights.insert(lheWeights.end(), pdfWeights->begin(), pdfWeights->end());
+                }
+            }
+        }
 
-    auto deltaEtajj = [](std::vector<float>* jEta) {
-        if (jEta->size() < 2)
-            return -1.;
-        double etaDiff = jEta->at(0) - jEta->at(1);
-        return std::abs(etaDiff);
-    };
-
-    auto zeppenfeld = [](std::vector<float>* jEta, float objEta) {
-        if (jEta->size() < 2)
-            return -999.;
-        return objEta - 0.5*(jEta->at(1) + jEta->at(0));
-    };
-
-
-    if (hists1D_["MTWZ"] != nullptr || hists1D_["M3lMET"] == nullptr) {
-        TLorentzVector l1 = TLorentzVector();
-        l1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, 0);
-        TLorentzVector l2 = TLorentzVector();
-        l2.SetPtEtaPhiM(l2Pt, l2Eta, l2Phi, 0);
-        TLorentzVector l3 = TLorentzVector();
-        l3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, 0);
-        TLorentzVector met = TLorentzVector();
-        met.SetPtEtaPhiM(type1_pfMETEt, 0, type1_pfMETPhi, 0);
-        TLorentzVector zp4 = l1+l2;
-        TLorentzVector wp4 = l3+met;
-        TLorentzVector wzp4 = l1+l2+l3+met;
-        float sumEt = zp4.Et() + wp4.Et();
-        MtWZ = std::sqrt(sumEt*sumEt - wzp4.Pt()*wzp4.Pt());
-        M3lMET = (l1+l2+l3+met).M();
+        if (hists1D_["MTWZ"] != nullptr || hists1D_["M3lMET"] == nullptr) {
+            TLorentzVector l1 = TLorentzVector();
+            l1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, 0);
+            TLorentzVector l2 = TLorentzVector();
+            l2.SetPtEtaPhiM(l2Pt, l2Eta, l2Phi, 0);
+            TLorentzVector l3 = TLorentzVector();
+            l3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, 0);
+            TLorentzVector met = TLorentzVector();
+            met.SetPtEtaPhiM(type1_pfMETEt, 0, type1_pfMETPhi, 0);
+            TLorentzVector zp4 = l1+l2;
+            TLorentzVector wp4 = l3+met;
+            TLorentzVector wzp4 = l1+l2+l3+met;
+            float sumEt = zp4.Et() + wp4.Et();
+            MtWZ = std::sqrt(sumEt*sumEt - wzp4.Pt()*wzp4.Pt());
+            M3lMET = (l1+l2+l3+met).M();
+        }
     }
-
-    if (isMC_) {
-        b_nTruePU->GetEntry(entry);
+    else if (isMC_) {
         if (variation.first == jetEnergyScaleUp) {
             b_mjj_jesUp->GetEntry(entry);
             b_jetEta_jesUp->GetEntry(entry);
@@ -195,21 +196,31 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
         }
     }
 
-    dEtajj = deltaEtajj(jetEta);
-    zep3l = zeppenfeld(jetEta, Eta);
-    dRjj = deltaRjj(jetEta, jetPhi);
-    
-    if (variation.second != Central)
-        return;
+    auto deltaRjj = [](std::vector<float>* jEta, std::vector<float>* jPhi) {
+        if (jEta->size() != jPhi->size() || jEta->size() < 2)
+            return -1.;
+        double etaDiff = jEta->at(0) - jEta->at(1);
+        double phiDiff = jPhi->at(0) - jPhi->at(1);
+        return std::sqrt(etaDiff*etaDiff - phiDiff*phiDiff);
+    };
 
-    if (isMC_ && weight_info_ > 0) {
-        b_scaleWeights->GetEntry(entry);
-        lheWeights = *scaleWeights;
-        if (weight_info_ == 2) {
-            b_pdfWeights->GetEntry(entry);
-            lheWeights.insert(lheWeights.end(), pdfWeights->begin(), pdfWeights->end());
-        }
-    }
+    auto deltaEtajj = [](std::vector<float>* jEta) {
+        if (jEta->size() < 2)
+            return -1.;
+        double etaDiff = jEta->at(0) - jEta->at(1);
+        return std::abs(etaDiff);
+    };
+
+    auto zeppenfeld = [](std::vector<float>* jEta, float objEta) {
+        if (jEta->size() < 2)
+            return -999.;
+        return objEta - 0.5*(jEta->at(1) + jEta->at(0));
+    };
+
+
+    dEtajj = deltaEtajj(jetEta);
+    dRjj = deltaRjj(jetEta, jetPhi);
+    zep3l = zeppenfeld(jetEta, Eta);
 }
 bool WZSelector::PassesVBSBackgroundControlSelection() {
     if (jetPt->size() != jetEta->size() || jetPt->size() < 2)
@@ -376,49 +387,37 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
     return true;
 }
 
-void WZSelector::FillVBSBackgroundControlHistograms(float weight, bool noBlind,
-        std::pair<Systematic, std::string> variation) { 
-    if (!PassesVBSBackgroundControlSelection())
-        return;
-
-    SafeHistFill(hists1D_, getHistName("backgroundControlYield", variation.second), 1, weight);
-    if (isMC_)
-        for (size_t i = 0; i < lheWeights.size(); i++) {
-            weighthists_["backgroundControlYield"]->Fill(1, i, lheWeights[i]/lheWeights[0]*weight);
-    }
-}
-
 void WZSelector::FillVBSHistograms(float weight, bool noBlind,
         std::pair<Systematic, std::string> variation) { 
     // JES/JER uncertainties
     // Need to separate check VBS cuts using JER/JES variations
     SafeHistFill(hists2D_, getHistName("mjj_etajj_2D", variation.second), 
         mjj, dEtajj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
-    SafeHistFill(hists1D_, "zep3l", zep3l, weight);
-    SafeHistFill(hists2D_, "mjj_dRjj_2D", mjj, dRjj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
+    SafeHistFill(hists1D_, getHistName("zep3l", variation.second), zep3l, weight);
+    SafeHistFill(hists2D_, getHistName("mjj_dRjj_2D", variation.second), mjj, dRjj, weight*(isMC_ || noBlind || mjj < 500 || dEtajj < 2.5));
 
-    SafeHistFill(hists1D_, "mjj", mjj, weight*(isMC_ || (mjj < 500) || noBlind));
-    SafeHistFill(hists1D_, "dEtajj", dEtajj, weight*(isMC_ || (dEtajj < 2.5) || noBlind));
+    SafeHistFill(hists1D_, getHistName("mjj", variation.second), mjj, weight*(isMC_ || (mjj < 500) || noBlind));
+    SafeHistFill(hists1D_, getHistName("dEtajj", variation.second), dEtajj, weight*(isMC_ || (dEtajj < 2.5) || noBlind));
 
     if (jetPt->size() > 0 && jetPt->size() == jetEta->size()) {
-        SafeHistFill(hists1D_, "jetPt[0]", jetPt->at(0), weight);
-        SafeHistFill(hists1D_, "jetEta[0]", jetEta->at(0), weight);
+        SafeHistFill(hists1D_, getHistName("jetPt[0]", variation.second), jetPt->at(0), weight);
+        SafeHistFill(hists1D_, getHistName("jetEta[0]", variation.second), jetEta->at(0), weight);
     }
     if (jetPt->size() > 1 && jetPt->size() == jetEta->size()) {
-        SafeHistFill(hists1D_, "jetPt[1]", jetPt->at(1), weight);
-        SafeHistFill(hists1D_, "jetEta[1]", jetEta->at(1), weight);
+        SafeHistFill(hists1D_, getHistName("jetPt[1]", variation.second), jetPt->at(1), weight);
+        SafeHistFill(hists1D_, getHistName("jetEta[1]", variation.second), jetEta->at(1), weight);
     }
     if (jetPt->size() > 2 && jetPt->size() == jetEta->size()) {
-        SafeHistFill(hists1D_, "jetPt[2]", jetPt->at(2), weight);
-        SafeHistFill(hists1D_, "jetEta[2]", jetEta->at(2), weight);
+        SafeHistFill(hists1D_, getHistName("jetPt[2]", variation.second), jetPt->at(2), weight);
+        SafeHistFill(hists1D_, getHistName("jetEta[2]", variation.second), jetEta->at(2), weight);
     }
      
     if (jetEta->size() > 3)
-        SafeHistFill(hists1D_, "zepj3", jetEta->at(2) - 0.5*(jetEta->at(1) + jetEta->at(0)), weight);
+        SafeHistFill(hists1D_, getHistName("zepj3", variation.second), jetEta->at(2) - 0.5*(jetEta->at(1) + jetEta->at(0)), weight);
     
-    if (hists1D_["jetEta12"] != nullptr && jetEta->size() > 1) {
-        hists1D_["jetEta12"]->Fill(jetEta->at(0), weight);
-        hists1D_["jetEta12"]->Fill(jetEta->at(1), weight);
+    if (hists1D_[getHistName("jetEta12", variation.second)] != nullptr && jetEta->size() > 1) {
+        hists1D_[getHistName("jetEta12", variation.second)]->Fill(jetEta->at(0), weight);
+        hists1D_[getHistName("jetEta12", variation.second)]->Fill(jetEta->at(1), weight);
     }
 }
 
@@ -428,10 +427,34 @@ std::string WZSelector::getHistName(std::string histName, std::string variationN
 
 void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind, 
         std::pair<Systematic, std::string> variation) { 
-    if (isVBS_ && !PassesVBSSelection(noBlind))
+    bool passesVBS = PassesVBSSelection(noBlind);
+    if (hists1D_[getHistName("backgroundControlYield", variation.second)] != nullptr)
+        if (PassesVBSBackgroundControlSelection())
+            hists1D_[getHistName("backgroundControlYield", variation.second)]->Fill(1, weight);
+
+    if (variation.first == Central && isMC_) {
+        for (size_t i = 0; i < lheWeights.size(); i++) {
+            if (PassesVBSBackgroundControlSelection())
+                SafeHistFill(weighthists_, "backgroundControlYield", 1, i, lheWeights[i]/lheWeights[0]*weight);
+            if (isVBS_ && !passesVBS)
+                continue;
+            SafeHistFill(weighthists_, "yield", 1, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "mjj", mjj, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "Mass", Mass, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "MTWZ", MtWZ, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "M3lMET", M3lMET, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "l1Pt", l1Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "l2Pt", l2Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "l3Pt", l3Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "ZPt", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "Pt", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, "Mass", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists2D_, "mjj_etajj_2D", mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists2D_, "mjj_dRjj_2D", mjj, dRjj, i, lheWeights[i]/lheWeights[0]*weight);
+        }
+    }
+    if (isVBS_ && !passesVBS)
         return;
-    if (hists1D_["backgroundControlYield"] != nullptr)
-        FillVBSBackgroundControlHistograms(weight, noBlind, variation);
     FillVBSHistograms(weight, noBlind, variation);
 
     SafeHistFill(hists1D_, getHistName("yield", variation.second), 1, weight);
@@ -484,23 +507,6 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
 
     SafeHistFill(hists1D_, getHistName("MTWZ", variation.second), MtWZ, weight*(isMC_ || MtWZ < 300 || noBlind));
     SafeHistFill(hists1D_, getHistName("M3lMET", variation.second), M3lMET, weight*(isMC_ || M3lMET < 300 || noBlind));
-
-    if (variation.first != Central)
-        return;
-    for (size_t i = 0; i < lheWeights.size(); i++) {
-        SafeHistFill(weighthists_, "yield", 1, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "mjj", mjj, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "Mass", Mass, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "MTWZ", MtWZ, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "M3lMET", M3lMET, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "l1Pt", l1Pt, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "l2Pt", l2Pt, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "l3Pt", l3Pt, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "ZPt", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "Pt", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists_, "Mass", ZPt, i, lheWeights[i]/lheWeights[0]*weight);
-        SafeHistFill(weighthists2D_, "mjj_etajj_2D", mjj, dEtajj, i, lheWeights[i]/lheWeights[0]*weight);
-    }
 }
 
 Bool_t WZSelector::Process(Long64_t entry)
@@ -515,6 +521,7 @@ Bool_t WZSelector::Process(Long64_t entry)
     if (PassesBaseSelection(true, selection_))
         FillHistograms(entry, weight, !blindVBS, central_var);
 
+    doSystematics_ = true;
     if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
@@ -559,7 +566,7 @@ void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> h
 
     if (histData.size() == 4) {
         AddObject<TH1D>(hists1D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax);
-        if (std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
+        if (doSystematics_ && std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
             for (auto& syst : systematics_) {
                 std::string syst_hist_name = name+"_"+syst.second;
                 hists1D_[syst_hist_name] = {};
@@ -580,7 +587,7 @@ void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> h
         float ymax = std::stof(histData[6]);
         AddObject<TH2D>(hists2D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax,
                 nbinsy, ymin, ymax);
-        if (std::find(systHists2D_.begin(), systHists2D_.end(), name) != systHists2D_.end()) {
+        if (doSystematics_ && std::find(systHists2D_.begin(), systHists2D_.end(), name) != systHists2D_.end()) {
             for (auto& syst : systematics_) {
                 std::string syst_hist_name = name+"_"+syst.second;
                 hists2D_[syst_hist_name] = {};

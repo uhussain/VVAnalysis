@@ -127,10 +127,10 @@ card_info = {
 
 pdf_entries = {
     "wzjj-vbfnlo" : 0,
-    "wzjj-ewk" : range(111,122),
-    "wzjj-aqgcfm" : range(111,122),
-    "wzjj-aqgcfs" : range(111,122),
-    "wzjj-aqgcft" : range(111,122),
+    "wzjj-ewk" : range(11,112),
+    "wzjj-aqgcfm" : range(11,112),
+    "wzjj-aqgcfs" : range(11,112),
+    "wzjj-aqgcft" : range(11,112),
     "wz-mgmlm" : range(11,112),
     "wz-powheg" : range(11,112),
     "wz" : range(11,112),

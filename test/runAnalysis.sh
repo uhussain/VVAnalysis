@@ -91,8 +91,8 @@ if [ "$2" != "noCombine" ]; then
             --folder_name $combine_folder \
             -l 35.9 \
             --combineChannels \
-            --addControlRegion \
             --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) 
         echo "Info: File /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename  $histfile) created"
+            #--addControlRegion \
     fi
 fi

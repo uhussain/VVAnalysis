@@ -48,7 +48,7 @@ def applySelector(filelist, selector_name, selection,
 
 def processLocalFiles(selector, file_path, chan):
     if not os.path.isdir(file_path.rsplit("/", 1)[0]):
-        raise ValueError("Invalid path!  Path was %s" 
+        raise ValueError("Invalid path! Path was %s" 
             % file_path)
     for filename in glob.glob(file_path):
         rtfile = ROOT.TFile(filename)

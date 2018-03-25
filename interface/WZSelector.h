@@ -207,8 +207,6 @@ protected:
             std::pair<Systematic, std::string> variation);
     void FillVBSHistograms(float weight, bool noBlind, 
             std::pair<Systematic, std::string> variation);
-    void FillVBSBackgroundControlHistograms(float weight, bool noBlind,
-            std::pair<Systematic, std::string> variation);
     bool PassesBaseSelection(bool tightLeps, Selection selection);
     bool PassesVBSSelection(bool noBlind);
     bool PassesVBSBackgroundControlSelection();
