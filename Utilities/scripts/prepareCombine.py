@@ -25,6 +25,8 @@ def getComLineArgs():
         action='store_true', help="Don't create cards for combine")
     parser.add_argument("--aqgc",
         action='store_true', help="Add aqgc files")
+    parser.add_argument("--manualStats",
+        action='store_true', help="Stat uncertainties inserted by bin")
     parser.add_argument("--lumi", "-l", type=float,
         default=35.87, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
@@ -155,19 +157,22 @@ wz_scalefacs = {
 
 
 scaleWZ = False
-manualStatUnc = False
-variations = ["jerUp", "jerDown", "jesUp", "jesDown"] 
+manualStatUnc = args['manualStats']
+#variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup"] for i in [x+"Up", x+"Down"]]
+jeVariations = [i for x in ["jes", "jer"] for i in [x+"Up", x+"Down"]]
+variations = jeVariations 
+
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
-numvars = 23 if "VBS" in args['selection'] else 13
+initNumvars = 24 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
 #variable = "yield"
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
 if args['fit_variable'] is "":
+    variable = "mjj_dRjj_unrolled" if isVBS else "yield"
     #variable = "mjj_etajj_unrolled" if isVBS else "yield"
-    variable = "mjj_etajj_unrolled" if isVBS else "yield"
     if isVBS and args['aqgc']:
         variable = "MTWZ"
 else:
@@ -192,7 +197,7 @@ combineChannels(alldata, chans)
 OutputTools.writeOutputListItem(alldata, fOut)
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans], rebin=rebin)
-for var in variations:
+for var in jeVariations:
     hists = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
             ["_".join([variable, var, "Fakes", c]) for c in chans], rebin=rebin)
     for h in hists:
@@ -209,7 +214,7 @@ for chan in chans:
         stat_variations[chan].extend(variation_names)
         nonprompt.extend(stat_hists[:])
 
-combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in variations], False)
+combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
 OutputTools.writeOutputListItem(nonprompt, fOut)
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
@@ -418,7 +423,7 @@ if not args['noCards']:
         chan_dict["signal_name"] = signal.replace("_", "-")
         chan_dict["fit_variable"] = variable
         chan_dict["signal_yield"] = chan_dict[signal]
-        numvars = numvars+len(chans)*(chan != "all")*len(stat_variations[chan]) -1*("Wselection" in args['selection'])
+        numvars = initNumvars+len(chans)*(chan != "all")*len(stat_variations[chan]) -1*("Wselection" in args['selection'])
         chan_dict["nuisances"] = numvars
         file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
                 else '%s/WZ_%s.txt' % (output_dir, chan)

@@ -43,10 +43,9 @@ fi
 #frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}_fromJakob.root
 #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_jakobsFakeRates.root
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
-frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRateMar2018-TightLepsFrom3MediumLeptons_TightAndLooseSFs.root
-#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
-#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
-histfile=${output}-${DATE}-${lepid}From${looselepsfile}.root
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+#histfile=${output}-${DATE}-${lepid}From${looselepsfile}.root
+
 if [[ "$3" != "" ]]; then 
     histfile=${histfile/.root/_${3}.root}
 fi
@@ -91,8 +90,8 @@ if [ "$2" != "noCombine" ]; then
             --folder_name $combine_folder \
             -l 35.9 \
             --combineChannels \
+            --addControlRegion \
             --output_file /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename $histfile) 
         echo "Info: File /eos/user/k/kelong/WZAnalysisData/CombineData/$(basename  $histfile) created"
-            #--addControlRegion \
     fi
 fi

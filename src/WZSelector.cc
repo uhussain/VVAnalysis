@@ -194,6 +194,16 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             jetEta = jetEta_jerDown;
             jetPt = jetPt_jerDown;
         }
+        else if (variation.first == pileupUp) {
+            weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftUp)/pileupSF_->Evaluate1D(nTruePU);
+        }
+        else if (variation.first == pileupDown) {
+            weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftDown)/pileupSF_->Evaluate1D(nTruePU);
+        }
+        else if (variation.first == electronEfficiencyUp || variation.first == electronEfficiencyDown ||
+                    variation.first == muonEfficiencyUp || variation.first == muonEfficiencyDown) {
+            ShiftEfficiencies(variation.first);
+        }
     }
 
     auto deltaRjj = [](std::vector<float>* jEta, std::vector<float>* jPhi) {
@@ -201,7 +211,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             return -1.;
         double etaDiff = jEta->at(0) - jEta->at(1);
         double phiDiff = jPhi->at(0) - jPhi->at(1);
-        return std::sqrt(etaDiff*etaDiff - phiDiff*phiDiff);
+        return std::sqrt(etaDiff*etaDiff + phiDiff*phiDiff);
     };
 
     auto deltaEtajj = [](std::vector<float>* jEta) {
@@ -225,9 +235,60 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
 bool WZSelector::PassesVBSBackgroundControlSelection() {
     if (jetPt->size() != jetEta->size() || jetPt->size() < 2)
         return false;
-    //return (dijetMass > 100 && (dijetMass < 500 || dEtajj < 2.5 || std::abs(zep3l) > 2.5));
+
+    if (selection_ != VBSselection_Loose) {
+        if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
+            return false;
+    }
     return (mjj > 100 && (mjj < 500 || dEtajj < 2.5 ));
     //return ((mjj > 500 && dEtajj < 2.5) || (mjj < 500 && dEtajj > 2.5));
+}
+
+void WZSelector::ShiftEfficiencies(Systematic variation) {
+    ScaleFactor::Variation shift = ScaleFactor::Variation::ShiftUp;
+    if (variation == electronEfficiencyDown || variation == muonEfficiencyDown)
+        shift = ScaleFactor::Variation::ShiftDown;
+
+    if (channel_ == eee && (variation == electronEfficiencyUp || variation == electronEfficiencyDown)) {
+        weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+    }
+    else if (channel_ == eem) {
+        if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        else if (variation == muonEfficiencyUp || variation == muonEfficiencyDown) {
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+    }
+    else if (channel_ == emm) {
+        if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        }
+        else if (variation == muonEfficiencyUp || variation == muonEfficiencyDown) {
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+    }
+    else if (channel_ == mmm && (variation == muonEfficiencyUp || variation == muonEfficiencyDown)) {
+        weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+    }
 }
 
 bool WZSelector::PassesVBSSelection(bool noBlind) {
@@ -238,8 +299,8 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
 
     // Use optimized point of pT(j1,j2) > 50 GeV
     if (selection_ != VBSselection_Loose && 
-            selection_ != VBSBackgroundControl &&
-            selection_ != VBSBackgroundControlLoose) { 
+            selection_ != VBSBackgroundControl) { // &&
+            //selection_ != VBSBackgroundControlLoose) { 
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
@@ -398,6 +459,7 @@ void WZSelector::FillVBSHistograms(float weight, bool noBlind,
 
     SafeHistFill(hists1D_, getHistName("mjj", variation.second), mjj, weight*(isMC_ || (mjj < 500) || noBlind));
     SafeHistFill(hists1D_, getHistName("dEtajj", variation.second), dEtajj, weight*(isMC_ || (dEtajj < 2.5) || noBlind));
+    SafeHistFill(hists1D_, getHistName("dRjj", variation.second), dRjj, weight*(isMC_ || (dRjj < 2.5) || noBlind));
 
     if (jetPt->size() > 0 && jetPt->size() == jetEta->size()) {
         SafeHistFill(hists1D_, getHistName("jetPt[0]", variation.second), jetPt->at(0), weight);

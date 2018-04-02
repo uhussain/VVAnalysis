@@ -9,10 +9,12 @@ parser.add_argument("--input_file", "-i", type=str,
 args = parser.parse_args()
 
 saveToFile = True
+adddRjj = True
 input_file_name = args.input_file
 input_file = ROOT.TFile(input_file_name, "update" if saveToFile else "read")
 
-jeVariations = ["jesUp", "jesDown", "jerUp", "jerDown"]
+variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup"] for i in [x+"Up", x+"Down"]]
+jeVariations = [i for x in ["jes", "jer"] for i in [x+"Up", x+"Down"]]
 
 transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
@@ -23,26 +25,27 @@ transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file,
         ["mjj_etajj_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
         ["mjj_etajj_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
         ["mjj_etajj_2D_%s_%s" % (var, c) for c in ConfigureJobs.getChannels()
-                for var in jeVariations] + \
+                for var in variations] + \
         ["mjj_etajj_2D_%s_Fakes_%s" % (var, c) for c in ConfigureJobs.getChannels()
-                for var in jeVariations],
+                for var in variations],
         HistTools.makeUnrolledHist, ConfigureJobs.get2DBinning()
 )
-
-transformed_mjj_dRjj_hists = HistTools.getTransformedHists(input_file, 
-        ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
-            ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
-                ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \
-                ['AllData', 'WZxsec2016data', 'DataEWKCorrected'], 
-            'Wselection'),
-        ["mjj_dRjj_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
-        ["mjj_dRjj_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
-        ["mjj_dRjj_2D_%s_%s" % (var, c) for c in ConfigureJobs.getChannels()
-                for var in jeVariations] + \
-        ["mjj_dRjj_2D_%s_Fakes_%s" % (var, c) for c in ConfigureJobs.getChannels()
-                for var in jeVariations],
-        HistTools.makeUnrolledHist, ConfigureJobs.get2DBinning("mjj", "dRjj")
-)
+transformed_mjj_dRjj_hists = []
+if adddRjj:
+    transformed_mjj_dRjj_hists = HistTools.getTransformedHists(input_file, 
+            ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
+                ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
+                    ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \
+                    ['AllData', 'WZxsec2016data', 'DataEWKCorrected'], 
+                'Wselection'),
+            ["mjj_dRjj_2D_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_dRjj_2D_Fakes_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["mjj_dRjj_2D_%s_%s" % (var, c) for c in ConfigureJobs.getChannels()
+                    for var in variations] + \
+            ["mjj_dRjj_2D_%s_Fakes_%s" % (var, c) for c in ConfigureJobs.getChannels()
+                    for var in variations],
+            HistTools.makeUnrolledHist, ConfigureJobs.get2DBinning("mjj", "dRjj")
+    )
 
 
 transformed_hists = transformed_mjj_etajj_hists+transformed_mjj_dRjj_hists
@@ -54,7 +57,8 @@ if addControlRegion:
         unrolled_hists_wcontrol.append(new_folder)
         for h in folder:
             append = h.GetName().split("_")
-            append = append[-1:] if "Fakes" not in h.GetName() else append[-2:]
+            isSyst = "Up" in h.GetName() or "Down" in h.GetName()
+            append = append[-1-isSyst:] if "Fakes" not in h.GetName() else append[-2-isSyst:]
             hist_name = "_".join(["backgroundControlYield"] + append)
             control_hist = input_file.Get(folder.GetName() + "/" +hist_name)
             if not control_hist:

@@ -32,10 +32,12 @@ MET                     lnN     1.02            1.02            1.04        1.06
 btag                    lnN     1.02            1.02            -           1.07            -           -
 eRes                    lnN     -               -               -           -               -           -
 eScale                  lnN     -               -               -           -               -           -   
-eEff                    lnN     -               -               -           -               -           -   
+eEff                    lnN     -               -               -           -               -           -
+mEff                    lnN     1.04            1.04            1.04        1.04            1.04        1.04     
 mRes                    lnN     1.03            1.03            1.03        1.03            1.03        - 
 mScale                  lnN     1.06            1.06            1.06        1.06            1.06        -
-mEff                    lnN     1.06            1.06            1.06        1.06            1.06        -
+#eEff                    shape   1               1               1           1               0           0
+#mEff                    shape   1               1               1           1               0           0
 ${signal_name}_scale    shape   1               -               -           -               -           -
 wz-mgmlm_scale          shape   -               1               -           -               -           -
 #wzQCDModeling           shape   -               1               -           -               -           -
@@ -49,3 +51,5 @@ top-ewk_pdf             lnN     -               -               -           1.05
 zg_pdf                  lnN     -               -               -           -               1.05           -
 jes                     shape   1               1               1           1               0           1
 jer                     shape   1               1               1           1               0           1
+#pileup                  shape   1               1               1           1               0           0
+pileup                  lnN     1.01            1.01            1.01        1.01            1.01        -  

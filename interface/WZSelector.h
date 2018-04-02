@@ -19,6 +19,8 @@ public :
         muonEfficiencyDown,
         electronEfficiencyUp,
         electronEfficiencyDown,
+        pileupUp,
+        pileupDown,
     }; 
 
     std::vector<std::string> systHists_ = {
@@ -34,12 +36,13 @@ public :
         {jetEnergyScaleDown, "jesDown"}, 
         {jetEnergyResolutionUp, "jerUp"},
         {jetEnergyResolutionDown, "jerDown"},
+        //{pileupUp, "pileupUp"},
+        //{pileupDown, "pileupDown"},
+        //{electronEfficiencyUp, "eEffUp"},
+        //{electronEfficiencyDown, "eEffDown"},
+        //{muonEfficiencyUp, "mEffUp"},
+        //{muonEfficiencyDown, "mEffDown"},
     };
-
-    //std::vector<std::string> systematicNames_ = {
-    //    "mEffUp", "mEffDown", "eEffUp", "eEffDown",
-    //    "pileupUp", "pileupDown"
-    //};
 
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
@@ -77,6 +80,7 @@ public :
         { "mjj",  {} },
         { "MtW",  {} },
         { "dEtajj",  {} },
+        { "dRjj",  {} },
         { "zep3l",  {} },
         { "zepj3",  {} }
     };
@@ -214,6 +218,7 @@ protected:
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
     std::string getHistName(std::string histName, std::string variationName);
+    void ShiftEfficiencies(Systematic variation);
     template<typename T, typename... Args>
     void SafeHistFill(std::map<std::string, T*> container, 
             std::string histname, Args... args) {
