@@ -1,22 +1,22 @@
 {
     "Object" : {
         "e" : [ 
-            "{object_name}Pt >= 7.0",
-            "abs({object_name}Eta) <  2.5",
-            "abs({object_name}PVDXY) < 0.5",
-            "abs({object_name}PVDZ) < 1.0",
-            "{object_name}ZZTightIDNoVtx >= 1",
-            "{object_name}ZZIsoPass > 0.5"
+            "({object_name}Pt >= 7.0)",
+            "(abs({object_name}Eta) <  2.5)",
+            "(abs({object_name}PVDXY) < 0.5)",
+            "(abs({object_name}PVDZ) < 1.0)",
+            "({object_name}ZZTightIDNoVtx > 0.5)",
+            "({object_name}ZZIsoPass > 0.5)"
         ],
         "m" : [
-            "{object_name}Pt > 5.0",
-            "abs({object_name}Eta) < 2.4",
+            "({object_name}Pt > 5.0)",
+            "(abs({object_name}Eta) < 2.4)",
             "({object_name}IsGlobal >= 1 || ({object_name}IsTracker >= 1 && {object_name}MatchedStations >= 1))",
-            "abs({object_name}PVDXY) < 0.5",
-            "abs({object_name}PVDZ) < 1.0",
-            "{object_name}BestTrackType !=2",
-            "{object_name}IsPFMuon >= 1",
-            "{object_name}ZZIsoPass > 0.5"
+            "(abs({object_name}PVDXY) < 0.5)",
+            "(abs({object_name}PVDZ) < 1.0))",
+            "({object_name}BestTrackType !=2)",
+            "({object_name}IsPFMuon >= 1)",
+            "({object_name}ZZIsoPass > 0.5)"
         ]
     },
     "State" : {
