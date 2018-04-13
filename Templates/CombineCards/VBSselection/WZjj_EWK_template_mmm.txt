@@ -32,12 +32,10 @@ MET                     lnN     1.02            1.02            1.04        1.06
 btag                    lnN     1.02            1.02            -           1.07            -           -
 eRes                    lnN     -               -               -           -               -           -
 eScale                  lnN     -               -               -           -               -           -   
-eEff                    lnN     -               -               -           -               -           -
-mEff                    lnN     1.04            1.04            1.04        1.04            1.04        1.04     
 mRes                    lnN     1.03            1.03            1.03        1.03            1.03        - 
 mScale                  lnN     1.06            1.06            1.06        1.06            1.06        -
-#eEff                    shape   1               1               1           1               0           0
-#mEff                    shape   1               1               1           1               0           0
+eEff                    shape   1               1               1           1               0           0
+mEff                    shape   1               1               1           1               0           0
 ${signal_name}_scale    shape   1               -               -           -               -           -
 wz-mgmlm_scale          shape   -               1               -           -               -           -
 #wzQCDModeling           shape   -               1               -           -               -           -

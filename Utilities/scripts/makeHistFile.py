@@ -81,7 +81,8 @@ if selection == "Inclusive2Jet":
 analysis = "/".join([args['analysis'], selection])
 hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
-    
+
+hists = [h for h in hists if "unrolled" not in h and h != "YieldByChannel"]
 hist_inputs = [getHistExpr(hists, analysis)]
 tselection = [ROOT.TNamed("selection", args['output_selection'])]
 
@@ -96,7 +97,6 @@ if "FakeRate" not in args['output_selection']:
             extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
             addSumweights=False,
             proof=args['proof'])
-#mc = SelectorTools.applySelector(ConfigureJobs.getListOfEWKFilenames() , "WZSelector", args['selection'], fOut, 
 mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         addSumweights=True, proof=args['proof'])

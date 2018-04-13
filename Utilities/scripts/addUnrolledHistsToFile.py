@@ -18,6 +18,7 @@ jeVariations = [i for x in ["jes", "jer"] for i in [x+"Up", x+"Down"]]
 
 transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
+            ConfigureJobs.getListOfNonpromptFilenames() + \
             ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
                 ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \
                 ['AllData', 'WZxsec2016data', 'DataEWKCorrected'], 

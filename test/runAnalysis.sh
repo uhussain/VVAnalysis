@@ -44,7 +44,6 @@ fi
 #histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_jakobsFakeRates.root
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
 histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
-#histfile=${output}-${DATE}-${lepid}From${looselepsfile}.root
 
 if [[ "$3" != "" ]]; then 
     histfile=${histfile/.root/_${3}.root}

@@ -40,6 +40,8 @@ def getListOfEWKFilenames():
         "wz3lnu-mgmlm-3j",
         "wlljj-ewk",
         "zz4l-powheg",
+        "zz4ljj-ewk",
+        "zz2l2vjj-ewk",
         "tzq",
         "ttz",
         "ttw",

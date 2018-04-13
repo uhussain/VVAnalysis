@@ -28,7 +28,16 @@ public :
         "backgroundControlYield",
         "mjj",
         "dEtajj",
-        "MTWZ"
+        "MTWZ",
+        "nTruePU",
+        "nvtx",
+        "Zlep1_Pt",
+        "Zlep2_Pt",
+        "Wlep_Pt",
+        "Zlep1_Eta",
+        "Zlep2_Eta",
+        "Wlep_Eta",
+        "ZMass",
     };
 
     std::map<Systematic, std::string> systematics_ = {
@@ -36,12 +45,12 @@ public :
         {jetEnergyScaleDown, "jesDown"}, 
         {jetEnergyResolutionUp, "jerUp"},
         {jetEnergyResolutionDown, "jerDown"},
-        //{pileupUp, "pileupUp"},
-        //{pileupDown, "pileupDown"},
-        //{electronEfficiencyUp, "eEffUp"},
-        //{electronEfficiencyDown, "eEffDown"},
-        //{muonEfficiencyUp, "mEffUp"},
-        //{muonEfficiencyDown, "mEffDown"},
+        {pileupUp, "pileupUp"},
+        {pileupDown, "pileupDown"},
+        {electronEfficiencyUp, "eEffUp"},
+        {electronEfficiencyDown, "eEffDown"},
+        {muonEfficiencyUp, "mEffUp"},
+        {muonEfficiencyDown, "mEffDown"},
     };
 
     std::map<std::string, TH1D*> hists1D_ = {

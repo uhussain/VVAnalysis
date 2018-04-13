@@ -158,9 +158,9 @@ wz_scalefacs = {
 
 scaleWZ = False
 manualStatUnc = args['manualStats']
-#variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup"] for i in [x+"Up", x+"Down"]]
+variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup"] for i in [x+"Up", x+"Down"]]
 jeVariations = [i for x in ["jes", "jer"] for i in [x+"Up", x+"Down"]]
-variations = jeVariations 
+#variations = jeVariations 
 
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
@@ -171,8 +171,7 @@ isVBS = "VBS" in args['selection']
 #variable = "yield"
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
 if args['fit_variable'] is "":
-    variable = "mjj_dRjj_unrolled" if isVBS else "yield"
-    #variable = "mjj_etajj_unrolled" if isVBS else "yield"
+    variable = "mjj_etajj_unrolled" if isVBS else "yield"
     if isVBS and args['aqgc']:
         variable = "MTWZ"
 else:
@@ -186,6 +185,8 @@ if args['addControlRegion']:
 mjj_binning = ConfigureJobs.get2DBinning()[0]
 #mjj_binning = array.array('d', [500, 1000,1500, 2000, 2500]) 
 rebin = mjj_binning if variable == "mjj" else None
+if variable == "MTWZ":
+    rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans], rebin=rebin)

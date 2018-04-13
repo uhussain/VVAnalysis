@@ -127,6 +127,7 @@ def getLHEWeightHists(init2D_hist, entries, name, variation_name, rebin=None):
 
 def getPDFHists(init2D_hist, entries, name, rebin=None):
     hists, hist_name = getLHEWeightHists(init2D_hist, entries, name, "pdf", rebin)
+    #return hists
     return getVariationHists(hists, name, hist_name, 
             lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[83])/2)
 
@@ -197,6 +198,7 @@ def getTransformed3DPDFHists(hist3D, transformation, transform_args, entries, na
         hist2D.SetName(hist_name)
         hist1D = transformation(hist2D, *transform_args)
         hists.append(hist1D)
+    #return hists
     hist_name = hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled",name,"pdfUp"]))
     return getVariationHists(hists, name, hist_name, 
             lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[83])/2)
@@ -279,7 +281,9 @@ def getTransformedHists(orig_file, folders, input_hists, transformation, transfo
         for input_hist_name in input_hists:
             orig_hist = orig_file.Get("/".join([folder, input_hist_name]))
             if not orig_hist:
-                print "WARNING: Histogram %s not found for dataset %s. Skipping." % (input_hist_name, folder)
+                if "Fakes" not in input_hist_name and \
+                    "Up" not in input_hist_name and "Down" not in input_hist_name:
+                    print "WARNING: Histogram %s not found for dataset %s. Skipping." % (input_hist_name, folder)
                 continue
             new_hist = transformation(orig_hist, *transform_inputs)
             ROOT.SetOwnership(new_hist, False)

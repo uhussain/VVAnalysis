@@ -41,6 +41,7 @@ isfile = any(os.path.isfile(name) or os.path.exists(name.rstrip("/*"))
                 for name in args.filelist)
 filelist = ConfigureJobs.getListOfFiles(args.filelist, args.selection) if \
     not isfile else args.filelist
+print filelist
 states = [x.strip() for x in args.channels.split(",")]
 file_paths = []
 output_dir = os.path.dirname(args.output_file)
@@ -66,21 +67,26 @@ for state in states:
     first = True
     for file_path in file_paths:
         state = state.strip()
+        print file_path
         chain = ROOT.TChain("%s/ntuple" % state)
         chain.Add(file_path[1])
+        ApplySelection.setAliases(chain, state, "Cuts/WZxsec2016/aliases.json")
         run_expr = "run:lumi:evt"
         trig_expr = "singleESingleMuPass:singleMuSingleEPass:doubleMuPass:doubleMuDZPass:doubleEPass"
         filter_expr = "Flag_duplicateMuonsPass:Flag_BadPFMuonFilterPass:Flag_badMuonsPass:Flag_goodVerticesPass"
-        lepid_expr = "e1IsCBVIDHLTSafe:e1IsCBVIDTight:e1Pt:e1Eta:e1Phi:e1PVDXY:e1PVDZ:" \
-                            "e2IsCBVIDHLTSafe:e2IsCBVIDTight:e2Pt:e2Eta:e2Phi:e2PVDXY:e2PVDZ:" \
-                            "e3IsCBVIDHLTSafe:e3IsCBVIDTight:e3Pt:e3Eta:e3Phi:e3PVDXY:e3PVDZ"
+        all_filters = "Flag_BadChargedCandidateFilterPass:Flag_HBHENoiseFilterPass:Flag_HBHENoiseIsoFilterPass:Flag_BadPFMuonFilterPass:Flag_EcalDeadCellTriggerPrimitiveFilterPass:Flag_goodVerticesPass:Flag_globalTightHalo2016FilterPass:Flag_eeBadScFilterPass:Flag_duplicateMuonsPass:Flag_badMuonsPass"
+        filter_expr = all_filters
+        filter_expr += ":metFiltersData" if "data_" in file_path[0] else ":metFiltersMC"
+        lepid_expr = "Zlep1IsMedium:Zlep1IsTight:Zlep1_Pt:Zlep1_Eta:Zlep1_Phi:Zlep1_PVDXY:Zlep1_PVDZ:" \
+                            "Zlep2IsMedium:Zlep2IsTight:Zlep2_Pt:Zlep2_Eta:Zlep2_Phi:Zlep2_PVDXY:Zlep2_PVDZ:" \
+                            "WlepIsMedium:WlepIsTight:Wlep_Pt:Wlep_Eta:Wlep_Phi:Wlep_PVDXY:Wlep_PVDZ"
         veto_expr = "nCBVIDHLTSafeElec:nWZMediumMuon:nCBVIDTightElec:nWZTightMuon"
         scan_expr = ":".join([run_expr,lepid_expr,veto_expr,filter_expr])
 
         outfile_name = "/".join([output_dir, file_path[0], args.output_file.split("/")[-1].replace("chan", state)])
-        events = getEventSelectionExpr("/eos/user/k/kelong/WZAnalysisData/SyncWithJakob/Differences_20Dec2017/InclusiveSelection",
+        events = getEventSelectionExpr("/eos/user/k/kelong/WZAnalysisData/SyncWithJakob/Differences_2018Apr/DataLooseControl/",
                 #"KennethNotJakob",
-                "JakobNotKenneth",
+                "MPnotWisc",
                 state
         )
         print events

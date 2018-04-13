@@ -33,7 +33,7 @@ void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
 }
 
 std::string WZSelectorBase::GetNameFromFile() {
-    std::regex expr = std::regex("201[0-9]-[0-9][0-2]-[0-9][0-9]-(.*)-WZxsec2016");
+    std::regex expr = std::regex("201[0-9]-[0-9][0-9]-[0-9][0-9]-(.*)-WZxsec2016");
     std::smatch matches;
     std::string fileName = fChain->GetTree()->GetDirectory()->GetFile()->GetName(); 
 
@@ -316,11 +316,19 @@ Bool_t WZSelectorBase::Notify()
 Bool_t WZSelectorBase::Process(Long64_t entry)
 {
     weight = 1;
+    b_l1Pt->GetEntry(entry);
+    b_l2Pt->GetEntry(entry);
+    b_l3Pt->GetEntry(entry);
+    b_l1Eta->GetEntry(entry);
+    b_l2Eta->GetEntry(entry);
+    b_l3Eta->GetEntry(entry);
+
     if (isMC_) {
         b_genWeight->GetEntry(entry);
         b_l1GenPt->GetEntry(entry);
         b_l2GenPt->GetEntry(entry);
         b_l3GenPt->GetEntry(entry);
+        b_nTruePU->GetEntry(entry);
         weight = genWeight;
         if (channel_ == eee) {
             weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
@@ -364,10 +372,6 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
     b_l1IsTight->GetEntry(entry);
     b_l2IsTight->GetEntry(entry);
     b_l3IsTight->GetEntry(entry);
-    b_l1Pt->GetEntry(entry);
-    b_l2Pt->GetEntry(entry);
-    b_l3Pt->GetEntry(entry);
-    b_l3Eta->GetEntry(entry);
     b_l3MtToMET->GetEntry(entry);
     b_type1_pfMETEt->GetEntry(entry);
     b_nCBVIDTightElec->GetEntry(entry);

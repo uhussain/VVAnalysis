@@ -34,10 +34,8 @@ eRes                    lnN     1.04            1.04            1.04        1.04
 eScale                  lnN     1.06            1.06            1.06        1.06            1.06        -
 mRes                    lnN     -               -               -           -               -           -
 mScale                  lnN     -               -               -           -               -           -
-eEff                    lnN     1.04            1.04            1.04        1.04            1.04        1.04     
-mEff                    lnN     -               -               -           -               -           -
-#eEff                    shape   1               1               1           1               0           0
-#mEff                    shape   1               1               1           1               0           0
+eEff                    shape   1               1               1           1               0           0
+mEff                    shape   1               1               1           1               0           0
 ${signal_name}_scale    shape   1               -               -           -               -           -
 wz-mgmlm_scale          shape   -               1               -           -               -           -
 vv_scale                shape   -               -               1           -               -           -
@@ -50,5 +48,4 @@ top-ewk_pdf             lnN     -               -               -           1.05
 zg_pdf                  lnN     -               -               -           -               1.05           -
 jes                     shape   1               1               1           1               0           1
 jer                     shape   1               1               1           1               0           1
-#pileup                  shape   1               1               1           1               0           0
-pileup                  lnN     1.01            1.01            1.01        1.01            1.01        -  
+pileup                  shape   1               1               1           1               0           0

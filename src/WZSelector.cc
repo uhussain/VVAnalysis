@@ -111,9 +111,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
         b_ZEta->GetEntry(entry);
         b_Mass->GetEntry(entry);
         //b_MtToMET->GetEntry(entry);
-        b_l1Eta->GetEntry(entry);
         b_l1Phi->GetEntry(entry);
-        b_l2Eta->GetEntry(entry);
         b_l2Phi->GetEntry(entry);
         b_l3Phi->GetEntry(entry);
         b_jetPt->GetEntry(entry);
@@ -123,7 +121,6 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
         b_mjj->GetEntry(entry);
     
         if (isMC_) {
-            b_nTruePU->GetEntry(entry);
             if (isMC_ && weight_info_ > 0) {
                 b_scaleWeights->GetEntry(entry);
                 lheWeights = *scaleWeights;
@@ -240,7 +237,8 @@ bool WZSelector::PassesVBSBackgroundControlSelection() {
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
-    return (mjj > 100 && (mjj < 500 || dEtajj < 2.5 ));
+    return (mjj > 100 && (mjj < 500 || dEtajj < 2.5));
+    //return (mjj > 100 && (mjj < 500 || dEtajj < 2.5 || std::abs(zep3l) > 2.5));
     //return ((mjj > 500 && dEtajj < 2.5) || (mjj < 500 && dEtajj > 2.5));
 }
 
@@ -569,6 +567,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
 
     SafeHistFill(hists1D_, getHistName("MTWZ", variation.second), MtWZ, weight*(isMC_ || MtWZ < 300 || noBlind));
     SafeHistFill(hists1D_, getHistName("M3lMET", variation.second), M3lMET, weight*(isMC_ || M3lMET < 300 || noBlind));
+    if (isMC_)
+        SafeHistFill(hists1D_, getHistName("nTruePU", variation.second), nTruePU, weight);
 }
 
 Bool_t WZSelector::Process(Long64_t entry)
