@@ -20,6 +20,8 @@ def getEventSelectionExpr(path, comparison, channel):
             event_num = line.strip().split(":")
             if len(event_num) == 3:
                 events.append("(run == {0} && lumi == {1} && evt == {2})".format(*event_num))
+            elif len(event_num) == 1:
+                events.append("evt == {0}".format(*event_num))
     return events
 
 parser = argparse.ArgumentParser() 
@@ -67,9 +69,13 @@ for state in states:
     first = True
     for file_path in file_paths:
         state = state.strip()
-        print file_path
         chain = ROOT.TChain("%s/ntuple" % state)
-        chain.Add(file_path[1])
+        if "store" in file_path[1][:6]:
+            path = "root://cmsxrootd.hep.wisc.edu/" + file_path[1]
+        else:
+            path = file_path[1]
+        chain.Add(path)
+        print "Path is", path
         ApplySelection.setAliases(chain, state, "Cuts/WZxsec2016/aliases.json")
         run_expr = "run:lumi:evt"
         trig_expr = "singleESingleMuPass:singleMuSingleEPass:doubleMuPass:doubleMuDZPass:doubleEPass"
@@ -77,16 +83,19 @@ for state in states:
         all_filters = "Flag_BadChargedCandidateFilterPass:Flag_HBHENoiseFilterPass:Flag_HBHENoiseIsoFilterPass:Flag_BadPFMuonFilterPass:Flag_EcalDeadCellTriggerPrimitiveFilterPass:Flag_goodVerticesPass:Flag_globalTightHalo2016FilterPass:Flag_eeBadScFilterPass:Flag_duplicateMuonsPass:Flag_badMuonsPass"
         filter_expr = all_filters
         filter_expr += ":metFiltersData" if "data_" in file_path[0] else ":metFiltersMC"
-        lepid_expr = "Zlep1IsMedium:Zlep1IsTight:Zlep1_Pt:Zlep1_Eta:Zlep1_Phi:Zlep1_PVDXY:Zlep1_PVDZ:" \
-                            "Zlep2IsMedium:Zlep2IsTight:Zlep2_Pt:Zlep2_Eta:Zlep2_Phi:Zlep2_PVDXY:Zlep2_PVDZ:" \
-                            "WlepIsMedium:WlepIsTight:Wlep_Pt:Wlep_Eta:Wlep_Phi:Wlep_PVDXY:Wlep_PVDZ"
+        lepid_expr = "Zlep1IsLoose:Zlep1IsTight:Zlep1_Pt:Zlep1_Eta:Zlep1_Phi:Zlep1_PVDXY:Zlep1_PVDZ:" \
+                            "Zlep2IsLoose:Zlep2IsTight:Zlep2_Pt:Zlep2_Eta:Zlep2_Phi:Zlep2_PVDXY:Zlep2_PVDZ:" \
+                            "WlepIsLoose:WlepIsTight:Wlep_Pt:Wlep_Eta:Wlep_Phi:Wlep_PVDXY:Wlep_PVDZ"
+        other_kinematics = "Mass:ZMass:type1_pfMETEt:Max$(jetCSVv2)"
+        jet_vars = "mjj:dEtajj:jetPt[0]:jetEta[0]:jetPt[1]:jetEta[1]:zep3l"
         veto_expr = "nCBVIDHLTSafeElec:nWZMediumMuon:nCBVIDTightElec:nWZTightMuon"
-        scan_expr = ":".join([run_expr,lepid_expr,veto_expr,filter_expr])
+        scan_expr = ":".join([run_expr,other_kinematics,lepid_expr,veto_expr,jet_vars,filter_expr])
 
         outfile_name = "/".join([output_dir, file_path[0], args.output_file.split("/")[-1].replace("chan", state)])
         events = getEventSelectionExpr("/eos/user/k/kelong/WZAnalysisData/SyncWithJakob/Differences_2018Apr/DataLooseControl/",
                 #"KennethNotJakob",
-                "MPnotWisc",
+        #        "MPnotWisc",
+                "WiscnotMP",
                 state
         )
         print events
@@ -94,6 +103,8 @@ for state in states:
             if i > 0:
                 outfile_name = outfile_name.replace(".txt", "%i.txt" % i)
             evtstring = " || ".join(eventlist)
+            print chain, chain.GetEntries()
+            print "Output file", outfile_name
             chain.GetPlayer().SetScanRedirect(True)
             chain.GetPlayer().SetScanFileName(outfile_name)
             chain.Scan(scan_expr, evtstring,"colsize=30")

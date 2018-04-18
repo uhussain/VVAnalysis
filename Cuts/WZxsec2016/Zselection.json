@@ -18,6 +18,6 @@
     "Event" : [
         "ZMass > 76.1876 && ZMass < 106.1876",
         "Zlep1_Pt > 20.",
-        "Zlep2_Pt > 20."
+        "Zlep2_Pt > 15."
     ]
 }
