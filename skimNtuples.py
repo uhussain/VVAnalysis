@@ -34,7 +34,7 @@ def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
         state_dir = output_file.mkdir(state)
     state_dir.cd()
     save_tree = tree.CopyTree(cut_string) if not deduplicate else \
-        getDeduplicatedTree(tree, state, cut_string)
+        getDeduplicatedTree(tree, state, cut_string).CopyTree("")
     save_tree.Write()
     # Remove AutoSaved trees
     output_file.Purge()
@@ -48,8 +48,7 @@ def getDeduplicatedTree(tree, state, cut_string):
     new_tree.Process(selector)#, cut_string)
     entryList = selector.GetOutputList().FindObject('bestCandidates')
     new_tree.SetEntryList(entryList)
-    ROOT.SetOwnership(new_tree, False)
-    return new_tree.CopyTree("")
+    return new_tree
 def writeMetaTreeToFile(output_file, metaTree):
     output_file.cd()
     meta_dir = output_file.mkdir("metaInfo")
@@ -83,22 +82,21 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
         event_counts["Input"][state] = tree.GetEntries()
         selection_groups = selections.split(";")
         for i, selection_group in enumerate(selection_groups):
-            applyDeduplicate = deduplicate
-            if i > 0:
-                applyDeduplicate = False
-                trigger = ""
+            applyDeduplicate = deduplicate if i > 0 else False
             cuts = ApplySelection.CutString()
             cuts.append(ApplySelection.buildCutString(state, 
-                selection_group.split(","), analysis, trigger).getString())
+                selection_group.split(","), analysis, trigger if i == 0 else "").getString())
             cut_string = cuts.getString()
             print "INFO: Cut string for channel %s is: %s" % (state, cut_string)
-            isFirstOfMultistep = (i == 0 and len(selection_groups) >= 1)
+            isFirstOfMultistep = (i == 0 and len(selection_groups) > 1)
             ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
             if not isFirstOfMultistep:
                 event_counts[selection_group][state] = writeNtupleToFile(output_file, tree, state, 
                     cut_string, applyDeduplicate)
             else:
-                tree = getDeduplicatedTree(tree, state, cut_string).Clone()
+                tmptree = getDeduplicatedTree(tree, state, cut_string)
+                tree = tmptree.CopyTree("")
+                tmptree.Delete()
                 event_counts[selection_group][state] = tree.GetEntries()
                 ROOT.SetOwnership(tree, False)
         del tree
