@@ -82,7 +82,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
         event_counts["Input"][state] = tree.GetEntries()
         selection_groups = selections.split(";")
         for i, selection_group in enumerate(selection_groups):
-            applyDeduplicate = deduplicate if i > 0 else False
+            applyDeduplicate = deduplicate if i == 0 else False
             cuts = ApplySelection.CutString()
             cuts.append(ApplySelection.buildCutString(state, 
                 selection_group.split(","), analysis, trigger if i == 0 else "").getString())
@@ -98,7 +98,6 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
                 tree = tmptree.CopyTree("")
                 tmptree.Delete()
                 event_counts[selection_group][state] = tree.GetEntries()
-                ROOT.SetOwnership(tree, False)
         del tree
     writeMetaTreeToFile(output_file, metaTree)
     event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
@@ -107,7 +106,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     print "\nResults for selection: %s" % selections
     if deduplicate:
         print "NOTE: Events deduplicated by choosing the ordering with m_l1_l2 " \
-                "closest to m_{Z}^{PDG} \n    after selection: %s" % selections.split(";")[0]
+                "closest to m_{Z}^{PDG} \n      after selection: %s" % selections.split(";")[0]
     else:
         print "NOTE: Events NOT deduplicated! Event may appear in multiple rows of ntuple!\n"
     print event_info.get_string()
