@@ -3,6 +3,7 @@ import ROOT
 import argparse
 import os
 import sys
+from collections import OrderedDict
 from Utilities.python import ApplySelection
 from Utilities.python.prettytable import PrettyTable
 
@@ -28,10 +29,12 @@ def getComLineArgs():
                         help="Don't remove duplicated events from ntuple")
     return vars(parser.parse_args())
 def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
-    state_dir = output_file.mkdir(state)
+    state_dir = output_file.Get(state)
+    if not state_dir:
+        state_dir = output_file.mkdir(state)
     state_dir.cd()
     save_tree = tree.CopyTree(cut_string) if not deduplicate else \
-        getDeduplicatedTree(tree, state, cut_string).CopyTree("")
+        getDeduplicatedTree(tree, state, cut_string)
     save_tree.Write()
     # Remove AutoSaved trees
     output_file.Purge()
@@ -45,7 +48,8 @@ def getDeduplicatedTree(tree, state, cut_string):
     new_tree.Process(selector)#, cut_string)
     entryList = selector.GetOutputList().FindObject('bestCandidates')
     new_tree.SetEntryList(entryList)
-    return new_tree
+    ROOT.SetOwnership(new_tree, False)
+    return new_tree.CopyTree("")
 def writeMetaTreeToFile(output_file, metaTree):
     output_file.cd()
     meta_dir = output_file.mkdir("metaInfo")
@@ -64,7 +68,9 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     metaTree = ROOT.TChain("metaInfo/metaInfo")
     for file_path in input_files:
         metaTree.Add(file_path)
-    event_counts = {"initial" : {}, "selected" : {}}
+    event_counts = OrderedDict({"Input" : {}})
+    for selection_group in selections.split(";"):
+        event_counts[selection_group] = {}
     states = []
     if "WZ" in analysis:
         states = ["eee", "eem", "emm", "mmm"]
@@ -74,15 +80,28 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
         tree = ROOT.TChain("%s/ntuple" % state)
         for file_path in input_files:
             tree.Add(file_path)
-        event_counts["initial"][state] = tree.GetEntries()
-        cuts = ApplySelection.CutString()
-        cuts.append(ApplySelection.buildCutString(state, 
-            selections.split(","), analysis, trigger).getString())
-        cut_string = cuts.getString()
-        print "Cut string is %s " % cut_string
-        ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
-        event_counts["selected"][state] = writeNtupleToFile(output_file, tree, state, cut_string,
-            deduplicate)
+        event_counts["Input"][state] = tree.GetEntries()
+        selection_groups = selections.split(";")
+        for i, selection_group in enumerate(selection_groups):
+            applyDeduplicate = deduplicate
+            if i > 0:
+                applyDeduplicate = False
+                trigger = ""
+            cuts = ApplySelection.CutString()
+            cuts.append(ApplySelection.buildCutString(state, 
+                selection_group.split(","), analysis, trigger).getString())
+            cut_string = cuts.getString()
+            print "INFO: Cut string for channel %s is: %s" % (state, cut_string)
+            isFirstOfMultistep = (i == 0 and len(selection_groups) >= 1)
+            ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
+            if not isFirstOfMultistep:
+                event_counts[selection_group][state] = writeNtupleToFile(output_file, tree, state, 
+                    cut_string, applyDeduplicate)
+            else:
+                tree = getDeduplicatedTree(tree, state, cut_string).Clone()
+                event_counts[selection_group][state] = tree.GetEntries()
+                ROOT.SetOwnership(tree, False)
+        del tree
     writeMetaTreeToFile(output_file, metaTree)
     event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
     for selection, events in event_counts.iteritems():
@@ -90,7 +109,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     print "\nResults for selection: %s" % selections
     if deduplicate:
         print "NOTE: Events deduplicated by choosing the ordering with m_l1_l2 " \
-            "closest to m_{Z}^{PDG} AFTER making full selection\n"
+                "closest to m_{Z}^{PDG} \n    after selection: %s" % selections.split(";")[0]
     else:
         print "NOTE: Events NOT deduplicated! Event may appear in multiple rows of ntuple!\n"
     print event_info.get_string()

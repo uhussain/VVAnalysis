@@ -69,6 +69,7 @@ def getListOfNonpromptFilenames():
     ]
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
+    selection = selection.replace(";",",")
     selections = selection.split(",")
     selection_name = "To".join([selections[0],selections[-1]]) \
         if len(selections) > 1 else selections[0]
@@ -180,6 +181,7 @@ def getPreviousStep(selection, analysis):
                 "Zselection" : "preselection",
                 "Wselection" : "Zselection"
         }
+    selection = selection.replace(";",",")
     first_selection = selection.split(",")[0].strip()
     if first_selection not in selection_map.keys():
         if "preselection" in first_selection:
