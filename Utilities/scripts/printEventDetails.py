@@ -78,7 +78,7 @@ for state in states:
         print "Path is", path
         ApplySelection.setAliases(chain, state, "Cuts/WZxsec2016/aliases.json")
         run_expr = "run:lumi:evt"
-        trig_expr = "singleESingleMuPass:singleMuSingleEPass:doubleMuPass:doubleMuDZPass:doubleEPass"
+        trig_expr = "singleEPass:singleMuPass:singleIsoMuPass:singleESingleMuPass:singleMuSingleEPass:doubleMuPass:doubleMuDZPass:doubleEPass:(singleESingleMuPass || singleMuSingleEPass || doubleMuPass || doubleMuDZPass || doubleEPass || singleEPass || singleMuPass || singleIsoMuPass)"
         filter_expr = "Flag_duplicateMuonsPass:Flag_BadPFMuonFilterPass:Flag_badMuonsPass:Flag_goodVerticesPass"
         all_filters = "Flag_BadChargedCandidateFilterPass:Flag_HBHENoiseFilterPass:Flag_HBHENoiseIsoFilterPass:Flag_BadPFMuonFilterPass:Flag_EcalDeadCellTriggerPrimitiveFilterPass:Flag_goodVerticesPass:Flag_globalTightHalo2016FilterPass:Flag_eeBadScFilterPass:Flag_duplicateMuonsPass:Flag_badMuonsPass"
         filter_expr = all_filters
@@ -89,13 +89,13 @@ for state in states:
         other_kinematics = "Mass:ZMass:type1_pfMETEt:Max$(jetCSVv2)"
         jet_vars = "mjj:dEtajj:jetPt[0]:jetEta[0]:jetPt[1]:jetEta[1]:zep3l"
         veto_expr = "nCBVIDHLTSafeElec:nWZMediumMuon:nCBVIDTightElec:nWZTightMuon"
-        scan_expr = ":".join([run_expr,other_kinematics,lepid_expr,veto_expr,jet_vars,filter_expr])
+        scan_expr = ":".join([run_expr,other_kinematics,lepid_expr,veto_expr,jet_vars,filter_expr,trig_expr])
 
         outfile_name = "/".join([output_dir, file_path[0], args.output_file.split("/")[-1].replace("chan", state)])
         events = getEventSelectionExpr("/eos/user/k/kelong/WZAnalysisData/SyncWithJakob/Differences_2018Apr/DataLooseControl/",
                 #"KennethNotJakob",
-        #        "MPnotWisc",
-                "WiscnotMP",
+                "MPnotWisc",
+        #        "WiscnotMP",
                 state
         )
         print events
