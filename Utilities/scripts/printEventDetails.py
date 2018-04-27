@@ -57,7 +57,7 @@ for name in filelist:
             print e
             continue
     else:
-        label = file_path.split(".")[0].split("/")[-1]
+        label = filelist[0].split(".")[0].split("/")[-1]
         file_paths.append((label, name))
     try:
         os.makedirs(output_dir + "/" + label)
