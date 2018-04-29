@@ -7,7 +7,7 @@
 
 class WZSelector : public WZSelectorBase {
 public :
-    bool doSystematics_;
+    bool doSystematics_ = false;
 
     enum Systematic {
         Central,
@@ -153,6 +153,8 @@ public :
     std::vector<float>* jetCSVv2 = NULL;
     UInt_t nvtx;
     Float_t Mass;
+    Float_t Zlep1_Wlep_Mass;
+    Float_t Zlep2_Wlep_Mass;
     Float_t Eta;
     Float_t Pt;
     Float_t ZPt;
@@ -192,6 +194,8 @@ public :
     TBranch* b_jetPt_jerDown;
     TBranch* b_nvtx;
     TBranch* b_Mass;
+    TBranch* b_Zlep1_Wlep_Mass;
+    TBranch* b_Zlep2_Wlep_Mass;
     TBranch* b_Eta;
     TBranch* b_Pt;
     TBranch* b_ZPt;
@@ -220,9 +224,10 @@ protected:
             std::pair<Systematic, std::string> variation);
     void FillVBSHistograms(float weight, bool noBlind, 
             std::pair<Systematic, std::string> variation);
-    bool PassesBaseSelection(bool tightLeps, Selection selection);
+    bool PassesBaseSelection(Long64_t entry, bool tightLeps, Selection selection);
     bool PassesVBSSelection(bool noBlind);
     bool PassesVBSBackgroundControlSelection();
+    bool PassesFullWZSelection(Long64_t entry);
     void InitialzeHistogram(std::string name, std::vector<std::string> histData);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);

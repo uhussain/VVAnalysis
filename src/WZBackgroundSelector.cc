@@ -97,14 +97,14 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
 
     LoadBranches(entry, central_var);
-    if (!PassesBaseSelection(false, selection_))
+    if (!PassesBaseSelection(entry, false, selection_))
         return true;
     FillHistograms(entry, getEventWeight(), true, central_var);
 
     if (doSystematics_) {
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
-            if (!PassesBaseSelection(false, selection_))
+            if (!PassesBaseSelection(entry, false, selection_))
                 return true;
             FillHistograms(entry, getEventWeight(), true, systematic);
         }

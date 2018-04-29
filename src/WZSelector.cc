@@ -42,6 +42,8 @@ void WZSelector::Init(TTree *tree)
 
     if (channel_ == eee) {
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e1_e3_Mass", &Zlep1_Wlep_Mass, &b_Zlep1_Wlep_Mass);
+        fChain->SetBranchAddress("e2_e3_Mass", &Zlep2_Wlep_Mass, &b_Zlep2_Wlep_Mass);
         fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("e1_e2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("e1_e2_Phi", &ZPhi, &b_ZPhi);
@@ -51,6 +53,8 @@ void WZSelector::Init(TTree *tree)
     }
     else if (channel_ == eem) { 
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e1_m_Mass", &Zlep1_Wlep_Mass, &b_Zlep1_Wlep_Mass);
+        fChain->SetBranchAddress("e2_m_Mass", &Zlep2_Wlep_Mass, &b_Zlep2_Wlep_Mass);
         fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("e1_e2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("e1_e2_Phi", &ZPhi, &b_ZPhi);
@@ -60,6 +64,8 @@ void WZSelector::Init(TTree *tree)
     }
     else if (channel_ == emm) { 
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e_m1_Mass", &Zlep1_Wlep_Mass, &b_Zlep1_Wlep_Mass);
+        fChain->SetBranchAddress("e_m2_Mass", &Zlep2_Wlep_Mass, &b_Zlep2_Wlep_Mass);
         fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("m1_m2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("m1_m2_Phi", &ZPhi, &b_ZPhi);
@@ -69,6 +75,8 @@ void WZSelector::Init(TTree *tree)
     }
     else if (channel_ == mmm) { 
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("m1_m3_Mass", &Zlep1_Wlep_Mass, &b_Zlep1_Wlep_Mass);
+        fChain->SetBranchAddress("m2_m3_Mass", &Zlep2_Wlep_Mass, &b_Zlep2_Wlep_Mass);
         fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("m1_m2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("m1_m2_Phi", &ZPhi, &b_ZPhi);
@@ -145,7 +153,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             TLorentzVector l3 = TLorentzVector();
             l3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, 0);
             TLorentzVector met = TLorentzVector();
-            met.SetPtEtaPhiM(type1_pfMETEt, 0, type1_pfMETPhi, 0);
+            met.SetPtEtaPhiM(MET, 0, type1_pfMETPhi, 0);
             TLorentzVector zp4 = l1+l2;
             TLorentzVector wp4 = l3+met;
             TLorentzVector wzp4 = l1+l2+l3+met;
@@ -233,7 +241,8 @@ bool WZSelector::PassesVBSBackgroundControlSelection() {
     if (jetPt->size() != jetEta->size() || jetPt->size() < 2)
         return false;
 
-    if (selection_ != VBSselection_Loose) {
+    if (selection_ != VBSselection_Loose &&
+            selection_ != VBSselection_Loose_Full) {
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
@@ -297,97 +306,14 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
 
     // Use optimized point of pT(j1,j2) > 50 GeV
     if (selection_ != VBSselection_Loose && 
+            selection_ != VBSselection_Loose_Full &&
             selection_ != VBSBackgroundControl) { // &&
             //selection_ != VBSBackgroundControlLoose) { 
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
-
-    // mjj > 400
-    if (selection_ == VBSselection_mjj_400_detajj_2) { 
-        return mjj > 400 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_400_detajj_2p5) { 
-        return mjj > 400 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_400_detajj_3) { 
-        return mjj > 400 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_400_detajj_3p5) { 
-        return mjj > 400 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_400_detajj_4) { 
-        return mjj > 400 && dEtajj > 4.;
-    }
-    // mjj > 450
-    else if (selection_ == VBSselection_mjj_450_detajj_2) { 
-        return mjj > 450 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_450_detajj_2p5) { 
-        return mjj > 450 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_450_detajj_3) { 
-        return mjj > 450 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_450_detajj_3p5) { 
-        return mjj > 450 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_450_detajj_4) { 
-        return mjj > 450 && dEtajj > 4.;
-    }
-    // mjj > 500
-    else if (selection_ == VBSselection_mjj_500_detajj_2) { 
-        return mjj > 500 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_500_detajj_2p5) { 
-        return mjj > 500 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_500_detajj_3) { 
-        return mjj > 500 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_500_detajj_3p5) { 
-        return mjj > 500 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_500_detajj_4) { 
-        return mjj > 500 && dEtajj > 4.;
-    }
-    // mjj > 550
-    else if (selection_ == VBSselection_mjj_550_detajj_2) { 
-        return mjj > 550 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_550_detajj_2p5) { 
-        return mjj > 550 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_550_detajj_3) { 
-        return mjj > 550 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_550_detajj_3p5) { 
-        return mjj > 550 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_550_detajj_4) { 
-        return mjj > 550 && dEtajj > 4.;
-    }
-
-    // mjj > 600
-    else if (selection_ == VBSselection_mjj_600_detajj_2) { 
-        return mjj > 600 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_600_detajj_2p5) { 
-        return mjj > 600 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_600_detajj_3) { 
-        return mjj > 600 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_600_detajj_3p5) { 
-        return mjj > 600 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_600_detajj_4) { 
-        return mjj > 600 && dEtajj > 4.;
-    }
-    else if (selection_ == VBSselection_Tight) { 
-        //if (type1_pfMETEt < 50)
-        //    return false;
-
+    if (selection_ == VBSselection_Tight ||
+                selection_ == VBSselection_Tight_Full) { 
         if (std::abs(zep3l) > 2.5)
             return false;
         return mjj > 500 && dEtajj > 2.5;
@@ -403,7 +329,30 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
     return mjj > 500 && dEtajj > 2.5;
 }
 
-bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) { 
+bool WZSelector::PassesFullWZSelection(Long64_t entry) {
+    if (ZMass > 106.1876 || ZMass < 76.1876)
+        return false;
+    if (l1Pt < 25 || l2Pt < 15 || l3Pt < 20)
+        return false;
+    if (Mass < 100)
+        return false;
+    if (MET < 30)
+        return false;
+
+    b_jetCSVv2->GetEntry(entry);
+    for (const auto& jetCSVval : *jetCSVv2) {
+        if (jetCSVval > 0.9535)
+            return false;
+    }
+    b_Zlep1_Wlep_Mass->GetEntry(entry);
+    b_Zlep2_Wlep_Mass->GetEntry(entry);
+    if (Zlep1_Wlep_Mass < 4 || Zlep2_Wlep_Mass < 4)
+        return false;
+
+    return true;
+}
+
+bool WZSelector::PassesBaseSelection(Long64_t entry, bool tightLeps, Selection selection) { 
     if (!(Flag_BadChargedCandidateFilterPass
             && Flag_HBHENoiseFilterPass 
             && Flag_HBHENoiseIsoFilterPass 
@@ -411,21 +360,28 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
             && Flag_EcalDeadCellTriggerPrimitiveFilterPass 
             && Flag_goodVerticesPass 
             && Flag_globalTightHalo2016FilterPass
-            && (isMC_ || (Flag_eeBadScFilterPass
-                && !Flag_duplicateMuonsPass 
-                && !Flag_badMuonsPass)
+            && (isMC_ || Flag_eeBadScFilterPass
+                //&& !Flag_duplicateMuonsPass 
+                //&& !Flag_badMuonsPass)
+                // No longer vetoing events failing these filters
+                // (we trust the MET in ReMiniAOD)
             )
         )
     ) 
         return false;
     if (!passesLeptonVeto)
         return false;
-    if (selection == FakeRateSelectionLoose || selection == FakeRateSelectionTight) {
+    if ((selection == Wselection_Full || 
+                selection == VBSselection_Tight_Full ||
+                selection == VBSselection_Loose_Full )
+            && !PassesFullWZSelection(entry))
+        return false;
+    else if (selection == FakeRateSelectionLoose || selection == FakeRateSelectionTight) {
         if (l1Pt < 25 || l2Pt < 15)
             return false;
         if (ZMass > 111.1876 || ZMass < 81.1876)
             return false;
-        if (type1_pfMETEt > 25)
+        if (MET > 25)
             return false;
         if (l3MtToMET > 30)
             return false;
@@ -434,7 +390,7 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
         if (selection == FakeRateSelectionLoose)
             tightLeps = false;
     }
-    if (selection == Inclusive2Jet && jetPt->size() < 2)
+    else if (selection == Inclusive2Jet && jetPt->size() < 2)
         return false;
     
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
@@ -533,7 +489,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("WlepRelPFIsoDBR04", variation.second), l3Pt, weight);
     SafeHistFill(hists1D_, getHistName("Wlep_Eta", variation.second), l3Eta, weight);
     SafeHistFill(hists1D_, getHistName("Wlep_Phi", variation.second), l3Phi, weight);
-    SafeHistFill(hists1D_, getHistName("MET", variation.second), type1_pfMETEt, weight);
+    SafeHistFill(hists1D_, getHistName("MET", variation.second), MET, weight);
     SafeHistFill(hists1D_, getHistName("MtW", variation.second), l3MtToMET, weight);
     SafeHistFill(hists1D_, getHistName("nJets", variation.second), jetPt->size(), weight);
 
@@ -580,14 +536,14 @@ Bool_t WZSelector::Process(Long64_t entry)
 
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
-    if (PassesBaseSelection(true, selection_))
+    if (PassesBaseSelection(entry, true, selection_))
         FillHistograms(entry, weight, !blindVBS, central_var);
 
-    doSystematics_ = true;
+    //doSystematics_ = true;
     if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
-            if (!PassesBaseSelection(true, selection_))
+            if (!PassesBaseSelection(entry, true, selection_))
                 return true;
             FillHistograms(entry, weight, !blindVBS, systematic);
         }

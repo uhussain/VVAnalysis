@@ -9,6 +9,10 @@ looselepsfile=3MediumLeptons
 
 input=Wselection${looselepsfile/3/}
 output=Wselection
+if [[ "$1" == "*Full" ]]; then
+    input=${looselepsfile}
+fi
+
 if [[ $1 == VBS* ]]; then
     output=$1
 elif [[ $1 == "Inclusive2Jet" ]]; then

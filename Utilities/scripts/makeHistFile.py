@@ -16,6 +16,8 @@ def getComLineArgs():
         default=35.87, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
         default="test.root", help="Output file name")
+    parser.add_argument("--test", action='store_true',
+        help="Run test job (no background estimate)")
     parser.add_argument("--output_selection", type=str,
         default="", help="Selection stage of output file "
         "(Same as input if not give)")
@@ -89,7 +91,7 @@ tselection = [ROOT.TNamed("selection", args['output_selection'])]
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
-if "FakeRate" not in args['output_selection']:
+if "FakeRate" not in args['output_selection'] and not args['test']:
     background = SelectorTools.applySelector(["WZxsec2016data"] +
         ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
         ConfigureJobs.getListOfNonpromptFilenames(), 
@@ -97,9 +99,12 @@ if "FakeRate" not in args['output_selection']:
             extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
             addSumweights=False,
             proof=args['proof'])
-mc = SelectorTools.applySelector(["WZxsec2016"], "WZSelector", args['selection'], fOut, 
+mc = SelectorTools.applySelector(args['filenames'], "WZSelector", args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         addSumweights=True, proof=args['proof'])
+if args['test']:
+    exit(0)
+
 alldata = HistTools.makeCompositeHists(fOut,"AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
 OutputTools.writeOutputListItem(alldata, fOut)
