@@ -566,7 +566,7 @@ Bool_t WZSelector::Process(Long64_t entry)
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
             if (!PassesBaseSelection(entry, true, selection_))
-                return true;
+                continue;
             FillHistograms(entry, weight, !blindVBS, systematic);
         }
     }
