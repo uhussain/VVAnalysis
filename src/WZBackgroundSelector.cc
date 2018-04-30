@@ -3,6 +3,12 @@
 
 void WZBackgroundSelector::SlaveBegin(TTree * /*tree*/)
 {
+    systematics_ = {
+        {jetEnergyScaleUp, "jesUp"}, 
+        {jetEnergyScaleDown, "jesDown"}, 
+        {jetEnergyResolutionUp, "jerUp"},
+        {jetEnergyResolutionDown, "jerDown"},
+    };
     isNonpromptEstimate_ = true;
     WZSelector::SlaveBegin(0);
     fakeRate_allE_ = (ScaleFactor *) GetInputList()->FindObject("fakeRate_allE");

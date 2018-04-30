@@ -27,6 +27,12 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("jetPt_jesDown", &jetPt_jesDown, &b_jetPt_jesDown);
         fChain->SetBranchAddress("jetPt_jerUp", &jetPt_jerUp, &b_jetPt_jerUp);
         fChain->SetBranchAddress("jetPt_jerDown", &jetPt_jerDown, &b_jetPt_jerDown);
+        fChain->SetBranchAddress("type1_pfMETEt_jesUp", &type1_pfMETEt_jesUp, &b_type1_pfMETEt_jesUp);
+        fChain->SetBranchAddress("type1_pfMETEt_jesDown", &type1_pfMETEt_jesDown, &b_type1_pfMETEt_jesDown);
+        fChain->SetBranchAddress("type1_pfMETEt_jerUp", &type1_pfMETEt_jerUp, &b_type1_pfMETEt_jerUp);
+        fChain->SetBranchAddress("type1_pfMETEt_jerDown", &type1_pfMETEt_jerDown, &b_type1_pfMETEt_jerDown);
+        fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnUp", &type1_pfMETEt_unclusteredEnUp, &b_type1_pfMETEt_unclusteredEnUp);
+        fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnDown", &type1_pfMETEt_unclusteredEnDown, &b_type1_pfMETEt_unclusteredEnDown);
     }
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
@@ -38,7 +44,6 @@ void WZSelector::Init(TTree *tree)
     fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
     fChain->SetBranchAddress("nvtx", &nvtx, &b_nvtx);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
-    //fChain->SetBranchAddress("MtToMET", &MtToMET, &b_MtToMET);
 
     if (channel_ == eee) {
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
@@ -167,37 +172,53 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             b_mjj_jesUp->GetEntry(entry);
             b_jetEta_jesUp->GetEntry(entry);
             b_jetPt_jesUp->GetEntry(entry);
+            b_type1_pfMETEt_jesUp->GetEntry(entry);
 
             mjj = mjj_jesUp;
             jetEta = jetEta_jesUp;
             jetPt = jetPt_jesUp;
+            MET = type1_pfMETEt_jesUp;
         }
         else if (variation.first == jetEnergyScaleDown) {
             b_mjj_jesDown->GetEntry(entry);
             b_jetEta_jesDown->GetEntry(entry);
             b_jetPt_jesDown->GetEntry(entry);
+            b_type1_pfMETEt_jesDown->GetEntry(entry);
 
             mjj = mjj_jesDown;
             jetEta = jetEta_jesDown;
             jetPt = jetPt_jesDown;
+            MET = type1_pfMETEt_jesDown;
         }
         else if (variation.first == jetEnergyResolutionUp) {
             b_mjj_jerUp->GetEntry(entry);
             b_jetEta_jerUp->GetEntry(entry);
             b_jetPt_jerUp->GetEntry(entry);
+            b_type1_pfMETEt_jerUp->GetEntry(entry);
 
             mjj = mjj_jerUp;
             jetEta = jetEta_jerUp;
             jetPt = jetPt_jerUp;
+            MET = type1_pfMETEt_jerUp;
         }
         else if (variation.first == jetEnergyResolutionDown) {
             b_mjj_jerDown->GetEntry(entry);
             b_jetEta_jerDown->GetEntry(entry);
             b_jetPt_jerDown->GetEntry(entry);
+            b_type1_pfMETEt_jerDown->GetEntry(entry);
 
             mjj = mjj_jerDown;
             jetEta = jetEta_jerDown;
             jetPt = jetPt_jerDown;
+            MET = type1_pfMETEt_jerDown;
+        }
+        else if (variation.first == metUnclusteredEnergyDown) {
+            b_type1_pfMETEt_unclusteredEnUp->GetEntry(entry);
+            MET = type1_pfMETEt_unclusteredEnUp;
+        }
+        else if (variation.first == metUnclusteredEnergyDown) {
+            b_type1_pfMETEt_unclusteredEnDown->GetEntry(entry);
+            MET = type1_pfMETEt_unclusteredEnDown;
         }
         else if (variation.first == pileupUp) {
             weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftUp)/pileupSF_->Evaluate1D(nTruePU);

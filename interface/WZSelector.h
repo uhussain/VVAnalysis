@@ -7,7 +7,7 @@
 
 class WZSelector : public WZSelectorBase {
 public :
-    bool doSystematics_ = false;
+    bool doSystematics_ = true;
 
     enum Systematic {
         Central,
@@ -15,6 +15,8 @@ public :
         jetEnergyScaleDown,
         jetEnergyResolutionUp,
         jetEnergyResolutionDown,
+        metUnclusteredEnergyUp,
+        metUnclusteredEnergyDown,
         muonEfficiencyUp,
         muonEfficiencyDown,
         electronEfficiencyUp,
@@ -29,14 +31,14 @@ public :
         "mjj",
         "dEtajj",
         "MTWZ",
-        "nTruePU",
-        "nvtx",
-        "Zlep1_Pt",
-        "Zlep2_Pt",
-        "Wlep_Pt",
-        "Zlep1_Eta",
-        "Zlep2_Eta",
-        "Wlep_Eta",
+        //"nTruePU",
+        //"nvtx",
+        //"Zlep1_Pt",
+        //"Zlep2_Pt",
+        //"Wlep_Pt",
+        //"Zlep1_Eta",
+        //"Zlep2_Eta",
+        //"Wlep_Eta",
         "ZMass",
     };
 
@@ -45,6 +47,8 @@ public :
         {jetEnergyScaleDown, "jesDown"}, 
         {jetEnergyResolutionUp, "jerUp"},
         {jetEnergyResolutionDown, "jerDown"},
+        {metUnclusteredEnergyUp, "metUnclEnUp"},
+        {metUnclusteredEnergyDown, "metUnclEnDown"},
         {pileupUp, "pileupUp"},
         {pileupDown, "pileupDown"},
         {electronEfficiencyUp, "eEffUp"},
@@ -171,6 +175,12 @@ public :
     Float_t MtToMET;
     Float_t MtWZ;
     Float_t M3lMET;
+    Float_t type1_pfMETEt_jesUp;
+    Float_t type1_pfMETEt_jesDown;
+    Float_t type1_pfMETEt_jerUp;
+    Float_t type1_pfMETEt_jerDown;
+    Float_t type1_pfMETEt_unclusteredEnUp;
+    Float_t type1_pfMETEt_unclusteredEnDown;
     
     TBranch* b_l3MtToMET;
     TBranch* b_MtToMET;
@@ -209,6 +219,12 @@ public :
     TBranch* b_l1Phi;
     TBranch* b_l2Phi;
     TBranch* b_l3Phi;
+    TBranch* b_type1_pfMETEt_jesUp;
+    TBranch* b_type1_pfMETEt_jesDown;
+    TBranch* b_type1_pfMETEt_jerUp;
+    TBranch* b_type1_pfMETEt_jerDown;
+    TBranch* b_type1_pfMETEt_unclusteredEnUp;
+    TBranch* b_type1_pfMETEt_unclusteredEnDown;
 
     // Readers to access the data (delete the ones you do not need).
     WZSelector(TTree * /*tree*/ =0) { }
