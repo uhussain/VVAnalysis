@@ -33,6 +33,7 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("type1_pfMETEt_jerDown", &type1_pfMETEt_jerDown, &b_type1_pfMETEt_jerDown);
         fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnUp", &type1_pfMETEt_unclusteredEnUp, &b_type1_pfMETEt_unclusteredEnUp);
         fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnDown", &type1_pfMETEt_unclusteredEnDown, &b_type1_pfMETEt_unclusteredEnDown);
+        fChain->SetBranchAddress("type1_pfMETEt_UncTool", &type1_pfMETEt_UncTool, &b_type1_pfMETEt_UncTool);
     }
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
@@ -199,7 +200,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             mjj = mjj_jerUp;
             jetEta = jetEta_jerUp;
             jetPt = jetPt_jerUp;
-            MET = type1_pfMETEt_jerUp;
+            MET = type1_pfMETEt_jerUp*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == jetEnergyResolutionDown) {
             b_mjj_jerDown->GetEntry(entry);
@@ -210,15 +211,15 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             mjj = mjj_jerDown;
             jetEta = jetEta_jerDown;
             jetPt = jetPt_jerDown;
-            MET = type1_pfMETEt_jerDown;
+            MET = type1_pfMETEt_jerDown*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == metUnclusteredEnergyDown) {
             b_type1_pfMETEt_unclusteredEnUp->GetEntry(entry);
-            MET = type1_pfMETEt_unclusteredEnUp;
+            MET = type1_pfMETEt_unclusteredEnUp*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == metUnclusteredEnergyDown) {
             b_type1_pfMETEt_unclusteredEnDown->GetEntry(entry);
-            MET = type1_pfMETEt_unclusteredEnDown;
+            MET = type1_pfMETEt_unclusteredEnDown*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == pileupUp) {
             weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftUp)/pileupSF_->Evaluate1D(nTruePU);
