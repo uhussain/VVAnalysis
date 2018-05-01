@@ -129,6 +129,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     b_jetPhi->GetEntry(entry);
     b_Eta->GetEntry(entry);
     b_mjj->GetEntry(entry);
+    b_MET->GetEntry(entry);
     
     if (variation.first == Central) {
         if (isMC_) {
