@@ -21,6 +21,8 @@ def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--vbfnlo",
         action='store_true', help="Use VBFNLO for signal")
+    parser.add_argument("--noTheory",
+        action='store_true', help="Don't add theory hists")
     parser.add_argument("--noCards",
         action='store_true', help="Don't create cards for combine")
     parser.add_argument("--aqgc",
@@ -158,7 +160,7 @@ wz_scalefacs = {
 
 scaleWZ = False
 manualStatUnc = args['manualStats']
-variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup"] for i in [x+"Up", x+"Down"]]
+variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup", "metUnclEn"] for i in [x+"Up", x+"Down"]]
 jeVariations = [i for x in ["jes", "jer"] for i in [x+"Up", x+"Down"]]
 #variations = jeVariations 
 
@@ -232,7 +234,7 @@ if args['aqgc']:
 wz_qcd_theory_hists = ROOT.TList()
 for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
-    if "data" not in plot_group and "aqgc" not in plot_group:
+    if "data" not in plot_group and "aqgc" not in plot_group and not args['noTheory']:
         plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
     if isVBS and "aqgc" not in plot_group:
         plots += ["_".join([variable, var, c]) for var in variations for c in chans]
@@ -254,7 +256,7 @@ for plot_group in plot_groups:
                 stat_hists,variation_names = HistTools.getStatHists(hist, plot_group, chan, signal)
                 stat_variations[chan].extend(variation_names)
                 group.extend(stat_hists)
-        if "data" not in plot_group:
+        if "data" not in plot_group and not args['noTheory']:
             weight_hist_name = base_variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
             if not weight_hist:
@@ -399,6 +401,7 @@ for name in ["wzjj_ewk", "wzjj_vbfnlo"]:
 combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_8_1_0/src/HiggsAnalysis/CombinedLimit"
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
                 datetime.date.today().strftime("%d%b%Y") 
+
 output_dir = '/'.join([combine_dir,args['selection'], folder_name])
 try:
     os.makedirs(output_dir)

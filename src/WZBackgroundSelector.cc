@@ -3,6 +3,12 @@
 
 void WZBackgroundSelector::SlaveBegin(TTree * /*tree*/)
 {
+    systematics_ = {
+        {jetEnergyScaleUp, "jesUp"}, 
+        {jetEnergyScaleDown, "jesDown"}, 
+        {jetEnergyResolutionUp, "jerUp"},
+        {jetEnergyResolutionDown, "jerDown"},
+    };
     isNonpromptEstimate_ = true;
     WZSelector::SlaveBegin(0);
     fakeRate_allE_ = (ScaleFactor *) GetInputList()->FindObject("fakeRate_allE");
@@ -97,14 +103,14 @@ Bool_t WZBackgroundSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
 
     LoadBranches(entry, central_var);
-    if (!PassesBaseSelection(false, selection_))
+    if (!PassesBaseSelection(entry, false, selection_))
         return true;
     FillHistograms(entry, getEventWeight(), true, central_var);
 
     if (doSystematics_) {
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
-            if (!PassesBaseSelection(false, selection_))
+            if (!PassesBaseSelection(entry, false, selection_))
                 return true;
             FillHistograms(entry, getEventWeight(), true, systematic);
         }

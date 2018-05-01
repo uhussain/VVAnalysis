@@ -50,9 +50,9 @@ def getListOfEWKFilenames():
         "www",
         "ww",
         "zg",
-        "ggZZ4e",
-        "ggZZ4m",
-        "ggZZ2e2mu",
+        #"ggZZ4e",
+        #"ggZZ4m",
+        #"ggZZ2e2mu",
     ]
 def getListOfNonpromptFilenames():
     return ["tt-lep",

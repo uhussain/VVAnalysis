@@ -13,7 +13,7 @@ adddRjj = True
 input_file_name = args.input_file
 input_file = ROOT.TFile(input_file_name, "update" if saveToFile else "read")
 
-variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup"] for i in [x+"Up", x+"Down"]]
+variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup", "metUnclEn"] for i in [x+"Up", x+"Down"]]
 jeVariations = [i for x in ["jes", "jer"] for i in [x+"Up", x+"Down"]]
 
 transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file, 

@@ -9,6 +9,10 @@ looselepsfile=3MediumLeptons
 
 input=Wselection${looselepsfile/3/}
 output=Wselection
+if [[ "$1" == *Full ]]; then
+    input=${looselepsfile}
+fi
+
 if [[ $1 == VBS* ]]; then
     output=$1
 elif [[ $1 == "Inclusive2Jet" ]]; then
@@ -40,10 +44,9 @@ else
     echo "INFO: Using default selection 'Wselection'"
 fi
 
-#frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}_fromJakob.root
-#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}_jakobsFakeRates.root
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
-histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}-${lepid}From${looselepsfile}.root
+#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}.root
+histfile=${output}-${DATE}.root
 
 if [[ "$3" != "" ]]; then 
     histfile=${histfile/.root/_${3}.root}

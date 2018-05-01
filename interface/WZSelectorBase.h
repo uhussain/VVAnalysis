@@ -33,38 +33,16 @@ public :
     enum Selection {
         tightleptons,
         Wselection,
+        Wselection_Full,
         FakeRateSelectionLoose,
         FakeRateSelectionTight,
         VBSselection_Loose,
         VBSselection_Tight,
+        VBSselection_Loose_Full,
+        VBSselection_Tight_Full,
         VBSBackgroundControl,
         VBSBackgroundControlLoose,
         Inclusive2Jet,
-        VBSselection_mjj_400_detajj_2, 
-        VBSselection_mjj_400_detajj_2p5, 
-        VBSselection_mjj_400_detajj_3, 
-        VBSselection_mjj_400_detajj_3p5, 
-        VBSselection_mjj_400_detajj_4, 
-        VBSselection_mjj_450_detajj_2, 
-        VBSselection_mjj_450_detajj_2p5, 
-        VBSselection_mjj_450_detajj_3, 
-        VBSselection_mjj_450_detajj_3p5, 
-        VBSselection_mjj_450_detajj_4, 
-        VBSselection_mjj_500_detajj_2, 
-        VBSselection_mjj_500_detajj_2p5, 
-        VBSselection_mjj_500_detajj_3, 
-        VBSselection_mjj_500_detajj_3p5, 
-        VBSselection_mjj_500_detajj_4, 
-        VBSselection_mjj_550_detajj_2, 
-        VBSselection_mjj_550_detajj_2p5, 
-        VBSselection_mjj_550_detajj_3, 
-        VBSselection_mjj_550_detajj_3p5, 
-        VBSselection_mjj_550_detajj_4, 
-        VBSselection_mjj_600_detajj_2, 
-        VBSselection_mjj_600_detajj_2p5, 
-        VBSselection_mjj_600_detajj_3, 
-        VBSselection_mjj_600_detajj_3p5, 
-        VBSselection_mjj_600_detajj_4
     };
 
     TList *currentHistDir_{nullptr};
@@ -77,7 +55,7 @@ public :
     Float_t genWeight;
     Float_t nTruePU;
     Float_t ZMass;
-    Float_t type1_pfMETEt;
+    Float_t MET;
     Float_t type1_pfMETPhi;
     UInt_t nCBVIDTightElec;
     UInt_t nCBVIDHLTSafeElec;
@@ -122,7 +100,7 @@ public :
     TBranch* b_genWeight;
     TBranch* b_nTruePU;
     TBranch* b_Zmass;
-    TBranch* b_type1_pfMETEt;
+    TBranch* b_MET;
     TBranch* b_type1_pfMETPhi;
     TBranch* b_nCBVIDTightElec;
     TBranch* b_nCBVIDHLTSafeElec;

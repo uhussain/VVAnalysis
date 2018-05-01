@@ -7,7 +7,7 @@
 
 class WZSelector : public WZSelectorBase {
 public :
-    bool doSystematics_;
+    bool doSystematics_ = true;
 
     enum Systematic {
         Central,
@@ -15,6 +15,8 @@ public :
         jetEnergyScaleDown,
         jetEnergyResolutionUp,
         jetEnergyResolutionDown,
+        metUnclusteredEnergyUp,
+        metUnclusteredEnergyDown,
         muonEfficiencyUp,
         muonEfficiencyDown,
         electronEfficiencyUp,
@@ -29,14 +31,14 @@ public :
         "mjj",
         "dEtajj",
         "MTWZ",
-        "nTruePU",
-        "nvtx",
-        "Zlep1_Pt",
-        "Zlep2_Pt",
-        "Wlep_Pt",
-        "Zlep1_Eta",
-        "Zlep2_Eta",
-        "Wlep_Eta",
+        //"nTruePU",
+        //"nvtx",
+        //"Zlep1_Pt",
+        //"Zlep2_Pt",
+        //"Wlep_Pt",
+        //"Zlep1_Eta",
+        //"Zlep2_Eta",
+        //"Wlep_Eta",
         "ZMass",
     };
 
@@ -45,6 +47,8 @@ public :
         {jetEnergyScaleDown, "jesDown"}, 
         {jetEnergyResolutionUp, "jerUp"},
         {jetEnergyResolutionDown, "jerDown"},
+        {metUnclusteredEnergyUp, "metUnclEnUp"},
+        {metUnclusteredEnergyDown, "metUnclEnDown"},
         {pileupUp, "pileupUp"},
         {pileupDown, "pileupDown"},
         {electronEfficiencyUp, "eEffUp"},
@@ -153,6 +157,8 @@ public :
     std::vector<float>* jetCSVv2 = NULL;
     UInt_t nvtx;
     Float_t Mass;
+    Float_t Zlep1_Wlep_Mass;
+    Float_t Zlep2_Wlep_Mass;
     Float_t Eta;
     Float_t Pt;
     Float_t ZPt;
@@ -169,6 +175,13 @@ public :
     Float_t MtToMET;
     Float_t MtWZ;
     Float_t M3lMET;
+    Float_t type1_pfMETEt_UncTool;
+    Float_t type1_pfMETEt_jesUp;
+    Float_t type1_pfMETEt_jesDown;
+    Float_t type1_pfMETEt_jerUp;
+    Float_t type1_pfMETEt_jerDown;
+    Float_t type1_pfMETEt_unclusteredEnUp;
+    Float_t type1_pfMETEt_unclusteredEnDown;
     
     TBranch* b_l3MtToMET;
     TBranch* b_MtToMET;
@@ -192,6 +205,8 @@ public :
     TBranch* b_jetPt_jerDown;
     TBranch* b_nvtx;
     TBranch* b_Mass;
+    TBranch* b_Zlep1_Wlep_Mass;
+    TBranch* b_Zlep2_Wlep_Mass;
     TBranch* b_Eta;
     TBranch* b_Pt;
     TBranch* b_ZPt;
@@ -205,6 +220,15 @@ public :
     TBranch* b_l1Phi;
     TBranch* b_l2Phi;
     TBranch* b_l3Phi;
+    TBranch* b_type1_pfMETEt_jesUp;
+    TBranch* b_type1_pfMETEt_UncTool;
+    TBranch* b_type1_pfMETEt_jesDown;
+    TBranch* b_type1_pfMETEt_jerUp;
+    TBranch* b_type1_pfMETEt_jerDown;
+    TBranch* b_type1_pfMETEt_unclusteredEnUp;
+    TBranch* b_type1_pfMETEt_unclusteredEnDown;
+    int cen_count = 0;
+    float count = 0;
 
     // Readers to access the data (delete the ones you do not need).
     WZSelector(TTree * /*tree*/ =0) { }
@@ -220,9 +244,10 @@ protected:
             std::pair<Systematic, std::string> variation);
     void FillVBSHistograms(float weight, bool noBlind, 
             std::pair<Systematic, std::string> variation);
-    bool PassesBaseSelection(bool tightLeps, Selection selection);
+    bool PassesBaseSelection(Long64_t entry, bool tightLeps, Selection selection);
     bool PassesVBSSelection(bool noBlind);
     bool PassesVBSBackgroundControlSelection();
+    bool PassesFullWZSelection(Long64_t entry);
     void InitialzeHistogram(std::string name, std::vector<std::string> histData);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);

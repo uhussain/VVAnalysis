@@ -27,6 +27,13 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("jetPt_jesDown", &jetPt_jesDown, &b_jetPt_jesDown);
         fChain->SetBranchAddress("jetPt_jerUp", &jetPt_jerUp, &b_jetPt_jerUp);
         fChain->SetBranchAddress("jetPt_jerDown", &jetPt_jerDown, &b_jetPt_jerDown);
+        fChain->SetBranchAddress("type1_pfMETEt_jesUp", &type1_pfMETEt_jesUp, &b_type1_pfMETEt_jesUp);
+        fChain->SetBranchAddress("type1_pfMETEt_jesDown", &type1_pfMETEt_jesDown, &b_type1_pfMETEt_jesDown);
+        fChain->SetBranchAddress("type1_pfMETEt_jerUp", &type1_pfMETEt_jerUp, &b_type1_pfMETEt_jerUp);
+        fChain->SetBranchAddress("type1_pfMETEt_jerDown", &type1_pfMETEt_jerDown, &b_type1_pfMETEt_jerDown);
+        fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnUp", &type1_pfMETEt_unclusteredEnUp, &b_type1_pfMETEt_unclusteredEnUp);
+        fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnDown", &type1_pfMETEt_unclusteredEnDown, &b_type1_pfMETEt_unclusteredEnDown);
+        fChain->SetBranchAddress("type1_pfMETEt_UncTool", &type1_pfMETEt_UncTool, &b_type1_pfMETEt_UncTool);
     }
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
@@ -38,10 +45,11 @@ void WZSelector::Init(TTree *tree)
     fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
     fChain->SetBranchAddress("nvtx", &nvtx, &b_nvtx);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
-    //fChain->SetBranchAddress("MtToMET", &MtToMET, &b_MtToMET);
 
     if (channel_ == eee) {
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e1_e3_Mass", &Zlep1_Wlep_Mass, &b_Zlep1_Wlep_Mass);
+        fChain->SetBranchAddress("e2_e3_Mass", &Zlep2_Wlep_Mass, &b_Zlep2_Wlep_Mass);
         fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("e1_e2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("e1_e2_Phi", &ZPhi, &b_ZPhi);
@@ -51,6 +59,8 @@ void WZSelector::Init(TTree *tree)
     }
     else if (channel_ == eem) { 
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e1_m_Mass", &Zlep1_Wlep_Mass, &b_Zlep1_Wlep_Mass);
+        fChain->SetBranchAddress("e2_m_Mass", &Zlep2_Wlep_Mass, &b_Zlep2_Wlep_Mass);
         fChain->SetBranchAddress("e1_e2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("e1_e2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("e1_e2_Phi", &ZPhi, &b_ZPhi);
@@ -60,6 +70,8 @@ void WZSelector::Init(TTree *tree)
     }
     else if (channel_ == emm) { 
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("e_m1_Mass", &Zlep1_Wlep_Mass, &b_Zlep1_Wlep_Mass);
+        fChain->SetBranchAddress("e_m2_Mass", &Zlep2_Wlep_Mass, &b_Zlep2_Wlep_Mass);
         fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("m1_m2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("m1_m2_Phi", &ZPhi, &b_ZPhi);
@@ -69,6 +81,8 @@ void WZSelector::Init(TTree *tree)
     }
     else if (channel_ == mmm) { 
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
+        fChain->SetBranchAddress("m1_m3_Mass", &Zlep1_Wlep_Mass, &b_Zlep1_Wlep_Mass);
+        fChain->SetBranchAddress("m2_m3_Mass", &Zlep2_Wlep_Mass, &b_Zlep2_Wlep_Mass);
         fChain->SetBranchAddress("m1_m2_Pt", &ZPt, &b_ZPt);
         fChain->SetBranchAddress("m1_m2_Eta", &ZEta, &b_ZEta);
         fChain->SetBranchAddress("m1_m2_Phi", &ZPhi, &b_ZPhi);
@@ -105,21 +119,19 @@ unsigned int WZSelector::GetLheWeightInfo() {
 
 void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     WZSelectorBase::Process(entry);
+
+    //b_MtToMET->GetEntry(entry);
+    b_ZPhi->GetEntry(entry);
+    b_ZEta->GetEntry(entry);
+    b_Mass->GetEntry(entry);
+    b_jetPt->GetEntry(entry);
+    b_jetEta->GetEntry(entry);
+    b_jetPhi->GetEntry(entry);
+    b_Eta->GetEntry(entry);
+    b_mjj->GetEntry(entry);
+    b_MET->GetEntry(entry);
     
     if (variation.first == Central) {
-        b_ZPhi->GetEntry(entry);
-        b_ZEta->GetEntry(entry);
-        b_Mass->GetEntry(entry);
-        //b_MtToMET->GetEntry(entry);
-        b_l1Phi->GetEntry(entry);
-        b_l2Phi->GetEntry(entry);
-        b_l3Phi->GetEntry(entry);
-        b_jetPt->GetEntry(entry);
-        b_jetEta->GetEntry(entry);
-        b_jetPhi->GetEntry(entry);
-        b_Eta->GetEntry(entry);
-        b_mjj->GetEntry(entry);
-    
         if (isMC_) {
             if (isMC_ && weight_info_ > 0) {
                 b_scaleWeights->GetEntry(entry);
@@ -138,6 +150,9 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
         }
 
         if (hists1D_["MTWZ"] != nullptr || hists1D_["M3lMET"] == nullptr) {
+            b_l1Phi->GetEntry(entry);
+            b_l2Phi->GetEntry(entry);
+            b_l3Phi->GetEntry(entry);
             TLorentzVector l1 = TLorentzVector();
             l1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, 0);
             TLorentzVector l2 = TLorentzVector();
@@ -145,7 +160,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             TLorentzVector l3 = TLorentzVector();
             l3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, 0);
             TLorentzVector met = TLorentzVector();
-            met.SetPtEtaPhiM(type1_pfMETEt, 0, type1_pfMETPhi, 0);
+            met.SetPtEtaPhiM(MET, 0, type1_pfMETPhi, 0);
             TLorentzVector zp4 = l1+l2;
             TLorentzVector wp4 = l3+met;
             TLorentzVector wzp4 = l1+l2+l3+met;
@@ -159,37 +174,59 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             b_mjj_jesUp->GetEntry(entry);
             b_jetEta_jesUp->GetEntry(entry);
             b_jetPt_jesUp->GetEntry(entry);
+            b_type1_pfMETEt_jesUp->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
 
             mjj = mjj_jesUp;
             jetEta = jetEta_jesUp;
             jetPt = jetPt_jesUp;
+            MET = type1_pfMETEt_jesUp*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == jetEnergyScaleDown) {
             b_mjj_jesDown->GetEntry(entry);
             b_jetEta_jesDown->GetEntry(entry);
             b_jetPt_jesDown->GetEntry(entry);
+            b_type1_pfMETEt_jesDown->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
 
             mjj = mjj_jesDown;
             jetEta = jetEta_jesDown;
             jetPt = jetPt_jesDown;
+            MET = type1_pfMETEt_jesDown*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == jetEnergyResolutionUp) {
             b_mjj_jerUp->GetEntry(entry);
             b_jetEta_jerUp->GetEntry(entry);
             b_jetPt_jerUp->GetEntry(entry);
+            b_type1_pfMETEt_jerUp->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
 
             mjj = mjj_jerUp;
             jetEta = jetEta_jerUp;
             jetPt = jetPt_jerUp;
+            MET = type1_pfMETEt_jerUp*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == jetEnergyResolutionDown) {
             b_mjj_jerDown->GetEntry(entry);
             b_jetEta_jerDown->GetEntry(entry);
             b_jetPt_jerDown->GetEntry(entry);
+            b_type1_pfMETEt_jerDown->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
 
             mjj = mjj_jerDown;
             jetEta = jetEta_jerDown;
             jetPt = jetPt_jerDown;
+            MET = type1_pfMETEt_jerDown*MET/type1_pfMETEt_UncTool;
+        }
+        else if (variation.first == metUnclusteredEnergyDown) {
+            b_type1_pfMETEt_unclusteredEnUp->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
+            MET = type1_pfMETEt_unclusteredEnUp*MET/type1_pfMETEt_UncTool;
+        }
+        else if (variation.first == metUnclusteredEnergyDown) {
+            b_type1_pfMETEt_unclusteredEnDown->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
+            MET = type1_pfMETEt_unclusteredEnDown*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == pileupUp) {
             weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftUp)/pileupSF_->Evaluate1D(nTruePU);
@@ -233,7 +270,8 @@ bool WZSelector::PassesVBSBackgroundControlSelection() {
     if (jetPt->size() != jetEta->size() || jetPt->size() < 2)
         return false;
 
-    if (selection_ != VBSselection_Loose) {
+    if (selection_ != VBSselection_Loose &&
+            selection_ != VBSselection_Loose_Full) {
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
@@ -297,97 +335,14 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
 
     // Use optimized point of pT(j1,j2) > 50 GeV
     if (selection_ != VBSselection_Loose && 
+            selection_ != VBSselection_Loose_Full &&
             selection_ != VBSBackgroundControl) { // &&
             //selection_ != VBSBackgroundControlLoose) { 
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
-
-    // mjj > 400
-    if (selection_ == VBSselection_mjj_400_detajj_2) { 
-        return mjj > 400 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_400_detajj_2p5) { 
-        return mjj > 400 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_400_detajj_3) { 
-        return mjj > 400 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_400_detajj_3p5) { 
-        return mjj > 400 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_400_detajj_4) { 
-        return mjj > 400 && dEtajj > 4.;
-    }
-    // mjj > 450
-    else if (selection_ == VBSselection_mjj_450_detajj_2) { 
-        return mjj > 450 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_450_detajj_2p5) { 
-        return mjj > 450 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_450_detajj_3) { 
-        return mjj > 450 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_450_detajj_3p5) { 
-        return mjj > 450 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_450_detajj_4) { 
-        return mjj > 450 && dEtajj > 4.;
-    }
-    // mjj > 500
-    else if (selection_ == VBSselection_mjj_500_detajj_2) { 
-        return mjj > 500 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_500_detajj_2p5) { 
-        return mjj > 500 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_500_detajj_3) { 
-        return mjj > 500 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_500_detajj_3p5) { 
-        return mjj > 500 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_500_detajj_4) { 
-        return mjj > 500 && dEtajj > 4.;
-    }
-    // mjj > 550
-    else if (selection_ == VBSselection_mjj_550_detajj_2) { 
-        return mjj > 550 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_550_detajj_2p5) { 
-        return mjj > 550 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_550_detajj_3) { 
-        return mjj > 550 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_550_detajj_3p5) { 
-        return mjj > 550 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_550_detajj_4) { 
-        return mjj > 550 && dEtajj > 4.;
-    }
-
-    // mjj > 600
-    else if (selection_ == VBSselection_mjj_600_detajj_2) { 
-        return mjj > 600 && dEtajj > 2.;
-    }
-    else if (selection_ == VBSselection_mjj_600_detajj_2p5) { 
-        return mjj > 600 && dEtajj > 2.5;
-    }
-    else if (selection_ == VBSselection_mjj_600_detajj_3) { 
-        return mjj > 600 && dEtajj > 3.;
-    }
-    else if (selection_ == VBSselection_mjj_600_detajj_3p5) { 
-        return mjj > 600 && dEtajj > 3.5;
-    }
-    else if (selection_ == VBSselection_mjj_600_detajj_4) { 
-        return mjj > 600 && dEtajj > 4.;
-    }
-    else if (selection_ == VBSselection_Tight) { 
-        //if (type1_pfMETEt < 50)
-        //    return false;
-
+    if (selection_ == VBSselection_Tight ||
+                selection_ == VBSselection_Tight_Full) { 
         if (std::abs(zep3l) > 2.5)
             return false;
         return mjj > 500 && dEtajj > 2.5;
@@ -403,7 +358,30 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
     return mjj > 500 && dEtajj > 2.5;
 }
 
-bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) { 
+bool WZSelector::PassesFullWZSelection(Long64_t entry) {
+    if (ZMass > 106.1876 || ZMass < 76.1876)
+        return false;
+    if (l1Pt < 25 || l2Pt < 15 || l3Pt < 20)
+        return false;
+    if (Mass < 100)
+        return false;
+    if (MET < 30)
+        return false;
+
+    b_jetCSVv2->GetEntry(entry);
+    for (const auto& jetCSVval : *jetCSVv2) {
+        if (jetCSVval > 0.9535)
+            return false;
+    }
+    b_Zlep1_Wlep_Mass->GetEntry(entry);
+    b_Zlep2_Wlep_Mass->GetEntry(entry);
+    if (Zlep1_Wlep_Mass < 4 || Zlep2_Wlep_Mass < 4)
+        return false;
+
+    return true;
+}
+
+bool WZSelector::PassesBaseSelection(Long64_t entry, bool tightLeps, Selection selection) { 
     if (!(Flag_BadChargedCandidateFilterPass
             && Flag_HBHENoiseFilterPass 
             && Flag_HBHENoiseIsoFilterPass 
@@ -411,21 +389,28 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
             && Flag_EcalDeadCellTriggerPrimitiveFilterPass 
             && Flag_goodVerticesPass 
             && Flag_globalTightHalo2016FilterPass
-            && (isMC_ || (Flag_eeBadScFilterPass
-                && !Flag_duplicateMuonsPass 
-                && !Flag_badMuonsPass)
+            && (isMC_ || Flag_eeBadScFilterPass
+                //&& !Flag_duplicateMuonsPass 
+                //&& !Flag_badMuonsPass)
+                // No longer vetoing events failing these filters
+                // (we trust the MET in ReMiniAOD)
             )
         )
     ) 
         return false;
     if (!passesLeptonVeto)
         return false;
-    if (selection == FakeRateSelectionLoose || selection == FakeRateSelectionTight) {
+    if ((selection == Wselection_Full || 
+                selection == VBSselection_Tight_Full ||
+                selection == VBSselection_Loose_Full )
+            && !PassesFullWZSelection(entry))
+        return false;
+    else if (selection == FakeRateSelectionLoose || selection == FakeRateSelectionTight) {
         if (l1Pt < 25 || l2Pt < 15)
             return false;
         if (ZMass > 111.1876 || ZMass < 81.1876)
             return false;
-        if (type1_pfMETEt > 25)
+        if (MET > 25)
             return false;
         if (l3MtToMET > 30)
             return false;
@@ -434,7 +419,7 @@ bool WZSelector::PassesBaseSelection(bool tightLeps, Selection selection) {
         if (selection == FakeRateSelectionLoose)
             tightLeps = false;
     }
-    if (selection == Inclusive2Jet && jetPt->size() < 2)
+    else if (selection == Inclusive2Jet && jetPt->size() < 2)
         return false;
     
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
@@ -533,7 +518,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("WlepRelPFIsoDBR04", variation.second), l3Pt, weight);
     SafeHistFill(hists1D_, getHistName("Wlep_Eta", variation.second), l3Eta, weight);
     SafeHistFill(hists1D_, getHistName("Wlep_Phi", variation.second), l3Phi, weight);
-    SafeHistFill(hists1D_, getHistName("MET", variation.second), type1_pfMETEt, weight);
+    SafeHistFill(hists1D_, getHistName("MET", variation.second), MET, weight);
     SafeHistFill(hists1D_, getHistName("MtW", variation.second), l3MtToMET, weight);
     SafeHistFill(hists1D_, getHistName("nJets", variation.second), jetPt->size(), weight);
 
@@ -580,16 +565,17 @@ Bool_t WZSelector::Process(Long64_t entry)
 
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
-    if (PassesBaseSelection(true, selection_))
+    if (PassesBaseSelection(entry, true, selection_)) {
         FillHistograms(entry, weight, !blindVBS, central_var);
+    }
 
-    doSystematics_ = true;
+    //doSystematics_ = true;
     if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
-            if (!PassesBaseSelection(true, selection_))
-                return true;
-            FillHistograms(entry, weight, !blindVBS, systematic);
+            if (PassesBaseSelection(entry, true, selection_)) {
+                FillHistograms(entry, weight, !blindVBS, systematic);
+            }
         }
     }
     
