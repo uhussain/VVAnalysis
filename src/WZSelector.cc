@@ -119,21 +119,18 @@ unsigned int WZSelector::GetLheWeightInfo() {
 
 void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     WZSelectorBase::Process(entry);
+
+    //b_MtToMET->GetEntry(entry);
+    b_ZPhi->GetEntry(entry);
+    b_ZEta->GetEntry(entry);
+    b_Mass->GetEntry(entry);
+    b_jetPt->GetEntry(entry);
+    b_jetEta->GetEntry(entry);
+    b_jetPhi->GetEntry(entry);
+    b_Eta->GetEntry(entry);
+    b_mjj->GetEntry(entry);
     
     if (variation.first == Central) {
-        b_ZPhi->GetEntry(entry);
-        b_ZEta->GetEntry(entry);
-        b_Mass->GetEntry(entry);
-        //b_MtToMET->GetEntry(entry);
-        b_l1Phi->GetEntry(entry);
-        b_l2Phi->GetEntry(entry);
-        b_l3Phi->GetEntry(entry);
-        b_jetPt->GetEntry(entry);
-        b_jetEta->GetEntry(entry);
-        b_jetPhi->GetEntry(entry);
-        b_Eta->GetEntry(entry);
-        b_mjj->GetEntry(entry);
-    
         if (isMC_) {
             if (isMC_ && weight_info_ > 0) {
                 b_scaleWeights->GetEntry(entry);
@@ -152,6 +149,9 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
         }
 
         if (hists1D_["MTWZ"] != nullptr || hists1D_["M3lMET"] == nullptr) {
+            b_l1Phi->GetEntry(entry);
+            b_l2Phi->GetEntry(entry);
+            b_l3Phi->GetEntry(entry);
             TLorentzVector l1 = TLorentzVector();
             l1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, 0);
             TLorentzVector l2 = TLorentzVector();
@@ -174,28 +174,31 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             b_jetEta_jesUp->GetEntry(entry);
             b_jetPt_jesUp->GetEntry(entry);
             b_type1_pfMETEt_jesUp->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
 
             mjj = mjj_jesUp;
             jetEta = jetEta_jesUp;
             jetPt = jetPt_jesUp;
-            MET = type1_pfMETEt_jesUp;
+            MET = type1_pfMETEt_jesUp*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == jetEnergyScaleDown) {
             b_mjj_jesDown->GetEntry(entry);
             b_jetEta_jesDown->GetEntry(entry);
             b_jetPt_jesDown->GetEntry(entry);
             b_type1_pfMETEt_jesDown->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
 
             mjj = mjj_jesDown;
             jetEta = jetEta_jesDown;
             jetPt = jetPt_jesDown;
-            MET = type1_pfMETEt_jesDown;
+            MET = type1_pfMETEt_jesDown*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == jetEnergyResolutionUp) {
             b_mjj_jerUp->GetEntry(entry);
             b_jetEta_jerUp->GetEntry(entry);
             b_jetPt_jerUp->GetEntry(entry);
             b_type1_pfMETEt_jerUp->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
 
             mjj = mjj_jerUp;
             jetEta = jetEta_jerUp;
@@ -207,6 +210,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             b_jetEta_jerDown->GetEntry(entry);
             b_jetPt_jerDown->GetEntry(entry);
             b_type1_pfMETEt_jerDown->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
 
             mjj = mjj_jerDown;
             jetEta = jetEta_jerDown;
@@ -215,10 +219,12 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
         }
         else if (variation.first == metUnclusteredEnergyDown) {
             b_type1_pfMETEt_unclusteredEnUp->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
             MET = type1_pfMETEt_unclusteredEnUp*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == metUnclusteredEnergyDown) {
             b_type1_pfMETEt_unclusteredEnDown->GetEntry(entry);
+            b_type1_pfMETEt_UncTool->GetEntry(entry);
             MET = type1_pfMETEt_unclusteredEnDown*MET/type1_pfMETEt_UncTool;
         }
         else if (variation.first == pileupUp) {
@@ -558,16 +564,17 @@ Bool_t WZSelector::Process(Long64_t entry)
 
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
-    if (PassesBaseSelection(entry, true, selection_))
+    if (PassesBaseSelection(entry, true, selection_)) {
         FillHistograms(entry, weight, !blindVBS, central_var);
+    }
 
     //doSystematics_ = true;
     if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
-            if (!PassesBaseSelection(entry, true, selection_))
-                continue;
-            FillHistograms(entry, weight, !blindVBS, systematic);
+            if (PassesBaseSelection(entry, true, selection_)) {
+                FillHistograms(entry, weight, !blindVBS, systematic);
+            }
         }
     }
     

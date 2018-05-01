@@ -227,6 +227,8 @@ public :
     TBranch* b_type1_pfMETEt_jerDown;
     TBranch* b_type1_pfMETEt_unclusteredEnUp;
     TBranch* b_type1_pfMETEt_unclusteredEnDown;
+    int cen_count = 0;
+    float count = 0;
 
     // Readers to access the data (delete the ones you do not need).
     WZSelector(TTree * /*tree*/ =0) { }
