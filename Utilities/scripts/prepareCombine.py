@@ -213,14 +213,16 @@ combineChannels(alldata, chans)
 OutputTools.writeOutputListItem(alldata, fOut)
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans], rebin=rebin)
+hists = []
 for var in jeVariations:
     hists = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
             ["_".join([variable, var, "Fakes", c]) for c in chans], rebin=rebin)
     for h in hists:
         h.SetName(h.GetName().replace(var+"_Fakes", "Fakes_"+var))
-        HistTools.removeZeros(h)
     nonprompt.extend(hists[:])
 combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
+for h in hists:
+    HistTools.removeZeros(h)
 
 for chan in chans + ["all"]:
     hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
