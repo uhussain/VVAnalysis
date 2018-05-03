@@ -18,9 +18,9 @@ def get2DBinning(xvar="mjj", yvar="etajj", analysis='WZ'):
         xbinning = array.array('d', [500, 1000,1500, 2000, 2500])
 
     if yvar == 'etajj':    
-        ybinning = [2.5, 4, 5.5, 20]
+        ybinning = [2.5, 4, 5, 20]
     elif yvar == 'dRjj':
-        ybinning = [0, 4, 6, 20]
+        ybinning = [0, 5, 6, 20]
     return (xbinning, ybinning)
 
 def getChannels(analysis='WZ'):

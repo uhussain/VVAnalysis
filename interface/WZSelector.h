@@ -43,18 +43,18 @@ public :
     };
 
     std::map<Systematic, std::string> systematics_ = {
-        {jetEnergyScaleUp, "jesUp"}, 
-        {jetEnergyScaleDown, "jesDown"}, 
-        {jetEnergyResolutionUp, "jerUp"},
-        {jetEnergyResolutionDown, "jerDown"},
-        {metUnclusteredEnergyUp, "metUnclEnUp"},
-        {metUnclusteredEnergyDown, "metUnclEnDown"},
-        {pileupUp, "pileupUp"},
-        {pileupDown, "pileupDown"},
-        {electronEfficiencyUp, "eEffUp"},
-        {electronEfficiencyDown, "eEffDown"},
-        {muonEfficiencyUp, "mEffUp"},
-        {muonEfficiencyDown, "mEffDown"},
+        {jetEnergyScaleUp, "CMS_scale_jUp"}, 
+        {jetEnergyScaleDown, "CMS_scale_jDown"}, 
+        {jetEnergyResolutionUp, "CMS_res_jUp"},
+        {jetEnergyResolutionDown, "CMS_res_jDown"},
+        {metUnclusteredEnergyUp, "CMS_scale_unclEnergyUp"},
+        {metUnclusteredEnergyDown, "CMS_scale_unclEnergyDown"},
+        {pileupUp, "CMS_pileupUp"},
+        {pileupDown, "CMS_pileupDown"},
+        {electronEfficiencyUp, "CMS_eff_eUp"},
+        {electronEfficiencyDown, "CMS_eff_eDown"},
+        {muonEfficiencyUp, "CMS_eff_mUp"},
+        {muonEfficiencyDown, "CMS_eff_mDown"},
     };
 
     std::map<std::string, TH1D*> hists1D_ = {

@@ -13,8 +13,9 @@ adddRjj = True
 input_file_name = args.input_file
 input_file = ROOT.TFile(input_file_name, "update" if saveToFile else "read")
 
-variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup", "metUnclEn"] for i in [x+"Up", x+"Down"]]
-jeVariations = [i for x in ["jes", "jer"] for i in [x+"Up", x+"Down"]]
+variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
+    "CMS_eff_m", "CMS_eff_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
+jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Down"]]
 
 transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
@@ -58,8 +59,7 @@ if addControlRegion:
         unrolled_hists_wcontrol.append(new_folder)
         for h in folder:
             append = h.GetName().split("_")
-            isSyst = "Up" in h.GetName() or "Down" in h.GetName()
-            append = append[-1-isSyst:] if "Fakes" not in h.GetName() else append[-2-isSyst:]
+            append = append[append.index("unrolled")+1:]
             hist_name = "_".join(["backgroundControlYield"] + append)
             control_hist = input_file.Get(folder.GetName() + "/" +hist_name)
             if not control_hist:

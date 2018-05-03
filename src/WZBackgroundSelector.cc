@@ -4,10 +4,10 @@
 void WZBackgroundSelector::SlaveBegin(TTree * /*tree*/)
 {
     systematics_ = {
-        {jetEnergyScaleUp, "jesUp"}, 
-        {jetEnergyScaleDown, "jesDown"}, 
-        {jetEnergyResolutionUp, "jerUp"},
-        {jetEnergyResolutionDown, "jerDown"},
+        {jetEnergyScaleUp, "CMS_scale_jUp"}, 
+        {jetEnergyScaleDown, "CMS_scale_jDown"}, 
+        {jetEnergyResolutionUp, "CMS_res_jUp"},
+        {jetEnergyResolutionDown, "CMS_res_jDown"},
     };
     isNonpromptEstimate_ = true;
     WZSelector::SlaveBegin(0);

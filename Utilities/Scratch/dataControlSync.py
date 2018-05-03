@@ -3,7 +3,7 @@ import json
 from python import ApplySelection
 
 selection = "Zlep1IsTight && Zlep2IsTight && WlepIsTight && abs(nLooseLep -3) < 0.1 && metFiltersDataNoBadMuon && mjj > 100 && (dEtajj < 2.5 || mjj < 500)"
-ptsort = False
+ptsort = True
 with open("controlevent.txt", "w") as outfile:
     file_info = json.load(open("/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo/WZxsec2016/WselectionMediumLeptons.json"))
     for i, chan in enumerate(["mmm", "eem", "emm", "eee"]):

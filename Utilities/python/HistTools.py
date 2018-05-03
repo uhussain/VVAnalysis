@@ -122,7 +122,7 @@ def getLHEWeightHists(init2D_hist, entries, name, variation_name, rebin=None):
     for i in entries:
         hist = getWeightHistProjection(init2D_hist, name, i, rebin)
         hists.append(hist)
-    hist_name = init2D_hist.GetName().replace("lheWeights", name+"_%sUp" % variation_name)
+    hist_name = init2D_hist.GetName().replace("lheWeights", "%s_%sUp" % (variation_name, name))
     return hists, hist_name
 
 def getPDFHists(init2D_hist, entries, name, rebin=None):
@@ -133,7 +133,7 @@ def getPDFHists(init2D_hist, entries, name, rebin=None):
 
 def getScaleHists(scale_hist2D, name, rebin=None):
     entries = [i for i in range(1,10) if i not in [7, 9]]
-    hists, hist_name = getLHEWeightHists(scale_hist2D, entries, name, "scale", rebin)
+    hists, hist_name = getLHEWeightHists(scale_hist2D, entries, name, "QCDscale", rebin)
     return getVariationHists(hists, name, hist_name, lambda x: x[-1], lambda x: x[0])
 
 def getVariationHists(hists, process_name, histUp_name, up_action, down_action):
@@ -185,7 +185,7 @@ def getTransformed3DScaleHists(scale_hist3D, transformation, transform_args, nam
         scale_hist2D.SetName(scale_hist_name)
         scale_hist1D = transformation(scale_hist2D, *transform_args)
         scale_hists.append(scale_hist1D)
-    hist_name = scale_hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled",name,"scaleUp"]))
+    hist_name = scale_hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled", "QCDscale", name+"Up"]))
     return getVariationHists(scale_hists, name, hist_name, lambda x: x[-1], lambda x: x[0])
 
 def getTransformed3DPDFHists(hist3D, transformation, transform_args, entries, name):
@@ -199,7 +199,7 @@ def getTransformed3DPDFHists(hist3D, transformation, transform_args, entries, na
         hist1D = transformation(hist2D, *transform_args)
         hists.append(hist1D)
     #return hists
-    hist_name = hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled",name,"pdfUp"]))
+    hist_name = hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled", "pdf", name+"Up"]))
     return getVariationHists(hists, name, hist_name, 
             lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[83])/2)
 

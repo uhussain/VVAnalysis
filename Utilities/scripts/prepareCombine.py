@@ -127,6 +127,18 @@ card_info = {
         "vv" : 0,
         "AllData" : 0,
     },
+    "all" : {
+        "wzjj_vbfnlo" : 0,
+        "wzjj_ewk" : 0,
+        "wz" : 0,
+        "wz_mgmlm" : 0,
+        "wz_powheg" : 0,
+        "vv_powheg" : 0,
+        "top_ewk" : 0,
+        "zg" : 0,
+        "vv" : 0,
+        "AllData" : 0,
+    },
 }
 
 pdf_entries = {
@@ -160,14 +172,15 @@ wz_scalefacs = {
 
 scaleWZ = False
 manualStatUnc = args['manualStats']
-variations = [i for x in ["jes", "jer", "mEff", "eEff", "pileup", "metUnclEn"] for i in [x+"Up", x+"Down"]]
-jeVariations = [i for x in ["jes", "jer"] for i in [x+"Up", x+"Down"]]
+variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
+    "CMS_eff_m", "CMS_eff_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
+jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Down"]]
 #variations = jeVariations 
 
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
-initNumvars = 24 if "VBS" in args['selection'] else 13
+initNumvars = 22 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
 #variable = "yield"
@@ -207,9 +220,12 @@ for var in jeVariations:
         h.SetName(h.GetName().replace(var+"_Fakes", "Fakes_"+var))
         HistTools.removeZeros(h)
     nonprompt.extend(hists[:])
+combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
 
-for chan in chans:
+for chan in chans + ["all"]:
     hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
+    if chan == "all":
+        hist = nonprompt.FindObject(variable+"_Fakes")
     HistTools.removeZeros(hist)
     card_info[chan]["nonprompt"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     if manualStatUnc:
@@ -217,7 +233,6 @@ for chan in chans:
         stat_variations[chan].extend(variation_names)
         nonprompt.extend(stat_hists[:])
 
-combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
 OutputTools.writeOutputListItem(nonprompt, fOut)
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
@@ -308,59 +323,17 @@ for plot_group in plot_groups:
                 theory_hists = scale_hists + pdf_hists
             group.extend(theory_hists)
 
+    theory_vars = ["_".join([var, plot_group + shift]) for var in ["QCDscale", "pdf"] for shift in ["Up", "Down"]]
+    combineChannels(group, chans, variations + theory_vars, True)
     for hist in group:
         HistTools.removeZeros(hist)
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
         card_info[chan][name] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
-    theory_vars = [plot_group+"_%s" % var for var in ["scaleUp", "scaleDown", "pdfUp", "pdfDown"]]
-    combineChannels(group, chans, variations + theory_vars, True)
     OutputTools.writeOutputListItem(group, fOut)
     yields = [card_info[c][name] for c in chans]
     yields.append(sum([card_info[c][name] for c in chans]))
     output_info.add_row([plot_group] + yields)
-
-addWZModelingUnc = False
-if addWZModelingUnc:
-    central_hist = "wz-mgmlm"
-    theoryvar = "wz"
-    theoryUnc = ROOT.TList()
-    theoryUnc.SetName(central_hist)
-    for chan in chans:
-        wzqcd_central = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, chan]))
-        wzqcd_scaleUp = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, "scaleUp", chan]))
-        wzqcd_scaleDown = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, "scaleDown", chan]))
-
-        wzqcd_pdfUp = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, "pdfUp", chan]))
-        wzqcd_pdfDown = wz_qcd_theory_hists.FindObject("_".join([variable, central_hist, "pdfDown", chan]))
-        wzqcd_modelvar = wz_qcd_theory_hists.FindObject("_".join([variable, theoryvar, chan]))
-        addTheoryUp = wzqcd_central.Clone("_".join([variable, "wzQCDModelingUp", chan]))
-        addTheoryDown = wzqcd_central.Clone("_".join([variable, "wzQCDModelingDown", chan]))
-        for i in range(addTheoryUp.GetNbinsX()+1):
-            central = wzqcd_central.GetBinContent(i)
-            scale_uncUp = wzqcd_scaleUp.GetBinContent(i) - central
-            pdf_uncUp = wzqcd_pdfUp.GetBinContent(i) - central
-            scale_uncDown = wzqcd_scaleDown.GetBinContent(i) - central
-            pdf_uncDown = wzqcd_pdfDown.GetBinContent(i) - central
-            modeling = wzqcd_modelvar.GetBinContent(i) - central
-            modelDiffUpsq = modeling**2 - scale_uncUp**2 - pdf_uncUp**2
-            modelDiffDownsq = modeling**2 - scale_uncDown**2 - pdf_uncDown**2
-            if modeling > 0 and modelDiffUpsq > 0:
-                addTheoryUp.SetBinContent(i, central+math.sqrt(modelDiffUpsq))
-            elif modeling < 0 and modelDiffDownsq > 0:
-                addTheoryDown.SetBinContent(i, central - math.sqrt(modelDiffDownsq))
-            if addTheoryUp.GetBinContent(i) != central \
-                and addTheoryDown.GetBinContent(i) != central:
-                raise RuntimeError("Additional theory modeling uncertainty MUST"
-                    "be one sided. For bin %i, Found:"
-                    "\n addTheoryUp: %0.2f"
-                    "\n addTheoryDown: %0.2f" % 
-                        (i, addTheoryUp.GetBinContent(i), addTheoryDown.GetBinContent(i))
-                )
-        theoryUnc.Add(addTheoryUp)
-        theoryUnc.Add(addTheoryDown)
-    combineChannels(theoryUnc)
-    OutputTools.writeOutputListItem(theoryUnc, fOut)
 
 output_info.add_row(["nonprompt", card_info["eee"]["nonprompt"], 
     card_info["eem"]["nonprompt"], 
@@ -370,6 +343,8 @@ output_info.add_row(["nonprompt", card_info["eee"]["nonprompt"],
 )
 background = {c : 0 for c in chans}
 for chan,yields in card_info.iteritems():
+    if chan == "all":
+        continue
     for name,value in yields.iteritems():
         if "data" in name:
             continue
@@ -418,9 +393,10 @@ with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
 
 if not args['noCards']:
     if args['combineChannels']:
-        card_info["all"] = dict(card_info[chans[0]])
-        for chan in chans[1:]:
+        card_info["all"]["output_file"] = args['output_file']
+        for chan in chans:
             for process, rate in card_info[chan].iteritems():
+                if process == "nonprompt": continue
                 if type(rate) is float:
                     card_info["all"][process] += rate
     for chan, chan_dict in card_info.iteritems():
@@ -428,6 +404,8 @@ if not args['noCards']:
         chan_dict["fit_variable"] = variable
         chan_dict["signal_yield"] = chan_dict[signal]
         numvars = initNumvars+len(chans)*(chan != "all")*len(stat_variations[chan]) -1*("Wselection" in args['selection'])
+        if chan != "all":
+            numvars += 3
         chan_dict["nuisances"] = numvars
         file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
                 else '%s/WZ_%s.txt' % (output_dir, chan)
@@ -439,7 +417,7 @@ if not args['noCards']:
         )
         with open(file_name, "a") as chan_file:
             if not manualStatUnc:
-                chan_file.write("* autoMCStats 0.5\n")
+                chan_file.write("* autoMCStats 1\n")
             for c in chans:
                 for hist_name in stat_variations[c]:
                     if 'Wselection' in args['selection'] and "wzjj-ewk" in hist_name:
@@ -470,15 +448,11 @@ if not args['noCards']:
                                     "nonprompt" in hist_name,
                                 )
                     )
-            chan_file.write("\nnonprompt_all group = nonprompt_norm %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" in h]))
             chan_file.write("mc_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
-            chan_file.write("lepton_unc group = eRes eScale eEff mRes mScale mEff\n")
+            chan_file.write("lepton_unc group = CMS_eff_e CMS_eff_m CMS_scale_e CMS_scale_m\n")
             if "VBS" in args['selection']:
                 chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
-                chan_file.write("wz_qcd_all group = wz-mgmlm_scale wz-mgmlm_pdf WZjjQCD_norm %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
-                #chan_file.write("wz_qcd_all group = wz-mgmlm_scale wz-mgmlm_pdf WZjjQCD_norm wzQCDModeling %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
-                chan_file.write(("theory group = wz-mgmlm_scale vv_scale top-ewk_scale {signal_name}_scale " +
-                                                "wz-mgmlm_pdf vv_pdf top-ewk_pdf {signal_name}_pdf").format(signal_name=chan_dict['signal_name']))
+                chan_file.write("wz_qcd_all group = QCDscale_wz-mgmlm pdf_wz-mgmlm CMS_norm_WZjjQCD %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
     ConfigureJobs.fillTemplatedFile(
         'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
         '%s/runCombine%s.sh' % (output_dir, signal_abv), 
