@@ -22,13 +22,13 @@ with open("controlevent.txt", "w") as outfile:
             if ptsort:
                 pts = []
                 if chan == "eee":
-                    leps = sorted([(row.e1Pt, row.e1Eta),(row.e2Pt, row.e2Eta),(row.e3Pt, row.e3Eta)], key=lambda x: x[0])
+                    leps = list(reversed(sorted([(row.e1Pt, row.e1Eta),(row.e2Pt, row.e2Eta),(row.e3Pt, row.e3Eta)], key=lambda x: x[0])))
                 elif chan == "eem":
-                    leps = sorted([(row.e1Pt, row.e1Eta),(row.e2Pt, row.e2Eta),(row.mPt, row.mEta)], key=lambda x: x[0])
+                    leps = list(reversed(sorted([(row.e1Pt, row.e1Eta),(row.e2Pt, row.e2Eta),(row.mPt, row.mEta)], key=lambda x: x[0])))
                 elif chan == "emm":
-                    leps = sorted([(row.m1Pt, row.m1Eta),(row.m2Pt, row.m2Eta),(row.ePt, row.eEta)], key=lambda x: x[0])
+                    leps = list(reversed(sorted([(row.m1Pt, row.m1Eta),(row.m2Pt, row.m2Eta),(row.ePt, row.eEta)], key=lambda x: x[0])))
                 if chan == "mmm":
-                    leps = sorted([(row.m1Pt, row.m1Eta),(row.m2Pt, row.m2Eta),(row.m3Pt, row.m3Eta)], key=lambda x: x[0])
+                    leps = list(reversed(sorted([(row.m1Pt, row.m1Eta),(row.m2Pt, row.m2Eta),(row.m3Pt, row.m3Eta)], key=lambda x: x[0])))
                 outfile.write(" " + " ".join([str(round(v,4)) for v in [leps[0][0],leps[0][1],leps[1][0],leps[1][1]]]) + " %i\n" %i)
             else:
                 if chan == "eee":

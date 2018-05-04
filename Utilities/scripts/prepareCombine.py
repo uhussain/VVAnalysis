@@ -137,6 +137,7 @@ card_info = {
         "top_ewk" : 0,
         "zg" : 0,
         "vv" : 0,
+        "nonprompt" : 0,
         "AllData" : 0,
     },
 }
@@ -213,22 +214,20 @@ combineChannels(alldata, chans)
 OutputTools.writeOutputListItem(alldata, fOut)
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans], rebin=rebin)
-hists = []
 for var in jeVariations:
     hists = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
             ["_".join([variable, var, "Fakes", c]) for c in chans], rebin=rebin)
     for h in hists:
         h.SetName(h.GetName().replace(var+"_Fakes", "Fakes_"+var))
     nonprompt.extend(hists[:])
-combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
-for h in hists:
-    HistTools.removeZeros(h)
 
+combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
+for h in nonprompt:
+    HistTools.removeZeros(h)
 for chan in chans + ["all"]:
     hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
     if chan == "all":
         hist = nonprompt.FindObject(variable+"_Fakes")
-    HistTools.removeZeros(hist)
     card_info[chan]["nonprompt"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     if manualStatUnc:
         stat_hists,variation_names = HistTools.getStatHists(hist, "nonprompt", chan, signal)
