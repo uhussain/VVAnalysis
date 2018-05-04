@@ -337,7 +337,6 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
     if (selection_ != VBSselection_Loose && 
             selection_ != VBSselection_Loose_Full &&
             selection_ != VBSBackgroundControl) { // &&
-            //selection_ != VBSBackgroundControlLoose) { 
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
