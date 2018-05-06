@@ -32,8 +32,8 @@ CMS_norm_nonprompt_eem  lnN     -               -               -           -   
 CMS_norm_nonprompt_emm  lnN     -               -               -           -               -           -
 CMS_norm_nonprompt_mmm  lnN     -               -               -           -               -           1.3
 CMS_eff_b               lnN     1.01            1.01            -           1.03            -           -
-CMS_scale_e             lnN     -               -               -           -               -           -          
-CMS_scale_m             lnN     1.06            1.06            1.06        1.06            1.06        -
+CMS_scale_e             shape   1               1               1           1               1           0
+CMS_scale_m             shape   1               1               1           1               1           0
 CMS_scale_unclEnergy    shape   1               1               1           1               1           0
 CMS_eff_e               shape   1               1               1           1               0           0
 CMS_eff_m               shape   1               1               1           1               0           0

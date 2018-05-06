@@ -34,6 +34,24 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnUp", &type1_pfMETEt_unclusteredEnUp, &b_type1_pfMETEt_unclusteredEnUp);
         fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnDown", &type1_pfMETEt_unclusteredEnDown, &b_type1_pfMETEt_unclusteredEnDown);
         fChain->SetBranchAddress("type1_pfMETEt_UncTool", &type1_pfMETEt_UncTool, &b_type1_pfMETEt_UncTool);
+        if (channel_ == eee) {
+            fChain->SetBranchAddress("e1PtScale_scaleUpResUp", &l1PtScaleUp, &b_l1PtScaleUp);
+            fChain->SetBranchAddress("e2PtScale_scaleUpResUp", &l2PtScaleUp, &b_l2PtScaleUp);
+            fChain->SetBranchAddress("e3PtScale_scaleUpResUp", &l3PtScaleUp, &b_l3PtScaleUp);
+            fChain->SetBranchAddress("e1PtScale_scaleDownResDown", &l1PtScaleDown, &b_l1PtScaleDown);
+            fChain->SetBranchAddress("e2PtScale_scaleDownResDown", &l2PtScaleDown, &b_l2PtScaleDown);
+            fChain->SetBranchAddress("e3PtScale_scaleDownResDown", &l3PtScaleDown, &b_l3PtScaleDown);
+        }
+        else if (channel_ == eem) {
+            fChain->SetBranchAddress("e1PtScale_scaleUpResUp", &l1PtScaleUp, &b_l1PtScaleUp);
+            fChain->SetBranchAddress("e2PtScale_scaleUpResUp", &l2PtScaleUp, &b_l2PtScaleUp);
+            fChain->SetBranchAddress("e1PtScale_scaleDownResDown", &l1PtScaleDown, &b_l1PtScaleDown);
+            fChain->SetBranchAddress("e2PtScale_scaleDownResDown", &l2PtScaleDown, &b_l2PtScaleDown);
+        }
+        else if (channel_ == emm) {
+            fChain->SetBranchAddress("ePtScale_scaleUpResUp", &l3PtScaleUp, &b_l3PtScaleUp);
+            fChain->SetBranchAddress("ePtScale_scaleDownResDown", &l3PtScaleDown, &b_l3PtScaleDown);
+        }
     }
     
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
@@ -56,6 +74,9 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
         fChain->SetBranchAddress("e3Phi", &l3Phi, &b_l3Phi);
+        fChain->SetBranchAddress("e1Mass", &l1Mass, &b_l1Mass);
+        fChain->SetBranchAddress("e2Mass", &l2Mass, &b_l2Mass);
+        fChain->SetBranchAddress("e3Mass", &l3Mass, &b_l3Mass);
     }
     else if (channel_ == eem) { 
         fChain->SetBranchAddress("e1_e2_Mass", &ZMass, &b_ZMass);
@@ -67,6 +88,9 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("mPhi", &l3Phi, &b_l3Phi);
         fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
+        fChain->SetBranchAddress("mMass", &l3Mass, &b_l3Mass);
+        fChain->SetBranchAddress("e1Mass", &l1Mass, &b_l1Mass);
+        fChain->SetBranchAddress("e2Mass", &l2Mass, &b_l2Mass);
     }
     else if (channel_ == emm) { 
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
@@ -78,6 +102,9 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("ePhi", &l3Phi, &b_l3Phi);
         fChain->SetBranchAddress("m1Phi", &l1Phi, &b_l1Phi);
         fChain->SetBranchAddress("m2Phi", &l2Phi, &b_l2Phi);
+        fChain->SetBranchAddress("eMass", &l3Mass, &b_l3Mass);
+        fChain->SetBranchAddress("m1Mass", &l1Mass, &b_l1Mass);
+        fChain->SetBranchAddress("m2Mass", &l2Mass, &b_l2Mass);
     }
     else if (channel_ == mmm) { 
         fChain->SetBranchAddress("m1_m2_Mass", &ZMass, &b_ZMass);
@@ -89,8 +116,34 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m1Phi", &l1Phi, &b_l1Phi);
         fChain->SetBranchAddress("m2Phi", &l2Phi, &b_l2Phi);
         fChain->SetBranchAddress("m3Phi", &l3Phi, &b_l3Phi);
+        fChain->SetBranchAddress("m1Mass", &l1Mass, &b_l1Mass);
+        fChain->SetBranchAddress("m2Mass", &l2Mass, &b_l2Mass);
+        fChain->SetBranchAddress("m3Mass", &l3Mass, &b_l3Mass);
     }
 }
+
+float WZSelector::GetMuonScaleUncertainty(float muEta) {
+    if (muEta < -2.1)
+        return 0.027;
+    if (std::abs(muEta) < 2.1 && std::abs(muEta) > 1.2)
+        return 0.009;
+    if (std::abs(muEta) < 1.2)
+        return 0.004;
+    if (muEta > 2.1)
+        return 0.0017;
+    throw std::out_of_range("Muon eta out of range of possible values! Range was " + std::to_string(muEta));
+}
+void WZSelector::SetShiftedMasses() {
+    TLorentzVector lepton1;
+    lepton1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, l1Mass);
+    TLorentzVector lepton2;
+    lepton2.SetPtEtaPhiM(l2Pt, l2Eta, l2Phi, l2Mass);
+    TLorentzVector lepton3;
+    lepton3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, l3Mass);
+    ZMass = (lepton1+lepton2).M();
+    Mass = (lepton1+lepton2+lepton3).M();
+}
+
 
 unsigned int WZSelector::GetLheWeightInfo() {
     std::vector<std::string> noLheWeights = {
@@ -123,6 +176,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     //b_MtToMET->GetEntry(entry);
     b_ZPhi->GetEntry(entry);
     b_ZEta->GetEntry(entry);
+    b_ZMass->GetEntry(entry);
     b_Mass->GetEntry(entry);
     b_jetPt->GetEntry(entry);
     b_jetEta->GetEntry(entry);
@@ -130,6 +184,9 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     b_Eta->GetEntry(entry);
     b_mjj->GetEntry(entry);
     b_MET->GetEntry(entry);
+    b_l1Pt->GetEntry(entry);
+    b_l2Pt->GetEntry(entry);
+    b_l3Pt->GetEntry(entry);
     
     if (variation.first == Central) {
         if (isMC_) {
@@ -217,6 +274,58 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
             jetEta = jetEta_jerDown;
             jetPt = jetPt_jerDown;
             MET = type1_pfMETEt_jerDown*MET/type1_pfMETEt_UncTool;
+        }
+        else if (variation.first == muonScaleUp || variation.first == muonScaleDown) {
+            if (channel_ == eee)
+                return;
+            if (channel_ == eem) {
+                float scaleUnc = GetMuonScaleUncertainty(l3Eta);
+                l3Pt *= variation.first == muonScaleUp ? (1+scaleUnc) : (1-scaleUnc);
+            }
+            else if (channel_ == emm) {
+                float scaleUnc = GetMuonScaleUncertainty(l1Eta);
+                l1Pt *= variation.first == muonScaleUp ? (1+scaleUnc) : (1-scaleUnc);
+                scaleUnc = GetMuonScaleUncertainty(l2Eta);
+                l2Pt *= variation.first == muonScaleUp ? (1+scaleUnc) : (1-scaleUnc);
+            }
+            else if (channel_ == mmm) {
+                float scaleUnc = GetMuonScaleUncertainty(l1Eta);
+                l1Pt *= variation.first == muonScaleUp ? (1+scaleUnc) : (1-scaleUnc);
+                scaleUnc = GetMuonScaleUncertainty(l2Eta);
+                l2Pt *= variation.first == muonScaleUp ? (1+scaleUnc) : (1-scaleUnc);
+                scaleUnc = GetMuonScaleUncertainty(l3Eta);
+                l3Pt *= variation.first == muonScaleUp ? (1+scaleUnc) : (1-scaleUnc);
+            }
+            SetShiftedMasses();
+        }
+        else if (variation.first == electronScaleUp || variation.first == electronScaleDown) {
+            if (channel_ == eee) {
+                b_l1PtScaleUp->GetEntry(entry);
+                b_l1PtScaleDown->GetEntry(entry);
+                b_l2PtScaleUp->GetEntry(entry);
+                b_l2PtScaleDown->GetEntry(entry);
+                b_l3PtScaleUp->GetEntry(entry);
+                b_l3PtScaleDown->GetEntry(entry);
+                l1Pt *= variation.first == electronScaleUp ? l1PtScaleUp : l1PtScaleDown;
+                l2Pt *= variation.first == electronScaleUp ? l2PtScaleUp : l2PtScaleDown;
+                l3Pt *= variation.first == electronScaleUp ? l3PtScaleUp : l3PtScaleDown;
+            }
+            if (channel_ == eem) {
+                b_l1PtScaleUp->GetEntry(entry);
+                b_l1PtScaleDown->GetEntry(entry);
+                b_l2PtScaleUp->GetEntry(entry);
+                b_l2PtScaleDown->GetEntry(entry);
+                l1Pt *= variation.first == electronScaleUp ? l1PtScaleUp : l1PtScaleDown;
+                l2Pt *= variation.first == electronScaleUp ? l2PtScaleUp : l2PtScaleDown;
+            }
+            else if (channel_ == emm) {
+                b_l3PtScaleUp->GetEntry(entry);
+                b_l3PtScaleDown->GetEntry(entry);
+                l3Pt *= variation.first == electronScaleUp ? l3PtScaleUp : l3PtScaleDown;
+            }
+            else if (channel_ == mmm)
+                return;
+            SetShiftedMasses();
         }
         else if (variation.first == metUnclusteredEnergyDown) {
             b_type1_pfMETEt_unclusteredEnUp->GetEntry(entry);

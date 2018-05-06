@@ -19,8 +19,12 @@ public :
         metUnclusteredEnergyDown,
         muonEfficiencyUp,
         muonEfficiencyDown,
+        muonScaleUp,
+        muonScaleDown,
         electronEfficiencyUp,
         electronEfficiencyDown,
+        electronScaleUp,
+        electronScaleDown,
         pileupUp,
         pileupDown,
     }; 
@@ -49,6 +53,10 @@ public :
         {jetEnergyResolutionDown, "CMS_res_jDown"},
         {metUnclusteredEnergyUp, "CMS_scale_unclEnergyUp"},
         {metUnclusteredEnergyDown, "CMS_scale_unclEnergyDown"},
+        {muonScaleUp, "CMS_scale_mUp"},
+        {muonScaleDown, "CMS_scale_mDown"},
+        {electronScaleUp, "CMS_scale_eUp"},
+        {electronScaleDown, "CMS_scale_eDown"},
         {pileupUp, "CMS_pileupUp"},
         {pileupDown, "CMS_pileupDown"},
         {electronEfficiencyUp, "CMS_eff_eUp"},
@@ -172,6 +180,9 @@ public :
     Float_t l1Phi;
     Float_t l2Phi;
     Float_t l3Phi;
+    Float_t l1Mass;
+    Float_t l2Mass;
+    Float_t l3Mass;
     Float_t MtToMET;
     Float_t MtWZ;
     Float_t M3lMET;
@@ -182,6 +193,12 @@ public :
     Float_t type1_pfMETEt_jerDown;
     Float_t type1_pfMETEt_unclusteredEnUp;
     Float_t type1_pfMETEt_unclusteredEnDown;
+    Float_t l1PtScaleUp;
+    Float_t l2PtScaleUp;
+    Float_t l3PtScaleUp;
+    Float_t l1PtScaleDown;
+    Float_t l2PtScaleDown;
+    Float_t l3PtScaleDown;
     
     TBranch* b_l3MtToMET;
     TBranch* b_MtToMET;
@@ -220,6 +237,15 @@ public :
     TBranch* b_l1Phi;
     TBranch* b_l2Phi;
     TBranch* b_l3Phi;
+    TBranch* b_l1Mass;
+    TBranch* b_l2Mass;
+    TBranch* b_l3Mass;
+    TBranch* b_l1PtScaleUp;
+    TBranch* b_l2PtScaleUp;
+    TBranch* b_l3PtScaleUp;
+    TBranch* b_l1PtScaleDown;
+    TBranch* b_l2PtScaleDown;
+    TBranch* b_l3PtScaleDown;
     TBranch* b_type1_pfMETEt_jesUp;
     TBranch* b_type1_pfMETEt_UncTool;
     TBranch* b_type1_pfMETEt_jesDown;
@@ -253,6 +279,8 @@ protected:
     std::vector<std::string> ReadHistData(std::string histDataString);
     std::string getHistName(std::string histName, std::string variationName);
     void ShiftEfficiencies(Systematic variation);
+    float GetMuonScaleUncertainty(float muEta);
+    void SetShiftedMasses();
     template<typename T, typename... Args>
     void SafeHistFill(std::map<std::string, T*> container, 
             std::string histname, Args... args) {

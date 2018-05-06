@@ -174,7 +174,7 @@ wz_scalefacs = {
 scaleWZ = False
 manualStatUnc = args['manualStats']
 variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
-    "CMS_eff_m", "CMS_eff_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
+    "CMS_eff_m", "CMS_scale_m", "CMS_eff_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
 jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Down"]]
 #variations = jeVariations 
 
