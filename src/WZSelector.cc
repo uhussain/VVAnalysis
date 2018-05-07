@@ -35,22 +35,16 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("type1_pfMETEt_unclusteredEnDown", &type1_pfMETEt_unclusteredEnDown, &b_type1_pfMETEt_unclusteredEnDown);
         fChain->SetBranchAddress("type1_pfMETEt_UncTool", &type1_pfMETEt_UncTool, &b_type1_pfMETEt_UncTool);
         if (channel_ == eee) {
-            fChain->SetBranchAddress("e1PtScale_scaleUpResUp", &l1PtScaleUp, &b_l1PtScaleUp);
-            fChain->SetBranchAddress("e2PtScale_scaleUpResUp", &l2PtScaleUp, &b_l2PtScaleUp);
-            fChain->SetBranchAddress("e3PtScale_scaleUpResUp", &l3PtScaleUp, &b_l3PtScaleUp);
-            fChain->SetBranchAddress("e1PtScale_scaleDownResDown", &l1PtScaleDown, &b_l1PtScaleDown);
-            fChain->SetBranchAddress("e2PtScale_scaleDownResDown", &l2PtScaleDown, &b_l2PtScaleDown);
-            fChain->SetBranchAddress("e3PtScale_scaleDownResDown", &l3PtScaleDown, &b_l3PtScaleDown);
+            fChain->SetBranchAddress("e1scaleCorrError", &l1PtScaleCorrErr, &b_l1PtScaleCorrErr);
+            fChain->SetBranchAddress("e2scaleCorrError", &l2PtScaleCorrErr, &b_l2PtScaleCorrErr);
+            fChain->SetBranchAddress("e3scaleCorrError", &l3PtScaleCorrErr, &b_l3PtScaleCorrErr);
         }
         else if (channel_ == eem) {
-            fChain->SetBranchAddress("e1PtScale_scaleUpResUp", &l1PtScaleUp, &b_l1PtScaleUp);
-            fChain->SetBranchAddress("e2PtScale_scaleUpResUp", &l2PtScaleUp, &b_l2PtScaleUp);
-            fChain->SetBranchAddress("e1PtScale_scaleDownResDown", &l1PtScaleDown, &b_l1PtScaleDown);
-            fChain->SetBranchAddress("e2PtScale_scaleDownResDown", &l2PtScaleDown, &b_l2PtScaleDown);
+            fChain->SetBranchAddress("e1scaleCorrError", &l1PtScaleCorrErr, &b_l1PtScaleCorrErr);
+            fChain->SetBranchAddress("e2scaleCorrError", &l2PtScaleCorrErr, &b_l2PtScaleCorrErr);
         }
         else if (channel_ == emm) {
-            fChain->SetBranchAddress("ePtScale_scaleUpResUp", &l3PtScaleUp, &b_l3PtScaleUp);
-            fChain->SetBranchAddress("ePtScale_scaleDownResDown", &l3PtScaleDown, &b_l3PtScaleDown);
+            fChain->SetBranchAddress("escaleCorrError", &l3PtScaleCorrErr, &b_l3PtScaleCorrErr);
         }
     }
     
@@ -300,28 +294,22 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
         }
         else if (variation.first == electronScaleUp || variation.first == electronScaleDown) {
             if (channel_ == eee) {
-                b_l1PtScaleUp->GetEntry(entry);
-                b_l1PtScaleDown->GetEntry(entry);
-                b_l2PtScaleUp->GetEntry(entry);
-                b_l2PtScaleDown->GetEntry(entry);
-                b_l3PtScaleUp->GetEntry(entry);
-                b_l3PtScaleDown->GetEntry(entry);
-                l1Pt *= variation.first == electronScaleUp ? l1PtScaleUp : l1PtScaleDown;
-                l2Pt *= variation.first == electronScaleUp ? l2PtScaleUp : l2PtScaleDown;
-                l3Pt *= variation.first == electronScaleUp ? l3PtScaleUp : l3PtScaleDown;
+                b_l1PtScaleCorrErr->GetEntry(entry);
+                b_l2PtScaleCorrErr->GetEntry(entry);
+                b_l3PtScaleCorrErr->GetEntry(entry);
+                l1Pt *= variation.first == electronScaleUp ? (1+l1PtScaleCorrErr) : (1-l1PtScaleCorrErr);
+                l2Pt *= variation.first == electronScaleUp ? (1+l2PtScaleCorrErr) : (1-l2PtScaleCorrErr);
+                l3Pt *= variation.first == electronScaleUp ? (1+l3PtScaleCorrErr) : (1-l3PtScaleCorrErr);
             }
             if (channel_ == eem) {
-                b_l1PtScaleUp->GetEntry(entry);
-                b_l1PtScaleDown->GetEntry(entry);
-                b_l2PtScaleUp->GetEntry(entry);
-                b_l2PtScaleDown->GetEntry(entry);
-                l1Pt *= variation.first == electronScaleUp ? l1PtScaleUp : l1PtScaleDown;
-                l2Pt *= variation.first == electronScaleUp ? l2PtScaleUp : l2PtScaleDown;
+                b_l1PtScaleCorrErr->GetEntry(entry);
+                b_l2PtScaleCorrErr->GetEntry(entry);
+                l1Pt *= variation.first == electronScaleUp ? (1+l1PtScaleCorrErr) : (1-l1PtScaleCorrErr);
+                l2Pt *= variation.first == electronScaleUp ? (1+l2PtScaleCorrErr) : (1-l2PtScaleCorrErr);
             }
             else if (channel_ == emm) {
-                b_l3PtScaleUp->GetEntry(entry);
-                b_l3PtScaleDown->GetEntry(entry);
-                l3Pt *= variation.first == electronScaleUp ? l3PtScaleUp : l3PtScaleDown;
+                b_l3PtScaleCorrErr->GetEntry(entry);
+                l3Pt *= variation.first == electronScaleUp ? (1+l3PtScaleCorrErr) : (1-l3PtScaleCorrErr);
             }
             else if (channel_ == mmm)
                 return;

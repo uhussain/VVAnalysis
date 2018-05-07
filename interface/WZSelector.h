@@ -193,12 +193,9 @@ public :
     Float_t type1_pfMETEt_jerDown;
     Float_t type1_pfMETEt_unclusteredEnUp;
     Float_t type1_pfMETEt_unclusteredEnDown;
-    Float_t l1PtScaleUp;
-    Float_t l2PtScaleUp;
-    Float_t l3PtScaleUp;
-    Float_t l1PtScaleDown;
-    Float_t l2PtScaleDown;
-    Float_t l3PtScaleDown;
+    Float_t l1PtScaleCorrErr;
+    Float_t l2PtScaleCorrErr;
+    Float_t l3PtScaleCorrErr;
     
     TBranch* b_l3MtToMET;
     TBranch* b_MtToMET;
@@ -240,12 +237,9 @@ public :
     TBranch* b_l1Mass;
     TBranch* b_l2Mass;
     TBranch* b_l3Mass;
-    TBranch* b_l1PtScaleUp;
-    TBranch* b_l2PtScaleUp;
-    TBranch* b_l3PtScaleUp;
-    TBranch* b_l1PtScaleDown;
-    TBranch* b_l2PtScaleDown;
-    TBranch* b_l3PtScaleDown;
+    TBranch* b_l1PtScaleCorrErr;
+    TBranch* b_l2PtScaleCorrErr;
+    TBranch* b_l3PtScaleCorrErr;
     TBranch* b_type1_pfMETEt_jesUp;
     TBranch* b_type1_pfMETEt_UncTool;
     TBranch* b_type1_pfMETEt_jesDown;
