@@ -18,6 +18,8 @@ for file_name in ["WZxsec2016_aQGC-" + i for i in ["FT", "FM", "FS"]]:
             "/AnalysisDatasetManager/PlotGroups/%s.json" % file_name) as plot_file:
         plot_group_info.update(json.load(plot_file))
 
+variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
+    "CMS_eff_m", "CMS_scale_m", "CMS_eff_e", "CMS_scale_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
 aqgc_hists = HistTools.make1DaQGCHists(input_file, 
         #["mjj_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
         #    ["Mass_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
@@ -26,6 +28,8 @@ aqgc_hists = HistTools.make1DaQGCHists(input_file,
         #    ["l2Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
         #    ["l3Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
             ["MTWZ_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["MTWZ_lheWeights_%s_%s" % (var, c) for c in ConfigureJobs.getChannels()
+                for var in variations] + \
             ["M3lMET_lheWeights_%s" % c for c in ConfigureJobs.getChannels()],
         plot_group_info,
 )

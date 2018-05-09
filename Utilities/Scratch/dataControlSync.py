@@ -3,7 +3,8 @@ import json
 from python import ApplySelection
 
 #selection = "Zlep1IsTight && Zlep2IsTight && WlepIsTight && abs(nLooseLep -3) < 0.1 && metFiltersDataNoBadMuon && mjj > 100 && (dEtajj < 2.5 || mjj < 500)"
-selection = "Zlep1IsTightNoIP && Zlep2IsTightNoIP && WlepIsTightNoIP && abs(nCBVIDHLTSafeElecNoIP+nWZTightMuon-3) < 0.1 && metFiltersDataNoBadMuon && mjj > 100 && (dEtajj < 2.5 || mjj < 500)"
+selection = "Zlep1IsTightNoIP && Zlep1_PVDZ < 1. && Zlep1_PVDXY < 1. && Zlep2IsTightNoIP && Zlep2_PVDZ < 1. && Zlep2_PVDXY < 1. && WlepIsTightNoIP && Wlep_PVDZ < 1. && Wlep_PVDXY < 1. && (nCBVIDHLTSafeElec+nWZMediumMuon) < 3.5  && metFiltersDataNoBadMuon && mjj > 100 && (dEtajj < 2.5 || mjj < 500)"
+#selection = "Zlep1IsTightNoIP && Zlep1_PVDZ < 1. && Zlep1_PVDXY < 1. && Zlep2IsTightNoIP && Zlep2_PVDZ < 1. && Zlep2_PVDXY < 1. && WlepIsTightNoIP && Wlep_PVDZ < 1. && Wlep_PVDXY < 1. && abs(nCBVIDHLTSafeElecNoIP+nWZMediumMuon - 3) < 0.1  && metFiltersDataNoBadMuon && mjj > 100 && (dEtajj < 2.5 || mjj < 500)"
 ptsort = True
 with open("controlevent.txt", "w") as outfile:
     #file_info = json.load(open("/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/FileInfo/WZxsec2016/WselectionMediumLeptons.json"))

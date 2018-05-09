@@ -16,6 +16,7 @@ def get2DBinning(xvar="mjj", yvar="etajj", analysis='WZ'):
     ybinning = []
     if xvar == "mjj":
         xbinning = array.array('d', [500, 1000,1500, 2000, 2500])
+        #xbinning = array.array('d', [500, 1000, 1350, 1750, 2500])
 
     if yvar == 'etajj':    
         ybinning = [2.5, 4, 5, 20]

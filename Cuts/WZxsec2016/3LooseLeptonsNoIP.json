@@ -3,7 +3,9 @@
         "e" : [ 
             "{object_name}Pt > 10",
             "abs({object_name}Eta) <  2.5",
-            "{object_name}IsCBVIDHLTSafeNoIP > 0.5"
+            "{object_name}IsCBVIDHLTSafeNoIP > 0.5",
+            "abs({object_name}PVDXY) < 1",
+            "abs({object_name}PVDZ) < 1"
         ],
         "m" : [
             "{object_name}Pt > 10",
