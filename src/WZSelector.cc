@@ -7,7 +7,8 @@ void WZSelector::Init(TTree *tree)
     WZSelectorBase::Init(tree);
 
     doSystematics_ = true;
-    isaQGC_ = (name_ == "wzjj-aqgcft") || (name_ ==  "wzjj-aqgcfm") || (name_ == "wzjj-aqgcfs");
+    //isaQGC_ = (name_ == "wzjj-aqgcft") || (name_ ==  "wzjj-aqgcfm") || (name_ == "wzjj-aqgcfs");
+    isaQGC_ = false;
     weight_info_ = 0;
     if (isMC_) {
         fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
@@ -149,6 +150,8 @@ unsigned int WZSelector::GetLheWeightInfo() {
         "wz3lnu-powheg", "wz3lnu-mg5amcnlo",
         "wz3lnu-mgmlm-0j", "wz3lnu-mgmlm-1j",
         "wz3lnu-mgmlm-2j", "wz3lnu-mgmlm-3j", "wlljj-ewk", 
+        "tzq", "ww", "www", "wwz", "zz-powheg",
+        "zz4l-mg5amcnlo", "zz4ljj-ewk", "zz2l2vjj-ewk"
     };
     std::vector<std::string> allLheWeights = {
         "wzjj-aqgcft", "wzjj-aqgcfm", "wzjj-aqgcfs",

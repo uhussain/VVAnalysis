@@ -86,8 +86,8 @@ fIn = ROOT.TFile(args['input_file'])
 card_info = {
     "eee" : { 
         "wzjj_vbfnlo" : 0,
-        "wzjj_ewk" : 0,
-        "wz_mgmlm" : 0,
+        "EW_WZjj" : 0,
+        "QCD_WZjj" : 0,
         "wz_powheg" : 0,
         "vv_powheg" : 0,
         "top_ewk" : 0,
@@ -97,7 +97,7 @@ card_info = {
     },
     "eem" : {
         "wzjj_vbfnlo" : 0,
-        "wzjj_ewk" : 0,
+        "EW_WZjj" : 0,
         "wz_powheg" : 0,
         "vv_powheg" : 0,
         "top_ewk" : 0,
@@ -107,8 +107,8 @@ card_info = {
     },
     "emm" : {
         "wzjj_vbfnlo" : 0,
-        "wzjj_ewk" : 0,
-        "wz_mgmlm" : 0,
+        "EW_WZjj" : 0,
+        "QCD_WZjj" : 0,
         "wz_powheg" : 0,
         "vv_powheg" : 0,
         "top_ewk" : 0,
@@ -118,8 +118,8 @@ card_info = {
     },
     "mmm" : {
         "wzjj_vbfnlo" : 0,
-        "wzjj_ewk" : 0,
-        "wz_mgmlm" : 0,
+        "EW_WZjj" : 0,
+        "QCD_WZjj" : 0,
         "wz_powheg" : 0,
         "vv_powheg" : 0,
         "top_ewk" : 0,
@@ -129,9 +129,9 @@ card_info = {
     },
     "all" : {
         "wzjj_vbfnlo" : 0,
-        "wzjj_ewk" : 0,
+        "EW_WZjj" : 0,
         "wz" : 0,
-        "wz_mgmlm" : 0,
+        "QCD_WZjj" : 0,
         "wz_powheg" : 0,
         "vv_powheg" : 0,
         "top_ewk" : 0,
@@ -144,11 +144,11 @@ card_info = {
 
 pdf_entries = {
     "wzjj-vbfnlo" : 0,
-    "wzjj-ewk" : range(11,112),
+    "EW-WZjj" : range(11,112),
     "wzjj-aqgcfm" : range(11,112),
     "wzjj-aqgcfs" : range(11,112),
     "wzjj-aqgcft" : range(11,112),
-    "wz-mgmlm" : range(11,112),
+    "QCD-WZjj" : range(11,112),
     "wz-powheg" : range(11,112),
     "wz" : range(11,112),
     "vv-powheg" : 0, 
@@ -159,13 +159,13 @@ pdf_entries = {
 }
 
 wz_scalefacs = {
-    "wz-mgmlm" : 0.813,
+    "QCD-WZjj" : 0.813,
     "wz" : 0.643,
     "wz-powheg" : 0.845,
 }
 # All to the same integral in the signal region
 #wz_scalefacs = {
-#    "wz-mgmlm" : 0.813,
+#    "QCD-WZjj" : 0.813,
 #    "wz" : 0.58342,
 #    "wz-powheg" : 0.77856,
 #}
@@ -180,7 +180,7 @@ jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Dow
 
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
-signal = "wzjj_vbfnlo" if args['vbfnlo'] else "wzjj_ewk"
+signal = "wzjj_vbfnlo" if args['vbfnlo'] else "EW_WZjj"
 initNumvars = 22 if "VBS" in args['selection'] else 13
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
@@ -237,9 +237,9 @@ for chan in chans + ["all"]:
 OutputTools.writeOutputListItem(nonprompt, fOut)
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
-plot_groups = ["wz-powheg", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv-powheg", "data_2016"]
+plot_groups = ["wz-powheg", "wzjj-vbfnlo", "EW-WZjj", "top-ewk", "zg", "vv-powheg", "data_2016"]
 if isVBS:
-    plot_groups = ["wz-mgmlm", "wz-powheg", "wz", "wzjj-vbfnlo", "wzjj-ewk", "top-ewk", "zg", "vv"]
+    plot_groups = ["QCD-WZjj", "wz-powheg", "wz", "wzjj-vbfnlo", "EW-WZjj", "top-ewk", "zg", "vv"]
 if args['aqgc']:
     import json
     base_name = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/PlotGroups/"
@@ -302,7 +302,7 @@ for plot_group in plot_groups:
                 raise RuntimeError("Invalid weight hist %s" % weight_hist_name +
                         " for %s. Can't make scale variations" % plot_group)
 
-            if plot_group in ["wz", "wz-mgmlm", "wz-powheg"]:
+            if plot_group in ["wz", "QCD-WZjj", "wz-powheg"]:
                 wz_qcd_theory_hists.append(hist.Clone(hist.GetName().replace(chan, "_".join([plot_group, chan]))))
                 wz_qcd_theory_hists.extend(scale_hists+pdf_hists)
             
@@ -349,7 +349,7 @@ for chan,yields in card_info.iteritems():
     for name,value in yields.iteritems():
         if "data" in name:
             continue
-        if name not in ["wzjj_ewk", "wz", 
+        if name not in ["EW_WZjj", "wz", 
                 "AllData", "wz_powheg", "wzjj_vbfnlo", "output_file"]:
             background[chan] += float(value)
 output_info.add_row(["Total background", 
@@ -364,7 +364,7 @@ yields = [card_info[c]["AllData"] for c in chans]
 yields.append(sum([card_info[c]["AllData"] for c in chans]))
 output_info.add_row(["Data"] + yields)
 
-for name in ["wzjj_ewk", "wzjj_vbfnlo"]:
+for name in ["EW_WZjj", "wzjj_vbfnlo"]:
     significance_info.add_row([name, 
         round(card_info["eee"][name]/math.sqrt(background["eee"]), 4), 
         round(card_info["eem"][name]/math.sqrt(background["eem"]), 4), 
@@ -421,14 +421,14 @@ if not args['noCards']:
                 chan_file.write("* autoMCStats 1\n")
             for c in chans:
                 for hist_name in stat_variations[c]:
-                    if 'Wselection' in args['selection'] and "wzjj-ewk" in hist_name:
+                    if 'Wselection' in args['selection'] and "EW-WZjj" in hist_name:
                         continue
                     if "VBS" in args['selection'] and chan == c:
                         chan_file.write(
                             "%s     shape   %i               %i               %i           %i               %i           %i\n" \
                                 % (hist_name, 
                                     chan_dict["signal_name"] in hist_name,
-                                    "wz-mgmlm" in hist_name,
+                                    "QCD-WZjj" in hist_name,
                                     "vv" in hist_name,
                                     "top-ewk" in hist_name,
                                     "zg" in hist_name,
@@ -453,7 +453,7 @@ if not args['noCards']:
             chan_file.write("lepton_unc group = CMS_eff_e CMS_eff_m CMS_scale_e CMS_scale_m\n")
             if "VBS" in args['selection']:
                 chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
-                chan_file.write("wz_qcd_all group = QCDscale_wz-mgmlm pdf_wz-mgmlm CMS_norm_WZjjQCD %s\n" % " ".join([h for h in stat_variations[chan] if "wz-mgmlm" in h]))
+                chan_file.write("wz_qcd_all group = QCDscale_QCD-WZjj pdf_QCD-WZjj CMS_norm_QCD-WZjj %s\n" % " ".join([h for h in stat_variations[chan] if "QCD-WZjj" in h]))
     ConfigureJobs.fillTemplatedFile(
         'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
         '%s/runCombine%s.sh' % (output_dir, signal_abv), 
