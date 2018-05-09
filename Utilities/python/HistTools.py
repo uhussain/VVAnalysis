@@ -129,12 +129,20 @@ def getPDFHists(init2D_hist, entries, name, rebin=None):
     hists, hist_name = getLHEWeightHists(init2D_hist, entries, name, "pdf", rebin)
     #return hists
     return getVariationHists(hists, name, hist_name, 
-            lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[83])/2)
+            lambda x: x[0]*(1+getPDFPercentVariation(x)), 
+            lambda x: x[0]*(1-getPDFPercentVariation(x))
+    )
+
+def getPDFPercentVariation(values):
+    denom = values[84] + values[16]
+    if denom == 0: 
+        return 0
+    return abs(values[84] - values[16])/denom
 
 def getScaleHists(scale_hist2D, name, rebin=None):
     entries = [i for i in range(1,10) if i not in [7, 9]]
     hists, hist_name = getLHEWeightHists(scale_hist2D, entries, name, "QCDscale", rebin)
-    return getVariationHists(hists, name, hist_name, lambda x: x[-1], lambda x: x[0])
+    return getVariationHists(hists, name, hist_name, lambda x: x[-1], lambda x: x[1])
 
 def getVariationHists(hists, process_name, histUp_name, up_action, down_action):
     histUp = hists[0].Clone(histUp_name)
@@ -144,11 +152,12 @@ def getVariationHists(hists, process_name, histUp_name, up_action, down_action):
     # Include overflow
     for i in range(0, hists[0].GetNbinsX()+2):
         vals = []
-        for hist in hists:
+        for hist in hists[1:]:
             vals.append(hist.GetBinContent(i))
         vals.sort()
-        histUp.SetBinContent(i, vals[-1])
-        histDown.SetBinContent(i, vals[0])
+        vals.insert(0, histCentral.GetBinContent(i))
+        histUp.SetBinContent(i, up_action(vals))
+        histDown.SetBinContent(i, down_action(vals))
         # For now, skip this check on aQGC for now, since they're screwed up
         if "aqgc" in process_name: continue
     isValidVariation(process_name, histCentral, histUp, histDown)
@@ -157,20 +166,20 @@ def getVariationHists(hists, process_name, histUp_name, up_action, down_action):
 def isValidVariation(process_name, histCentral, histUp, histDown):
     for i in range(0, histCentral.GetNbinsX()+2):
         if histDown.GetBinContent(i) >= histCentral.GetBinContent(i) and histCentral.GetBinContent(i) != 0:
-            raise RuntimeError("Down scale variation >= central value for %s."
+            raise RuntimeError("Down variation >= central value for %s, hist %s"
                 " This shouldn't be possible.\n"
                 "scaleDown_hist: %0.4f\n" 
                 "central_hist: %0.4f\n" 
                 "bin: %i\n" 
-                % (process_name, histUp.GetBinContent(i), histCentral.GetBinContent(i), i)
+                % (process_name, histDown.GetName(), histUp.GetBinContent(i), histCentral.GetBinContent(i), i)
             )
         if histUp.GetBinContent(i) <= histCentral.GetBinContent(i) and histCentral.GetBinContent(i) != 0:
-            raise RuntimeError("Up scale variation <= central value for %s."
+            raise RuntimeError("Up variation <= central value for %s, hist %s."
                 " This shouldn't be possible.\n"
                 "scaleUp_hist: %0.2f\n" 
                 "central_hist: %0.2f\n" 
                 "bin: %i\n" 
-                % (process_name, histUp.GetBinContent(i), histCentral.GetBinContent(i), i)
+                % (process_name, histUp.GetName(), histUp.GetBinContent(i), histCentral.GetBinContent(i), i)
             )
 
 def getTransformed3DScaleHists(scale_hist3D, transformation, transform_args, name):
@@ -186,7 +195,7 @@ def getTransformed3DScaleHists(scale_hist3D, transformation, transform_args, nam
         scale_hist1D = transformation(scale_hist2D, *transform_args)
         scale_hists.append(scale_hist1D)
     hist_name = scale_hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled", "QCDscale", name+"Up"]))
-    return getVariationHists(scale_hists, name, hist_name, lambda x: x[-1], lambda x: x[0])
+    return getVariationHists(scale_hists, name, hist_name, lambda x: x[-1], lambda x: x[1])
 
 def getTransformed3DPDFHists(hist3D, transformation, transform_args, entries, name):
     hists = []
@@ -201,7 +210,9 @@ def getTransformed3DPDFHists(hist3D, transformation, transform_args, entries, na
     #return hists
     hist_name = hist3D.GetName().replace("2D_lheWeights", "_".join(["unrolled", "pdf", name+"Up"]))
     return getVariationHists(hists, name, hist_name, 
-            lambda x: (x[15]-x[83])/2, lambda x: (x[15]-x[83])/2)
+            lambda x: x[0]*(1+getPDFPercentVariation(x)), 
+            lambda x: x[0]*(1-getPDFPercentVariation(x))
+    )
 
 def addControlRegionToFitHist(control_hist, unrolled_hist):
     hist = ROOT.TH1D("tmp", unrolled_hist.GetTitle(), 
