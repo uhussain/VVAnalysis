@@ -151,10 +151,10 @@ pdf_entries = {
     "QCD-WZjj" : [1]+range(11,112),
     "wz-powheg" : [1]+range(11,112),
     "wz" : [1]+range(11,112),
-    "vv-powheg" : 0, 
-    "top-ewk" : 0,
+    "vv-powheg" : [1]+range(11,112),
+    "top-ewk" : [1]+range(11,112),
     "zg" : 0,
-    "vv" : 0,
+    "vv" : [1]+range(11,112),
     "AllData" : 0,
 }
 

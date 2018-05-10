@@ -44,8 +44,8 @@ QCDscale_top-ewk        shape   -               -               -           1   
 QCDscale_zg             lnN     -               -               1           -               1.1         -
 pdf_${signal_name}              shape   1               -               -           -               -           -
 pdf_QCD-WZjj            shape   -               1               -           -               -           -
-pdf_vv                  lnN     -               -               1.05        -               -           -
-pdf_top-ewk             lnN     -               -               -           1.05            -           -
+pdf_vv                  shape   -               -               1           -               -           -
+pdf_top-ewk             shape   -               -               -           1               -           -
 pdf_zg                  lnN     -               -               -           -               1.05           -
 CMS_scale_j             shape   1               1               1           1               0           1
 CMS_res_j               shape   1               1               1           1               0           1
