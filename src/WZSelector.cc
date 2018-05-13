@@ -4,11 +4,9 @@
 
 void WZSelector::Init(TTree *tree)
 {
+    doSystematics_ = true;
     WZSelectorBase::Init(tree);
 
-    doSystematics_ = true;
-    //isaQGC_ = (name_ == "wzjj-aqgcft") || (name_ ==  "wzjj-aqgcfm") || (name_ == "wzjj-aqgcfs");
-    isaQGC_ = false;
     weight_info_ = 0;
     if (isMC_) {
         fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
@@ -118,6 +116,7 @@ void WZSelector::Init(TTree *tree)
     }
 }
 
+// Values from https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceScaleResolRun2
 float WZSelector::GetMuonScaleUncertainty(float muEta) {
     if (muEta < -2.1)
         return 0.027;
@@ -577,7 +576,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
         if (PassesVBSBackgroundControlSelection())
             hists1D_[getHistName("backgroundControlYield", variation.second)]->Fill(1, weight);
 
-    if ((variation.first == Central || isaQGC_) && isMC_) {
+    if ((variation.first == Central || (doaQGC_ && isaQGC_)) && isMC_) {
         for (size_t i = 0; i < lheWeights.size(); i++) {
             if (PassesVBSBackgroundControlSelection())
                 SafeHistFill(weighthists_, "backgroundControlYield", 1, i, lheWeights[i]/lheWeights[0]*weight);
@@ -720,6 +719,12 @@ void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> h
                 hists1D_[syst_hist_name] = {};
                 AddObject<TH1D>(hists1D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
                     histData[0].c_str(),nbins, xmin, xmax);
+                if (isaQGC_ && doaQGC_ && (weighthists_.find(name) != weighthists_.end())) { 
+                    std::string weightsyst_hist_name = name+"_lheWeights_"+syst.second;
+                    AddObject<TH2D>(weighthists_[syst_hist_name], 
+                        (weightsyst_hist_name+"_"+channelName_).c_str(), histData[0].c_str(),
+                        nbins, xmin, xmax, 1000, 0, 1000);
+                }
             }
         }
         // Weight hists must be subset of 1D hists!
@@ -755,6 +760,7 @@ void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> h
 void WZSelector::SetupNewDirectory()
 {
     WZSelectorBase::SetupNewDirectory();
+    isaQGC_ = name_.find("aqgc") != std::string::npos;
    
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
     if (histInfo == nullptr ) 

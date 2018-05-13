@@ -10,6 +10,7 @@ void WZBackgroundSelector::SlaveBegin(TTree * /*tree*/)
         {jetEnergyResolutionDown, "CMS_res_jDown"},
     };
     isNonpromptEstimate_ = true;
+    doaQGC_ = false;
     WZSelector::SlaveBegin(0);
     fakeRate_allE_ = (ScaleFactor *) GetInputList()->FindObject("fakeRate_allE");
     if (fakeRate_allE_ == nullptr ) Abort("Must pass electron fake rate to input list!");

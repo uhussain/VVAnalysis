@@ -9,6 +9,7 @@ class WZSelector : public WZSelectorBase {
 public :
     bool doSystematics_ = true;
     bool isaQGC_ = false;
+    bool doaQGC_ = true;
 
     enum Systematic {
         Central,

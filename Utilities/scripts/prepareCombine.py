@@ -55,9 +55,10 @@ def combineChannels(group, chans, variations=[], central=True):
         variations.append("")
     for var in variations:
         name = variable if var is "" else "_".join([variable, var])
-        hist = group.FindObject(name + "_" + chans[0])
+        hist_name = name + "_" + chans[0]
+        hist = group.FindObject(hist_name)
         if not hist:
-            logging.warning("Failed to find hist %s in group %s. Skipping" % (name, group.GetName()))
+            logging.warning("Failed to find hist %s in group %s. Skipping" % (hist_name, group.GetName()))
             continue
         hist = hist.Clone(name)
         ROOT.SetOwnership(hist, False)
@@ -249,10 +250,12 @@ if args['aqgc']:
 
 wz_qcd_theory_hists = ROOT.TList()
 for plot_group in plot_groups:
+    # Theory hists won't work right for non-central aQGC points
+    isaQGCpoint = "aqgc" in plot_group and "__" in plot_group
     plots = [variable+"_" + c for c in chans]
-    if "data" not in plot_group and "aqgc" not in plot_group and not args['noTheory']:
+    if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
         plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
-    if isVBS and "aqgc" not in plot_group:
+    if isVBS:
         plots += ["_".join([variable, var, c]) for var in variations for c in chans]
         if args['addControlRegion']:
             plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
@@ -272,7 +275,7 @@ for plot_group in plot_groups:
                 stat_hists,variation_names = HistTools.getStatHists(hist, plot_group, chan, signal)
                 stat_variations[chan].extend(variation_names)
                 group.extend(stat_hists)
-        if "data" not in plot_group and not args['noTheory']:
+        if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
             weight_hist_name = base_variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
             if not weight_hist:
@@ -320,11 +323,13 @@ for plot_group in plot_groups:
                     control_hist = control_hists.FindObject(control_hist_name)
                     hist = HistTools.addControlRegionToFitHist(control_hist, h)
                     theory_hists.append(hist)
-            else: 
+            elif "aqgc" not in plot_group and "__" not in plot_group: 
                 theory_hists = scale_hists + pdf_hists
             group.extend(theory_hists)
 
-    theory_vars = ["_".join([var, plot_group + shift]) for var in ["QCDscale", "pdf"] for shift in ["Up", "Down"]]
+    theory_vars = []
+    if "aqgc" not in plot_group and "__" not in plot_group: 
+        theory_vars = ["_".join([var, plot_group + shift]) for var in ["QCDscale", "pdf"] for shift in ["Up", "Down"]]
     combineChannels(group, chans, variations + theory_vars, True)
     for hist in group:
         HistTools.removeZeros(hist)
@@ -397,7 +402,7 @@ if not args['noCards']:
         card_info["all"]["output_file"] = args['output_file']
         for chan in chans:
             for process, rate in card_info[chan].iteritems():
-                if process == "nonprompt": continue
+                if process == "nonprompt" or "aqgc" in process: continue
                 if type(rate) is float:
                     card_info["all"][process] += rate
     for chan, chan_dict in card_info.iteritems():

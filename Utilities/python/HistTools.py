@@ -165,18 +165,18 @@ def getVariationHists(hists, process_name, histUp_name, up_action, down_action):
 
 def isValidVariation(process_name, histCentral, histUp, histDown):
     for i in range(0, histCentral.GetNbinsX()+2):
-        if histDown.GetBinContent(i) >= histCentral.GetBinContent(i) and histCentral.GetBinContent(i) != 0:
+        if histDown.GetBinContent(i) >= histCentral.GetBinContent(i) and histCentral.GetBinContent(i) > 0:
             raise RuntimeError("Down variation >= central value for %s, hist %s"
                 " This shouldn't be possible.\n"
-                "scaleDown_hist: %0.4f\n" 
+                "down_hist: %0.4f\n" 
                 "central_hist: %0.4f\n" 
                 "bin: %i\n" 
-                % (process_name, histDown.GetName(), histUp.GetBinContent(i), histCentral.GetBinContent(i), i)
+                % (process_name, histDown.GetName(), histDown.GetBinContent(i), histCentral.GetBinContent(i), i)
             )
-        if histUp.GetBinContent(i) <= histCentral.GetBinContent(i) and histCentral.GetBinContent(i) != 0:
+        if histUp.GetBinContent(i) <= histCentral.GetBinContent(i) and histCentral.GetBinContent(i) > 0:
             raise RuntimeError("Up variation <= central value for %s, hist %s."
                 " This shouldn't be possible.\n"
-                "scaleUp_hist: %0.2f\n" 
+                "up_hist: %0.2f\n" 
                 "central_hist: %0.2f\n" 
                 "bin: %i\n" 
                 % (process_name, histUp.GetName(), histUp.GetBinContent(i), histCentral.GetBinContent(i), i)
