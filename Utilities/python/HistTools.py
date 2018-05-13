@@ -301,3 +301,30 @@ def getTransformedHists(orig_file, folders, input_hists, transformation, transfo
             output_list.Add(new_hist)
         output_folders.append(output_list)
     return output_folders 
+
+def addaQGCTheoryHists(rtfile_name, plot_groups):
+    rtfile = ROOT.TFile(rtfile_name, "update")
+    print plot_groups
+    for name in plot_groups:
+        if "__" not in name:
+            continue
+        aqgc_dir = rtfile.Get(name)
+        aqgc_dir.cd()
+
+        for chan in ["eee", "eem", "emm", "mmm"]:
+            base_hist_name = "MTWZ"
+            central_name = name.split("__")[0]
+            varhist_name = "_".join([base_hist_name, "pdf_%sUp" % central_name, chan])
+            hists = [varhist_name, varhist_name.replace("Up", "Down"), varhist_name.replace("pdf", "QCDscale"), 
+                    varhist_name.replace("pdf", "QCDscale").replace("Up", "Down")]
+            for hist_name in hists:
+                base_hist = rtfile.Get("/".join([central_name, base_hist_name + "_" +chan]))
+                aqgc_hist = rtfile.Get("/".join([name, base_hist_name + "_" +chan]))
+                var_hist = rtfile.Get("/".join([central_name, hist_name]))
+                aqgc_varhist = var_hist.Clone(hist_name.replace(central_name, name))
+                for i in range(1, base_hist.GetNbinsX()+1):
+                    if base_hist.GetBinContent(i) <= 0: 
+                        continue
+                    scale = aqgc_hist.GetBinContent(i)/base_hist.GetBinContent(i)
+                    aqgc_varhist.SetBinContent(i, aqgc_varhist.GetBinContent(i)*scale)
+                aqgc_varhist.Write()

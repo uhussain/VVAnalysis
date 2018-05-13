@@ -241,12 +241,15 @@ significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All st
 plot_groups = ["wz-powheg", "wzjj-vbfnlo", "EW-WZjj", "top-ewk", "zg", "vv-powheg", "data_2016"]
 if isVBS:
     plot_groups = ["QCD-WZjj", "wz-powheg", "wz", "wzjj-vbfnlo", "EW-WZjj", "top-ewk", "zg", "vv"]
+
+aqgc_groups =  []
 if args['aqgc']:
     import json
     base_name = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/PlotGroups/"
     for filename in ["WZxsec2016_aQGC-FM.json", "WZxsec2016_aQGC-FS.json", "WZxsec2016_aQGC-FT.json",]:
         aqgc_names = json.load(open(base_name+filename))
-        plot_groups.extend([str(n) for n in aqgc_names.keys()])
+        aqgc_groups.extend([str(n) for n in aqgc_names.keys()])
+    plot_groups.extend(aqgc_groups)
 
 wz_qcd_theory_hists = ROOT.TList()
 for plot_group in plot_groups:
@@ -323,7 +326,7 @@ for plot_group in plot_groups:
                     control_hist = control_hists.FindObject(control_hist_name)
                     hist = HistTools.addControlRegionToFitHist(control_hist, h)
                     theory_hists.append(hist)
-            elif "aqgc" not in plot_group and "__" not in plot_group: 
+            elif not isaQGCpoint: 
                 theory_hists = scale_hists + pdf_hists
             group.extend(theory_hists)
 
@@ -464,3 +467,9 @@ if not args['noCards']:
         '%s/runCombine%s.sh' % (output_dir, signal_abv), 
         {"sample" : signal_abv}
     )
+
+fOut.Close()
+if args['aqgc']:
+    "Adding theory hists"
+    HistTools.addaQGCTheoryHists(args['output_file'], aqgc_groups)
+
