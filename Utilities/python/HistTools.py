@@ -56,7 +56,7 @@ def makeUnrolledHist(init_2D_hist, xbins, ybins, name=""):
 
     return unrolled_hist
 
-def make1DaQGCHists(orig_file, input2D_hists, plot_info):
+def make1DaQGCHists(orig_file, input2D_hists, plot_info, rebin=None):
     output_folders = []
     for name, data in plot_info.iteritems():
         entry = data["lheWeightEntry"]
@@ -70,9 +70,11 @@ def make1DaQGCHists(orig_file, input2D_hists, plot_info):
             # If a histogram with the same name exisits, ROOT will return
             # that instead of creating a new one. See:
             # https://root.cern.ch/root/html532/src/TH2.cxx.html#2253
-            temp = init_2D_hist.ProjectionX("temphist", entry, entry, "e")
-            hist1D = temp.Clone(init_2D_hist_name.replace("lheWeights_", ""))
-            temp.Delete()
+            tmphist = init_2D_hist.ProjectionX("temphist", entry, entry, "e")
+            hist_name = init_2D_hist_name.replace("lheWeights_", "")
+            print rebin
+            hist1D = tmphist.Clone(hist_name) if not rebin else tmphist.Rebin(len(rebin)-1, hist_name, rebin)
+            tmphist.Delete()
             ROOT.SetOwnership(hist1D, False)
             output_list.Add(hist1D)
         output_folders.append(output_list)
@@ -214,17 +216,17 @@ def getTransformed3DPDFHists(hist3D, transformation, transform_args, entries, na
             lambda x: x[0]*(1-getPDFPercentVariation(x))
     )
 
-def addControlRegionToFitHist(control_hist, unrolled_hist):
-    hist = ROOT.TH1D("tmp", unrolled_hist.GetTitle(), 
-            unrolled_hist.GetNbinsX()+1, 0, unrolled_hist.GetNbinsX()+1)
-    hist.SetName(unrolled_hist.GetName().replace("unrolled", "unrolled_wCR"))
+def addControlRegionToFitHist(control_hist, input_hist, base_name="unrolled"):
+    hist = ROOT.TH1D("tmp", input_hist.GetTitle(), 
+            input_hist.GetNbinsX()+1, 0, input_hist.GetNbinsX()+1)
+    hist.SetName(input_hist.GetName().replace(base_name, base_name+"_wCR"))
     control_err = array.array('d', [0])
     control_yield = control_hist.IntegralAndError(0, control_hist.GetNbinsX()+1, control_err)
     hist.SetBinContent(1, control_yield) 
     hist.SetBinError(1, control_err[0])
-    for i in range(1, unrolled_hist.GetNbinsX()+1):
-        hist.SetBinContent(i+1, unrolled_hist.GetBinContent(i))
-        hist.SetBinError(i+1, unrolled_hist.GetBinError(i))
+    for i in range(1, hist.GetNbinsX()+1):
+        hist.SetBinContent(i+1, input_hist.GetBinContent(i))
+        hist.SetBinError(i+1, input_hist.GetBinError(i))
     ROOT.SetOwnership(hist, False)
     return hist
 
@@ -302,9 +304,8 @@ def getTransformedHists(orig_file, folders, input_hists, transformation, transfo
         output_folders.append(output_list)
     return output_folders 
 
-def addaQGCTheoryHists(rtfile_name, plot_groups):
+def addaQGCTheoryHists(rtfile_name, plot_groups, base_hist_name):
     rtfile = ROOT.TFile(rtfile_name, "update")
-    print plot_groups
     for name in plot_groups:
         if "__" not in name:
             continue
@@ -312,7 +313,6 @@ def addaQGCTheoryHists(rtfile_name, plot_groups):
         aqgc_dir.cd()
 
         for chan in ["eee", "eem", "emm", "mmm"]:
-            base_hist_name = "MTWZ"
             central_name = name.split("__")[0]
             varhist_name = "_".join([base_hist_name, "pdf_%sUp" % central_name, chan])
             hists = [varhist_name, varhist_name.replace("Up", "Down"), varhist_name.replace("pdf", "QCDscale"), 
@@ -328,3 +328,8 @@ def addaQGCTheoryHists(rtfile_name, plot_groups):
                     scale = aqgc_hist.GetBinContent(i)/base_hist.GetBinContent(i)
                     aqgc_varhist.SetBinContent(i, aqgc_varhist.GetBinContent(i)*scale)
                 aqgc_varhist.Write()
+                var_hist.Delete()
+                base_hist.Delete()
+                aqgc_hist.Delete()
+        aqgc_dir.Delete()
+    rtfile.Close()

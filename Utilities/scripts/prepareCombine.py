@@ -201,7 +201,7 @@ if args['addControlRegion']:
 
 mjj_binning = ConfigureJobs.get2DBinning()[0]
 #mjj_binning = array.array('d', [500, 1000,1500, 2000, 2500]) 
-rebin = mjj_binning if variable == "mjj" else None
+rebin = mjj_binning if base_variable == "mjj" else None
 if variable == "MTWZ":
     rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
@@ -260,7 +260,7 @@ for plot_group in plot_groups:
         plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
     if isVBS:
         plots += ["_".join([variable, var, c]) for var in variations for c in chans]
-        if args['addControlRegion']:
+        if args['addControlRegion'] and not isaQGCpoint:
             plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
@@ -281,11 +281,14 @@ for plot_group in plot_groups:
         if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
             weight_hist_name = base_variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
+            print weight_hist
             if not weight_hist:
                 logging.warning("Failed to find %s. Skipping" % weight_hist_name)
                 continue
             pdf_hists = []
             if "TH2" in weight_hist.ClassName():
+                if "MTWZ" in variable:
+                    rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
                 scale_hists = HistTools.getScaleHists(weight_hist, plot_group, rebin)
                 if pdf_entries[plot_group]:
                     pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, rebin)
@@ -315,16 +318,17 @@ for plot_group in plot_groups:
             theory_hists = []
             if args['addControlRegion']:
                 control_hist2D = group.FindObject("backgroundControlYield_lheWeights_" + chan)
+                print plot_group, control_hist2D
                 control_hists = ROOT.TList()
-                unrolled_theory = HistTools.getScaleHists(control_hist2D, plot_group, rebin) 
+                unrolled_theory = HistTools.getScaleHists(control_hist2D, plot_group) 
                 if pdf_entries[plot_group]:
-                    unrolled_theory += HistTools.getPDFHists(control_hist2D, pdf_entries[plot_group], plot_group, rebin)
+                    unrolled_theory += HistTools.getPDFHists(control_hist2D, pdf_entries[plot_group], plot_group)
                 for h in unrolled_theory:
                     control_hists.Add(h)
                 for h in scale_hists+pdf_hists:
                     control_hist_name = "_".join(["backgroundControlYield"] + h.GetName().split("_")[-3:])
                     control_hist = control_hists.FindObject(control_hist_name)
-                    hist = HistTools.addControlRegionToFitHist(control_hist, h)
+                    hist = HistTools.addControlRegionToFitHist(control_hist, h, args['fit_variable'].replace("_wCR", ""))
                     theory_hists.append(hist)
             elif not isaQGCpoint: 
                 theory_hists = scale_hists + pdf_hists
@@ -468,8 +472,7 @@ if not args['noCards']:
         {"sample" : signal_abv}
     )
 
-fOut.Close()
 if args['aqgc']:
-    "Adding theory hists"
-    HistTools.addaQGCTheoryHists(args['output_file'], aqgc_groups)
+    fOut.Close()
+    HistTools.addaQGCTheoryHists(args['output_file'], aqgc_groups, variable)
 

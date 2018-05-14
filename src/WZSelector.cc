@@ -375,7 +375,9 @@ bool WZSelector::PassesVBSBackgroundControlSelection() {
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
-    //return (mjj > 100 && (mjj < 500 || dEtajj < 2.5));
+    else
+        return (mjj > 100 && (mjj < 500 || dEtajj < 2.5));
+
     return (mjj > 100 && (mjj < 500 || dEtajj < 2.5 || std::abs(zep3l) > 2.5));
     //return ((mjj > 500 && dEtajj < 2.5) || (mjj < 500 && dEtajj > 2.5));
 }
