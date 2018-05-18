@@ -67,6 +67,43 @@ void WZSelectorBase::Init(TTree *tree)
             selectionName_ = selection->GetTitle();
         }
     }
+
+    if (selectionName_ == "tightleptons")
+        selection_ = tightleptons;
+    else if (selectionName_ == "Wselection")
+        selection_ = Wselection;
+    else if (selectionName_ == "Wselection_Full")
+        selection_ = Wselection_Full;
+    else if (selectionName_ == "FakeRateSelectionLoose")
+        selection_ = FakeRateSelectionLoose;
+    else if (selectionName_ == "FakeRateSelectionTight")
+        selection_ = FakeRateSelectionTight;
+    else if (selectionName_ == "VBSselection_Loose")
+        selection_ = VBSselection_Loose;
+    else if (selectionName_ == "VBSselection_Loose_Full")
+        selection_ = VBSselection_Loose_Full;
+    else if (selectionName_ == "VBSselection_Tight")
+        selection_ = VBSselection_Tight;
+    else if (selectionName_ == "VBSselection_Tight_Full")
+        selection_ = VBSselection_Tight_Full;
+    else if (selectionName_ == "VBSBackgroundControl")
+        selection_ = VBSBackgroundControl;
+    else if (selectionName_ == "VBSBackgroundControlLoose")
+        selection_ = VBSBackgroundControlLoose;
+    else if (selectionName_ == "Inclusive2Jet")
+        selection_ = Inclusive2Jet;
+    else {
+        std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
+        selection_ = tightleptons;
+    }
+    isVBS_ = (selection_ == VBSselection_Loose || 
+        selection_ == VBSselection_Loose_Full || 
+        selection_ == VBSselection_Tight || 
+        selection_ == VBSselection_Tight_Full || 
+        selection_ == VBSBackgroundControl || 
+        selection_ == VBSBackgroundControlLoose
+        );
+
     
     isNonpromptEstimate_ = false;
     isMC_ = false;
@@ -187,42 +224,6 @@ void WZSelectorBase::Init(TTree *tree)
     }
     else
         throw std::invalid_argument("Invalid channel choice!");
-
-    if (selectionName_ == "tightleptons")
-        selection_ = tightleptons;
-    else if (selectionName_ == "Wselection")
-        selection_ = Wselection;
-    else if (selectionName_ == "Wselection_Full")
-        selection_ = Wselection_Full;
-    else if (selectionName_ == "FakeRateSelectionLoose")
-        selection_ = FakeRateSelectionLoose;
-    else if (selectionName_ == "FakeRateSelectionTight")
-        selection_ = FakeRateSelectionTight;
-    else if (selectionName_ == "VBSselection_Loose")
-        selection_ = VBSselection_Loose;
-    else if (selectionName_ == "VBSselection_Loose_Full")
-        selection_ = VBSselection_Loose_Full;
-    else if (selectionName_ == "VBSselection_Tight")
-        selection_ = VBSselection_Tight;
-    else if (selectionName_ == "VBSselection_Tight_Full")
-        selection_ = VBSselection_Tight_Full;
-    else if (selectionName_ == "VBSBackgroundControl")
-        selection_ = VBSBackgroundControl;
-    else if (selectionName_ == "VBSBackgroundControlLoose")
-        selection_ = VBSBackgroundControlLoose;
-    else if (selectionName_ == "Inclusive2Jet")
-        selection_ = Inclusive2Jet;
-    else {
-        std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
-        selection_ = tightleptons;
-    }
-    isVBS_ = (selection_ == VBSselection_Loose || 
-        selection_ == VBSselection_Loose_Full || 
-        selection_ == VBSselection_Tight || 
-        selection_ == VBSselection_Tight_Full || 
-        selection_ == VBSBackgroundControl || 
-        selection_ == VBSBackgroundControlLoose
-        );
 
     fChain->SetBranchAddress("type1_pfMETEt", &MET, &b_MET);
     fChain->SetBranchAddress("type1_pfMETPhi", &type1_pfMETPhi, &b_type1_pfMETPhi);

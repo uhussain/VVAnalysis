@@ -8,8 +8,9 @@
 class WZSelector : public WZSelectorBase {
 public :
     bool doSystematics_ = true;
+    bool applyFullSelection_ = true;
     bool isaQGC_ = false;
-    bool doaQGC_ = true;
+    bool doaQGC_ = false;
 
     enum Systematic {
         Central,
@@ -105,7 +106,8 @@ public :
         { "dEtajj",  {} },
         { "dRjj",  {} },
         { "zep3l",  {} },
-        { "zepj3",  {} }
+        { "zepj3",  {} },
+        { "Eta",  {} },
     };
 
     // Weight hists must be subset of 1D hists!

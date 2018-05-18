@@ -40,13 +40,15 @@ elif [[ $1 == "FakeRateSelectionLoose" ]]; then
 elif [[ $1 == "FakeRateSelectionTight" ]]; then
     input=${looselepsfile}
     output=FakeRateSelectionTight
+elif [[ $1 == "Wselection_"* ]]; then
+    output=$1
 else
     echo "INFO: Using default selection 'Wselection'"
 fi
 
 frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
-#histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}.root
-histfile=${output}-${DATE}.root
+histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}.root
+#histfile=${output}-${DATE}.root
 
 if [[ "$3" != "" ]]; then 
     histfile=${histfile/.root/_${3}.root}

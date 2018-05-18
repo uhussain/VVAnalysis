@@ -4,7 +4,6 @@
 
 void WZSelector::Init(TTree *tree)
 {
-    doSystematics_ = true;
     WZSelectorBase::Init(tree);
 
     weight_info_ = 0;
@@ -13,7 +12,7 @@ void WZSelector::Init(TTree *tree)
         weight_info_ = GetLheWeightInfo();
         if (weight_info_ > 0)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
-        if (weight_info_ == 2 || weight_info_ == 3)
+        if ((weight_info_ == 2 || weight_info_ == 3) && doSystematics_)
             fChain->SetBranchAddress("pdfWeights", &pdfWeights, &b_pdfWeights);
         fChain->SetBranchAddress("mjj_jesUp", &mjj_jesUp, &b_mjj_jesUp);
         fChain->SetBranchAddress("mjj_jesDown", &mjj_jesDown, &b_mjj_jesDown);
@@ -186,7 +185,7 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     b_l3Pt->GetEntry(entry);
     
     if (variation.first == Central) {
-        if (isMC_) {
+        if (isMC_ && doSystematics_) {
             if (isMC_ && weight_info_ > 0) {
                 b_scaleWeights->GetEntry(entry);
                 lheWeights = *scaleWeights;
@@ -501,10 +500,7 @@ bool WZSelector::PassesBaseSelection(Long64_t entry, bool tightLeps, Selection s
         return false;
     if (!passesLeptonVeto)
         return false;
-    if ((selection == Wselection_Full || 
-                selection == VBSselection_Tight_Full ||
-                selection == VBSselection_Loose_Full )
-            && !PassesFullWZSelection(entry))
+    if (applyFullSelection_ && !PassesFullWZSelection(entry))
         return false;
     else if (selection == FakeRateSelectionLoose || selection == FakeRateSelectionTight) {
         if (l1Pt < 25 || l2Pt < 15)
@@ -622,6 +618,7 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("MET", variation.second), MET, weight);
     SafeHistFill(hists1D_, getHistName("MtW", variation.second), l3MtToMET, weight);
     SafeHistFill(hists1D_, getHistName("nJets", variation.second), jetPt->size(), weight);
+    SafeHistFill(hists1D_, getHistName("Eta", variation.second), Eta, weight);
 
     if (hists1D_[getHistName("dR_lW_Z", variation.second)] != nullptr) {
         float dPhi_lW_Z = ZPhi - l3Phi;
@@ -659,10 +656,11 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
 
 Bool_t WZSelector::Process(Long64_t entry)
 {
-    bool blindVBS = (selection_ == Wselection || 
-            (isVBS_ && 
-                selection_ != VBSBackgroundControl && 
-                selection_ != VBSBackgroundControlLoose));
+    //bool blindVBS = (selection_ == Wselection || 
+    //        (isVBS_ && 
+    //            selection_ != VBSBackgroundControl && 
+    //            selection_ != VBSBackgroundControlLoose));
+    bool blindVBS = false;
 
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
@@ -670,7 +668,6 @@ Bool_t WZSelector::Process(Long64_t entry)
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
 
-    //doSystematics_ = true;
     if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
@@ -763,6 +760,10 @@ void WZSelector::SetupNewDirectory()
 {
     WZSelectorBase::SetupNewDirectory();
     isaQGC_ = name_.find("aqgc") != std::string::npos;
+    applyFullSelection_ = (selection_ == VBSselection_Loose_Full ||
+                      selection_ == VBSselection_Tight_Full || 
+                      selection_ == Wselection_Full);
+    doSystematics_ = applyFullSelection_;
    
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
     if (histInfo == nullptr ) 

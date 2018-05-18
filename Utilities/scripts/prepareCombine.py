@@ -281,7 +281,6 @@ for plot_group in plot_groups:
         if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
             weight_hist_name = base_variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
-            print weight_hist
             if not weight_hist:
                 logging.warning("Failed to find %s. Skipping" % weight_hist_name)
                 continue
@@ -318,7 +317,6 @@ for plot_group in plot_groups:
             theory_hists = []
             if args['addControlRegion']:
                 control_hist2D = group.FindObject("backgroundControlYield_lheWeights_" + chan)
-                print plot_group, control_hist2D
                 control_hists = ROOT.TList()
                 unrolled_theory = HistTools.getScaleHists(control_hist2D, plot_group) 
                 if pdf_entries[plot_group]:
@@ -328,7 +326,7 @@ for plot_group in plot_groups:
                 for h in scale_hists+pdf_hists:
                     control_hist_name = "_".join(["backgroundControlYield"] + h.GetName().split("_")[-3:])
                     control_hist = control_hists.FindObject(control_hist_name)
-                    hist = HistTools.addControlRegionToFitHist(control_hist, h, args['fit_variable'].replace("_wCR", ""))
+                    hist = HistTools.addControlRegionToFitHist(control_hist, h, base_variable)
                     theory_hists.append(hist)
             elif not isaQGCpoint: 
                 theory_hists = scale_hists + pdf_hists

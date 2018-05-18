@@ -84,7 +84,7 @@ analysis = "/".join([args['analysis'], selection])
 hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
 
-hists = [h for h in hists if "unrolled" not in h and h != "YieldByChannel"]
+hists = [h for h in hists if "unrolled" not in h and "wCR" not in h and h not in  ["YieldByChannel", "CutFlow"]]
 hist_inputs = [getHistExpr(hists, analysis)]
 tselection = [ROOT.TNamed("selection", args['output_selection'])]
 
@@ -106,17 +106,20 @@ if args['test']:
     exit(0)
 
 alldata = HistTools.makeCompositeHists(fOut,"AllData", 
-    ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'])
+    ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
+    underflow=False, overflow=False)
 OutputTools.writeOutputListItem(alldata, fOut)
 alldata.Delete()
 
 nonpromptmc = HistTools.makeCompositeHists(fOut, "NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
-    ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'])
+    ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'],
+    underflow=False, overflow=False)
 nonpromptmc.Delete()
 
 OutputTools.writeOutputListItem(nonpromptmc, fOut)
 ewkmc = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
-    ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'])
+    ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'],
+    underflow=False, overflow=False)
 OutputTools.writeOutputListItem(ewkmc, fOut)
 ewkmc.Delete()
 

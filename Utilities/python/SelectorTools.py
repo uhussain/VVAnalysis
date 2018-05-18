@@ -19,7 +19,7 @@ def applySelector(filelist, selector_name, selection,
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
             select = getattr(ROOT, selector_name)()
             select.SetInputList(inputs)
-            print "Processing", dataset
+            print "Processing channel %s for dataset %s" % (chan, dataset)
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     selection, analysis)
