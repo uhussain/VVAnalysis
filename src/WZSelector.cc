@@ -9,7 +9,7 @@ void WZSelector::Init(TTree *tree)
     weight_info_ = 0;
     if (isMC_) {
         fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
-        weight_info_ = GetLheWeightInfo();
+        //weight_info_ = GetLheWeightInfo();
         if (weight_info_ > 0)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
         if ((weight_info_ == 2 || weight_info_ == 3) && doSystematics_)
@@ -516,7 +516,8 @@ bool WZSelector::PassesBaseSelection(Long64_t entry, bool tightLeps, Selection s
         if (selection == FakeRateSelectionLoose)
             tightLeps = false;
     }
-    else if (selection == Inclusive2Jet && jetPt->size() < 2)
+    else if ((selection == Inclusive2Jet || selection == Inclusive2Jet_Full) &&
+                (jetPt->size() < 2 || jetPt->at(0) < 50 || jetPt->at(1) < 50))
         return false;
     
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
@@ -762,8 +763,10 @@ void WZSelector::SetupNewDirectory()
     isaQGC_ = name_.find("aqgc") != std::string::npos;
     applyFullSelection_ = (selection_ == VBSselection_Loose_Full ||
                       selection_ == VBSselection_Tight_Full || 
+                      selection_ == Inclusive2Jet_Full ||
                       selection_ == Wselection_Full);
-    doSystematics_ = applyFullSelection_;
+    //doSystematics_ = applyFullSelection_;
+    doSystematics_ = true;
    
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
     if (histInfo == nullptr ) 

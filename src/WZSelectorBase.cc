@@ -92,6 +92,8 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = VBSBackgroundControlLoose;
     else if (selectionName_ == "Inclusive2Jet")
         selection_ = Inclusive2Jet;
+    else if (selectionName_ == "Inclusive2Jet_Full")
+        selection_ = Inclusive2Jet_Full;
     else {
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;

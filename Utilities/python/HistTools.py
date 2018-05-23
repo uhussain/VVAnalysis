@@ -242,7 +242,7 @@ def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
         add_underflow = hist.GetBinContent(0) + hist.GetBinContent(1)
         hist.SetBinContent(1, add_underflow)
 
-def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=True, overflow=True, rebin=None):
+def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=False, overflow=True, rebin=None):
     composite = ROOT.TList()
     composite.SetName(name)
     for directory in [str(i) for i in members.keys()]:

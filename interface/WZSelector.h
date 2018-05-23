@@ -38,6 +38,12 @@ public :
         "mjj",
         "dEtajj",
         "MTWZ",
+        "zep3l",
+        "ZMass",
+        "jetPt[0]",
+        "jetPt[1]",
+        "jetEta[0]",
+        "jetEta[1]",
         //"nTruePU",
         //"nvtx",
         //"Zlep1_Pt",
@@ -46,7 +52,6 @@ public :
         //"Zlep1_Eta",
         //"Zlep2_Eta",
         //"Wlep_Eta",
-        "ZMass",
     };
 
     std::map<Systematic, std::string> systematics_ = {
@@ -114,8 +119,7 @@ public :
     std::map<std::string, TH2D*> weighthists_ = {
         { "backgroundControlYield",  {} },
         { "MTWZ",  {} },
-        { "M3lMET", {} },
-        { "yield",  {} }
+        { "yield",  {} },
     };
     
     std::map<std::string, TH2D*> hists2D_ = {

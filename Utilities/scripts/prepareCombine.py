@@ -182,7 +182,7 @@ jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Dow
 output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
 signal = "wzjj_vbfnlo" if args['vbfnlo'] else "EW_WZjj"
-initNumvars = 22 if "VBS" in args['selection'] else 13
+initNumvars = 22 if "VBS" in args['selection'] else 17
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
 #variable = "yield"
@@ -199,8 +199,8 @@ if args['addControlRegion']:
     base_variable = variable
     variable = base_variable + "_wCR"
 
-mjj_binning = ConfigureJobs.get2DBinning()[0]
-#mjj_binning = array.array('d', [500, 1000,1500, 2000, 2500]) 
+#mjj_binning = ConfigureJobs.get2DBinning()[0]
+mjj_binning = array.array('d', [i*100 for i in range(0,25)]) 
 rebin = mjj_binning if base_variable == "mjj" else None
 if variable == "MTWZ":
     rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
@@ -238,9 +238,7 @@ for chan in chans + ["all"]:
 OutputTools.writeOutputListItem(nonprompt, fOut)
 significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
-plot_groups = ["wz-powheg", "wzjj-vbfnlo", "EW-WZjj", "top-ewk", "zg", "vv-powheg", "data_2016"]
-if isVBS:
-    plot_groups = ["QCD-WZjj", "wz-powheg", "wz", "wzjj-vbfnlo", "EW-WZjj", "top-ewk", "zg", "vv"]
+plot_groups = ["QCD-WZjj", "wz", "wz-powheg", "EW-WZjj", "top-ewk", "zg", "vv-powheg", "vv"]
 
 aqgc_groups =  []
 if args['aqgc']:
@@ -258,10 +256,9 @@ for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
     if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
         plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
-    if isVBS:
-        plots += ["_".join([variable, var, c]) for var in variations for c in chans]
-        if args['addControlRegion'] and not isaQGCpoint:
-            plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
+    plots += ["_".join([variable, var, c]) for var in variations for c in chans]
+    if args['addControlRegion'] and not isaQGCpoint:
+        plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots, rebin=rebin)
@@ -286,13 +283,15 @@ for plot_group in plot_groups:
                 continue
             pdf_hists = []
             if "TH2" in weight_hist.ClassName():
-                if "MTWZ" in variable:
+                if "MTWZ" in variable and isVBS:
                     rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
+                elif "MTWZ" in variable:
+                    rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1200]) 
                 scale_hists = HistTools.getScaleHists(weight_hist, plot_group, rebin)
                 if pdf_entries[plot_group]:
                     pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, rebin)
                 for hist in scale_hists+pdf_hists:
-                    HistTools.addOverflowAndUnderflow(hist)
+                    HistTools.addOverflowAndUnderflow(hist,underflow=False)
             elif "TH3" in weight_hist.ClassName(): 
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
                     HistTools.makeUnrolledHist,
@@ -414,7 +413,7 @@ if not args['noCards']:
         chan_dict["signal_name"] = signal.replace("_", "-")
         chan_dict["fit_variable"] = variable
         chan_dict["signal_yield"] = chan_dict[signal]
-        numvars = initNumvars+len(chans)*(chan != "all")*len(stat_variations[chan]) -1*("Wselection" in args['selection'])
+        numvars = initNumvars+len(chans)*(chan != "all")*len(stat_variations[chan]) 
         if chan != "all":
             numvars += 3
         chan_dict["nuisances"] = numvars
@@ -433,7 +432,7 @@ if not args['noCards']:
                 for hist_name in stat_variations[c]:
                     if 'Wselection' in args['selection'] and "EW-WZjj" in hist_name:
                         continue
-                    if "VBS" in args['selection'] and chan == c:
+                    if isVBS and chan == c:
                         chan_file.write(
                             "%s     shape   %i               %i               %i           %i               %i           %i\n" \
                                 % (hist_name, 
@@ -445,7 +444,7 @@ if not args['noCards']:
                                     "nonprompt" in hist_name,
                                 )
                     )
-                    elif "VBS" in args['selection']:
+                    elif isVBS:
                         chan_file.write(
                             "%s     shape   0               0               0           0               0           0\n" % hist_name)
                     else:
@@ -461,7 +460,7 @@ if not args['noCards']:
                     )
             chan_file.write("mc_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
             chan_file.write("lepton_unc group = CMS_eff_e CMS_eff_m CMS_scale_e CMS_scale_m\n")
-            if "VBS" in args['selection']:
+            if isVBS:
                 chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
                 chan_file.write("wz_qcd_all group = QCDscale_QCD-WZjj pdf_QCD-WZjj CMS_norm_QCD-WZjj %s\n" % " ".join([h for h in stat_variations[chan] if "QCD-WZjj" in h]))
     ConfigureJobs.fillTemplatedFile(

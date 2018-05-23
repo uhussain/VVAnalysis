@@ -43,6 +43,7 @@ public :
         VBSBackgroundControl,
         VBSBackgroundControlLoose,
         Inclusive2Jet,
+        Inclusive2Jet_Full,
     };
 
     TList *currentHistDir_{nullptr};
