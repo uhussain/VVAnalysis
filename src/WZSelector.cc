@@ -9,7 +9,7 @@ void WZSelector::Init(TTree *tree)
     weight_info_ = 0;
     if (isMC_) {
         fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
-        //weight_info_ = GetLheWeightInfo();
+        weight_info_ = GetLheWeightInfo();
         if (weight_info_ > 0)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
         if ((weight_info_ == 2 || weight_info_ == 3) && doSystematics_)
@@ -763,10 +763,11 @@ void WZSelector::SetupNewDirectory()
     isaQGC_ = name_.find("aqgc") != std::string::npos;
     applyFullSelection_ = (selection_ == VBSselection_Loose_Full ||
                       selection_ == VBSselection_Tight_Full || 
+                      selection_ == VBSselection_NoZeppenfeld_Full || 
                       selection_ == Inclusive2Jet_Full ||
                       selection_ == Wselection_Full);
-    //doSystematics_ = applyFullSelection_;
-    doSystematics_ = true;
+    doSystematics_ = applyFullSelection_;
+    //doSystematics_ = true;
    
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
     if (histInfo == nullptr ) 

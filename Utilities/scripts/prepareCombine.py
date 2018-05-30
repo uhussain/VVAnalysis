@@ -290,8 +290,6 @@ for plot_group in plot_groups:
                 scale_hists = HistTools.getScaleHists(weight_hist, plot_group, rebin)
                 if pdf_entries[plot_group]:
                     pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, rebin)
-                for hist in scale_hists+pdf_hists:
-                    HistTools.addOverflowAndUnderflow(hist,underflow=False)
             elif "TH3" in weight_hist.ClassName(): 
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
                     HistTools.makeUnrolledHist,
@@ -308,6 +306,14 @@ for plot_group in plot_groups:
             else:
                 raise RuntimeError("Invalid weight hist %s" % weight_hist_name +
                         " for %s. Can't make scale variations" % plot_group)
+                
+            # Account for gg component which doesn't have weights
+            if "vv" in plot_group:
+                print "INFO: Scaling VV theory hists by 1.12!"
+            for hist in scale_hists+pdf_hists:
+                HistTools.addOverflowAndUnderflow(hist,underflow=False)
+                if "vv" in plot_group:
+                    hist.Scale(1.12)
 
             if plot_group in ["wz", "QCD-WZjj", "wz-powheg"]:
                 wz_qcd_theory_hists.append(hist.Clone(hist.GetName().replace(chan, "_".join([plot_group, chan]))))

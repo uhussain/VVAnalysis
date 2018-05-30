@@ -82,6 +82,10 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = VBSselection_Loose;
     else if (selectionName_ == "VBSselection_Loose_Full")
         selection_ = VBSselection_Loose_Full;
+    else if (selectionName_ == "VBSselection_NoZeppenfeld")
+        selection_ = VBSselection_NoZeppenfeld;
+    else if (selectionName_ == "VBSselection_NoZeppenfeld_Full")
+        selection_ = VBSselection_NoZeppenfeld_Full;
     else if (selectionName_ == "VBSselection_Tight")
         selection_ = VBSselection_Tight;
     else if (selectionName_ == "VBSselection_Tight_Full")
@@ -100,6 +104,8 @@ void WZSelectorBase::Init(TTree *tree)
     }
     isVBS_ = (selection_ == VBSselection_Loose || 
         selection_ == VBSselection_Loose_Full || 
+        selection_ == VBSselection_NoZeppenfeld || 
+        selection_ == VBSselection_NoZeppenfeld_Full || 
         selection_ == VBSselection_Tight || 
         selection_ == VBSselection_Tight_Full || 
         selection_ == VBSBackgroundControl || 
