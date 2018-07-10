@@ -92,8 +92,12 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ = VBSselection_Tight_Full;
     else if (selectionName_ == "VBSBackgroundControl")
         selection_ = VBSBackgroundControl;
+    else if (selectionName_ == "VBSBackgroundControl_Full")
+        selection_ = VBSBackgroundControl_Full;
     else if (selectionName_ == "VBSBackgroundControlLoose")
         selection_ = VBSBackgroundControlLoose;
+    else if (selectionName_ == "VBSBackgroundControlLoose_Full")
+        selection_ = VBSBackgroundControlLoose_Full;
     else if (selectionName_ == "Inclusive2Jet")
         selection_ = Inclusive2Jet;
     else if (selectionName_ == "Inclusive2Jet_Full")
@@ -109,7 +113,9 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ == VBSselection_Tight || 
         selection_ == VBSselection_Tight_Full || 
         selection_ == VBSBackgroundControl || 
-        selection_ == VBSBackgroundControlLoose
+        selection_ == VBSBackgroundControl_Full || 
+        selection_ == VBSBackgroundControlLoose ||
+        selection_ == VBSBackgroundControlLoose_Full
         );
 
     

@@ -309,11 +309,11 @@ for plot_group in plot_groups:
                 
             # Account for gg component which doesn't have weights
             if "vv" in plot_group:
-                print "INFO: Scaling VV theory hists by 1.12!"
+                print "INFO: Scaling VV theory hists by 1.1!"
             for hist in scale_hists+pdf_hists:
                 HistTools.addOverflowAndUnderflow(hist,underflow=False)
                 if "vv" in plot_group:
-                    hist.Scale(1.12)
+                    hist.Scale(1.1)
 
             if plot_group in ["wz", "QCD-WZjj", "wz-powheg"]:
                 wz_qcd_theory_hists.append(hist.Clone(hist.GetName().replace(chan, "_".join([plot_group, chan]))))

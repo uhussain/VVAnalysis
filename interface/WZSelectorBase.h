@@ -43,7 +43,9 @@ public :
         VBSselection_NoZeppenfeld_Full,
         VBSselection_Tight_Full,
         VBSBackgroundControl,
+        VBSBackgroundControl_Full,
         VBSBackgroundControlLoose,
+        VBSBackgroundControlLoose_Full,
         Inclusive2Jet,
         Inclusive2Jet_Full,
     };

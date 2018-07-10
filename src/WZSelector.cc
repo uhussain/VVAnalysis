@@ -378,7 +378,6 @@ bool WZSelector::PassesVBSBackgroundControlSelection() {
         return (mjj > 100 && (mjj < 500 || dEtajj < 2.5));
 
     return (mjj > 100 && (mjj < 500 || dEtajj < 2.5 || std::abs(zep3l) > 2.5));
-    //return ((mjj > 500 && dEtajj < 2.5) || (mjj < 500 && dEtajj > 2.5));
 }
 
 void WZSelector::ShiftEfficiencies(Systematic variation) {
@@ -447,12 +446,13 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
             return false;
         return mjj > 500 && dEtajj > 2.5;
     }
-    // Backgournd control
+    // Background control
     else if (selection_ == VBSBackgroundControl) { 
         return ((mjj > 500 && dEtajj < 2.5) ||
                 (mjj < 500 && dEtajj > 2.5));
     }
-    else if (selection_ == VBSBackgroundControlLoose) { 
+    else if (selection_ == VBSBackgroundControlLoose ||
+             selection_ == VBSBackgroundControlLoose_Full) { 
         return PassesVBSBackgroundControlSelection();
     }
     return mjj > 500 && dEtajj > 2.5;
@@ -765,9 +765,11 @@ void WZSelector::SetupNewDirectory()
                       selection_ == VBSselection_Tight_Full || 
                       selection_ == VBSselection_NoZeppenfeld_Full || 
                       selection_ == Inclusive2Jet_Full ||
-                      selection_ == Wselection_Full);
+                      selection_ == Wselection_Full ||
+                      selection_ == VBSBackgroundControl_Full ||
+                      selection_ == VBSBackgroundControlLoose_Full);
     doSystematics_ = applyFullSelection_;
-    //doSystematics_ = true;
+    //doSystematics_ = false;
    
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
     if (histInfo == nullptr ) 

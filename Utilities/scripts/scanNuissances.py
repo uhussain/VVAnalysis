@@ -3,40 +3,51 @@ import subprocess
 import math
 
 def getMuAndErr(arg):
-    if subprocess.call(["bash", "runCombine.sh", "mu", arg]):
+    if subprocess.call(["bash", "runCombine.sh", "mu", arg, "noBlind", ]):
         return (0, 0, 0)
-    rtfile = ROOT.TFile("mlfit.root")
+    rtfile = ROOT.TFile("fitDiagnostics.root")
     tree = rtfile.Get("tree_fit_sb")
     row = tree.__iter__().next()
 
-    return (row.mu, row.muLoErr, row.muHiErr)
+    return (row.r, row.rLoErr, row.rHiErr)
 
 muCentral, muCentralErrDown, muCentralErrUp = getMuAndErr("")
 
 results = {}
 
-nuisances = {"jes" : "simple",
-    #"jer" : "simple",
-    #"lumi" : "simple",
-    #"MET" : "simple",
-    #"btag" : "simple",
-    "wzjj-ewk_scale,wzjj-ewk_pdf" : "simple",
-    "wzQCDModeling" : "simple",
+nuisances = {
+    #"CMS_res_j" : "simple",
+    #"CMS_pileup" : "simple",
+    "CMS_scale_j" : "simple",
+    #"lepton_unc" : "group",
+    #"lumi2016_13TeV" : "simple",
+    #"CMS_eff_b" : "simple",
+    #"QCDscale_EW-WZjj,pdf_EW-WZjj" : "simple",
+    #"CMS_norm_QCD-WZjj,pdf_QCD-WZjj,QCDscale_QCD-WZjj" : "simple",
     #"nonprompt_all" : "group" ,
-    #"mc_stat" : "group" ,
-    #"mu_unc" : "group" ,
-    #"e_unc" : "group" ,
-    #"wz_qcd_all": "group" ,
     #"background_theory" : "group",
+    #"prop_binmmm_bin0,prop_binemm_bin0,prop_bineem_bin0,prop_bineee_bin0": "simple" ,
 }
 for nuisance, nutype in nuisances.iteritems():
     if nutype == "simple":
-        arg = "--freezeNuisances=%s" % nuisance
+        arg = "--freezeParameters=%s" % nuisance
     else:
         arg = "--freezeNuisanceGroup=%s" % nuisance
     mu, muErrDown, muErrUp = getMuAndErr(arg)
-    nuErrDown = math.sqrt(muCentralErrDown**2-muErrDown**2)
-    nuErrUp = math.sqrt(muCentralErrUp**2-muErrUp**2)
+    muErrDownRel = muErrDown/mu if mu > 0 else 0
+    muErrUpRel = muErrUp/mu if mu > 0 else 0
+    print "muErrUpRel", muErrUpRel
+    print "muErrDownRel", muErrDownRel
+    muCentralErrDownRel = muCentralErrDown/muCentral
+    muCentralErrUpRel = muCentralErrUp/muCentral
+    print "muCentralErrUpRel", muCentralErrUpRel
+    print "muCentralErrDownRel", muCentralErrDownRel
+    print "muCentral", muCentral
+    print "muCentralErrUp", muCentralErrUp
+    print "muCentralErrDown", muCentralErrDown
+
+    nuErrDown = math.sqrt(abs(muCentralErrDownRel**2-muErrDownRel**2))
+    nuErrUp = math.sqrt(abs(muCentralErrUpRel**2-muErrUpRel**2))
     results[nuisance] = { "mu" : mu,
         "errDown" : muErrDown,
         "errUp" : muErrUp,
@@ -45,7 +56,7 @@ for nuisance, nutype in nuisances.iteritems():
     }
 
 print "-"*80
-print "    Full fit gives %0.3f^{%0.3f}_{%0.3f}" % (muCentral, muCentralErrDown, muCentralErrUp)
+print "    Full fit gives %0.3f^{%0.3f}_{%0.3f}" % (muCentral, muCentralErrUp, muCentralErrDown)
 print ""
 for nuisance in nuisances:
     res = results[nuisance]
