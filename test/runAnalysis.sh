@@ -46,7 +46,7 @@ else
     echo "INFO: Using default selection 'Wselection'"
 fi
 
-frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
+frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRateFinal-${lepid}LepsFrom${looselepsfile}.root
 histfile=/eos/user/k/kelong/WZAnalysisData/HistFiles/${output}-${DATE}.root
 #histfile=${output}-${DATE}.root
 
@@ -59,6 +59,7 @@ if [ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
     echo "INFO: Fake rate file $frfile exists! Using exisiting file."
 else
     echo "INFO: Fake rate file $frfile not found. It will be created."
+    frfile=/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
     ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile 
     python ScaleFactors/setupScaleFactors.py -t $frfile 
 fi
