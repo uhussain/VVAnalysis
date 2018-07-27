@@ -1,4 +1,4 @@
-#include "Analysis/WZAnalysis/interface/WZSelector.h"
+#include "Analysis/VVAnalysis/interface/WZSelector.h"
 #include "TLorentzVector.h"
 #include <boost/algorithm/string.hpp>
 

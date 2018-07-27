@@ -7,7 +7,7 @@
  *
  * https://github.com/nsmith-/ZHinvAnalysis/blob/master/disambiguateFinalStates.C
  */
-#include "Analysis/WZAnalysis/interface/disambiguateFinalStates.h"
+#include "Analysis/VVAnalysis/interface/disambiguateFinalStates.h"
 
 void disambiguateFinalStates::Init(TTree *tree)
 {

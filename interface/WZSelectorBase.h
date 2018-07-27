@@ -12,7 +12,7 @@
 
 // Headers needed by this particular selector
 #include <vector>
-#include "Analysis/WZAnalysis/interface/ScaleFactor.h"
+#include "Analysis/VVAnalysis/interface/ScaleFactor.h"
 
 class WZSelectorBase : public TSelector {
 public :
