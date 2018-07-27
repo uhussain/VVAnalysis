@@ -45,9 +45,9 @@ fScales = ROOT.TFile('data/scaleFactors.root', 'recreate')
 
 # For nTruePU reweighting
 pileupSF = ROOT.ScaleFactor("pileupSF", "Run2016B-H 36.8/fb Pileup profile over RunIISpring16 MC Scale Factor, x=NTruePU")
-pileupFile = ROOT.TFile.Open('ScaleFactors/PileupWeights/PU_Central.root')
-pileupFileUp = ROOT.TFile.Open('ScaleFactors/PileupWeights/PU_minBiasUP.root')
-pileupFileDown = ROOT.TFile.Open('ScaleFactors/PileupWeights/PU_minBiasDOWN.root')
+pileupFile = ROOT.TFile.Open('PileupWeights/PU_Central.root')
+pileupFileUp = ROOT.TFile.Open('PileupWeights/PU_minBiasUP.root')
+pileupFileDown = ROOT.TFile.Open('PileupWeights/PU_minBiasDOWN.root')
 pileupSF.Set1DHist(pileupFile.Get('pileup'), pileupFileUp.Get('pileup'), pileupFileDown.Get('pileup'))
 fScales.cd()
 pileupSF.Write()
