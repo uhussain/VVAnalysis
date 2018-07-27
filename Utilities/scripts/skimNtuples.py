@@ -4,8 +4,8 @@ import argparse
 import os
 import sys
 from collections import OrderedDict
-from Utilities.python import ApplySelection
-from Utilities.python.prettytable import PrettyTable
+from python import ApplySelection
+from python.prettytable import PrettyTable
 
 def getComLineArgs():
     parser = argparse.ArgumentParser()
@@ -60,8 +60,6 @@ def writeMetaTreeToFile(output_file, metaTree):
     save_mt = metaTree.CopyTree("")
     save_mt.Write()
 def skimNtuple(selections, analysis, trigger, filelist, output_file_name, deduplicate):
-    current_path = os.getcwd()
-    os.chdir(sys.path[0])
     ROOT.gROOT.SetBatch(True)
     output_file = ROOT.TFile(output_file_name, "RECREATE")
     ROOT.gROOT.cd()
@@ -121,7 +119,6 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     
     if tmpfile != 0:
         os.remove(tmpfile.GetName())
-    os.chdir(current_path)
 def main():
     args = getComLineArgs()
     skimNtuple(args['selections'], args['analysis'], args['trigger'], args['filelist'], 

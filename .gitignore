@@ -1,5 +1,6 @@
 *.pyc
 *.root
+Cuts/*/aliases.json
 Utilities/Selectors/disambiguateFinalStates_*
 *.cs
 *_C*

@@ -6,8 +6,8 @@ import sys
 import datetime
 import subprocess
 import glob
-from Utilities.python import UserInput
-from Utilities.python import ConfigureJobs
+from python import UserInput
+from python import ConfigureJobs
 import math
 import logging
 
@@ -68,6 +68,7 @@ def farmoutNtupleSkim(sample_name, selection, analysis, version, scaleFacs, noSu
     )
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
+    farmout_dict['base_dir'] = farmout_dict['base_dir'].replace("/Utilities/scripts", "")
     submission_dir = '/{space}/{user}/{folder}'.format(
         space="nfs_scratch" if "hep.wisc.edu" in os.environ['HOSTNAME'] else "data",
         user=os.environ["USER"],

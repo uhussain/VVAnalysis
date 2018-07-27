@@ -9,8 +9,7 @@ if [ ! -f ${job_dir}/analysis_code.tar.gz ]; then
     tar \
         -zcvhf ${job_dir}/analysis_code.tar.gz \
         Cuts/ \
-        Utilities/ \
-        skimNtuples.py
+        Utilities
 fi
 if [ ! -f ${job_dir}/input_file_list.txt ]; then
 ./Utilities/scripts/makeInputFilesList.py \
