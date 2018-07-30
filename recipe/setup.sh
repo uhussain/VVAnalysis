@@ -3,6 +3,7 @@
 dataset_manager=$(./Utilities/scripts/getConfigValue.py dataset_manager_path)/AnalysisDatasetManager
 pushd $CMSSW_BASE/src/Analysis/VVAnalysis/Cuts
 
+echo "INFO: Linking alias files"
 for folder in $(ls -d */); do
     analysis_name=${folder/\//}
     alias_file=${dataset_manager}/Aliases/${analysis_name}.json 
@@ -15,3 +16,19 @@ for folder in $(ls -d */); do
 done
 
 popd
+
+echo "INFO: Downloading scale factor files"
+pushd ScaleFacotrs
+bash setup.sh
+popd
+
+if [ -d PileupWeights ]; then
+    echo "INFO: Producing pileup weight distribution files"
+    pushd PileupWeights
+    bash getDataDistribution.sh
+    python calculatePileupCorrections.py
+    popd
+else
+    echo "WARNING! PileupWeights repository not found. You should clone with"
+    echo ' --recursive, or run "git submodule update --init" now'
+fi
