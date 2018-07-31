@@ -1,0 +1,8 @@
+[Setup]
+user = kelong
+analysis = WZ
+dataset_manager_path = /afs/cern.ch/user/k/%(user)s/work 
+output_path = /data/%(user)s/%(analysis)sAnalysisData
+fakeRate_output = %(output_path)s/FakesRates
+hist_output = %(output_path)s/HistFiles
+combine_output = %(output_path)s/CombineData

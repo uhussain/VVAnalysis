@@ -18,7 +18,7 @@ done
 popd
 
 echo "INFO: Downloading scale factor files"
-pushd ScaleFacotrs
+pushd ScaleFactors
 bash setup.sh
 popd
 
