@@ -80,7 +80,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     selection_groups = selections.split(";")
     tmpfile = 0
     for state in states:
-        if len(selection_groups) > 0:
+        if len(selection_groups) > 1:
             tmpfile = ROOT.TFile("tmpfile.root", "UPDATE")
         tree = ROOT.TChain("%s/ntuple" % state)
         for file_path in input_files:
@@ -105,6 +105,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
                 tree = tmpfile.Get("%s/ntuple" % state)
         if tmpfile:
             tmpfile.Close()
+        tree.Delete()
     writeMetaTreeToFile(output_file, metaTree)
     event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
     for selection, events in event_counts.iteritems():
