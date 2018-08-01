@@ -32,10 +32,10 @@ def getChannels(analysis='WZ'):
         return ["eee", "eem", "emm", "mmm"]
 def getManagerPath():
     config = configparser.ConfigParser()
-    config.read_file(open("Templates/config"))
+    config.read_file(open("Templates/config.%s" % os.environ["USER"]))
     if "dataset_manager_path" not in config['Setup']:
-        raise ValueError("variable %s does not exist in config file Template/config" % args.variable)
-
+        raise ValueError("variable %s does not exist in config file Template/config.%s" 
+                            % (args.variable, os.environ["USER"]))
     return config['Setup']['dataset_manager_path'] + "/"
 def getListOfEWKFilenames():
     return [
