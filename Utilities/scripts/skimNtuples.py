@@ -33,8 +33,7 @@ def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
     if not state_dir:
         state_dir = output_file.mkdir(state)
     state_dir.cd()
-    save_tree = tree.CopyTree(cut_string) if not deduplicate else \
-        getDeduplicatedTree(tree, state, cut_string).CopyTree("")
+    save_tree = tree.CopyTree(cut_string if not deduplicate else "")
     save_tree.Write()
     # Remove AutoSaved trees
     output_file.Purge()
@@ -43,16 +42,25 @@ def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
     #tree.Delete()
     #save_tree.Delete()
     return entries 
-def getDeduplicatedTree(tree, state, cut_string):
+def getDeduplicatedListForTree(tree, analysis, state, cut_string):
     selector = ROOT.disambiguateFinalStates()
     zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
     selector.setZCandidateBranchName(zcand_name)
-    new_tree = tree.CopyTree(cut_string)
-    #tree.Delete()
-    new_tree.Process(selector)#, cut_string)
+    ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
+    tree.Process(selector, cut_string)
     entryList = selector.GetOutputList().FindObject('bestCandidates')
-    new_tree.SetEntryList(entryList)
-    return new_tree
+    return entryList
+def getDeduplicatedListForChain(input_files, analysis, state, cut_string):
+    fullEntryList = ROOT.TEntryList() 
+    for i, input_file in enumerate(input_files):
+        rtfile = ROOT.TFile(input_file)
+        tree = rtfile.Get("%s/ntuple" % state)
+        entryList = getDeduplicatedListForTree(tree, analysis, state, cut_string) 
+        entryList.SetName(rtfile.GetName())
+        entryList.SetTreeNumber(i)
+        entryList.SetTree(tree)
+        fullEntryList.Add(entryList)
+    return fullEntryList
 def writeMetaTreeToFile(output_file, metaTree):
     output_file.cd()
     meta_dir = output_file.mkdir("metaInfo")
@@ -80,12 +88,16 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     selection_groups = selections.split(";")
     tmpfile = 0
     for state in states:
+        if len(input_files) > 1:
+            tree = ROOT.TChain("%s/ntuple" % state)
+            for file_path in input_files:
+                tree.Add(file_path)
+        else: 
+            input_file = ROOT.TFile(input_files[0])
+            tree = input_file.Get("%s/ntuple" % state)
+        event_counts["Input"][state] = tree.GetEntries()
         if len(selection_groups) > 1:
             tmpfile = ROOT.TFile("tmpfile.root", "UPDATE")
-        tree = ROOT.TChain("%s/ntuple" % state)
-        for file_path in input_files:
-            tree.Add(file_path)
-        event_counts["Input"][state] = tree.GetEntries()
         for i, selection_group in enumerate(selection_groups):
             applyDeduplicate = deduplicate if i == 0 else False
             cuts = ApplySelection.CutString()
@@ -93,19 +105,22 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
                 selection_group.split(","), analysis, trigger if i == 0 else "").getString())
             cut_string = cuts.getString()
             print "INFO: Cut string for channel %s is: %s" % (state, cut_string)
-            isFirstOfMultistep = (i == 0 and len(selection_groups) > 1)
             ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
+
+            isFirstOfMultistep = (i == 0 and len(selection_groups) > 1)
+            if applyDeduplicate:
+                entryList = getDeduplicatedListForTree(tree, analysis, state, cut_string) \
+                    if len(input_files) == 1 else getDeduplicatedListForChain(input_files, analysis, state, cut_string) 
+                tree.SetEntryList(entryList)
             if not isFirstOfMultistep:
                 event_counts[selection_group][state] = writeNtupleToFile(output_file, tree, state, 
                     cut_string, applyDeduplicate)
             else:
                 event_counts[selection_group][state] = writeNtupleToFile(tmpfile, tree, state, 
                     cut_string, applyDeduplicate)
-                del tree  
                 tree = tmpfile.Get("%s/ntuple" % state)
         if tmpfile:
             tmpfile.Close()
-        tree.Delete()
     writeMetaTreeToFile(output_file, metaTree)
     event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
     for selection, events in event_counts.iteritems():

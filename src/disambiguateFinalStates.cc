@@ -18,10 +18,10 @@ void disambiguateFinalStates::Init(TTree *tree)
   fChain->SetBranchAddress("evt", &evt, &b_evt);
   fChain->SetBranchAddress("run", &run, &b_run);
 
-  //SafeDelete(fCutFormula);
-  //fCutFormula = new TTreeFormula("CutFormula", fOption, fChain);
-  //fCutFormula->SetQuickLoad(kTRUE);
-  //if (!fCutFormula->GetNdim()) { delete fCutFormula; fCutFormula = 0; }
+  SafeDelete(fCutFormula);
+  fCutFormula = new TTreeFormula("CutFormula", fOption, fChain);
+  fCutFormula->SetQuickLoad(kTRUE);
+  if (!fCutFormula->GetNdim()) { delete fCutFormula; fCutFormula = 0; }
 }
 
 Bool_t disambiguateFinalStates::Notify()
@@ -54,13 +54,13 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
   
   // TODO Understand why this gives segfault for chains
   // with multiple entries
-  //if ( fCutFormula && fCutFormula->EvalInstance() > 0. )
-  //{
+  if ( fCutFormula && fCutFormula->EvalInstance() > 0. )
+  {
     b_Mass->GetEntry(entry);
     Float_t discriminant = fabs(Mass-91.1876);
     fEntriesToCompare.push_back(entry);
     fEntryDiscriminants.push_back(discriminant);
-  //}
+  }
 
   if ( entry == fChain->GetEntries()-1 ) {
     findBestEntry();
