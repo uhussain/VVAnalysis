@@ -130,7 +130,7 @@ def addDuplicationFlag(original_file,state,FlaggedEvents):
         for i in tree:
             eventString='{0}:{1}:{2}'.format(i.run,i.lumi,i.evt)
             if eventString in FlaggedEvents[0]:
-                print eventString
+                #print eventString
                 Flag[0]=1
                 Flag_branch.Fill()
             else:
@@ -180,9 +180,9 @@ events,events_score = getEventScore(original_file)
 #eeee_eemm,eemm_mmmm,eeee_mmmm => SetIntersectionList[0],[1],[2] respectively
 IntersectionList = getSetIntersections(events) 
 eventsbyChannel(events)
-#print "No.of events in eeee_eemm intersection: ",len(IntersectionList[0])
-#print "No.of events in eemm_mmmm intersection: ",len(IntersectionList[1])
-#print "No.of events in eeee_mmmm intersection: ",len(IntersectionList[2])
+print "No.of events in eeee_eemm intersection: ",len(IntersectionList[0])
+print "No.of events in eemm_mmmm intersection: ",len(IntersectionList[1])
+print "No.of events in eeee_mmmm intersection: ",len(IntersectionList[2])
 #Apply flagduplicates function
 #FinalEventList is a list of 3 sets containining unique events corresponding to the three states
 FlaggedEventList = flagduplicates(IntersectionList,events_score)

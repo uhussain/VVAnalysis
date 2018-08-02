@@ -14,18 +14,20 @@ channels = {"eeee":variables[0],"eemm":variables,"mmmm":variables[1]}
 Z_MASS = 91.1876
 def createDataH1(ch,channels):
     dataFiles = glob("/data/uhussain/SkimmedZZNtuples_data_2018-03-06_hadd/results_full/*.root")
+    #print dataFiles
     chain = ROOT.TChain(ch+"/ntuple")
     for f in dataFiles:
+        #print f
         chain.Add(f)
-    #chain.ls()
+    chain.ls()
         #chain.SetBranchStatus(variable,1)
-    data_hist = "ZMass"+ch
+    data_hist = "ZMass_"+ch
     h1 = ROOT.TH1F(data_hist, data_hist, nbins, 40, 120)
     if (ch=="eeee" or ch=="mmmm"):
-        chain.Draw(channels[ch]+">>"+data_hist)
+        chain.Draw(channels[ch]+">>"+data_hist,"nZZTightIsoElec+nZZTightIsoMu==4")
     #Function to retrieve mZ1 in ch=eemm
     else:
-        chain.Draw("(( abs(e1_e2_Mass-91.1876)<abs(m1_m2_Mass-91.1876) ) ? e1_e2_Mass : m1_m2_Mass)>>"+data_hist, "")
+        chain.Draw("(( abs(e1_e2_Mass-91.1876)<abs(m1_m2_Mass-91.1876) ) ? e1_e2_Mass : m1_m2_Mass)>>"+data_hist, "nZZTightIsoElec+nZZTightIsoMu==4")
     h1.SetLineColor(ROOT.kWhite)
     h1.SetLineWidth(2)
     h1.SetStats(0)
@@ -39,10 +41,15 @@ def createDataH1(ch,channels):
     return h1
 
 def createMCStack(ch,channels):
-    mcSamples = {"DYJetsToLL_M10to50":18610,"DYJetsToLLM-50_ext1":6104,"ggHZZ_ext1":0.01218,"GluGluZZTo2e2mu":0.00319,
+    #ext samples
+    #mcSamples = {"DYJetsToLL_M10to50":18610,"DYJetsToLLM-50_ext1":6104,"ggHZZ_ext1":0.01218,"GluGluZZTo2e2mu":0.00319,
+    #        "GluGluZZTo2e2tau":0.00319,"GluGluZZTo2mu2tau": 0.00319,"GluGluZZTo4e":0.00159,"GluGluZZTo4mu":0.00159,
+    #        "ttH_HToZZ_4L_ext1":0.000393,"TTJets-amcatnlo":815.96,"TTTo2L2Nu-powheg":87.31,"WminusHToZZ_ext1":0.000147,
+    #        "WplusHToZZ_ext1":0.000232,"WZTo3LNu":4.430,"ZHToZZ_4L":0.000668,"ZZTo4L-powheg_ext1":1.256} 
+    mcSamples = {"DYJetsToLL_M10to50":18610,"DYJetsToLLM-50_ext1":6104,"ggHZZ":0.01218,"GluGluZZTo2e2mu":0.00319,
             "GluGluZZTo2e2tau":0.00319,"GluGluZZTo2mu2tau": 0.00319,"GluGluZZTo4e":0.00159,"GluGluZZTo4mu":0.00159,
             "ttH_HToZZ_4L_ext1":0.000393,"TTJets-amcatnlo":815.96,"TTTo2L2Nu-powheg":87.31,"WminusHToZZ_ext1":0.000147,
-            "WplusHToZZ_ext1":0.000232,"WZTo3LNu":4.430,"ZHToZZ_4L":0.000668,"ZZTo4L-powheg_ext1":1.256} 
+            "WplusHToZZ_ext1":0.000232,"WZTo3LNu":4.430,"ZHToZZ_4L":0.000668,"ZZTo4L-powheg":1.256} 
     #channels = ["eeee/ntuple","eemm/ntuple", "eeee/ntuple"]  
     MCStack = ROOT.THStack("stack", "stack")
     ROOT.SetOwnership(MCStack, False)
@@ -53,19 +60,19 @@ def createMCStack(ch,channels):
         f1 = ROOT.TFile(mcFile)
         tree = f1.Get(ch+"/ntuple")
         meta_tree = f1.Get("metaInfo/metaInfo")
-        hist_name = "ZMass"+mc_Sample+ch
+        hist_name = "ZMass_"+mc_Sample+"_"+ch
         hist = ROOT.TH1F(hist_name, hist_name, nbins, 40, 120)
         #ROOT.SetOwnership(hist, False)
         if (ch=="eeee" or ch=="mmmm"):
-            tree.Draw(channels[ch]+">>"+hist_name,"")
+            tree.Draw(channels[ch]+">>"+hist_name,"genWeight*(nZZTightIsoElec+nZZTightIsoMu==4)")
         #Function to retrieve mZ1 in ch=eemm
         else:
-            tree.Draw("(( abs(e1_e2_Mass-91.1876)<abs(m1_m2_Mass-91.1876) ) ? e1_e2_Mass : m1_m2_Mass)>>"+hist_name, "")
+            tree.Draw("(( abs(e1_e2_Mass-91.1876)<abs(m1_m2_Mass-91.1876) ) ? e1_e2_Mass : m1_m2_Mass)>>"+hist_name, "genWeight*(nZZTightIsoElec+nZZTightIsoMu==4)")
         sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1,0,100)
         meta_tree.Draw("1>>sumweights","summedWeights")
         sumweights = sumweights_hist.Integral()
         xsec = mcSamples[mc_Sample]*1000
-        hist.Scale(xsec*lumi/sumweights)
+        hist.Scale((xsec*lumi)/sumweights)
         #hist.Scale(xsec*lumi)
         hist.SetFillColor(ROOT.kBlue)
         gROOT.cd()
@@ -77,7 +84,7 @@ def createMCStack(ch,channels):
         #print hist.Integral()
         
     #ROOT.SetOwnership(MCStack, False)
-    for i in MCStack.GetHists(): print "Name is", i.GetName(), "Integral is", i.Integral()
+    for i in MCStack.GetHists(): print i.GetName(), "Integral is", i.Integral()
     return MCStack
 def createRatio(h1, h2):
     Nbins = h1.GetNbinsX()
@@ -181,7 +188,7 @@ def stackplot(ch,channels):
     h2 = hStack.GetStack().Last()
     print "Total Stack Integral",h2.Integral()
     Stackmaximum = h2.GetMaximum()
-    hStack.SetTitle("")
+    hStack.SetTitle("mZ1_"+ch)
     hStack.Draw("HIST")
     hStack.SetMinimum(0)
     if(Datamaximum > Stackmaximum):
@@ -197,6 +204,14 @@ def stackplot(ch,channels):
     h1.SetMarkerSize(0.7)
     h1.Draw("pex0same")
     
+    leg = ROOT.TLegend(0.20,0.54,0.48,0.84,"")
+    leg.AddEntry(h1,"Data")
+    leg.AddEntry(h2, "2017 Background MC Samples")
+    leg.SetFillColor(ROOT.kWhite)
+    leg.SetFillStyle(0)
+    leg.SetTextSize(0.025)
+    leg.Draw()
+
     #SecondPad
     texS,texS1,pad2 = createPad2(c)
     #Starting the ratio proceedure
@@ -225,7 +240,7 @@ def stackplot(ch,channels):
     yaxis.Draw("SAME")
 
     c.Update()
-    print hStack.ls()
+    #print hStack.ls()
     #hStack.GetYaxis().SetTitle("Events / 2 GeV")
     #hStack.GetYaxis().SetTitleOffset(1.0)
     #c, pad1, pad2 = createCanvasPads()
@@ -246,7 +261,7 @@ def stackplot(ch,channels):
     #axis.Draw()
     #pad2.cd()
     #h3.Draw("ep")
-    c.SaveAs("ZMass_"+ch+"_someDuplication.pdf") 
+    c.SaveAs("DataMCPlots_Mar15/ZMass_"+ch+"_full_noext.pdf") 
     #text = raw_input()
     from IPython import embed
     embed()
