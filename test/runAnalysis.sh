@@ -56,17 +56,18 @@ if [[ "$3" != "" ]]; then
 fi
 
 cd $CMSSW_BASE/src/Analysis/VVAnalysis
-if [ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
+if [ 1 == 1 ]; then #[ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
     echo "INFO: Fake rate file $frfile exists! Using exisiting file."
 else
     echo "INFO: Fake rate file $frfile not found. It will be created."
+    python ScaleFactors/setupScaleFactors.py -t $frfile 
     frfile=${frpath}/fakeRate${DATE_MONTHONLY}-${lepid}LepsFrom${looselepsfile}.root
     ./Utilities/scripts/makeFakeRates.py -s ${looselepsfile} -l $lumi -o $frfile 
     python ScaleFactors/setupScaleFactors.py -t $frfile 
 fi
 
 if [ "$2" != "combineOnly" ]; then
-    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output 
+    echo ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output 
     if [ -f $histfile ]; then
         echo "Histogram file $histfile produced"
     else

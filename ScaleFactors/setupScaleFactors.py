@@ -8,6 +8,7 @@
 #!/usr/bin/env python
 import ROOT
 import argparse
+import os
 ROOT.gROOT.SetBatch(True)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -41,7 +42,8 @@ parser.add_argument("-t", "--tightfr_file", type=str,
 parser.add_argument("-m", "--medfr_file", type=str,
         default='data/fakeRate18Apr2017-3LooseLeptons-MediumMuons.root')
 args = parser.parse_args()
-fScales = ROOT.TFile('data/scaleFactors.root', 'recreate')
+output_file = 'data/scaleFactors.root'
+fScales = ROOT.TFile(output_file, 'recreate')
 
 # For nTruePU reweighting
 pileupSF = ROOT.ScaleFactor("pileupSF", "Run2016B-H 36.8/fb Pileup profile over RunIISpring16 MC Scale Factor, x=NTruePU")
@@ -129,19 +131,24 @@ muonIsoSF.Write()
 #eCBMedFakeRate.Write()
 #eCBTightFakeRate.Write()
 
-fakeRateFile = ROOT.TFile.Open(args.medfr_file)
-eCBMedFakeRateZjets = ROOT.ScaleFactor("eCBMedFakeRate", "Fake rate from Z+jet")
-eCBMedFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allE'), 0, 0, ROOT.ScaleFactor.AsInHist)
-mCBMedFakeRateZjets = ROOT.ScaleFactor("mCBMedFakeRate", "Fake rate from Z+jet")
-mCBMedFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu'), 0, 0, ROOT.ScaleFactor.AsInHist)
-fScales.cd()
+if os.path.isfile(args.medfr_file):
+    print "INFO: Adding medium fake rates to %s" % output_file
+    fakeRateFile = ROOT.TFile.Open(args.medfr_file)
+    eCBMedFakeRateZjets = ROOT.ScaleFactor("eCBMedFakeRate", "Fake rate from Z+jet")
+    eCBMedFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allE'), 0, 0, ROOT.ScaleFactor.AsInHist)
+    mCBMedFakeRateZjets = ROOT.ScaleFactor("mCBMedFakeRate", "Fake rate from Z+jet")
+    mCBMedFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu'), 0, 0, ROOT.ScaleFactor.AsInHist)
+    fScales.cd()
+    mCBMedFakeRateZjets.Write()
+    eCBMedFakeRateZjets.Write()
 
-fakeRateFile = ROOT.TFile.Open(args.tightfr_file)
-eCBTightFakeRateZjets = ROOT.ScaleFactor("eCBTightFakeRate", "Fake rate from Z+jet")
-eCBTightFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allE'), 0, 0, ROOT.ScaleFactor.AsInHist)
-mCBTightFakeRateZjets = ROOT.ScaleFactor("mCBTightFakeRate", "Fake rate from Z+jet")
-mCBTightFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu'), 0, 0, ROOT.ScaleFactor.AsInHist)
-
-fScales.cd()
-mCBTightFakeRateZjets.Write()
-eCBTightFakeRateZjets.Write()
+if os.path.isfile(args.tightfr_file):
+    print "INFO: Adding tight fake rates to %s" % output_file
+    fakeRateFile = ROOT.TFile.Open(args.tightfr_file)
+    eCBTightFakeRateZjets = ROOT.ScaleFactor("eCBTightFakeRate", "Fake rate from Z+jet")
+    eCBTightFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allE'), 0, 0, ROOT.ScaleFactor.AsInHist)
+    mCBTightFakeRateZjets = ROOT.ScaleFactor("mCBTightFakeRate", "Fake rate from Z+jet")
+    mCBTightFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu'), 0, 0, ROOT.ScaleFactor.AsInHist)
+    fScales.cd()
+    mCBTightFakeRateZjets.Write()
+    eCBTightFakeRateZjets.Write()
