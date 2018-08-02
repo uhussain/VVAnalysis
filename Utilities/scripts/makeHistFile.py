@@ -64,8 +64,10 @@ elif useJakobsFRs:
     eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Jakob")
 # For medium muons
 #mCBMedFakeRate.SetName("fakeRate_allMu")
-mCBTightFakeRate.SetName("fakeRate_allMu")
-eCBTightFakeRate.SetName("fakeRate_allE")
+if mCBTightFakeRate:
+    mCBTightFakeRate.SetName("fakeRate_allMu")
+if eCBTightFakeRate:
+    eCBTightFakeRate.SetName("fakeRate_allE")
 
 muonIsoSF = fScales.Get('muonIsoSF')
 muonIdSF = fScales.Get('muonTightIdSF')
