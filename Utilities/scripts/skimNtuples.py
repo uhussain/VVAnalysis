@@ -53,7 +53,7 @@ def getDeduplicatedListForTree(tree, analysis, state, cut_string):
 def getDeduplicatedListForChain(input_files, analysis, state, cut_string):
     fullEntryList = ROOT.TEntryList() 
     for i, input_file in enumerate(input_files):
-        rtfile = ROOT.TFile(input_file)
+        rtfile = ROOT.TFile.Open(input_file)
         tree = rtfile.Get("%s/ntuple" % state)
         entryList = getDeduplicatedListForTree(tree, analysis, state, cut_string) 
         entryList.SetName(rtfile.GetName())
@@ -93,7 +93,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
             for file_path in input_files:
                 tree.Add(file_path)
         else: 
-            input_file = ROOT.TFile(input_files[0])
+            input_file = ROOT.TFile.Open(input_files[0])
             tree = input_file.Get("%s/ntuple" % state)
         event_counts["Input"][state] = tree.GetEntries()
         if len(selection_groups) > 1:

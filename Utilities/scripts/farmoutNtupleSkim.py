@@ -28,7 +28,7 @@ def getFilesPerJob(path_to_files):
     if num == 0:
         raise ValueError("Size of file list is zero for path: %s" % path_to_files)
     average_size = tot_size/num
-    return int(math.ceil(200./average_size))
+    return int(math.ceil(300./average_size))
 # The intention here was to make sure the output order isn't jumbled together,
 # as it is when subprocess outputs are written together. This is an admittedly
 # sloppy solution, however
