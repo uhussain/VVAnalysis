@@ -10,7 +10,7 @@
         "m" : [
             "{object_name}Pt > 10",
             "abs({object_name}Eta) < 2.4",
-            "{object_name}IsWZLoose > 0.5",
+            "{object_name}IsWZMedium > 0.5",
             "abs({object_name}PVDXY) < 0.02",
             "abs({object_name}PVDZ) < 0.1"
         ]
