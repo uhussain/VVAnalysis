@@ -10,13 +10,6 @@ import math
 import array
 import logging
 
-stat_variations = { "eee" : [],
-    "eem" : [],
-    "emm" : [],
-    "mmm" : [],
-    "all" : [],
-}
-
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--vbfnlo",
@@ -69,6 +62,8 @@ def combineChannels(group, chans, variations=[], central=True):
 
 ROOT.gROOT.SetBatch(True)
 chans = ConfigureJobs.getChannels()
+stat_variations = { chan : [] for chan in (chans + ["all"])}
+
 args = getComLineArgs()
 
 manager_path = ConfigureJobs.getManagerPath() 
@@ -85,62 +80,18 @@ fOut = ROOT.TFile(args['output_file'], "recreate")
 fIn = ROOT.TFile(args['input_file'])
 
 card_info = {
-    "eee" : { 
+    chan : { 
         "wzjj_vbfnlo" : 0,
         "EW_WZjj" : 0,
         "QCD_WZjj" : 0,
-        "wz_powheg" : 0,
-        "vv_powheg" : 0,
-        "top_ewk" : 0,
-        "zg" : 0,
-        "vv" : 0,
-        "AllData" : 0,
-    },
-    "eem" : {
-        "wzjj_vbfnlo" : 0,
-        "EW_WZjj" : 0,
-        "wz_powheg" : 0,
-        "vv_powheg" : 0,
-        "top_ewk" : 0,
-        "zg" : 0,
-        "vv" : 0,
-        "AllData" : 0,
-    },
-    "emm" : {
-        "wzjj_vbfnlo" : 0,
-        "EW_WZjj" : 0,
-        "QCD_WZjj" : 0,
-        "wz_powheg" : 0,
-        "vv_powheg" : 0,
-        "top_ewk" : 0,
-        "zg" : 0,
-        "vv" : 0,
-        "AllData" : 0,
-    },
-    "mmm" : {
-        "wzjj_vbfnlo" : 0,
-        "EW_WZjj" : 0,
-        "QCD_WZjj" : 0,
-        "wz_powheg" : 0,
-        "vv_powheg" : 0,
-        "top_ewk" : 0,
-        "zg" : 0,
-        "vv" : 0,
-        "AllData" : 0,
-    },
-    "all" : {
-        "wzjj_vbfnlo" : 0,
-        "EW_WZjj" : 0,
         "wz" : 0,
-        "QCD_WZjj" : 0,
         "wz_powheg" : 0,
         "vv_powheg" : 0,
         "top_ewk" : 0,
         "zg" : 0,
         "vv" : 0,
-        "nonprompt" : 0,
         "AllData" : 0,
-    },
+    } for chan in (chans + ["all"])
 }
 
 pdf_entries = {
