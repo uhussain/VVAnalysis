@@ -243,7 +243,7 @@ plot_groups = ["QCD-WZjj", "wz", "wz-powheg", "EW-WZjj", "top-ewk", "zg", "vv-po
 aqgc_groups =  []
 if args['aqgc']:
     import json
-    base_name = "/afs/cern.ch/user/k/kelong/work/AnalysisDatasetManager/PlotGroups/"
+    base_name = manager_path +"/PlotGroups/"
     for filename in ["WZxsec2016_aQGC-FM.json", "WZxsec2016_aQGC-FS.json", "WZxsec2016_aQGC-FT.json",]:
         aqgc_names = json.load(open(base_name+filename))
         aqgc_groups.extend([str(n) for n in aqgc_names.keys()])
@@ -389,7 +389,7 @@ for name in ["EW_WZjj", "wzjj_vbfnlo"]:
             /math.sqrt(sum([background[c] for c in chans])), 4), 
     ])
 
-combine_dir = "/afs/cern.ch/user/k/kelong/work/HiggsCombine/CMSSW_8_1_0/src/HiggsAnalysis/CombinedLimit"
+combine_dir = ConfigureJobs.getCombinePath() 
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
                 datetime.date.today().strftime("%d%b%Y") 
 
