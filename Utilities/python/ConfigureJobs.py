@@ -34,9 +34,16 @@ def getManagerPath():
     config = configparser.ConfigParser()
     config.read_file(open("Templates/config.%s" % os.environ["USER"]))
     if "dataset_manager_path" not in config['Setup']:
-        raise ValueError("variable %s does not exist in config file Template/config.%s" 
-                            % (args.variable, os.environ["USER"]))
+        raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
+                            % os.environ["USER"])
     return config['Setup']['dataset_manager_path'] + "/"
+def getCombinePath():
+    config = configparser.ConfigParser()
+    config.read_file(open("Templates/config.%s" % os.environ["USER"]))
+    if "combine_path" not in config['Setup']:
+        raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
+                            % os.environ["USER"])
+    return config['Setup']['combine_path'] + "/"
 def getListOfEWKFilenames():
     return [
     #    "wz3lnu-powheg",
