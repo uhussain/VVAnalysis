@@ -89,6 +89,7 @@ def getListOfFiles(filelist, manager_path):
         if "ZZ4l2018" in name:
             dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
                 "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2018/%s.json" % "ntuples"
+            print dataset_file
             allnames = json.load(open(dataset_file)).keys()
             print allnames
             if "nodata" in name:
