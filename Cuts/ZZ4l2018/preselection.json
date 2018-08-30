@@ -15,7 +15,7 @@
             "(abs({object_name}PVDXY) < 0.5)",
             "(abs({object_name}PVDZ) < 1.0)",
             "({object_name}BestTrackType !=2)",
-            "({object_name}IsPFMuon >= 1)",
+            "({object_name}ZZTightIDNoVtx > 0.5)",
             "({object_name}ZZIsoPass > 0.5)"
         ]
     },
