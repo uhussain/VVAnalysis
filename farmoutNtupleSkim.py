@@ -82,14 +82,22 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     )
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
-    submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
-        % '{:%Y-%m-%d}_ZZ2018AnalysisJobs'.format(datetime.date.today())
+    if analysis="ZZ4lCR2018":
+        submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
+            % '{:%Y-%m-%d}_ZZ4lCR2018AnalysisJobs'.format(datetime.date.today())
+    else:
+        submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
+            % '{:%Y-%m-%d}_ZZ2018AnalysisJobs'.format(datetime.date.today())
     try:
         os.mkdir(submission_dir)
     except:
         pass
     farmout_dict['job_dir'] = submission_dir + "/" + job_name
-    farmout_dict['files_per_job'] = getFilesPerJob(farmout_dict['input_files_path'])
+    #This is to make sure the copyTree function does not fail with memory allocation due to big trees especiall in ZZ4l samples!
+    if ("Run" not in sample_name):
+        farmout_dict['files_per_job'] = 1
+    else:
+        farmout_dict['files_per_job'] = getFilesPerJob(farmout_dict['input_files_path'])
     farmout_dict['job_name'] = job_name
     farmout_dict['time'] = datetime.datetime.now()
     farmout_dict['command'] = ' '.join(sys.argv)
