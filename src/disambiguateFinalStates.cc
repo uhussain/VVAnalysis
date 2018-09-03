@@ -25,10 +25,10 @@ void disambiguateFinalStates::Init(TTree *tree)
   fChain->SetBranchAddress("evt", &evt, &b_evt);
   fChain->SetBranchAddress("run", &run, &b_run);
 
-  //SafeDelete(fCutFormula);
-  //fCutFormula = new TTreeFormula("CutFormula", fOption, fChain);
-  //fCutFormula->SetQuickLoad(kTRUE);
-  //if (!fCutFormula->GetNdim()) { delete fCutFormula; fCutFormula = 0; }
+  SafeDelete(fCutFormula);
+  fCutFormula = new TTreeFormula("CutFormula", fOption, fChain);
+  fCutFormula->SetQuickLoad(kTRUE);
+  if (!fCutFormula->GetNdim()) { delete fCutFormula; fCutFormula = 0; }
 }
 
 Bool_t disambiguateFinalStates::Notify()
@@ -61,8 +61,8 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
   
   // TODO Understand why this gives segfault for chains
   // with multiple entries
-  //if ( fCutFormula && fCutFormula->EvalInstance() > 0. )
-  //{
+  if ( fCutFormula && fCutFormula->EvalInstance() > 0. )
+    {
     b_l1_l2_Mass->GetEntry(entry);
     b_l1_Pt->GetEntry(entry);
     b_l2_Pt->GetEntry(entry);
@@ -83,7 +83,7 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
     fEntriesToCompare.push_back(entry);
     fEntryDiscriminants.push_back(mass_discriminant);
     fEntryZ2PtSum.push_back(Z2ptSum);
-  //}
+  }
 
   if ( entry == fChain->GetEntries()-1 ) {
     findBestEntry();

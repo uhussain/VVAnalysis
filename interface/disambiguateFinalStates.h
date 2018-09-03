@@ -43,14 +43,17 @@ public :
   TBranch        *b_evt;
   TBranch        *b_run;
 
+  TEntryList     *fBestCandidateEntryList;
+  
   // TODO Add TTreeFormula, fix issue when using chain.Process 
   // over multiple files (currently segfaults)
   TTreeFormula   *fCutFormula;
 
-  TEntryList     *fBestCandidateEntryList;
 
-  disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0), /*fCutFormula(0),*/ fCurrentRun(-1), fCurrentEvt(-1) { }
-  virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList); /*SafeDelete(fCutFormula)*/; }
+  //disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0), /*fCutFormula(0),*/ fCurrentRun(-1), fCurrentEvt(-1) { }
+  disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0), fCutFormula(0), fCurrentRun(-1), fCurrentEvt(-1) { }
+  //virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList); /*SafeDelete(fCutFormula)*/; }
+  virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList); SafeDelete(fCutFormula); }
   virtual Int_t   Version() const { return 2; }
   virtual void    Begin(TTree *tree);
   virtual void    SlaveBegin(TTree *tree);
