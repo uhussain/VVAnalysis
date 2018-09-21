@@ -83,7 +83,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
     submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
-        % '{:%Y-%m-%d}_ZZ2018AnalysisJobs'.format(datetime.date.today())
+        % '{:%Y-%m-%d}_ZZ2019AnalysisJobs'.format(datetime.date.today())
     try:
         os.mkdir(submission_dir)
     except:

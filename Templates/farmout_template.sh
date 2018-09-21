@@ -23,7 +23,7 @@ popd
 chmod +x ${job_dir}/skim.sh
 farmoutAnalysisJobs \
     --fwklite \
-    --output-dir=srm://cmssrm2.hep.wisc.edu:8443/srm/v2/server?SFN=/hdfs/store/user/$$USER/ZZAnalysisJobs_$$DATE/${job_name} \
+    --output-dir=gsiftp://cms-lvs-gridftp.hep.wisc.edu:2811//hdfs/store/user/$$USER/ZZAnalysisJobs2019_$$DATE/${job_name} \
     --input-file-list=${job_dir}/input_file_list.txt \
     --submit-dir=${job_dir}/submit \
     --input-files-per-job=${files_per_job} \
