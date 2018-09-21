@@ -4,6 +4,7 @@ import argparse
 import os
 import json
 import sys
+from collections import OrderedDict
 from Utilities.python import ApplySelection
 from Utilities.python.prettytable import PrettyTable
 
@@ -14,7 +15,7 @@ def getComLineArgs():
                         "separated by commas. They must be"
                         " mapped to a cuts json via Cuts/definitions.json")
     parser.add_argument("-t", "--trigger", type=str, default="",
-                        choices=["DoubleEG", "DoubleMuon", "MuonEG", 
+                        choices=["EGamma", "DoubleMuon", "MuonEG", 
                             "SingleMuon", "SingleElectron", "MonteCarlo", ""],
                         help="Name of trigger to select in data")
     parser.add_argument("-f", "--filelist", type=str,
@@ -29,16 +30,20 @@ def getComLineArgs():
                         help="Don't remove duplicated events from ntuple")
     return vars(parser.parse_args())
 def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
-    state_dir = output_file.mkdir(state)
+    state_dir = output_file.Get(state)
+    if not state_dir:
+        state_dir = output_file.mkdir(state)
     state_dir.cd()
-    save_tree = tree.CopyTree(cut_string) if not deduplicate else \
-        getDeduplicatedTree(tree, state, cut_string).CopyTree("")
+    save_tree = tree.CopyTree(cut_string if not deduplicate else "")
     save_tree.Write()
     # Remove AutoSaved trees
     output_file.Purge()
     ROOT.gROOT.cd()
-    return save_tree.GetEntries()
-def getDeduplicatedTree(tree, state, cut_string):
+    entries = save_tree.GetEntries()
+    #tree.Delete()
+    #save_tree.Delete()
+    return entries
+def getDeduplicatedListForTree(tree, analysis, state, cut_string):
     selector = ROOT.disambiguateFinalStates()
     if state.count('e') > 2:
         l1_l2_cand_mass = "e1_e2_Mass"
@@ -62,11 +67,21 @@ def getDeduplicatedTree(tree, state, cut_string):
         l3_cand_pt = "m1Pt"
         l4_cand_pt = "m2Pt"
     selector.setZCandidateBranchName(l1_l2_cand_mass,l1_cand_pt,l2_cand_pt,l3_l4_cand_mass,l3_cand_pt,l4_cand_pt)
-    new_tree = tree.CopyTree(cut_string)
-    new_tree.Process(selector)#, cut_string)
+    ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
+    tree.Process(selector, cut_string)
     entryList = selector.GetOutputList().FindObject('bestCandidates')
-    new_tree.SetEntryList(entryList)
-    return new_tree
+    return entryList
+def getDeduplicatedListForChain(input_files, analysis, state, cut_string):
+    fullEntryList = ROOT.TEntryList() 
+    for i, input_file in enumerate(input_files):
+        rtfile = ROOT.TFile.Open(input_file)
+        tree = rtfile.Get("%s/ntuple" % state)
+        entryList = getDeduplicatedListForTree(tree, analysis, state, cut_string) 
+        entryList.SetName(rtfile.GetName())
+        entryList.SetTreeNumber(i)
+        entryList.SetTree(tree)
+        fullEntryList.Add(entryList)
+    return fullEntryList
 def writeMetaTreeToFile(output_file, metaTree):
     output_file.cd()
     meta_dir = output_file.mkdir("metaInfo")
@@ -74,8 +89,6 @@ def writeMetaTreeToFile(output_file, metaTree):
     save_mt = metaTree.CopyTree("")
     save_mt.Write()
 def skimNtuple(selections, analysis, trigger, filelist, output_file_name, deduplicate):
-    current_path = os.getcwd()
-    os.chdir(sys.path[0])
     ROOT.gROOT.SetBatch(True)
     output_file = ROOT.TFile(output_file_name, "RECREATE")
     ROOT.gROOT.cd()
@@ -87,33 +100,70 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     for file_path in input_files:
         metaTree.Add(file_path)
     #event_counts for writing the tree to the File with all selections together
-    event_counts = {"initial" : {}, "selected" : {}}
-    for state in ["eeee", "eemm", "mmmm"]:
-        tree = ROOT.TChain("%s/ntuple" % state)
-        for file_path in input_files:
-            tree.Add(file_path)
-        event_counts["initial"][state] = tree.GetEntries()
-        cuts = ApplySelection.CutString()
-        cuts.append(ApplySelection.buildCutString(state, 
-           selections.split(","), analysis, trigger).getString())
-        cuts_string = cuts.getString()
-        print "Cut string is %s " % cuts_string
-        ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
-        event_counts["selected"][state] = writeNtupleToFile(output_file, tree, state, cuts_string,deduplicate)
+    event_counts = OrderedDict({"Input" : {}})
+    for selection_group in selections.split(";"):
+        event_counts[selection_group] = {}
+    states = []
+    if "WZ" in analysis or "ZL" in analysis:
+        states = ["eee", "eem", "emm", "mmm"]
+    elif "ZZ" in analysis:
+        states = ["eeee", "eemm", "mmmm"]
+    selection_groups = selections.split(";")
+    tmpfile = 0
+    for state in states:
+        if len(input_files) > 1:
+            tree = ROOT.TChain("%s/ntuple" % state)
+            for file_path in input_files:
+                tree.Add(file_path)
+        else: 
+            input_file = ROOT.TFile.Open(input_files[0])
+            tree = input_file.Get("%s/ntuple" % state)
+        event_counts["Input"][state] = tree.GetEntries()
+        if len(selection_groups) > 1:
+            tmpfile = ROOT.TFile("tmpfile.root", "UPDATE")
+        for i, selection_group in enumerate(selection_groups):
+            applyDeduplicate = deduplicate if i == 0 else False
+            print applyDeduplicate
+            print "selection_group: ", selection_group
+            cuts = ApplySelection.CutString()
+            cuts.append(ApplySelection.buildCutString(state, 
+                selection_group.split(","), analysis, trigger if i == 0 else "").getString())
+            cut_string = cuts.getString()
+            print "INFO: Cut string for channel %s is: %s" % (state, cut_string)
+            ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
+
+            isFirstOfMultistep = (i == 0 and len(selection_groups) > 1)
+            print selection_group
+            if applyDeduplicate:
+                print cut_string
+                entryList = getDeduplicatedListForTree(tree, analysis, state, cut_string) \
+                    if len(input_files) == 1 else getDeduplicatedListForChain(input_files, analysis, state, cut_string) 
+                tree.SetEntryList(entryList)
+            if not isFirstOfMultistep:
+                event_counts[selection_group][state] = writeNtupleToFile(output_file, tree, state, 
+                    cut_string, applyDeduplicate)
+                print "Entries after each step: ", event_counts[selection_group][state] 
+            else:
+                event_counts[selection_group][state] = writeNtupleToFile(tmpfile, tree, state, 
+                    cut_string, applyDeduplicate)
+                tree = tmpfile.Get("%s/ntuple" % state)
+                print "Entries after first step: ", tree.GetEntries()
+        if tmpfile:
+            tmpfile.Close()
     writeMetaTreeToFile(output_file, metaTree)
-    event_info = PrettyTable(["Selection", "eeee", "eemm","mmmm"])
+    event_info = PrettyTable(["Selection", "eeee", "eemm", "mmmm"])
     for selection, events in event_counts.iteritems():
         event_info.add_row([selection, events["eeee"], events["eemm"],events["mmmm"]])
     print "\nResults for selection: %s" % selections
-
     if deduplicate:
         print "NOTE: Events deduplicated by choosing the ordering with m_l1_l2 " \
-            "closest to m_{Z}^{PDG} AFTER making full selection\n"
+                "closest to m_{Z}^{PDG} \n      after selection: %s" % selections.split(";")[0]
     else:
         print "NOTE: Events NOT deduplicated! Event may appear in multiple rows of ntuple!\n"
     print event_info.get_string()
     
-    os.chdir(current_path)
+    if tmpfile != 0:
+        os.remove(tmpfile.GetName())
 def main():
     args = getComLineArgs()
     print args['filelist']
