@@ -1,0 +1,4 @@
+{ 
+    "MonteCarlo" : "",    
+    "DoubleMuon" : "(doubleMuDZPass || tripleMuPass)"
+}
