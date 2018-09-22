@@ -4,8 +4,8 @@ lumi=35.87
 lepid="Tight"
 DATE=$(date +%d%b%Y)
 DATE_MONTHONLY=$(date +%b%Y)
-looselepsfile=3MediumLeptons
-#looselepsfile=3LooseLeptons
+#looselepsfile=3MediumLeptons
+looselepsfile=3LooseLeptons
 
 input=Wselection${looselepsfile/3/}
 output=Wselection
@@ -67,7 +67,7 @@ else
 fi
 
 if [ "$2" != "combineOnly" ]; then
-    echo ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output 
+    ./Utilities/scripts/makeHistFile.py -l $lumi -s $input -o $histfile --output_selection $output 
     if [ -f $histfile ]; then
         echo "Histogram file $histfile produced"
     else
@@ -87,7 +87,7 @@ if [ "$2" != "noCombine" ]; then
     fi
 
     if [[ "$2" != "combineOnly" && "$1" == "VBSselection"* ]]; then
-        python ./Utilities/scripts/addaQGCHistsToFile.py -i $histfile
+        #python ./Utilities/scripts/addaQGCHistsToFile.py -i $histfile
         python ./Utilities/scripts/addUnrolledHistsToFile.py -i $histfile
     fi
     if [ "$1" != "FakeRate"* ]; then

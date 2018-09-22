@@ -19,7 +19,6 @@ jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Dow
 
 transformed_mjj_etajj_hists = HistTools.getTransformedHists(input_file, 
         ConfigureJobs.getListOfFiles(ConfigureJobs.getListOfEWKFilenames() + \
-            ["wlljj-ewk__prefire"] + \
             ConfigureJobs.getListOfNonpromptFilenames() + \
             ['wzjj-vbfnlo-sf', 'wzjj-vbfnlo-of', ] + \
                 ['wz3lnu-mg5amcnlo','wz3lnu-powheg', 'zz4l-mg5amcnlo'] + \

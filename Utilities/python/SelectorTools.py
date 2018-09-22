@@ -23,7 +23,6 @@ def applySelector(filelist, selector_name, selection,
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     selection, analysis)
-                print file_path
                 processLocalFiles(select, file_path, chan)
             except ValueError as e:
                 print e

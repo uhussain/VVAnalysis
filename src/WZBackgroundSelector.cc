@@ -96,6 +96,8 @@ float WZBackgroundSelector::getEventWeight() {
         }
         evtwgt = -1*getl2FakeRate()*getl3FakeRate()*weight;
     }
+    if (isMC_)
+        evtwgt *= GetPrefiringEfficiencyWeight(jetPt, jetEta);
     return evtwgt;
 }
 

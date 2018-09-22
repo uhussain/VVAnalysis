@@ -214,6 +214,7 @@ protected:
     bool lepton3IsTight();
     bool tightZLeptons();
     bool IsGenMatched3l();
+    float GetPrefiringEfficiencyWeight(std::vector<float>* jetPt, std::vector<float>* jetEta);
     std::string GetNameFromFile();
 };
 
