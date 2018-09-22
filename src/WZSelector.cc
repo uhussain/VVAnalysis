@@ -183,7 +183,6 @@ void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     b_l1Pt->GetEntry(entry);
     b_l2Pt->GetEntry(entry);
     b_l3Pt->GetEntry(entry);
-    
     if (variation.first == Central) {
         if (isMC_ && doSystematics_) {
             if (isMC_ && weight_info_ > 0) {
@@ -666,9 +665,29 @@ Bool_t WZSelector::Process(Long64_t entry)
     //            selection_ != VBSBackgroundControlLoose));
     bool blindVBS = false;
 
+
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
     if (PassesBaseSelection(entry, true, selection_)) {
+        // Need to modify for JEC
+        if (name_ == "wlljj-ewk__prefire") {
+            if (jetPt->size() > 0) {
+                float j1Pt = jetPt->at(0);
+                float j1Eta = std::abs(jetEta->at(0));
+                weight *= (1-prefireEff_->GetEfficiency(prefireEff_->FindFixBin(j1Eta, j1Pt)));
+                //std::cout << "Jet 1 has pt = " << j1Pt << " and eta = " << j1Eta << std::endl;
+                //std::cout << "    Gives efficiency SF " << (1-prefireEff_->GetEfficiency(prefireEff_->FindFixBin(j1Eta, j1Pt)));
+                //std::cout << std::endl;
+            }
+            if (jetPt->size() > 1) {
+                float j2Pt = jetPt->at(1);
+                float j2Eta = std::abs(jetEta->at(1));
+                weight *= (1-prefireEff_->GetEfficiency(prefireEff_->FindFixBin(j2Eta, j2Pt)));
+                //std::cout << "Jet 2 has pt = " << j2Pt << " and eta = " << j2Eta << std::endl;
+                //std::cout << "    Gives efficiency SF " << (1-prefireEff_->GetEfficiency(prefireEff_->FindFixBin(j2Eta, j2Pt)));
+                //std::cout << std::endl;
+            }
+        }
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
 
@@ -771,8 +790,8 @@ void WZSelector::SetupNewDirectory()
                       selection_ == Wselection_Full ||
                       selection_ == VBSBackgroundControl_Full ||
                       selection_ == VBSBackgroundControlLoose_Full);
-    doSystematics_ = applyFullSelection_;
-    //doSystematics_ = false;
+    //doSystematics_ = applyFullSelection_;
+    doSystematics_ = false;
    
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
     if (histInfo == nullptr ) 

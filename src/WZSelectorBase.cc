@@ -25,6 +25,11 @@ void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
     mIsoSF_ = (ScaleFactor *) GetInputList()->FindObject("muonIsoSF");
     if (mIsoSF_ == nullptr ) 
         Abort("Must pass muon Iso SF");
+
+    prefireEff_ = (TEfficiency*) GetInputList()->FindObject("prefireEfficiencyMap");
+    if (prefireEff_ == nullptr ) 
+        Abort("Must pass prefiring efficiency map");
+
     TParameter<bool>* addSum = (TParameter<bool>*) GetInputList()->FindObject("addSumweights");
     if (addSum != nullptr) 
         addSumweights_ = addSum->GetVal();

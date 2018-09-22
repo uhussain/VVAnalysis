@@ -75,8 +75,11 @@ electronTightIdSF = fScales.Get('electronTightIdSF')
 electronGsfSF = fScales.Get('electronGsfSF')
 pileupSF = fScales.Get('pileupSF')
 
+fPrefireEfficiency = ROOT.TFile('data/Map_Jet_L1FinOReff_bxm1_looseJet_JetHT_Run2016B-H.root')
+prefireEff = fPrefireEfficiency.Get('prefireEfficiencyMap')
+
 fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
-sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
+sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF, prefireEff]
 selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
 if selection == "Inclusive2Jet":

@@ -7,6 +7,7 @@
 #include <TSelector.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TEfficiency.h>
 #include <exception>
 #include <iostream>
 
@@ -21,6 +22,7 @@ public :
     ScaleFactor* eGsfSF_;
     ScaleFactor* mIdSF_;
     ScaleFactor* mIsoSF_;
+    TEfficiency* prefireEff_;
     
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
     enum Channel {
