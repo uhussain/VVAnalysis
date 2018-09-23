@@ -56,8 +56,9 @@ if [[ "$3" != "" ]]; then
 fi
 
 cd $CMSSW_BASE/src/Analysis/VVAnalysis
-if [ 1 == 1 ]; then #[ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
+if [ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
     echo "INFO: Fake rate file $frfile exists! Using exisiting file."
+    python ScaleFactors/setupScaleFactors.py -t $frfile 
 else
     echo "INFO: Fake rate file $frfile not found. It will be created."
     python ScaleFactors/setupScaleFactors.py 
@@ -92,7 +93,7 @@ if [ "$2" != "noCombine" ]; then
     fi
     if [ "$1" != "FakeRate"* ]; then
         combine_path=$(./Utilities/scripts/getConfigValue.py combine_output)
-        combine_file=${combine_output}/$(basename $histfile) 
+        combine_file=${combine_path}/$(basename $histfile) 
         ./Utilities/scripts/prepareCombine.py \
             --input_file $histfile \
             -s $combine_selection \
