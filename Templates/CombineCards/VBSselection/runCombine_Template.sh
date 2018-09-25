@@ -13,7 +13,11 @@ if [[ "$$1" == "noBlind" || "$$2" == "noBlind" || "$$3" == "noBlind" ]]; then
 fi
 
 if [[ $$1 == "mu" ]]; then
-    combine -M MaxLikelihoodFit -d $$card $$blind $$2
+    shapeInfo=""
+    if [[ $$4 == "saveShapes" ]]; then
+        shapeInfo="--saveShapes --saveOverallShapes --saveNormalizations --saveWithUncertainties"
+    fi
+    combine -M MaxLikelihoodFit -d $$card $$blind $$2 $$shapeInfo
 elif [[ $$1 == "impacts" ]]; then
     rm -rf impact
     mkdir impact

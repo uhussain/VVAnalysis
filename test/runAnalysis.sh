@@ -58,7 +58,9 @@ fi
 cd $CMSSW_BASE/src/Analysis/VVAnalysis
 if [ -f $frfile ] && [ "$2" != "RedoFakeRates" ]; then
     echo "INFO: Fake rate file $frfile exists! Using exisiting file."
-    python ScaleFactors/setupScaleFactors.py -t $frfile 
+    if [ "$2" != "combineOnly" ]; then
+        python ScaleFactors/setupScaleFactors.py -t $frfile 
+    fi
 else
     echo "INFO: Fake rate file $frfile not found. It will be created."
     python ScaleFactors/setupScaleFactors.py 
