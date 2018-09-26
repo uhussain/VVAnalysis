@@ -104,7 +104,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     for selection_group in selections.split(";"):
         event_counts[selection_group] = {}
     states = []
-    if "WZ" in analysis or "ZL" in analysis:
+    if "WZ" in analysis or "ZplusL" in analysis:
         states = ["eee", "eem", "emm", "mmm"]
     elif "ZZ" in analysis:
         states = ["eeee", "eemm", "mmmm"]
@@ -151,9 +151,16 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
         if tmpfile:
             tmpfile.Close()
     writeMetaTreeToFile(output_file, metaTree)
-    event_info = PrettyTable(["Selection", "eeee", "eemm", "mmmm"])
-    for selection, events in event_counts.iteritems():
-        event_info.add_row([selection, events["eeee"], events["eemm"],events["mmmm"]])
+
+    if "WZ" in analysis or "ZplusL" in analysis:
+        event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
+        for selection, events in event_counts.iteritems():
+            event_info.add_row([selection, events["eee"], events["eem"], events["emm"], events["mmm"]])
+    elif "ZZ" in analysis:
+        event_info = PrettyTable(["Selection", "eeee", "eemm", "mmmm"])
+        for selection, events in event_counts.iteritems():
+            event_info.add_row([selection, events["eeee"], events["eemm"],events["mmmm"]])
+
     print "\nResults for selection: %s" % selections
     if deduplicate:
         print "NOTE: Events deduplicated by choosing the ordering with m_l1_l2 " \

@@ -88,13 +88,17 @@ def getListOfFiles(filelist, manager_path):
     for name in filelist:
         zz4l="ZZ4l2018"
         zzl4lCR="ZZ4lCR2018"
-        if (zz4l in name) or (zz4lCR in name):
+        Zl="ZplusL2018"
+        if (zz4l in name) or (zz4lCR in name) or (Zl in name):
             if (zz4l in name):
                 dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
                     "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2018/%s.json" % "ntuples"
-            else: 
+            elif(zz4lCR in name): 
                 dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
                     "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4lCR2018/%s.json" % "ntuples"
+            elif(Zl in name):
+                dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                    "ZZ4lAnalysisDatasetManager/FileInfo/ZplusL2018/%s.json" % "ntuples"
             print dataset_file
             allnames = json.load(open(dataset_file)).keys()
             print allnames
@@ -141,6 +145,10 @@ def getPreviousStep(selection, analysis):
     elif analysis == "ZZ4lCR2018":
         selection_map = { "ntuples": "ntuples",
                 "4lCRBase" : "ntuples"
+        }
+    elif analysis == "ZplusL2018":
+        selection_map = { "ntuples": "ntuples",
+                "ZplusLBase" : "ntuples"
         }
     elif analysis == "WZDecemberAnalysis":
         selection_map = { "ntuples" : "ntuples",

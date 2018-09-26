@@ -85,6 +85,9 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     if analysis="ZZ4lCR2018":
         submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
             % '{:%Y-%m-%d}_ZZ4lCR2018AnalysisJobs'.format(datetime.date.today())
+    elif analysis="ZplusL2018":
+        submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
+            % '{:%Y-%m-%d}_ZplusL2018AnalysisJobs'.format(datetime.date.today())
     else:
         submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
             % '{:%Y-%m-%d}_ZZ2018AnalysisJobs'.format(datetime.date.today())
