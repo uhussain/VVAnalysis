@@ -82,10 +82,10 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     )
     job_name = ConfigureJobs.getJobName(sample_name, analysis, selection, version) 
     farmout_dict['base_dir'] = os.path.dirname(os.path.realpath(sys.argv[0]))
-    if analysis="ZZ4lCR2018":
+    if analysis=="ZZ4lCR2018":
         submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
             % '{:%Y-%m-%d}_ZZ4lCR2018AnalysisJobs'.format(datetime.date.today())
-    elif analysis="ZplusL2018":
+    elif analysis=="ZplusL2018":
         submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
             % '{:%Y-%m-%d}_ZplusL2018AnalysisJobs'.format(datetime.date.today())
     else:

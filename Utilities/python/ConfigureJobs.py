@@ -87,7 +87,7 @@ def getListOfFiles(filelist, manager_path):
     names = []
     for name in filelist:
         zz4l="ZZ4l2018"
-        zzl4lCR="ZZ4lCR2018"
+        zz4lCR="ZZ4lCR2018"
         Zl="ZplusL2018"
         if (zz4l in name) or (zz4lCR in name) or (Zl in name):
             if (zz4l in name):
