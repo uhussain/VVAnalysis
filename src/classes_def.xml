@@ -3,6 +3,7 @@
   <class name="WZSelector"/>
   <class name="WZBackgroundSelector"/>
   <class name="WZSelectorBase"/>
+  <class name="ZLSelectorBase"/>
   <class name="ScaleFactor"/>
   <class name="disambiguateFinalStates"/>
 </lcgdict>

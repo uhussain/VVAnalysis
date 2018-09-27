@@ -10,26 +10,14 @@
 #include <iostream>
 
 // Headers needed by this particular selector
-#include "Analysis/VVAnalysis/interface/WZSelectorBase.h"
+#include "Analysis/VVAnalysis/interface/ZLSelectorBase.h"
 #include <vector>
 
 
-class FakeRateSelector : public WZSelectorBase { 
+class FakeRateSelector : public ZLSelectorBase { 
 public :
-    TH2D* passingTight2D_;
-    TH1D* passingTight1DPt_;
-    TH1D* passingTight1DEta_;
-    TH2D* passingLoose2D_;
-    TH1D* passingLoose1DPt_;
-    TH1D* passingLoose1DEta_;
-    TH2D* ratio2D_;
-    TH1D* ratio1DPt_;
-    TH1D* ratio1DEta_;
-
     Float_t Zmass;
     Float_t type1_pfMETEt;
-    UInt_t nCBVIDVetoElec;
-    UInt_t nWZLooseMuon;
     Float_t l1Pt;
     Float_t l2Pt;
     Float_t l3Pt;
@@ -38,8 +26,6 @@ public :
     
     TBranch* b_Zmass;
     TBranch* b_type1_pfMETEt;
-    TBranch* b_nCBVIDVetoElec;
-    TBranch* b_nWZLooseMuon;
     TBranch* b_l1Pt;
     TBranch* b_l2Pt;
     TBranch* b_l3Pt;

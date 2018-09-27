@@ -3,7 +3,7 @@
 
 Bool_t FakeRateSelector::Process(Long64_t entry)
 {
-    WZSelectorBase::Process(entry);
+    ZLSelectorBase::Process(entry);
 
     b_Zmass->GetEntry(entry);
     b_type1_pfMETEt->GetEntry(entry);
@@ -14,23 +14,25 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
     b_l3Eta->GetEntry(entry);
     b_l3MtToMET->GetEntry(entry);
     
-    if (!passesLeptonVeto)
-        return true;
-    if (l1Pt < 25 || l2Pt < 15)
-        return true;
+    //if (!passesLeptonVeto)
+    //    return true;
+    //if (l1Pt < 25 || l2Pt < 15)
+    //    return true;
     if (Zmass > 111.1876 || Zmass < 81.1876)
         return true;
-    if (type1_pfMETEt > 30)
+    if (type1_pfMETEt > 25)
         return true;
-    //if (l3MtToMET > 30)
-    //    return true;
+    if (l3MtToMET > 30)
+        return true;
     if (!tightZLeptons())
         return true;
     float pt_fillval = l3Pt < FR_MAX_PT_ ? l3Pt : FR_MAX_PT_ - 0.01;
     float eta_fillval = std::abs(l3Eta) < FR_MAX_ETA_ ? std::abs(l3Eta) : FR_MAX_ETA_ - 0.01;
+    //Loose means Loose Lepton ID and no Isolation
     passingLoose2D_->Fill(pt_fillval, eta_fillval, genWeight);
     passingLoose1DPt_->Fill(pt_fillval, genWeight);
     passingLoose1DEta_->Fill(eta_fillval, genWeight);
+    //Tight includes TightID+isolation
     if (lepton3IsTight()) {
         passingTight2D_->Fill(pt_fillval, eta_fillval, genWeight);
         passingTight1DPt_->Fill(pt_fillval, genWeight);
@@ -41,7 +43,7 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
 
 void FakeRateSelector::Init(TTree *tree)
 {
-    WZSelectorBase::Init(tree);
+    ZLSelectorBase::Init(tree);
 
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
 
@@ -54,8 +56,7 @@ void FakeRateSelector::Init(TTree *tree)
         fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else if (channel_ == eem) { 
-        fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass);
-        
+        fChain->SetBranchAddress("e1_e2_Mass", &Zmass, &b_Zmass); 
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
@@ -82,8 +83,9 @@ void FakeRateSelector::Init(TTree *tree)
 
 void FakeRateSelector::SetupNewDirectory()
 {
-    WZSelectorBase::SetupNewDirectory();
+    ZLSelectorBase::SetupNewDirectory();
 
+    //Tight includes TightID+isolation
     AddObject<TH2D>(passingTight2D_, ("passingTight2D_"+channelName_).c_str(), "#eta; p_{T} [GeV]", 4, 10, 50, 3, 0, 2.5);
     AddObject<TH1D>(passingTight1DPt_, ("passingTight1DPt_"+channelName_).c_str(), "Tight leptons; p_{T} [GeV]", 4, 10, 50);
     AddObject<TH1D>(passingTight1DEta_, ("passingTight1DEta_"+channelName_).c_str(), "Tight leptons; #eta", 3, 0, 2.5);
