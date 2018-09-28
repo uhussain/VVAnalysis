@@ -10,11 +10,11 @@
 #include <iostream>
 
 // Headers needed by this particular selector
-#include "Analysis/VVAnalysis/interface/WZSelectorBase.h"
+#include "Analysis/VVAnalysis/interface/ZLSelectorBase.h"
 #include <vector>
 
 
-class FakeRateSelector : public WZSelectorBase { 
+class FakeRateSelector : public ZLSelectorBase { 
 public :
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
@@ -26,13 +26,6 @@ public :
     TH1D* ratio1DPt_;
     TH1D* ratio1DEta_;
 
-    Float_t type1_pfMETEt;
-    UInt_t nCBVIDVetoElec;
-    UInt_t nWZLooseMuon;
-    
-    TBranch* b_type1_pfMETEt;
-    TBranch* b_nCBVIDVetoElec;
-    TBranch* b_nWZLooseMuon;
 
     // Readers to access the data (delete the ones you do not need).
     FakeRateSelector(TTree * /*tree*/ =0) { }

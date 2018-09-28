@@ -14,7 +14,7 @@ def getComLineArgs():
     parser.add_argument("--proof", "-p", 
         action='store_true', help="Don't use proof")
     parser.add_argument("--lumi", "-l", type=float,
-        default=35.87, help="luminosity value (in fb-1)")
+        default=41.5, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
         default="", help="Output file name")
     return vars(parser.parse_args())
@@ -102,26 +102,26 @@ fileName = "data/fakeRate%s-%s.root" % (today, args['selection']) if args['outpu
         else args['output_file']
 fOut = ROOT.TFile(fileName, "recreate")
 
-fScales = ROOT.TFile('data/scaleFactors.root')
-muonIsoSF = fScales.Get('muonIsoSF')
-muonIdSF = fScales.Get('muonTightIdSF')
-electronTightIdSF = fScales.Get('electronTightIdSF')
-electronGsfSF = fScales.Get('electronGsfSF')
-pileupSF = fScales.Get('pileupSF')
-sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
+#fScales = ROOT.TFile('data/scaleFactors.root')
+#muonIsoSF = fScales.Get('muonIsoSF')
+#muonIdSF = fScales.Get('muonTightIdSF')
+#electronTightIdSF = fScales.Get('electronTightIdSF')
+#electronGsfSF = fScales.Get('electronGsfSF')
+#pileupSF = fScales.Get('pileupSF')
+#sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
 
 SelectorTools.applySelector(args["filenames"],
-        "FakeRateSelector", args['selection'], fOut, 
-        extra_inputs=sf_inputs, proof=args['proof'],
-        addSumweights=True)
+        "FakeRateSelector", args['selection'], fOut,
+        proof=args['proof'], addSumweights=True)
+        #extra_inputs=sf_inputs, proof=args['proof'],
 
-alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"]))
+alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["ZZ4l2018data"]))
 OutputTools.writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames()), False)
 OutputTools.writeOutputListItem(allewk, fOut)
-allnonprompt = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(
-    ConfigureJobs.getListOfNonpromptFilenames()))
-OutputTools.writeOutputListItem(allnonprompt, fOut)
+#allnonprompt = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(
+#    ConfigureJobs.getListOfNonpromptFilenames()))
+#OutputTools.writeOutputListItem(allnonprompt, fOut)
 final = HistTools.getDifference(fOut, "DataEWKCorrected", "AllData", "AllEWK", getRatios)
 OutputTools.writeOutputListItem(final, fOut)

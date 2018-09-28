@@ -8,17 +8,23 @@ import os
 
 def applySelector(filelist, selector_name, selection, 
         rootfile,
-        analysis="WZxsec2016", channels=["eee", "eem", "emm", "mmm"], 
+        analysis="ZZ4l2018", channels=["eee", "eem", "emm", "mmm"], 
         extra_inputs = [],
         addSumweights=True,
         proof=False):
     for i, chan in enumerate(channels):
         inputs = ROOT.TList()
-        for inp in extra_inputs:
-            inputs.Add(inp)
+        #for inp in extra_inputs:
+        #    inputs.Add(inp)
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
             select = getattr(ROOT, selector_name)()
             select.SetInputList(inputs)
+            #This part is introduced to work out the fact that I dont have "extra_inputs" such as SFs yet.
+            tchan=ROOT.TNamed("channel",chan)
+            tname=ROOT.TNamed("name",dataset)
+            inputs.Add(tchan)
+            inputs.Add(tname)
+            #So line 38 doesn't give a false because of null list?
             print "Processing channel %s for dataset %s" % (chan, dataset)
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 

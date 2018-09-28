@@ -1,11 +1,14 @@
 /*
+ *
  * TSelector deduplicate events in combinatorical ntuple
  * by choosing event with l1_l2_Mass pairing closest to
- * M_PDG(Z) = 91.1876
+ * M_PDG(Z) = 91.1876 
+ * with the highest scalar Pt sum of the remaining leptons
+ * used as a tiebreaker. 
  *
- * Modified from N. Smith, U. Wisconsin
+ * Modified from K. Long, U. Wisconsin
  *
- * https://github.com/nsmith-/ZHinvAnalysis/blob/master/disambiguateFinalStates.h
+ * https://https://github.com/kdlong/VVAnalysis/blob/master/src/disambiguateFinalStates.cc
  */
 #ifndef disambiguateFinalStates_h
 #define disambiguateFinalStates_h
@@ -21,21 +24,35 @@ class disambiguateFinalStates : public TSelector {
 public :
   TTree          *fChain;
 
-  Float_t         Mass;
+  float           l1_l2_Mass;
+  float           l1_Pt;
+  float           l2_Pt;
+  float           l3_l4_Mass;
+  float           l3_Pt;
+  float           l4_Pt;
   ULong64_t        evt;
   UInt_t           run;
 
-  TBranch        *b_Mass;
+  TBranch        *b_l1_l2_Mass;
+  TBranch        *b_l1_Pt; 
+  TBranch        *b_l2_Pt;
+  TBranch        *b_l3_l4_Mass;
+  TBranch        *b_l3_Pt;
+  TBranch        *b_l4_Pt;
+
   TBranch        *b_evt;
   TBranch        *b_run;
 
   TEntryList     *fBestCandidateEntryList;
-
+  
   // TODO Add TTreeFormula, fix issue when using chain.Process 
   // over multiple files (currently segfaults)
   TTreeFormula   *fCutFormula;
 
+
+  //disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0), /*fCutFormula(0),*/ fCurrentRun(-1), fCurrentEvt(-1) { }
   disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0), fCutFormula(0), fCurrentRun(-1), fCurrentEvt(-1) { }
+  //virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList); /*SafeDelete(fCutFormula)*/; }
   virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList); SafeDelete(fCutFormula); }
   virtual Int_t   Version() const { return 2; }
   virtual void    Begin(TTree *tree);
@@ -50,7 +67,14 @@ public :
   virtual TList  *GetOutputList() const { return fOutput; }
   virtual void    SlaveTerminate();
   virtual void    Terminate();
-  void setZCandidateBranchName(const char* name) { zCand_name = const_cast<char*>(name); }
+  void setZCandidateBranchName(const char* name1,const char* name2, const char* name3,const char* name4,const char* name5,const char* name6) { 
+    l1_l2_Cand_mass = const_cast<char*>(name1);  
+    l1_Cand_pt = const_cast<char*>(name2);  
+    l2_Cand_pt = const_cast<char*>(name3); 
+    l3_l4_Cand_mass = const_cast<char*>(name4); 
+    l3_Cand_pt = const_cast<char*>(name5);
+    l4_Cand_pt = const_cast<char*>(name6); 
+  }
 
   ClassDef(disambiguateFinalStates,0);
 
@@ -59,8 +83,14 @@ private :
   UInt_t fCurrentRun;
   ULong64_t fCurrentEvt;
   std::vector<Long64_t> fEntriesToCompare;
-  std::vector<Float_t> fEntryDiscriminants;
-  char* zCand_name;
+  std::vector<float> fEntryDiscriminants; 
+  std::vector<float> fEntryZ2PtSum;
+  char* l1_l2_Cand_mass; 
+  char* l1_Cand_pt;
+  char* l2_Cand_pt; 
+  char* l3_l4_Cand_mass; 
+  char* l3_Cand_pt;
+  char* l4_Cand_pt; 
 };
 
 #endif

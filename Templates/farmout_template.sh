@@ -4,12 +4,14 @@
 #
 # To resubmit failed jobs: ./farmout.sh --resubmit-failed-jobs
 DATE=`date +%Y-%m-%d`
+#DATE=2018-03-06
 pushd ${base_dir}
 if [ ! -f ${job_dir}/analysis_code.tar.gz ]; then
     tar \
         -zcvhf ${job_dir}/analysis_code.tar.gz \
         Cuts/ \
-        Utilities
+        Utilities/ \
+        skimNtuples.py
 fi
 if [ ! -f ${job_dir}/input_file_list.txt ]; then
 ./Utilities/scripts/makeInputFilesList.py \
@@ -21,7 +23,7 @@ popd
 chmod +x ${job_dir}/skim.sh
 farmoutAnalysisJobs \
     --fwklite \
-    --output-dir=gsiftp://cms-lvs-gridftp.hep.wisc.edu:2811//hdfs/store/user/$$USER/WZAnalysisJobs_$$DATE/${job_name} \
+    --output-dir=gsiftp://cms-lvs-gridftp.hep.wisc.edu:2811//hdfs/store/user/$$USER/ZplusLAnalysisJobs2018_$$DATE/${job_name} \
     --input-file-list=${job_dir}/input_file_list.txt \
     --submit-dir=${job_dir}/submit \
     --input-files-per-job=${files_per_job} \

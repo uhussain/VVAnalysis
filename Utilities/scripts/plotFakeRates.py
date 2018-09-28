@@ -96,12 +96,12 @@ def makeMCPlots(param, obj, outdir):
     canvas.Print("%s/ratio%s_all%s.png" % (outdir, param, obj))
     canvas.Print("%s/ratio%s_all%s.pdf" % (outdir, param, obj))
 
-frfile = ROOT.TFile("/eos/user/k/kelong/WZAnalysisData/FakeRates/fakeRateMar2018-TightLepsFrom3MediumLeptons.root")
+frfile = ROOT.TFile("/eos/user/u/uhussain/ZZAnalysisData/FakeRates/fakeRateSep2018-TightLepFromZplusLlooseLep.root")
 
 
 data_folder_name = datetime.date.today().strftime("%Y%b"+"_ScaleFacs") 
-data_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name + "/plots"
-mc_outdir = "~/www/DibosonAnalysisData/PlottingResults/WZxsec2016/FakeRates/" + data_folder_name + "-MC/plots"
+data_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2018/FakeRates/" + data_folder_name + "/plots"
+mc_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2018/FakeRates/" + data_folder_name + "-MC/plots"
 
 for outdir in [data_outdir, mc_outdir]:
     try:

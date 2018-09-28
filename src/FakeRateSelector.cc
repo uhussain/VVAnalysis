@@ -3,13 +3,9 @@
 
 Bool_t FakeRateSelector::Process(Long64_t entry)
 {
-    WZSelectorBase::Process(entry);
+    ZLSelectorBase::Process(entry);
 
-    if (!passesLeptonVeto)
-        return true;
-    if (l1Pt < 25 || l2Pt < 15)
-        return true;
-    if (ZMass > 101.1876 || ZMass < 81.1876)
+    if (Zmass > 101.1876 || Zmass < 81.1876)
         return true;
     if (type1_pfMETEt > 25)
         return true;
@@ -17,20 +13,17 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
         return false;
     if (!tightZLeptons())
         return true;
-
-    if (!IsGenMatched3l())
-        return true;
-
+    
     float pt_fillval = l3Pt;
     float eta_fillval = std::abs(l3Eta);
 
     float loose_weight = weight;
-    if (channel_ == eee || channel_ == emm) {
-        loose_weight /= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-    }
-    else if (channel_ == eem || channel_ == mmm) {
-        loose_weight /= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-    }
+    //if (channel_ == eee || channel_ == emm) {
+    //    loose_weight /= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+    //}
+    //else if (channel_ == eem || channel_ == mmm) {
+    //    loose_weight /= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+    //}
     passingLoose2D_->Fill(pt_fillval, eta_fillval, loose_weight);
     passingLoose1DPt_->Fill(pt_fillval, loose_weight);
     passingLoose1DEta_->Fill(eta_fillval, loose_weight);
@@ -44,12 +37,12 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
 
 void FakeRateSelector::Init(TTree *tree)
 {
-    WZSelectorBase::Init(tree);
+    ZLSelectorBase::Init(tree);
 }
 
 void FakeRateSelector::SetupNewDirectory()
 {
-    WZSelectorBase::SetupNewDirectory();
+    ZLSelectorBase::SetupNewDirectory();
 
     const int nvarbins = 3;
     double variable_pt_bins[nvarbins+1] = {10, 20, 30, FR_MAX_PT_};

@@ -48,22 +48,22 @@ def getListOfEWKFilenames():
     return [
     #    "wz3lnu-powheg",
     # Use jet binned WZ samples for subtraction by default
-        "wz3lnu-mgmlm-0j",
-        "wz3lnu-mgmlm-1j",
-        "wz3lnu-mgmlm-2j",
-        "wz3lnu-mgmlm-3j",
-        "wlljj-ewk",
+        #"wz3lnu-mgmlm-0j",
+        #"wz3lnu-mgmlm-1j",
+        #"wz3lnu-mgmlm-2j",
+        #"wz3lnu-mgmlm-3j",
+        #"wlljj-ewk",
         "zz4l-powheg",
-        "zz4ljj-ewk",
-        "zz2l2vjj-ewk",
-        "tzq",
-        "ttz",
-        "ttw",
-        "zzz",
-        "wwz",
-        "www",
-        "ww",
-        "zg",
+        #"zz4ljj-ewk",
+        #"zz2l2vjj-ewk",
+        #"tzq",
+        #"ttz",
+        #"ttw",
+        #"zzz",
+        #"wwz",
+        #"www",
+        #"ww",
+        #"zg",
         "ggZZ4e",
         "ggZZ4m",
         "ggZZ2e2mu",
@@ -122,15 +122,15 @@ def getListOfHDFSFiles(file_path):
 def getListOfFiles(filelist, selection, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
-        if "WZxsec2016" in name:
+        if "ZZ4l2018" in name:
             dataset_file = manager_path + \
-                "AnalysisDatasetManager/FileInfo/WZxsec2016/%s.json" % selection
+                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2018/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
@@ -156,7 +156,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
 def getListOfFilesWithXSec(filelist, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     files = getListOfFiles(filelist, "ntuples", manager_path)
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     info = {}
@@ -170,23 +170,14 @@ def getListOfFilesWithXSec(filelist, manager_path=""):
     return info
 def getPreviousStep(selection, analysis):
     selection_map = {}
-    if analysis == "WZxsec2016":
+    if analysis == "ZZ4l2018":
         selection_map = { "ntuples" : "ntuples",
-                "loosepreselection" : "ntuples",
                 "preselection" : "ntuples",
-                "3LooseLeptons" : "ntuples",
-                "3LooseLeptonsNoIP" : "ntuples",
-                "3LooseLeptonsNoVeto" : "ntuples",
-                "3TightLeptonsNoVeto" : "ntuples",
-                "3MediumLeptonsNoVeto" : "ntuples",
-                "preselectionLooseVeto" : "ntuples",
-                "preselectionNoVeto" : "ntuples",
-                "LepVetoAnd3lmass" : "preselection",
-                "3lmass" : "preselection",
-                "Zselection" : "3lmass",
-                "Wselection" : "Zselection",
-                "3lDYControl" : "Zselection",
-                "3lTTbarControl" : "3lmass",
+                "4lCRBase" : "ntuples"
+        }
+    elif analysis == "ZplusL2018":
+        selection_map = { "ntuples": "ntuples",
+                "ZplusLBase" : "ntuples"
         }
     elif analysis == "WZDecemberAnalysis":
         selection_map = { "ntuples" : "ntuples",
@@ -208,7 +199,7 @@ def getPreviousStep(selection, analysis):
 def getInputFilesPath(sample_name, selection, analysis, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
         selection])
     input_files = UserInput.readJson(input_file_name)
