@@ -20,6 +20,8 @@ def getComLineArgs():
         action='store_true', help="Don't create cards for combine")
     parser.add_argument("--aqgc",
         action='store_true', help="Add aqgc files")
+    parser.add_argument("--higgs",
+        action='store_true', help="Add higgs files")
     parser.add_argument("--manualStats",
         action='store_true', help="Stat uncertainties inserted by bin")
     parser.add_argument("--lumi", "-l", type=float,
@@ -110,6 +112,12 @@ pdf_entries = {
     "AllData" : 0,
 }
 
+higgsMasses = [300,400,500,600,700,800,900,1000,1500,2000]
+
+pdf_entries.update({"chargedHiggsWZ-m%i" % i : 0 for i in higgsMasses})
+for chan in chans + ["all"]:
+    card_info[chan].update({"chargedHiggsWZ-m%i" % i : 0 for i in higgsMasses})
+
 wz_scalefacs = {
     "QCD-WZjj" : 0.813,
     "wz" : 0.643,
@@ -194,21 +202,24 @@ plot_groups = ["QCD-WZjj", "wz", "wz-powheg", "EW-WZjj", "top-ewk", "zg", "vv-po
 aqgc_groups =  []
 if args['aqgc']:
     import json
-    base_name = manager_path +"/PlotGroups/"
+    base_name = manager_path +"AnalysisDatasetManager/PlotGroups/"
     for filename in ["WZxsec2016_aQGC-FM.json", "WZxsec2016_aQGC-FS.json", "WZxsec2016_aQGC-FT.json",]:
         aqgc_names = json.load(open(base_name+filename))
         aqgc_groups.extend([str(n) for n in aqgc_names.keys()])
     plot_groups.extend(aqgc_groups)
 
+if args['higgs']:
+    plot_groups.extend(["chargedHiggsWZ-m%i" % i for i in higgsMasses])
+
 wz_qcd_theory_hists = ROOT.TList()
 for plot_group in plot_groups:
     # Theory hists won't work right for non-central aQGC points
-    isaQGCpoint = "aqgc" in plot_group and "__" in plot_group
+    isNPpoint = ("aqgc" in plot_group and "__" in plot_group) or "Higgs" in plot_group
     plots = [variable+"_" + c for c in chans]
-    if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
+    if "data" not in plot_group and not isNPpoint and not args['noTheory']:
         plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
     plots += ["_".join([variable, var, c]) for var in variations for c in chans]
-    if args['addControlRegion'] and not isaQGCpoint:
+    if args['addControlRegion'] and not isNPpoint:
         plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
 
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
@@ -226,7 +237,7 @@ for plot_group in plot_groups:
                 stat_hists,variation_names = HistTools.getStatHists(hist, plot_group, chan, signal)
                 stat_variations[chan].extend(variation_names)
                 group.extend(stat_hists)
-        if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
+        if "data" not in plot_group and not isNPpoint and not args['noTheory']:
             weight_hist_name = base_variable.replace("unrolled", "2D")+"_lheWeights_"+chan
             weight_hist = group.FindObject(weight_hist_name)
             if not weight_hist:
@@ -284,12 +295,12 @@ for plot_group in plot_groups:
                     control_hist = control_hists.FindObject(control_hist_name)
                     hist = HistTools.addControlRegionToFitHist(control_hist, h, base_variable)
                     theory_hists.append(hist)
-            elif not isaQGCpoint: 
+            elif not isNPpoint: 
                 theory_hists = scale_hists + pdf_hists
             group.extend(theory_hists)
 
     theory_vars = []
-    if "aqgc" not in plot_group and "__" not in plot_group: 
+    if not isNPpoint and "__" not in plot_group: 
         theory_vars = ["_".join([var, plot_group + shift]) for var in ["QCDscale", "pdf"] for shift in ["Up", "Down"]]
     combineChannels(group, chans, variations + theory_vars, True)
     for hist in group:
