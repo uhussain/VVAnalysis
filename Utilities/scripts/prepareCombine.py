@@ -114,9 +114,9 @@ pdf_entries = {
 
 higgsMasses = [300,400,500,600,700,800,900,1000,1500,2000]
 
-pdf_entries.update({"chargedHiggsWZ-m%i" % i : 0 for i in higgsMasses})
+pdf_entries.update({"chargedHiggsWZ_m%i" % i : 0 for i in higgsMasses})
 for chan in chans + ["all"]:
-    card_info[chan].update({"chargedHiggsWZ-m%i" % i : 0 for i in higgsMasses})
+    card_info[chan].update({"chargedHiggsWZ_m%i" % i : 0 for i in higgsMasses})
 
 wz_scalefacs = {
     "QCD-WZjj" : 0.813,
@@ -148,7 +148,7 @@ isVBS = "VBS" in args['selection']
 #variable = "mjj_etajj_unrolled" if isVBS else "yield"
 if args['fit_variable'] is "":
     variable = "mjj_etajj_unrolled" if isVBS else "yield"
-    if isVBS and args['aqgc']:
+    if isVBS and (args['aqgc'] or args['higgs']):
         variable = "MTWZ"
 else:
     variable = args['fit_variable']
@@ -387,7 +387,13 @@ if not args['noCards']:
         chan_dict["nuisances"] = numvars
         file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
                 else '%s/WZ_%s.txt' % (output_dir, chan)
-        template_process = "WZ" if not isVBS else "_".join(["WZjj", "EW" if not args['aqgc'] else "aQGC"])
+
+        template_process = "WZ" if not isVBS else "WZjj_EWK" 
+        if args['aqgc']:
+            template_process = template_process.replace("EWK", "aQGC")
+        elif args['higgs']:
+            template_process = template_process.replace("EWK", "Higgs")
+
         template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
             (args['selection'].split("/")[-1], template_process, chan)
         ConfigureJobs.fillTemplatedFile(template_name,

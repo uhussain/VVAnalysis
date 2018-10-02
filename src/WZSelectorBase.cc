@@ -384,7 +384,6 @@ bool WZSelectorBase::IsGenMatched3l() {
 float WZSelectorBase::GetPrefiringEfficiencyWeight(
         std::vector<float>* jetPt, std::vector<float>* jetEta) {
     float prefire_weight = 1;
-    return prefire_weight;
     for (size_t i = 0; i < jetPt->size(); i++) {
         float jPt = jetPt->at(i);
         float jEta = std::abs(jetEta->at(i));
