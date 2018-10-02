@@ -387,8 +387,9 @@ if not args['noCards']:
         chan_dict["nuisances"] = numvars
         file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
                 else '%s/WZ_%s.txt' % (output_dir, chan)
+        template_process = "WZ" if not isVBS else "_".join(["WZjj", "EW" if not args['aqgc'] else "aQGC"])
         template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
-            (args['selection'].split("/")[-1], ("WZjj_EWK" if isVBS else "WZ"), chan)
+            (args['selection'].split("/")[-1], template_process, chan)
         ConfigureJobs.fillTemplatedFile(template_name,
             file_name,
             chan_dict
