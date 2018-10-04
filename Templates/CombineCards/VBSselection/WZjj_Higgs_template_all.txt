@@ -9,7 +9,7 @@ shapes vv        * ${output_file} vv/${fit_variable}              vv/${fit_varia
 shapes top-ewk   * ${output_file} top-ewk/${fit_variable}         top-ewk/${fit_variable}_$$SYSTEMATIC 
 shapes zg        * ${output_file} zg/${fit_variable}              zg/${fit_variable}_$$SYSTEMATIC 
 
-shapes Higgs     * ${output_file} chargedHiggsWZ-m$$MASS/MTWZ     chargedHiggsWZ-m$$MASS/MTWZ_$$SYSTEMATIC
+shapes Higgs     * ${output_file} chargedHiggsWZ-m$$MASS/${fit_variable}     chargedHiggsWZ-m$$MASS/${fit_variable}_$$SYSTEMATIC
 
 shapes nonprompt * ${output_file} DataEWKCorrected/${fit_variable}_Fakes DataEWKCorrected/${fit_variable}_Fakes_$$SYSTEMATIC
 shapes data_obs  *  ${output_file} AllData/${fit_variable}

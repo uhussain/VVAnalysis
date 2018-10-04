@@ -9,7 +9,7 @@ shapes vv        * ${output_file} vv/${fit_variable}_$$CHANNEL             vv/${
 shapes top-ewk   * ${output_file} top-ewk/${fit_variable}_$$CHANNEL        top-ewk/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
 shapes zg        * ${output_file} zg/${fit_variable}_$$CHANNEL             zg/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
 
-shapes Higgs * ${output_file} chargedHiggsWZ-m$$MASS/MTWZ_$$CHANNEL chargedHiggsWZ-m$$MASS/MTWZ_$$SYSTEMATIC_$$CHANNEL 
+shapes Higgs * ${output_file} chargedHiggsWZ-m$$MASS/${fit_variable}_$$CHANNEL chargedHiggsWZ-m$$MASS/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
 
 shapes nonprompt * ${output_file} DataEWKCorrected/${fit_variable}_Fakes_$$CHANNEL DataEWKCorrected/${fit_variable}_Fakes_$$SYSTEMATIC_$$CHANNEL
 shapes data_obs  *  ${output_file} AllData/${fit_variable}_$$CHANNEL

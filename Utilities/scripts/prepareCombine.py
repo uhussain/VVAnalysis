@@ -157,12 +157,13 @@ base_variable = variable
 if args['addControlRegion']:
     base_variable = variable
     variable = base_variable + "_wCR"
+print "VARIABLE", variable
 
 #mjj_binning = ConfigureJobs.get2DBinning()[0]
 mjj_binning = array.array('d', [i*100 for i in range(0,25)]) 
 rebin = mjj_binning if base_variable == "mjj" else None
 if variable == "MTWZ":
-    rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
+    rebin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS))
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans], rebin=rebin)
@@ -245,13 +246,11 @@ for plot_group in plot_groups:
                 continue
             pdf_hists = []
             if "TH2" in weight_hist.ClassName():
-                if "MTWZ" in variable and isVBS:
-                    rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
-                elif "MTWZ" in variable:
-                    rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1200]) 
-                scale_hists = HistTools.getScaleHists(weight_hist, plot_group, rebin)
+                if "MTWZ" in variable:
+                    threbin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS))
+                scale_hists = HistTools.getScaleHists(weight_hist, plot_group, threbin)
                 if pdf_entries[plot_group]:
-                    pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, rebin)
+                    pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, threbin)
             elif "TH3" in weight_hist.ClassName(): 
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
                     HistTools.makeUnrolledHist,
@@ -308,6 +307,9 @@ for plot_group in plot_groups:
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
         card_info[chan][name] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
+    if args['combineChannels']:
+        hist = group.FindObject(variable)
+        card_info["all"][name] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     OutputTools.writeOutputListItem(group, fOut)
     yields = [card_info[c][name] for c in chans]
     yields.append(sum([card_info[c][name] for c in chans]))
@@ -372,11 +374,6 @@ with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
 if not args['noCards']:
     if args['combineChannels']:
         card_info["all"]["output_file"] = args['output_file']
-        for chan in chans:
-            for process, rate in card_info[chan].iteritems():
-                if process == "nonprompt" or "aqgc" in process: continue
-                if type(rate) is float:
-                    card_info["all"][process] += rate
     for chan, chan_dict in card_info.iteritems():
         chan_dict["signal_name"] = signal.replace("_", "-")
         chan_dict["fit_variable"] = variable

@@ -27,6 +27,13 @@ def get2DBinning(xvar="mjj", yvar="etajj", analysis='WZ'):
         ybinning = [0, 5, 6, 20]
     return (xbinning, ybinning)
 
+def getBinning(variable='MTWZ', isVBS=True):
+    if variable == 'MTWZ':
+        if isVBS:
+            return [0,50,100,200,300,400,500,700,1000,1500,2000]
+        return [0,50,100,200,300,400,500,700,1000,1200]
+    return []
+
 def getChannels(analysis='WZ'):
     if analysis == 'WZ':
         return ["eee", "eem", "emm", "mmm"]

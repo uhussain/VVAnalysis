@@ -75,7 +75,8 @@ electronTightIdSF = fScales.Get('electronTightIdSF')
 electronGsfSF = fScales.Get('electronGsfSF')
 pileupSF = fScales.Get('pileupSF')
 
-fPrefireEfficiency = ROOT.TFile('data/Map_Jet_L1FinOReff_bxm1_looseJet_JetHT_Run2016B-H.root')
+#fPrefireEfficiency = ROOT.TFile('data/Map_Jet_L1FinOReff_bxm1_looseJet_JetHT_Run2016B-H.root')
+fPrefireEfficiency = ROOT.TFile('data/Map_Jet_L1FinOReff_bxm1_looseJet_SingleMuon_Run2016B-H.root')
 prefireEff = fPrefireEfficiency.Get('prefireEfficiencyMap')
 
 fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
