@@ -157,7 +157,6 @@ base_variable = variable
 if args['addControlRegion']:
     base_variable = variable
     variable = base_variable + "_wCR"
-print "VARIABLE", variable
 
 #mjj_binning = ConfigureJobs.get2DBinning()[0]
 mjj_binning = array.array('d', [i*100 for i in range(0,25)]) 

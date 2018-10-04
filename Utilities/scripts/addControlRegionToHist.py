@@ -36,8 +36,6 @@ for key in input_file.GetListOfKeys():
         hist_names += ["_".join([name, var, chan]) for var in variations for chan in chans]
     elif "DataEWKCorrected" in folder.GetName():
         hist_names += ["_".join([args.hist_name, var, "Fakes", chan]) for var in jeVariations for chan in chans]
-    print "-"*20
-    print folder.GetName()
     try:
         for hist_name in hist_names:
             h = folder.Get(hist_name+";1")
@@ -55,7 +53,6 @@ for key in input_file.GetListOfKeys():
                 raise RuntimeError("failed to find hist %s for folder %s" % (crhist_name, folder))
             h.SetName(hist_name)
             hist = HistTools.addControlRegionToFitHist(control_hist, h, args.hist_name)
-            print hist, hist.GetNbinsX()
             new_folder.Add(hist)
     except RuntimeError as e:
         print e
