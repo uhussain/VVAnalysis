@@ -4,11 +4,13 @@ if [[ "$$1" != "all" && "$$2" != "all" && $$3 != "all" ]]; then
 else
     card="WZjj${sample}_all.txt"
 fi
-text2workspace.py $$card -m 999 -o $${card/txt/root}
+text2workspace.py $$card -m 900 -o $${card/txt/root}
 card=$${card/txt/root}
 
 blind="-t -1 --expectSignal 1."
-if [[ "$$1" == "noBlind" || "$$2" == "noBlind" || "$$3" == "noBlind" ]]; then
+if [[ "$$2" == "unblindExpected" ]]; then
+   blind="$blind --toysFreq" 
+elif [[ "$$1" == "noBlind" || "$$2" == "noBlind" || "$$3" == "noBlind" ]]; then
    blind="" 
 fi
 

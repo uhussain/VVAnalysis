@@ -9,7 +9,7 @@ parser.add_argument("--input_file", "-i", type=str,
 parser.add_argument("--hist_name", "-n", type=str,
     default="MTWZ", help="Name of histogram to add CR to")
 parser.add_argument("--rebin", type=lambda x: [float(i) for i in x.split(",")], 
-                    default=ConfigureJobs.getBinning(),
+                    default=ConfigureJobs.getBinning(isHiggs=True),
                     help="Rebin values, comma separated list")
 args = parser.parse_args()
 
@@ -22,7 +22,7 @@ variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
 jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Down"]]
 
 chans = ConfigureJobs.getChannels()
-rebin = array.array('d', ConfigureJobs.getBinning(args.hist_name))
+rebin = array.array('d', ConfigureJobs.getBinning(args.hist_name, isHiggs=True))
 output = []
 for key in input_file.GetListOfKeys():
     folder = input_file.Get(key.GetName())

@@ -162,7 +162,7 @@ if args['addControlRegion']:
 mjj_binning = array.array('d', [i*100 for i in range(0,25)]) 
 rebin = mjj_binning if base_variable == "mjj" else None
 if variable == "MTWZ":
-    rebin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS))
+    rebin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS, isHiggs=args['higgs']))
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans], rebin=rebin)
@@ -246,7 +246,7 @@ for plot_group in plot_groups:
             pdf_hists = []
             if "TH2" in weight_hist.ClassName():
                 if "MTWZ" in variable:
-                    threbin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS))
+                    threbin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS, isHiggs=args['higgs']))
                 scale_hists = HistTools.getScaleHists(weight_hist, plot_group, threbin)
                 if pdf_entries[plot_group]:
                     pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, threbin)

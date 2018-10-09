@@ -27,10 +27,12 @@ def get2DBinning(xvar="mjj", yvar="etajj", analysis='WZ'):
         ybinning = [0, 5, 6, 20]
     return (xbinning, ybinning)
 
-def getBinning(variable='MTWZ', isVBS=True):
+def getBinning(variable='MTWZ', isVBS=True, isHiggs=False):
     if variable == 'MTWZ':
         if isVBS:
-            return [0,50,100,200,300,400,500,700,1000,1500,2000]
+            if isHiggs:
+                return [0,50,100,150,200,250,300,400,500,700,1000,1500,2000]
+            return [0,100,200,300,400,500,700,1000,1500,2000]
         return [0,50,100,200,300,400,500,700,1000,1200]
     return []
 
