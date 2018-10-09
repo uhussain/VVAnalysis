@@ -9,7 +9,7 @@ card=$${card/txt/root}
 
 blind="-t -1 --expectSignal 1."
 if [[ "$$2" == "unblindExpected" ]]; then
-   blind="$blind --toysFreq" 
+   blind="$$blind --toysFreq" 
 elif [[ "$$1" == "noBlind" || "$$2" == "noBlind" || "$$3" == "noBlind" ]]; then
    blind="" 
 fi

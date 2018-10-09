@@ -16,6 +16,8 @@ def getComLineArgs():
         action='store_true', help="Use VBFNLO for signal")
     parser.add_argument("--noTheory",
         action='store_true', help="Don't add theory hists")
+    parser.add_argument("--nonpromptCombinedShapes",
+        action='store_true', help="Use combined shape for nonprompt")
     parser.add_argument("--noCards",
         action='store_true', help="Don't create cards for combine")
     parser.add_argument("--aqgc",
@@ -61,6 +63,33 @@ def combineChannels(group, chans, variations=[], central=True):
         for chan in chans[1:]:
             chan_hist = group.FindObject(name + "_" + chan)
             hist.Add(chan_hist)
+
+# Return appropriate scale factor for nonprompt distribution,
+# derived from WZ+2j events and applied to the combined shape
+# to obtain the per-channel distributions
+def replaceNonpromptChanShapes(variable, nonprompt):
+    # Taken from inclusive + 2j pt > 30
+    scale_facs = {
+        "eee" : 10.36/134.4,
+        "eem" : 21.44/134.4,
+        "emm" : 44.1/134.4,
+        "mmm" : 58.47/134.4,
+    }
+    combined_nonprompt = ROOT.TList()
+    combined_nonprompt.SetName(nonprompt.GetName())
+    central_comb = nonprompt.FindObject(variable+"_Fakes")
+    combined_vars = [nonprompt.FindObject("_".join([variable,"Fakes",var])) for var in jeVariations]
+    for central_hist in combined_vars + [central_comb]:
+        new_hist = central_hist.Clone()
+        combined_nonprompt.Add(central_hist)
+        ROOT.SetOwnership(new_hist, False)
+        for chan in ConfigureJobs.getChannels():
+            new_chan_hist = central_hist.Clone(new_hist.GetName()+"_"+chan)
+            new_chan_hist.Scale(scale_facs[chan])
+            print new_chan_hist, new_chan_hist.Integral()
+            combined_nonprompt.Add(new_chan_hist)
+            ROOT.SetOwnership(new_hist, False)
+    return combined_nonprompt
 
 ROOT.gROOT.SetBatch(True)
 chans = ConfigureJobs.getChannels()
@@ -172,6 +201,7 @@ for chan in chans:
 combineChannels(alldata, chans)
 
 OutputTools.writeOutputListItem(alldata, fOut)
+
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans], rebin=rebin)
 for var in jeVariations:
@@ -182,6 +212,8 @@ for var in jeVariations:
     nonprompt.extend(hists[:])
 
 combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
+if args['nonpromptCombinedShapes']:
+    nonprompt = replaceNonpromptChanShapes(variable, nonprompt)
 for h in nonprompt:
     HistTools.removeZeros(h)
 for chan in chans + ["all"]:
@@ -365,6 +397,11 @@ except OSError as e:
 
 signal_abv = "_vbfnlo" if args['vbfnlo'] else ""
 with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
+    meta_info = '-'*80 + '\n' + \
+        'Script called at %s\n' % datetime.datetime.now() + \
+        'The command was: %s\n' % ' '.join(sys.argv) + \
+        '-'*80 + '\n'
+    yields.write(meta_info)
     yields.write("\n" + " "*30 + "Event Yields")
     yields.write("\n" + str(output_info))
     yields.write("\n" + " "*30 + "S/sqrt(B)")
