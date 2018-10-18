@@ -14,8 +14,12 @@ def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--vbfnlo",
         action='store_true', help="Use VBFNLO for signal")
+    parser.add_argument("--allWZSignal",
+        action='store_true', help="Treat all WZjj as signal")
     parser.add_argument("--noTheory",
         action='store_true', help="Don't add theory hists")
+    parser.add_argument("--addInterference",
+        action='store_true', help="Add shape-based interference uncertainty")
     parser.add_argument("--nonpromptCombinedShapes",
         action='store_true', help="Use combined shape for nonprompt")
     parser.add_argument("--noCards",
@@ -86,11 +90,23 @@ def replaceNonpromptChanShapes(variable, nonprompt):
         for chan in ConfigureJobs.getChannels():
             new_chan_hist = central_hist.Clone(new_hist.GetName()+"_"+chan)
             new_chan_hist.Scale(scale_facs[chan])
-            print new_chan_hist, new_chan_hist.Integral()
             combined_nonprompt.Add(new_chan_hist)
             ROOT.SetOwnership(new_hist, False)
     return combined_nonprompt
 
+def addInterference(fOut, variable, addControlRegion):
+    wzdir = fOut.Get("EW-WZjj")
+    wzdir.cd()
+    for chan in ConfigureJobs.getChannels():
+        for var in ["Up", "Down"]:
+            hist = wzdir.Get(variable + "_" + chan)
+            int_hist = hist.Clone("%s_InterferenceEW-QCD%s_%s" % (variable, var, chan))
+            for i in range(1, int_hist.GetNbinsX()+1):
+                int_hist.SetBinContent(i, hist.GetBinContent(i)*(1.0 + 0.04*(-1 if var == "Down" else 1)))
+            if addControlRegion:
+                int_hist.SetBinContent(1, hist.GetBinContent(1)*(1.0 + 0.12*(-1 if var == "Down" else 1)))
+            int_hist.Write()
+        
 ROOT.gROOT.SetBatch(True)
 chans = ConfigureJobs.getChannels()
 stat_variations = { chan : [] for chan in (chans + ["all"])}
@@ -179,6 +195,8 @@ if args['fit_variable'] is "":
     variable = "mjj_etajj_unrolled" if isVBS else "yield"
     if isVBS and (args['aqgc'] or args['higgs']):
         variable = "MTWZ"
+    elif args['allWZSignal']:
+        variable = "yield"
 else:
     variable = args['fit_variable']
 
@@ -277,6 +295,7 @@ for plot_group in plot_groups:
                 continue
             pdf_hists = []
             if "TH2" in weight_hist.ClassName():
+                threbin = 0
                 if "MTWZ" in variable:
                     threbin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS, isHiggs=args['higgs']))
                 scale_hists = HistTools.getScaleHists(weight_hist, plot_group, threbin)
@@ -415,6 +434,9 @@ if not args['noCards']:
         chan_dict["fit_variable"] = variable
         chan_dict["signal_yield"] = chan_dict[signal]
         numvars = initNumvars+len(chans)*(chan != "all")*len(stat_variations[chan]) 
+        numvars += args['addInterference']
+        if args['allWZSignal']:
+            numvars -= 5
         if chan != "all":
             numvars += 3
         chan_dict["nuisances"] = numvars
@@ -426,6 +448,8 @@ if not args['noCards']:
             template_process = template_process.replace("EWK", "aQGC")
         elif args['higgs']:
             template_process = template_process.replace("EWK", "Higgs")
+        elif args['allWZSignal']:
+            template_process = template_process.replace("_EWK", "")
 
         template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
             (args['selection'].split("/")[-1], template_process, chan)
@@ -434,6 +458,8 @@ if not args['noCards']:
             chan_dict
         )
         with open(file_name, "a") as chan_file:
+            if args['addInterference']:
+                chan_file.write('InterferenceEW-QCD      shape   1' + '            -'*5 + '\n')
             if not manualStatUnc:
                 chan_file.write("* autoMCStats 1\n")
             for c in chans:
@@ -453,8 +479,7 @@ if not args['noCards']:
                                 )
                     )
                     elif isVBS:
-                        chan_file.write(
-                            "%s     shape   0               0               0           0               0           0\n" % hist_name)
+                        chan_file.write("%s     shape   0" % hist_name + '            -'*5 + '\n')
                     else:
                         chan_file.write(
                             "%s     shape   %i               %i               %i           %i               %i\n" \
@@ -466,17 +491,14 @@ if not args['noCards']:
                                     "nonprompt" in hist_name,
                                 )
                     )
-            chan_file.write("mc_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
-            chan_file.write("lepton_unc group = CMS_eff_e CMS_eff_m CMS_scale_e CMS_scale_m\n")
-            if isVBS:
-                chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
-                chan_file.write("wz_qcd_all group = QCDscale_QCD-WZjj pdf_QCD-WZjj CMS_norm_QCD-WZjj %s\n" % " ".join([h for h in stat_variations[chan] if "QCD-WZjj" in h]))
     ConfigureJobs.fillTemplatedFile(
         'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
         '%s/runCombine%s.sh' % (output_dir, signal_abv), 
         {"sample" : signal_abv}
     )
 
+if args['addInterference']:
+    addInterference(fOut, variable, args['addControlRegion'])
 if args['aqgc']:
     fOut.Close()
     HistTools.addaQGCTheoryHists(args['output_file'], aqgc_groups, variable)

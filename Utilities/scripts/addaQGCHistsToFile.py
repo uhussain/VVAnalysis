@@ -7,9 +7,12 @@ import array
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_file", "-i", type=str,
     default="test.root", help="Output file name")
+parser.add_argument("--rebin", type=lambda x: [float(i) for i in x.split(",")], 
+                    default=ConfigureJobs.getBinning(),
+                    help="Rebin values, comma separated list")
 args = parser.parse_args()
 
-rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
+rebin = array.array('d', args.rebin)
 saveToFile = True
 input_file_name = args.input_file
 input_file = ROOT.TFile(input_file_name, "update" if saveToFile else "read")
@@ -42,6 +45,7 @@ if saveToFile:
         OutputTools.writeOutputListItem(output, input_file)
 
 addControlRegion=True
+
 if addControlRegion:
     for folder_name in input_file.GetListOfKeys():
         if folder_name.GetName() == "NonpromptMC":
@@ -68,4 +72,5 @@ if addControlRegion:
             hist = HistTools.addControlRegionToFitHist(control_hist, h, "MTWZ")
             hist.Write()
             h.Delete()
+        input_file.cd()
 

@@ -22,7 +22,7 @@ variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
 jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Down"]]
 
 chans = ConfigureJobs.getChannels()
-rebin = array.array('d', ConfigureJobs.getBinning(args.hist_name, isHiggs=True))
+rebin = array.array('d', args.rebin)
 output = []
 for key in input_file.GetListOfKeys():
     folder = input_file.Get(key.GetName())

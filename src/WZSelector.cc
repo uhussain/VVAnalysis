@@ -467,8 +467,8 @@ bool WZSelector::PassesFullWZSelection(Long64_t entry) {
         return false;
     if (Mass < 100)
         return false;
-    if (MET < 30)
-        return false;
+    //if (MET < 30)
+    //    return false;
 
     b_jetCSVv2->GetEntry(entry);
     for (const auto& jetCSVval : *jetCSVv2) {

@@ -3,6 +3,7 @@ import ROOT
 import math
 import array
 
+ROOT.gROOT.SetBatch(True)
 nocorr_file = ROOT.TFile("/afs/cern.ch/user/k/kelong/public/SMP-18-001/Higgs/NoCorrection/VBSselection_Loose_Full-04Oct2018_Higgs_NoPrefireCorrection_wCR.root")
 corr_file = ROOT.TFile("/afs/cern.ch/user/k/kelong/public/SMP-18-001/Higgs/WithPrefiringCorrection/VBSselection_Loose_Full-04Oct2018_Higgs_WithPrefireCorrection_wCR.root")
 jakobs_file = ROOT.TFile("Jakob/higgs30/wz3l3lHig_input_13TeV2016.root")
@@ -20,7 +21,7 @@ names = {"EWWZ" : "EW-WZjj",
 }
 
 names.update({ "Higgs_M%i" % m : "chargedHiggsWZ-m%i" % m for m in [300,400,500,600,700,800,900,1000,1500,2000]})
-flatScaleFac=False
+flatScaleFac=True
 
 corrections_file.cd()
 for folder in names.values():
@@ -44,7 +45,6 @@ for folder in names.values():
     ROOT.SetOwnership(ratio, False)
     # These seem too unstable to take bin-by-bin corrections
     if nonprompt or flatScaleFac:
-        print "OUI C'est Ca!"
         ratio.SetBinContent(1, cr_ratio)
         ratio.SetBinError(1, cr_err)
         for i in range(2, ratio.GetNbinsX()+1):
@@ -67,7 +67,6 @@ for folder in names.values():
     filename = "/afs/cern.ch/user/k/kelong/www/ChargedHiggs/Kenneth/PrefireCorrRatios/%s.pdf" % folder 
     if flatScaleFac:
         filename = filename.replace(".pdf", "_flat.pdf")
-    print filename
     canvas.Print(filename)
 
 for hist_key in jakobs_file.GetListOfKeys():
@@ -91,7 +90,6 @@ for hist_key in jakobs_file.GetListOfKeys():
         raise RuntimeError("Unequal number of bins for correction and central hist" \
                 "found %i for correction, %i for central" % (correction_hist.GetNbinsX(), hist.GetNbinsX()))
     for i in range(hist.GetNbinsX()+1):
+        corrected_hist.SetBinError(i, hist.GetBinError(i)*correction_hist.GetBinContent(i))
         corrected_hist.SetBinContent(i, hist.GetBinContent(i)*correction_hist.GetBinContent(i))
     corrected_hist.Write()
-
-print ROOT.gROOT.FindObject("EW-WZjj_ratio")

@@ -9,9 +9,9 @@ shapes vv        * ${output_file} vv/${fit_variable}              vv/${fit_varia
 shapes top-ewk   * ${output_file} top-ewk/${fit_variable}         top-ewk/${fit_variable}_$$SYSTEMATIC 
 shapes zg        * ${output_file} zg/${fit_variable}              zg/${fit_variable}_$$SYSTEMATIC 
 
-shapes wzjj-aqgcfm__fm0-4_fm1-m8        * ${output_file} wzjj-aqgcfm__fm0-4_fm1-m8/MTWZ wzjj-aqgcfm__fm0-4_fm1-m8/MTWZ_$$SYSTEMATIC 
-shapes wzjj-aqgcft__ft0-0_ft1-0_ft2-m1  * ${output_file} wzjj-aqgcft__ft0-0_ft1-0_ft2-m1/MTWZ wzjj-aqgcft__ft0-0_ft1-0_ft2-m1/MTWZ_$$SYSTEMATIC 
-shapes wzjj-aqgcfs__fs0-32_fs1-16       * ${output_file} wzjj-aqgcfs__fs0-32_fs1-16/MTWZ wzjj-aqgcfs__fs0-32_fs1-16/MTWZ_$$SYSTEMATIC 
+shapes wzjj-aqgcfm__fm0-8_fm1-m4        * ${output_file} wzjj-aqgcfm__fm0-8_fm1-m4/${fit_variable} wzjj-aqgcfm__fm0-8_fm1-m4/${fit_variable}_$$SYSTEMATIC 
+shapes wzjj-aqgcft__ft0-0_ft1-0_ft2-3   * ${output_file} wzjj-aqgcft__ft0-0_ft1-0_ft2-3/${fit_variable} wzjj-aqgcft__ft0-0_ft1-0_ft2-3/${fit_variable}_$$SYSTEMATIC 
+shapes wzjj-aqgcfs__fs0-32_fs1-16       * ${output_file} wzjj-aqgcfs__fs0-32_fs1-16/${fit_variable} wzjj-aqgcfs__fs0-32_fs1-16/${fit_variable}_$$SYSTEMATIC 
 
 shapes nonprompt * ${output_file} DataEWKCorrected/${fit_variable}_Fakes DataEWKCorrected/${fit_variable}_Fakes_$$SYSTEMATIC
 shapes data_obs  *  ${output_file} AllData/${fit_variable}
@@ -24,8 +24,8 @@ observation  -1.0
 # the second 'pr  allocess' line must have a positive number for backgrounds, and 0 for signal
 # then we list the independent sources of uncertainties, and give their effect (syst. error)
 # on each process and bin
-bin                           eee                          eee                          eee                               all             all             all         all             all         all         
-process                       wzjj-aqgcfm__fm0-4_fm1-m8    wzjj-aqgcfs__fs0-32_fs1-16   wzjj-aqgcft__ft0-0_ft1-0_ft2-m1   EW-WZjj         QCD-WZjj        vv          top-ewk         zg          nonprompt   
+bin                           all                          all                          all                               all             all             all         all             all         all         
+process                       wzjj-aqgcfm__fm0-8_fm1-m4    wzjj-aqgcfs__fs0-32_fs1-16   wzjj-aqgcft__ft0-0_ft1-0_ft2-3   EW-WZjj         QCD-WZjj        vv          top-ewk         zg          nonprompt   
 process                       -2                           -1                            0                                0               1               2           3               4           5           
 rate                          -1                           -1                           -1                                ${signal_yield} ${QCD_WZjj}     ${vv}       ${top_ewk}      ${zg}       ${nonprompt} 
 ------------                                                                                                                                                                                                                                                                                                           
