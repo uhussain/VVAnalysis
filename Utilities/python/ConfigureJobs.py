@@ -46,7 +46,7 @@ def getCombinePath():
     return config['Setup']['combine_path'] + "/"
 def getListOfEWKFilenames():
     return [
-    #    "wz3lnu-powheg",
+        "wz3lnu-mg5amcnlo",
     # Use jet binned WZ samples for subtraction by default
         #"wz3lnu-mgmlm-0j",
         #"wz3lnu-mgmlm-1j",
@@ -68,6 +68,11 @@ def getListOfEWKFilenames():
         "ggZZ4m",
         "ggZZ2e2mu",
     ]
+def getListOfDYFilenames():
+    return[
+        "DYJetsToLL_M10to50",
+        "DYJetsToLLM-50",
+        ]
 def getListOfNonpromptFilenames():
     return ["tt-lep",
         "st-schan",

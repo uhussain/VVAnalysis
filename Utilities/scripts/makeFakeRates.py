@@ -30,6 +30,8 @@ def getHistNames(channels):
 def makeCompositeHists(name, members, addRatios=True, overflow=False):
     composite = ROOT.TList()
     composite.SetName(name)
+    if name=="AllEWK":
+        print "EWK members: ",members
     for directory in [str(i) for i in members.keys()]:
         for histname in getHistNames(["eee", "eem", "emm", "mmm"]):
             hist = fOut.Get("/".join([directory, histname]))
@@ -120,6 +122,9 @@ OutputTools.writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames()), False)
 OutputTools.writeOutputListItem(allewk, fOut)
+allDYJets = makeCompositeHists("DYMC", ConfigureJobs.getListOfFilesWithXSec(
+    ConfigureJobs.getListOfDYFilenames()),False)
+OutputTools.writeOutputListItem(allDYJets, fOut)
 #allnonprompt = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(
 #    ConfigureJobs.getListOfNonpromptFilenames()))
 #OutputTools.writeOutputListItem(allnonprompt, fOut)
