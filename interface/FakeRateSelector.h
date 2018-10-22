@@ -10,11 +10,11 @@
 #include <iostream>
 
 // Headers needed by this particular selector
-#include "Analysis/VVAnalysis/interface/ZLSelectorBase.h"
+#include "Analysis/VVAnalysis/interface/ZZSelectorBase.h"
 #include <vector>
 
 
-class FakeRateSelector : public ZLSelectorBase { 
+class FakeRateSelector : public ZZSelectorBase { 
 public :
     TH2D* passingTight2D_;
     TH1D* passingTight1DPt_;
