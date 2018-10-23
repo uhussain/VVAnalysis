@@ -12,7 +12,7 @@
 
 // Headers needed by this particular selector
 #include <vector>
-//#include "Analysis/VVAnalysis/interface/ScaleFactor.h"
+#include "Analysis/VVAnalysis/interface/ScaleFactor.h"
 
 class ZZSelectorBase : public TSelector {
 public :
@@ -35,30 +35,15 @@ public :
     }; 
     enum Selection {
         tightleptons,
-        Wselection,
-        Wselection_Full,
         FakeRateSelectionLoose,
         FakeRateSelectionTight,
-        VBSselection_Loose,
-        VBSselection_NoZeppenfeld,
-        VBSselection_Tight,
-        VBSselection_Loose_Full,
-        VBSselection_NoZeppenfeld_Full,
-        VBSselection_Tight_Full,
-        VBSBackgroundControl,
-        VBSBackgroundControlATLAS,
-        VBSBackgroundControl_Full,
-        VBSBackgroundControlLoose,
-        VBSBackgroundControlLoose_Full,
-        Inclusive2Jet,
-        Inclusive2Jet_Full,
     };
 
     TList *currentHistDir_{nullptr};
     TH1D* sumWeightsHist_;
 
     bool addSumweights_;
-    bool isVBS_;
+    //bool isVBS_;
     //MC variable to check for duplication(this is a flag to differentiate between channels)
     Int_t duplicated;
     Float_t weight;
