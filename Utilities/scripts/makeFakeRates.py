@@ -112,7 +112,7 @@ fOut = ROOT.TFile(fileName, "recreate")
 #pileupSF = fScales.Get('pileupSF')
 #sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
 
-SelectorTools.applySelector(args["filenames"],
+SelectorTools.applySelector(args["filenames"],channels,
         "FakeRateSelector", args['selection'], fOut,
         proof=args['proof'], addSumweights=True)
         #extra_inputs=sf_inputs, proof=args['proof'],

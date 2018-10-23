@@ -77,6 +77,7 @@ def processLocalFiles(selector, file_path, chan):
         print "filename: ", filename
         rtfile = ROOT.TFile(filename)
         tree = rtfile.Get("%s/ntuple" % chan)
+        print "tree exists"
         if not tree:
             raise ValueError(("tree %s/ntuple not found for file %s. " \
                     "Probably it is corrupted") % (chan, filename)
