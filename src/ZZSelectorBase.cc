@@ -70,56 +70,26 @@ void ZZSelectorBase::Init(TTree *tree)
 
     if (selectionName_ == "tightleptons")
         selection_ = tightleptons;
-    else if (selectionName_ == "Wselection")
-        selection_ = Wselection;
-    else if (selectionName_ == "Wselection_Full")
-        selection_ = Wselection_Full;
     else if (selectionName_ == "FakeRateSelectionLoose")
         selection_ = FakeRateSelectionLoose;
     else if (selectionName_ == "FakeRateSelectionTight")
         selection_ = FakeRateSelectionTight;
-    else if (selectionName_ == "VBSselection_Loose")
-        selection_ = VBSselection_Loose;
-    else if (selectionName_ == "VBSselection_Loose_Full")
-        selection_ = VBSselection_Loose_Full;
-    else if (selectionName_ == "VBSselection_NoZeppenfeld")
-        selection_ = VBSselection_NoZeppenfeld;
-    else if (selectionName_ == "VBSselection_NoZeppenfeld_Full")
-        selection_ = VBSselection_NoZeppenfeld_Full;
-    else if (selectionName_ == "VBSselection_Tight")
-        selection_ = VBSselection_Tight;
-    else if (selectionName_ == "VBSselection_Tight_Full")
-        selection_ = VBSselection_Tight_Full;
-    else if (selectionName_ == "VBSBackgroundControl")
-        selection_ = VBSBackgroundControl;
-    else if (selectionName_ == "VBSBackgroundControlATLAS")
-        selection_ = VBSBackgroundControlATLAS;
-    else if (selectionName_ == "VBSBackgroundControl_Full")
-        selection_ = VBSBackgroundControl_Full;
-    else if (selectionName_ == "VBSBackgroundControlLoose")
-        selection_ = VBSBackgroundControlLoose;
-    else if (selectionName_ == "VBSBackgroundControlLoose_Full")
-        selection_ = VBSBackgroundControlLoose_Full;
-    else if (selectionName_ == "Inclusive2Jet")
-        selection_ = Inclusive2Jet;
-    else if (selectionName_ == "Inclusive2Jet_Full")
-        selection_ = Inclusive2Jet_Full;
     else {
         std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;
     }
-    isVBS_ = (selection_ == VBSselection_Loose || 
-        selection_ == VBSselection_Loose_Full || 
-        selection_ == VBSselection_NoZeppenfeld || 
-        selection_ == VBSselection_NoZeppenfeld_Full || 
-        selection_ == VBSselection_Tight || 
-        selection_ == VBSselection_Tight_Full || 
-        selection_ == VBSBackgroundControl || 
-        selection_ == VBSBackgroundControl_Full || 
-        selection_ == VBSBackgroundControlATLAS || 
-        selection_ == VBSBackgroundControlLoose ||
-        selection_ == VBSBackgroundControlLoose_Full
-        );
+    //isVBS_ = (selection_ == VBSselection_Loose || 
+    //    selection_ == VBSselection_Loose_Full || 
+    //    selection_ == VBSselection_NoZeppenfeld || 
+    //    selection_ == VBSselection_NoZeppenfeld_Full || 
+    //    selection_ == VBSselection_Tight || 
+    //    selection_ == VBSselection_Tight_Full || 
+    //    selection_ == VBSBackgroundControl || 
+    //    selection_ == VBSBackgroundControl_Full || 
+    //    selection_ == VBSBackgroundControlATLAS || 
+    //    selection_ == VBSBackgroundControlLoose ||
+    //    selection_ == VBSBackgroundControlLoose_Full
+    //    );
 
     
     isNonpromptEstimate_ = false;
