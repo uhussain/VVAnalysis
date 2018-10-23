@@ -8,6 +8,7 @@ from python import HistTools
 import os
 import sys
 
+channels = ["eeee", "eemm","mmmm"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 
@@ -24,7 +25,7 @@ def getComLineArgs():
     parser.add_argument("-b", "--hist_names", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["all"], help="List of histograms, "
-                        "as defined in AnalysisDatasetManager, separated "
+                        "as defined in ZZ4lAnalysisDatasetManager, separated "
                         "by commas")
     return vars(parser.parse_args())
 
@@ -45,43 +46,43 @@ ROOT.gROOT.SetBatch(True)
 args = getComLineArgs()
 manager_path = ConfigureJobs.getManagerPath()
 sys.path.append("/".join([manager_path, 
-    "AnalysisDatasetManager", "Utilities/python"]))
+    "ZZ4lAnalysisDatasetManager", "Utilities/python"]))
 import ConfigHistTools 
 
 tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
-fScales = ROOT.TFile('data/scaleFactors.root')
-mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
-eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
-useSvenjasFRs = False
-useJakobsFRs = False
-if useSvenjasFRs:
-    mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
-    eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
-elif useJakobsFRs:
-    mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Jakob")
-    eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Jakob")
-# For medium muons
-#mCBMedFakeRate.SetName("fakeRate_allMu")
-if mCBTightFakeRate:
-    mCBTightFakeRate.SetName("fakeRate_allMu")
-if eCBTightFakeRate:
-    eCBTightFakeRate.SetName("fakeRate_allE")
+#fScales = ROOT.TFile('data/scaleFactors.root')
+#mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
+#eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
+#useSvenjasFRs = False
+#useJakobsFRs = False
+#if useSvenjasFRs:
+#    mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
+#    eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
+#elif useJakobsFRs:
+#    mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Jakob")
+#    eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Jakob")
+## For medium muons
+##mCBMedFakeRate.SetName("fakeRate_allMu")
+#if mCBTightFakeRate:
+#    mCBTightFakeRate.SetName("fakeRate_allMu")
+#if eCBTightFakeRate:
+#    eCBTightFakeRate.SetName("fakeRate_allE")
+#
+#muonIsoSF = fScales.Get('muonIsoSF')
+#muonIdSF = fScales.Get('muonTightIdSF')
+#electronTightIdSF = fScales.Get('electronTightIdSF')
+#electronGsfSF = fScales.Get('electronGsfSF')
+#pileupSF = fScales.Get('pileupSF')
 
-muonIsoSF = fScales.Get('muonIsoSF')
-muonIdSF = fScales.Get('muonTightIdSF')
-electronTightIdSF = fScales.Get('electronTightIdSF')
-electronGsfSF = fScales.Get('electronGsfSF')
-pileupSF = fScales.Get('pileupSF')
-
-fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
-sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
+#fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
+#sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
 selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
-if selection == "Inclusive2Jet":
-    selection = "Wselection"
-    print "Info: Using Wselection for hist defintions"
+if selection == "":
+    selection = "BasicZZSelections"
+    print "Info: Using BasicZZSelections for hist defintions"
 analysis = "/".join([args['analysis'], selection])
 hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
@@ -94,31 +95,38 @@ if args['proof']:
     ROOT.TProof.Open('workers=12')
 
 if "FakeRate" not in args['output_selection'] and not args['test']:
-    background = SelectorTools.applySelector(["WZxsec2016data"] +
-        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
-        ConfigureJobs.getListOfNonpromptFilenames(), 
-            "WZBackgroundSelector", args['selection'], fOut, 
-            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
+   # background = SelectorTools.applySelector(["ZZ4l2018data"] +
+   #     ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
+   #     ConfigureJobs.getListOfNonpromptFilenames(),channels, 
+   #         "WZBackgroundSelector", args['selection'], fOut, 
+   #         extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
+   #         addSumweights=False,
+   #         proof=args['proof'])
+    background = SelectorTools.applySelector(["ZZ4l2018data"] +
+        ConfigureJobs.getListOfEWKFilenames(),channels, 
+            "ZZBackgroundSelector", args['selection'], fOut, 
+            extra_inputs=fr_inputs+hist_inputs+tselection, 
             addSumweights=False,
             proof=args['proof'])
-mc = SelectorTools.applySelector(args['filenames'], "WZSelector", args['selection'], fOut, 
-        extra_inputs=sf_inputs+hist_inputs+tselection, 
+mc = SelectorTools.applySelector(args['filenames'],channels, "ZZSelector", args['selection'], fOut, 
+        extra_inputs=hist_inputs+tselection,
+        #extra_inputs=sf_inputs+hist_inputs+tselection, 
         addSumweights=True, proof=args['proof'])
 if args['test']:
     exit(0)
 
 alldata = HistTools.makeCompositeHists(fOut,"AllData", 
-    ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
+    ConfigureJobs.getListOfFilesWithXSec(["ZZ4l2018data"], manager_path), args['lumi'],
     underflow=False, overflow=False)
 OutputTools.writeOutputListItem(alldata, fOut)
 alldata.Delete()
 
-nonpromptmc = HistTools.makeCompositeHists(fOut, "NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
-    ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'],
-    underflow=False, overflow=False)
-nonpromptmc.Delete()
-
-OutputTools.writeOutputListItem(nonpromptmc, fOut)
+#nonpromptmc = HistTools.makeCompositeHists(fOut, "NonpromptMC", ConfigureJobs.getListOfFilesWithXSec( 
+#    ConfigureJobs.getListOfNonpromptFilenames(), manager_path), args['lumi'],
+#    underflow=False, overflow=False)
+#nonpromptmc.Delete()
+#
+#OutputTools.writeOutputListItem(nonpromptmc, fOut)
 ewkmc = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), manager_path), args['lumi'],
     underflow=False, overflow=False)

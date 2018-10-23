@@ -5,9 +5,9 @@ import datetime
 import ConfigureJobs, OutputTools
 import sys
 import os
-def applySelector(filelist, selector_name, selection, 
+def applySelector(filelist, channels,selector_name, selection, 
         rootfile,
-        analysis="ZZ4l2018", channels=["eee", "eem", "emm", "mmm"], 
+        analysis="ZZ4l2018", 
         extra_inputs = [],
         addSumweights=True,
         proof=False):
@@ -74,6 +74,7 @@ def processLocalFiles(selector, file_path, chan):
             % file_path)
     countfiles=0
     for filename in glob.glob(file_path):
+        print "filename: ", filename
         rtfile = ROOT.TFile(filename)
         tree = rtfile.Get("%s/ntuple" % chan)
         if not tree:

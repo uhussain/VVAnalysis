@@ -32,6 +32,6 @@ def getDefaultParser():
     parser.add_argument("-f", "--filenames", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["ZZ4l2018"], help="List of input file names, "
-                        "as defined in AnalysisDatasetManager, separated "
+                        "as defined in ZZ4lAnalysisDatasetManager, separated "
                         "by commas")
     return parser
