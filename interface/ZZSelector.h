@@ -76,7 +76,7 @@ public :
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
         { "backgroundControlYield",  {} },
-        { "nTruePU",  {} },
+        //{ "nTruePU",  {} },
         { "nvtx",  {} },
         { "Z1Mass",  {} },
         { "Z2Mass",  {} },

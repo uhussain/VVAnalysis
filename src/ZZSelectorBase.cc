@@ -54,14 +54,14 @@ void ZZSelectorBase::Init(TTree *tree)
         TNamed* chan = (TNamed *) GetInputList()->FindObject("channel");
         //std::cout<<"channel is added and passed" <<std::endl;
         TNamed* selection = (TNamed *) GetInputList()->FindObject("selection");
-        std::cout<<"channelName: "<<channelName_<<std::endl;
+        //std::cout<<"channelName: "<<channelName_<<std::endl;
         if (name != nullptr) {
             name_ = name->GetTitle();
         }
         else {
             name_ = GetNameFromFile();
         }
-        std::cout<<"name: "<<name_<<std::endl; 
+        //std::cout<<"name: "<<name_<<std::endl; 
         if (chan != nullptr) {
             channelName_ = chan->GetTitle();
         }
@@ -79,7 +79,7 @@ void ZZSelectorBase::Init(TTree *tree)
     else if (selectionName_ == "FakeRateSelectionTight")
         selection_ = FakeRateSelectionTight;
     else {
-        std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
+        //std::cerr << "INFO: Selection set to default value: TightLeptons" << std::endl;
         selection_ = tightleptons;
     }
     //isVBS_ = (selection_ == VBSselection_Loose || 
@@ -135,12 +135,12 @@ void ZZSelectorBase::Init(TTree *tree)
         }
     }
     UpdateDirectory();
-    std::cout<<"channelName: "<<channelName_<<std::endl;
-    std::cout<<"enum channel_: "<<channel_<<std::endl;
-    std::cout<<"isMC: "<<isMC_<<std::endl;
+    //std::cout<<"channelName: "<<channelName_<<std::endl;
+    //std::cout<<"enum channel_: "<<channel_<<std::endl;
+    //std::cout<<"isMC: "<<isMC_<<std::endl;
     if (channelName_ == "eeee") {
         channel_ = eeee;
-        std::cout<<"enum channel_: "<<channel_<<std::endl;
+        //std::cout<<"enum channel_: "<<channel_<<std::endl;
         fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
@@ -172,7 +172,7 @@ void ZZSelectorBase::Init(TTree *tree)
     }
     //Add 2e2mu channel also but it still needs to differentiate which one is Z1Mass and which one is Z2Mass leptons
     //This is done with a flag at the time of Process for each event on the fly
-    if (channelName_ == "eemm") {
+    else if (channelName_ == "eemm") {
         channel_ = eemm;
         fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
@@ -213,7 +213,7 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m3ZZIsoPass", &l3IsIso, &b_l3IsIso);
         fChain->SetBranchAddress("m4ZZTightIDNoVtx", &l4IsTight, &b_l4IsTight);
         fChain->SetBranchAddress("m4ZZIsoPass", &l4IsIso, &b_l4IsIso);
-        fChain->SetBranchAddress("m1_e2_Mass", &Z1mass, &b_Z1mass);
+        fChain->SetBranchAddress("m1_m2_Mass", &Z1mass, &b_Z1mass);
         fChain->SetBranchAddress("m3_m4_Mass", &Z2mass, &b_Z2mass);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
@@ -418,6 +418,7 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
         //b_Flag_duplicateMuonsPass->GetEntry(entry);          
         //b_Flag_badMuonsPass->GetEntry(entry);          
     }
+    //std::cout<<"Is the ZZSelectorBase fine until here"<<std::endl;
     if (channel_ == eeee || channel_ == eemm || channel_ == mmmm) {
       b_l4Pt->GetEntry(entry);
       b_l4Eta->GetEntry(entry);
@@ -429,8 +430,7 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
       b_Z2mass->GetEntry(entry);
     }
     b_Z1mass->GetEntry(entry);
-    b_type1_pfMETEt->GetEntry(entry);
-    
+    b_type1_pfMETEt->GetEntry(entry); 
     b_l1IsTight->GetEntry(entry);
     b_l1IsIso->GetEntry(entry);
     b_l2IsTight->GetEntry(entry);
@@ -445,7 +445,9 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     //b_l2PVDZ->GetEntry(entry);
     //b_l3PVDZ->GetEntry(entry);
 
-    b_l3MtToMET->GetEntry(entry);
+    if (channel_ == eee || channel_ == eem || channel_ == emm || channel_ == mmm) {
+      b_l3MtToMET->GetEntry(entry);
+    }
     //b_Flag_BadPFMuonFilterPass->GetEntry(entry);                    
     //b_Flag_BadChargedCandidateFilterPass->GetEntry(entry);          
     //b_Flag_HBHENoiseFilterPass->GetEntry(entry);                    
@@ -468,6 +470,7 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     //  else{ 
     //    e1e2IsZ1=0;}
     //}
+    //std::cout<<"Does the ZZSelectorBase finish processing"<<std::endl;
     return kTRUE;
 }
 

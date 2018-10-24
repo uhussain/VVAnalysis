@@ -45,10 +45,10 @@ public :
     bool addSumweights_;
     //bool isVBS_;
     //MC variable to check for duplication(this is a flag to differentiate between channels)
-    Int_t duplicated;
+    //Int_t duplicated;
     Float_t weight;
     Float_t genWeight;
-    Float_t nTruePU;
+    //Float_t nTruePU;
     Float_t Z1mass;
     Float_t Z2mass;
     Float_t type1_pfMETEt;
@@ -91,11 +91,11 @@ public :
     
     Float_t l3MtToMET;
     
-    TBranch* b_duplicated;
+    //TBranch* b_duplicated;
     TBranch* b_genWeight;
     TBranch* b_Z1mass;
     TBranch* b_Z2mass;
-    TBranch* b_nTruePU;
+    //TBranch* b_nTruePU;
     TBranch* b_type1_pfMETEt;
     TBranch* b_type1_pfMETPhi;
     TBranch* b_l1GenPt;

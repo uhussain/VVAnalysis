@@ -96,20 +96,20 @@ print "tselection: ",tselection
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
-if "FakeRate" not in args['output_selection'] and not args['test']:
-   # background = SelectorTools.applySelector(["ZZ4l2018data"] +
-   #     ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
-   #     ConfigureJobs.getListOfNonpromptFilenames(),channels, 
-   #         "WZBackgroundSelector", args['selection'], fOut, 
-   #         extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
-   #         addSumweights=False,
-   #         proof=args['proof'])
-    background = SelectorTools.applySelector(["ZZ4l2018data"] +
-        ConfigureJobs.getListOfEWKFilenames(),channels, 
-            "ZZBackgroundSelector", args['selection'], fOut, 
-            extra_inputs=fr_inputs+hist_inputs+tselection, 
-            addSumweights=False,
-            proof=args['proof'])
+#if "FakeRate" not in args['output_selection'] and not args['test']:
+#   # background = SelectorTools.applySelector(["ZZ4l2018data"] +
+#   #     ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
+#   #     ConfigureJobs.getListOfNonpromptFilenames(),channels, 
+#   #         "WZBackgroundSelector", args['selection'], fOut, 
+#   #         extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
+#   #         addSumweights=False,
+#   #         proof=args['proof'])
+#    background = SelectorTools.applySelector(["ZZ4l2018data"] +
+#        ConfigureJobs.getListOfEWKFilenames(),channels, 
+#            "ZZBackgroundSelector", args['selection'], fOut, 
+#            extra_inputs=hist_inputs+tselection, 
+#            addSumweights=False,
+#            proof=args['proof'])
 mc = SelectorTools.applySelector(args['filenames'],channels, "ZZSelector", args['selection'], fOut, 
         extra_inputs=hist_inputs+tselection,
         #extra_inputs=sf_inputs+hist_inputs+tselection, 

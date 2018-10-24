@@ -7,11 +7,12 @@ void ZZSelector::Init(TTree *tree)
     ZZSelectorBase::Init(tree);
 
     //weight_info_ = 0;
-    if (isMC_) {
-        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
+    //if (isMC_) {
+    //    fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
         //weight_info_ = GetLheWeightInfo();
-    }
+    //}
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
+    //std::cout<<"Is it able to initialize"<<std::endl; 
 }
 void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     ZZSelectorBase::Process(entry);
@@ -21,9 +22,8 @@ void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     //b_l2Pt->GetEntry(entry);
     //b_l3Pt->GetEntry(entry);
     b_Mass->GetEntry(entry);
-    if(channelName_=="eemm"){
+    if(channel_ == eemm){
       SetVariables(entry);}
-    
 }
 //Similar to Kenneth's SetShiftedMasses function which i will need later as well
 void ZZSelector::SetVariables(Long64_t entry) {
@@ -133,8 +133,8 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     //}
 
     //SafeHistFill(hists1D_, getHistName("M3lMET", variation.second), M3lMET, weight*(isMC_ || M3lMET < 300 || noBlind));
-    if (isMC_)
-        SafeHistFill(hists1D_, getHistName("nTruePU", variation.second), nTruePU, weight);
+    //if (isMC_)
+    //    SafeHistFill(hists1D_, getHistName("nTruePU", variation.second), nTruePU, weight);
 }
 
 Bool_t ZZSelector::Process(Long64_t entry)
@@ -147,6 +147,7 @@ Bool_t ZZSelector::Process(Long64_t entry)
 
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
+    //std::cout<<"Is it able to load branches"<<std::endl; 
     if (TightZZLeptons()) {
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
