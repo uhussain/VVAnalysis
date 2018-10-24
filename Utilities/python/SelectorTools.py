@@ -11,38 +11,67 @@ def applySelector(filelist, channels,selector_name, selection,
         extra_inputs = [],
         addSumweights=True,
         proof=False):
+    print "channels: ",channels
     for i, chan in enumerate(channels):
-        #inputs = ROOT.TList()
-        #for inp in extra_inputs:
-        #    inputs.Add(inp)
+        print "channel length: ",len(chan)
+        if len(chan)==4:
+            inputs = ROOT.TList()
+            for inp in extra_inputs:
+                inputs.Add(inp)
+                print "inputs getting added: ",inp
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
             select = getattr(ROOT, selector_name)()
-            inputs = ROOT.TList()
-            select.SetInputList(inputs)
-            #This part is introduced to work out the fact that I dont have "extra_inputs" such as SFs yet.
-            tchan=ROOT.TNamed("channel",chan)
-            tname=ROOT.TNamed("name",dataset) 
-            inputs.Add(tname)
-            inputs.Add(tchan)
-            ROOT.gROOT.cd()
-            #So line 38 doesn't give a false because of null list?
-            print "Processing channel %s for dataset %s" % (chan, dataset)
-            try:
-                #print dataset
-                file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                    selection, analysis)
-                print file_path
-                countfiles=processLocalFiles(select, file_path, chan)
-                print countfiles
-            except ValueError as e:
-                print e
-                continue
-            output_list = select.GetOutputList()
-            print "Output_list: ", output_list
-            #dataset_list = output_list.FindObject(dataset)
-            #if not dataset_list or dataset_list.ClassName() != "TList":
-            #    print "WARNING: No output found for dataset %s" % dataset
-            #    continue
+            #This is the original implementation with inputLists and for ZZSelector hist_inputs is still there
+            #even if there are no fake rates or scale factors as extra_inputs
+            if len(chan)==4:
+                select.SetInputList(inputs)
+                tchan=ROOT.TNamed("channel",chan)
+                tname=ROOT.TNamed("name",dataset) 
+                inputs.Add(tname)
+                inputs.Add(tchan)
+                print "inputs: ",inputs.Print()
+                print "Processing channel %s for dataset %s" % (chan, dataset)
+                try:
+                    file_path = ConfigureJobs.getInputFilesPath(dataset, 
+                        selection, analysis)
+                    processLocalFiles(select, file_path, chan)
+                except ValueError as e:
+                    print e
+                    continue
+                output_list = select.GetOutputList()
+                dataset_list = output_list.FindObject(dataset)
+                if not dataset_list or dataset_list.ClassName() != "TList":
+                    print "WARNING: No output found for dataset %s" % dataset
+                    continue
+            #This is a workaround for FakeRateSelector until there are no SFs as inputs
+            else:
+                inputs = ROOT.TList()
+                select.SetInputList(inputs)
+                #This part is introduced to work out the fact that I dont have "extra_inputs" such as SFs yet.
+                tchan=ROOT.TNamed("channel",chan)
+                tname=ROOT.TNamed("name",dataset) 
+                inputs.Add(tname)
+                inputs.Add(tchan)
+                print "inputs: ",inputs.Print()
+                #ROOT.gROOT.cd()
+                #So line 56 doesn't give a false because of null list?
+                print "Processing channel %s for dataset %s" % (chan, dataset)
+                try:
+                    #print dataset
+                    file_path = ConfigureJobs.getInputFilesPath(dataset, 
+                        selection, analysis)
+                    print file_path
+                    countfiles=processLocalFiles(select, file_path, chan)
+                    print countfiles
+                except ValueError as e:
+                    print e
+                    continue
+                output_list = select.GetOutputList()
+                print "Output_list: ", output_list
+                #dataset_list = output_list.FindObject(dataset)
+                #if not dataset_list or dataset_list.ClassName() != "TList":
+                #    print "WARNING: No output found for dataset %s" % dataset
+                #    continue
             # Only add for one channel
             if addSumweights and i == 0:
                 meta_chain = ROOT.TChain("metaInfo/metaInfo")
@@ -74,10 +103,10 @@ def processLocalFiles(selector, file_path, chan):
             % file_path)
     countfiles=0
     for filename in glob.glob(file_path):
-        print "filename: ", filename
+        #print "filename: ", filename
         rtfile = ROOT.TFile(filename)
         tree = rtfile.Get("%s/ntuple" % chan)
-        print "tree exists"
+        #print "tree exists"
         if not tree:
             raise ValueError(("tree %s/ntuple not found for file %s. " \
                     "Probably it is corrupted") % (chan, filename)

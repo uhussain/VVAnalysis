@@ -50,14 +50,18 @@ void ZZSelectorBase::Init(TTree *tree)
 
     if (GetInputList() != nullptr) {
         TNamed* name = (TNamed *) GetInputList()->FindObject("name");
+        //std::cout<<"name is added"<<std::endl;
         TNamed* chan = (TNamed *) GetInputList()->FindObject("channel");
+        //std::cout<<"channel is added and passed" <<std::endl;
         TNamed* selection = (TNamed *) GetInputList()->FindObject("selection");
+        std::cout<<"channelName: "<<channelName_<<std::endl;
         if (name != nullptr) {
             name_ = name->GetTitle();
         }
         else {
             name_ = GetNameFromFile();
         }
+        std::cout<<"name: "<<name_<<std::endl; 
         if (chan != nullptr) {
             channelName_ = chan->GetTitle();
         }
@@ -67,7 +71,7 @@ void ZZSelectorBase::Init(TTree *tree)
             selectionName_ = selection->GetTitle();
         }
     }
-
+    //std::cout<<"fChain: "<< fChain->Print() <<std::endl;
     if (selectionName_ == "tightleptons")
         selection_ = tightleptons;
     else if (selectionName_ == "FakeRateSelectionLoose")
@@ -91,7 +95,6 @@ void ZZSelectorBase::Init(TTree *tree)
     //    selection_ == VBSBackgroundControlLoose_Full
     //    );
 
-    
     isNonpromptEstimate_ = false;
     isMC_ = false;
     if (name_.find("data") == std::string::npos){
@@ -132,9 +135,12 @@ void ZZSelectorBase::Init(TTree *tree)
         }
     }
     UpdateDirectory();
-
+    std::cout<<"channelName: "<<channelName_<<std::endl;
+    std::cout<<"enum channel_: "<<channel_<<std::endl;
+    std::cout<<"isMC: "<<isMC_<<std::endl;
     if (channelName_ == "eeee") {
         channel_ = eeee;
+        std::cout<<"enum channel_: "<<channel_<<std::endl;
         fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
@@ -361,15 +367,18 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     b_l1Phi->GetEntry(entry);
     b_l2Phi->GetEntry(entry);
     b_l3Phi->GetEntry(entry);
+    //std::cout<<"IsMC: "<<isMC_<<std::endl;
     if (isMC_) {
-        b_duplicated->GetEntry(entry);
+        //b_duplicated->GetEntry(entry);
         b_genWeight->GetEntry(entry);
         //b_l1GenPt->GetEntry(entry);
         //b_l2GenPt->GetEntry(entry);
-        //b_l3GenPt->GetEntry(entry); 
-        b_nTruePU->GetEntry(entry);
+        //b_l3GenPt->GetEntry(entry);
+        //std::cout<<"Its fine before nTruePU" <<std::endl;
+        //b_nTruePU->GetEntry(entry);
         //if (channel_ == eeee || channel_ == eemm || channel_ == mmmm) {
         //  b_l4GenPt->GetEntry(entry);}
+        //std::cout<<"It fails before weight=genWeight assignment" <<std::endl;
         weight = genWeight;
         //if (channel_ == eee) {
         //    weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
@@ -409,7 +418,6 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
         //b_Flag_duplicateMuonsPass->GetEntry(entry);          
         //b_Flag_badMuonsPass->GetEntry(entry);          
     }
-
     if (channel_ == eeee || channel_ == eemm || channel_ == mmmm) {
       b_l4Pt->GetEntry(entry);
       b_l4Eta->GetEntry(entry);
@@ -459,7 +467,7 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     //    e1e2IsZ1=1;}
     //  else{ 
     //    e1e2IsZ1=0;}
-    //} 
+    //}
     return kTRUE;
 }
 
