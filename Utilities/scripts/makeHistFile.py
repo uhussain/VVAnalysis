@@ -81,16 +81,18 @@ fOut = ROOT.TFile(tmpFileName, "recreate")
 selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
 if selection == "":
-    selection = "BasicZZSelections"
+    selection = "LooseLeptons"
     print "Info: Using BasicZZSelections for hist defintions"
 analysis = "/".join([args['analysis'], selection])
 hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
 
 hists = [h for h in hists if "unrolled" not in h and "wCR" not in h and h not in  ["YieldByChannel", "CutFlow"]]
+print "hists: ", hists
 hist_inputs = [getHistExpr(hists, analysis)]
+print "hist_inputs: ",hist_inputs
 tselection = [ROOT.TNamed("selection", args['output_selection'])]
-
+print "tselection: ",tselection
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
