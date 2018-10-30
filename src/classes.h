@@ -4,6 +4,7 @@
 #include "Analysis/VVAnalysis/interface/WZBackgroundSelector.h"
 #include "Analysis/VVAnalysis/interface/ScaleFactor.h"
 #include "Analysis/VVAnalysis/interface/disambiguateFinalStates.h"
+#include "Analysis/VVAnalysis/interface/disambiguateFinalStatesZZ.h"
 
 namespace{
   namespace{
@@ -13,5 +14,6 @@ namespace{
     WZBackgroundSelector pWZBackgroundSelector;
     ScaleFactor pScaleFactor;
     disambiguateFinalStates pDisambiguator;
+    disambiguateFinalStates pDisambiguatorZZ;
   }
 }
