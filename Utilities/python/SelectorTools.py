@@ -44,9 +44,10 @@ def applySelector(filelist, channels,selector_name, selection,
                         selection, analysis)
                     #processLocalFiles(select, file_path, chan)
                     countfiles=processLocalFiles(select, file_path, chan)
-                    print countfiles
+                    print "CountFiles: ",countfiles
                 except ValueError as e:
                     print e
+                    print "CountFiles: ",countfiles
                     continue
                 output_list = select.GetOutputList()
                 print "Output_list: ", output_list
@@ -73,9 +74,10 @@ def applySelector(filelist, channels,selector_name, selection,
                         selection, analysis)
                     #print file_path
                     countfiles=processLocalFiles(select, file_path, chan)
-                    print countfiles
+                    print "CountFiles: ",countfiles
                 except ValueError as e:
                     print e
+                    print "CountFiles: ",countfiles
                     continue
                 output_list = select.GetOutputList()
                 print "Output_list: ", output_list
@@ -123,6 +125,7 @@ def processLocalFiles(selector, file_path, chan):
             raise ValueError(("tree %s/ntuple not found for file %s. " \
                     "Probably it is corrupted") % (chan, filename)
             )
+            continue
         tree.Process(selector, "")
         countfiles=countfiles+1
     return countfiles
