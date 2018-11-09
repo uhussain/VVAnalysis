@@ -1,0 +1,31 @@
+{
+    "Object" : {
+        "e" : [ 
+            "({object_name}Pt >= 7.0)",
+            "(abs({object_name}Eta) <  2.5)",
+            "(abs({object_name}PVDXY) < 0.5)",
+            "(abs({object_name}PVDZ) < 1.0)",
+            "({object_name}SIP3D < 10.0)"
+        ],
+        "m" : [
+            "({object_name}Pt > 5.0)",
+            "(abs({object_name}Eta) < 2.4)",
+            "({object_name}IsGlobal >= 1 || ({object_name}IsTracker >= 1 && {object_name}MatchedStations >= 1))",
+            "(abs({object_name}PVDXY) < 0.5)",
+            "(abs({object_name}PVDZ) < 1.0)",
+            "({object_name}BestTrackType !=2)",
+            "({object_name}SIP3D < 10.0)"
+        ]
+    },
+    "State" : {
+        "eeee" : ["((e1_e2_SS >= 1 || e1_e2_Mass >= 4.0) && (e1_e3_SS >= 1 || e1_e3_Mass >= 4.0) && (e1_e4_SS >= 1 || e1_e4_Mass >= 4.0) && (e2_e3_SS >= 1 ||  e2_e3_Mass >= 4.0) && (e2_e4_SS >= 1 || e2_e4_Mass >= 4.0) && (e3_e4_SS >= 1 || e3_e4_Mass >= 4.0))"
+        ],
+        "eemm" : ["((e1_e2_SS >= 1 || e1_e2_Mass >= 4.0) && (e1_m1_SS >= 1 || e1_m1_Mass >= 4.0) && (e1_m2_SS >= 1 || e1_m2_Mass >= 4.0) && (e2_m1_SS >= 1 ||  e2_m1_Mass >= 4.0) && (e2_m2_SS >= 1 || e2_m2_Mass >= 4.0) && (m1_m2_SS >= 1 || m1_m2_Mass >= 4.0))" 
+        ],
+        "mmmm" : ["((m1_m2_SS >= 1 || m1_m2_Mass >= 4.0) && (m1_m3_SS >= 1 || m1_m3_Mass >= 4.0) && (m1_m4_SS >= 1 || m1_m4_Mass >= 4.0) && (m2_m3_SS >= 1 ||  m2_m3_Mass >= 4.0) && (m2_m4_SS >= 1 || m2_m4_Mass >= 4.0) && (m3_m4_SS >= 1 || m3_m4_Mass >= 4.0))" 
+        ]
+    },
+    "Event" : [
+        "(pvndof >=4 && abs(pvZ) < 24 && pvRho < 2)"
+    ]
+}
