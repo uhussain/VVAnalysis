@@ -13,20 +13,13 @@ def getManagerPath():
     return path
 def getListOfEWKFilenames():
     return [
-        "wz3lnu-powheg",
+        "wz3lnu-mg5amcnlo",
     # Use jet binned WZ samples for subtraction by default
     #    "wz3lnu-mgmlm-0j",
     #    "wz3lnu-mgmlm-1j",
     #    "wz3lnu-mgmlm-2j",
     #    "wz3lnu-mgmlm-3j",
         "zz4l-powheg",
-        "tzq",
-        "ttz",
-        "ttw",
-        "zzz",
-        "wwz",
-        "www",
-        "zg",
         "ggZZ4e",
         "ggZZ4m",
         "ggZZ2e2mu",
@@ -97,8 +90,12 @@ def getListOfFiles(filelist, manager_path):
                 dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
                     "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4lCR2018/%s.json" % "ntuples"
             elif(Zl in name):
-                dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                    "ZZ4lAnalysisDatasetManager/FileInfo/ZplusL2018/%s.json" % "ntuples"
+                if "Skim" in name:
+                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                        "ZZ4lAnalysisDatasetManager/FileInfo/ZplusL2018/%s.json" % "skim"
+                else:
+                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                        "ZZ4lAnalysisDatasetManager/FileInfo/ZplusL2018/%s.json" % "ntuples"
             print dataset_file
             allnames = json.load(open(dataset_file)).keys()
             print allnames
@@ -125,7 +122,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
         outFile.write(result)
 def getListOfFilesWithXSec(filelist, manager_path):
     data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
-    files = getListOfFiles(filelist, manager_path, "ntuples")
+    files = getListOfFiles(filelist, manager_path)
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     info = {}
     for file_name in files:
@@ -140,7 +137,9 @@ def getPreviousStep(selection, analysis):
     selection_map = {}
     if analysis == "ZZ4l2018":
         selection_map = { "ntuples": "ntuples",
-                "preselection" : "ntuples"
+                "loosePreselection" : "ntuples",
+                "preselection" : "ntuples",
+                "4lCRBase" : "ntuples"
         }
     elif analysis == "ZZ4lCR2018":
         selection_map = { "ntuples": "ntuples",
