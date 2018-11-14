@@ -1,9 +1,11 @@
 <lcgdict>
   <class name="FakeRateSelector"/>
   <class name="WZSelector"/>
+  <class name="ZZSelector"/>
   <class name="WZBackgroundSelector"/>
+  <class name="ZZBackgroundSelector"/>
   <class name="WZSelectorBase"/>
-  <class name="ZLSelectorBase"/>
+  <class name="ZZSelectorBase"/>
   <class name="ScaleFactor"/>
   <class name="disambiguateFinalStates"/>
 </lcgdict>
