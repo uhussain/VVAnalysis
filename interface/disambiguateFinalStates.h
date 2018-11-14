@@ -59,17 +59,16 @@ public :
   TBranch        *b_evt;
   TBranch        *b_run;
 
-  TEntryList     *fBestCandidateTightEntryList; 
-  TEntryList     *fBestCandidateLooseEntryList;
+  TEntryList     *fBestCandidateEntryList; 
   // TODO Add TTreeFormula, fix issue when using chain.Process 
   // over multiple files (currently segfaults)
   TTreeFormula   *fCutFormula;
 
 
   //disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0), /*fCutFormula(0),*/ fCurrentRun(-1), fCurrentEvt(-1) { }
-  disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateTightEntryList(0), fBestCandidateLooseEntryList(0), fCutFormula(0), fCurrentRun(-1), fCurrentEvt(-1) { }
+  disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0),fCutFormula(0), fCurrentRun(-1), fCurrentEvt(-1) { }
   //virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList); /*SafeDelete(fCutFormula)*/; }
-  virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateTightEntryList); SafeDelete(fBestCandidateLooseEntryList); SafeDelete(fCutFormula); }
+  virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList);SafeDelete(fCutFormula); }
   virtual Int_t   Version() const { return 2; }
   virtual void    Begin(TTree *tree);
   virtual void    SlaveBegin(TTree *tree);
@@ -117,7 +116,8 @@ private :
   std::vector<float> fEntryDiscriminantsTight; 
   std::vector<float> fEntryZ2PtSumTight;
   std::vector<Long64_t> fEntriesToCompareLoose;
-  std::vector<float> fEntryDiscriminantsLoose; 
+  std::vector<float> fEntryDiscriminantsLoose;
+  std::vector<float> fEntryZ2PtSumLoose;
   char* l1_l2_Cand_mass; 
   char* l1_Cand_pt;
   char* l2_Cand_pt; 

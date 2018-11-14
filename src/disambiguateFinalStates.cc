@@ -50,12 +50,8 @@ void disambiguateFinalStates::Begin(TTree * /*tree*/)
 
 void disambiguateFinalStates::SlaveBegin(TTree * /*tree*/)
 {
-  fBestCandidateTightEntryList = new TEntryList("TightbestCandidates", "Entry List of disambiguated combinatoric candidates after leptons pass tight ID");
-  fOutput->Add(fBestCandidateTightEntryList);
-
-
-  fBestCandidateLooseEntryList = new TEntryList("LoosebestCandidates", "Entry List of disambiguated combinatoric candidates after leptons pass loose ID");
-  fOutput->Add(fBestCandidateLooseEntryList);
+  fBestCandidateEntryList = new TEntryList("bestCandidates", "Entry List of disambiguated combinatoric candidates after leptons pass tight ID");
+  fOutput->Add(fBestCandidateEntryList);
 }
 
 Bool_t disambiguateFinalStates::Process(Long64_t entry)
@@ -106,10 +102,11 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
       fEntryDiscriminantsTight.push_back(mass_discriminant);
       fEntryZ2PtSumTight.push_back(Z2ptSum);
     }
-    //This list is for possible 3P1F and 2P2F CRs but still pick candidates where Z1 is closer to mZ
+    //
     else{ 
       fEntriesToCompareLoose.push_back(entry);
       fEntryDiscriminantsLoose.push_back(mass_discriminant);
+      fEntryZ2PtSumLoose.push_back(Z2ptSum);
     }
   }
 
@@ -122,13 +119,10 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
 
 void disambiguateFinalStates::SlaveTerminate()
 {
-  fBestCandidateTightEntryList->OptimizeStorage();
+  fBestCandidateEntryList->OptimizeStorage();
   // Pointer is owned by fOutput, dereference
-  fBestCandidateTightEntryList = nullptr;
+  fBestCandidateEntryList = nullptr;
 
-  fBestCandidateLooseEntryList->OptimizeStorage();
-  // Pointer is owned by fOutput, dereference
-  fBestCandidateLooseEntryList = nullptr;
 }
 
 void disambiguateFinalStates::Terminate()
@@ -146,45 +140,43 @@ void disambiguateFinalStates::findBestEntry()
 
   Long64_t bestEntryLoose = -1L;
   float lowestDiscriminantLoose = 1e100;
+  float MaxPtSumLoose = 0.0;
   
-  if(tightZ1Leptons() && tightZ2Leptons()){ 
-    for (size_t i=0; i<fEntriesToCompareTight.size(); ++i)
+  for (size_t i=0; i<fEntriesToCompareTight.size(); ++i)
+  {
+    if ((fEntryDiscriminantsTight[i] < lowestDiscriminantTight) || ((fEntryDiscriminantsTight[i] == lowestDiscriminantTight) && (fEntryZ2PtSumTight[i] > MaxPtSumTight)))
     {
-      if ((fEntryDiscriminantsTight[i] < lowestDiscriminantTight) || ((fEntryDiscriminantsTight[i] == lowestDiscriminantTight) && (fEntryZ2PtSumTight[i] > MaxPtSumTight)))
-      {
-        MaxPtSumTight = fEntryZ2PtSumTight[i];
-        lowestDiscriminantTight = fEntryDiscriminantsTight[i];
-        bestEntryTight = fEntriesToCompareTight[i];
-      }
+      MaxPtSumTight = fEntryZ2PtSumTight[i];
+      lowestDiscriminantTight = fEntryDiscriminantsTight[i];
+      bestEntryTight = fEntriesToCompareTight[i];
     }
+  }
+ 
+  for (size_t i=0; i<fEntriesToCompareLoose.size(); ++i)
+  {
+    if ((fEntryDiscriminantsLoose[i] < lowestDiscriminantLoose) || ((fEntryDiscriminantsLoose[i] == lowestDiscriminantLoose) && (fEntryZ2PtSumLoose[i] > MaxPtSumLoose)))
+    {
+      MaxPtSumLoose = fEntryZ2PtSumLoose[i];
+      lowestDiscriminantLoose = fEntryDiscriminantsLoose[i];
+      bestEntryLoose = fEntriesToCompareLoose[i];
+    }
+  }
 
     if ( bestEntryTight >= 0 )
     {
-      fBestCandidateTightEntryList->Enter(bestEntryTight);
+      fBestCandidateEntryList->Enter(bestEntryTight);
+    }
+    else{ 
+      fBestCandidateEntryList->Enter(bestEntryLoose);
     }
 
     fEntriesToCompareTight.clear();
     fEntryDiscriminantsTight.clear();
     fEntryZ2PtSumTight.clear();
-  }
-  else{
-    for (size_t i=0; i<fEntriesToCompareLoose.size(); ++i)
-    {
-      if ((fEntryDiscriminantsLoose[i] < lowestDiscriminantLoose))
-      {
-        lowestDiscriminantLoose = fEntryDiscriminantsLoose[i];
-        bestEntryLoose = fEntriesToCompareLoose[i];
-      }
-    }
-
-    if ( bestEntryLoose >= 0 )
-    {
-      fBestCandidateLooseEntryList->Enter(bestEntryLoose);
-    }
 
     fEntriesToCompareLoose.clear();
     fEntryDiscriminantsLoose.clear();
-  }
+    fEntryZ2PtSumLoose.clear();
 }
 
 bool disambiguateFinalStates::lep1IsTight() {
