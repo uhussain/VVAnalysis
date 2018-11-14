@@ -79,6 +79,10 @@ public :
     Float_t l2Phi;
     Float_t l3Phi;
     Float_t l4Phi;
+    Float_t l1SIP3D;
+    Float_t l2SIP3D;
+    Float_t l3SIP3D;
+    Float_t l4SIP3D;
 
     Float_t l1PVDXY;
     Float_t l2PVDXY;
@@ -123,8 +127,12 @@ public :
     TBranch* b_l1Phi;
     TBranch* b_l2Phi;
     TBranch* b_l3Phi;
-    TBranch* b_l4Phi;
-    
+    TBranch* b_l4Phi; 
+    TBranch* b_l1SIP3D;
+    TBranch* b_l2SIP3D;
+    TBranch* b_l3SIP3D;
+    TBranch* b_l4SIP3D;
+
     TBranch* b_l3MtToMET;
 
     // Readers to access the data (delete the ones you do not need).
@@ -190,6 +198,8 @@ protected:
     bool lep2IsTight();
     bool lep3IsTight();
     bool lep4IsTight();
+    bool lep3IsLoose();
+    bool lep4IsLoose();
     bool tightZ1Leptons();
     bool tightZ2Leptons();
     //bool IsGenMatched3l();

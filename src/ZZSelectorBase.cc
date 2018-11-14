@@ -163,6 +163,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
         fChain->SetBranchAddress("e3Phi", &l3Phi, &b_l3Phi);
         fChain->SetBranchAddress("e4Phi", &l4Phi, &b_l4Phi);
+        fChain->SetBranchAddress("e1SIP3D", &l1SIP3D, &b_l1SIP3D);
+        fChain->SetBranchAddress("e2SIP3D", &l2SIP3D, &b_l2SIP3D);
+        fChain->SetBranchAddress("e3SIP3D", &l3SIP3D, &b_l3SIP3D);
+        fChain->SetBranchAddress("e4SIP3D", &l4SIP3D, &b_l4SIP3D);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -194,8 +198,12 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m2Eta", &l4Eta, &b_l4Eta);
         fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
+        fChain->SetBranchAddress("e1SIP3D", &l1SIP3D, &b_l1SIP3D);
+        fChain->SetBranchAddress("e2SIP3D", &l2SIP3D, &b_l2SIP3D);
         fChain->SetBranchAddress("m1Phi", &l3Phi, &b_l3Phi);
         fChain->SetBranchAddress("m2Phi", &l4Phi, &b_l4Phi);
+        fChain->SetBranchAddress("m1SIP3D", &l3SIP3D, &b_l3SIP3D);
+        fChain->SetBranchAddress("m2SIP3D", &l4SIP3D, &b_l4SIP3D);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -227,6 +235,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m2Phi", &l2Phi, &b_l2Phi);
         fChain->SetBranchAddress("m3Phi", &l3Phi, &b_l3Phi);
         fChain->SetBranchAddress("m4Phi", &l4Phi, &b_l4Phi);
+        fChain->SetBranchAddress("m1SIP3D", &l1SIP3D, &b_l1SIP3D);
+        fChain->SetBranchAddress("m2SIP3D", &l2SIP3D, &b_l2SIP3D);
+        fChain->SetBranchAddress("m3SIP3D", &l3SIP3D, &b_l3SIP3D);
+        fChain->SetBranchAddress("m4SIP3D", &l4SIP3D, &b_l4SIP3D);
         //if (isMC_) {
         //    fChain->SetBranchAddress("m1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("m2GenPt", &l2GenPt, &b_l2GenPt);
@@ -367,6 +379,9 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     b_l1Phi->GetEntry(entry);
     b_l2Phi->GetEntry(entry);
     b_l3Phi->GetEntry(entry);
+    b_l1SIP3D->GetEntry(entry);
+    b_l2SIP3D->GetEntry(entry);
+    b_l3SIP3D->GetEntry(entry);
     //std::cout<<"IsMC: "<<isMC_<<std::endl;
     if (isMC_) {
         //b_duplicated->GetEntry(entry);
@@ -423,6 +438,7 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
       b_l4Pt->GetEntry(entry);
       b_l4Eta->GetEntry(entry);
       b_l4Phi->GetEntry(entry);
+      b_l4SIP3D->GetEntry(entry);
       b_l4IsTight->GetEntry(entry);
       b_l4IsIso->GetEntry(entry);
       //b_l4PVDXY->GetEntry(entry);
@@ -498,9 +514,16 @@ bool ZZSelectorBase::lep2IsTight() {
 bool ZZSelectorBase::tightZ1Leptons() {
     return lep1IsTight() && lep2IsTight(); 
 }
-
+//This is explicitly for 2P2F CR
+bool ZZSelectorBase::lep3IsLoose() {
+    return (!(l3IsTight) && !(l3IsIso));
+}
 bool ZZSelectorBase::lep3IsTight() {
     return (l3IsTight && l3IsIso);
+}
+//This is explicitly for 2P2F CR and 3P1F CR
+bool ZZSelectorBase::lep4IsLoose() {
+    return (!(l4IsTight) && !(l4IsIso));
 }
 bool ZZSelectorBase::lep4IsTight() {
     return (l4IsTight && l4IsIso);

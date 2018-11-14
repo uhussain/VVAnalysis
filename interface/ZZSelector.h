@@ -268,7 +268,10 @@ protected:
     std::vector<std::string> ReadHistData(std::string histDataString);
     std::string getHistName(std::string histName, std::string variationName);
     void SetVariables(Long64_t entry); 
-    bool TightZZLeptons(); 
+    bool TightZZLeptons();
+    bool ZZSelection();
+    bool Z4lSelection();
+    bool HZZSelection();
     //void ShiftEfficiencies(Systematic variation);
     //float GetMuonScaleUncertainty(float muEta);
     //void SetShiftedMasses();

@@ -28,24 +28,55 @@ void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
 //Similar to Kenneth's SetShiftedMasses function which i will need later as well
 void ZZSelector::SetVariables(Long64_t entry) {
     if(!(e1e2IsZ1(entry))){ 
+      float tempMass = Z1mass;
       Z1mass = Z2mass;
-      Z2mass = Z1mass;
-      l1Pt=l3Pt;
-      l2Pt=l4Pt;
-      l3Pt=l1Pt;
-      l4Pt=l2Pt;
-      l1Eta=l3Eta;
-      l2Eta=l4Eta;
-      l3Eta=l1Eta;
-      l4Eta=l2Eta;
-      l1Phi=l3Phi;
-      l2Phi=l4Phi;
-      l3Phi=l1Phi;
-      l4Phi=l2Phi;
+      Z2mass = tempMass;
+      float templ1Pt = l1Pt;
+      l1Pt = l3Pt;
+      l3Pt = templ1Pt;
+      float templ2Pt = l2Pt;
+      l2Pt = l4Pt;
+      l4Pt = templ2Pt;
+      float templ1Eta = l1Eta;
+      l1Eta = l3Eta;
+      l3Eta = templ1Eta;
+      float templ2Eta = l2Eta;
+      l2Eta = l4Eta;
+      l4Eta = templ2Eta;
+      float templ1Phi = l1Phi;
+      l1Phi = l3Phi;
+      l3Phi = templ1Phi;
+      float templ2Phi = l2Phi;
+      l2Phi = l4Phi;
+      l4Phi = templ2Phi;
+      float templ1SIP3D = l1SIP3D;
+      l1SIP3D = l3SIP3D;
+      l3SIP3D = templ1SIP3D;
+      float templ2SIP3D = l2SIP3D;
+      l2SIP3D = l4SIP3D;
+      l4SIP3D = templ2SIP3D;
     }
 }
 bool ZZSelector::TightZZLeptons() {
     if (tightZ1Leptons() && tightZ2Leptons()){
+        return true;}
+    else{
+        return false;}
+}
+bool ZZSelector::ZZSelection() {
+    if ((Z1mass > 60.0 && Z1mass < 120.0) && (Z2mass > 60.0 && Z2mass < 120.0)){
+        return true;}
+    else{
+        return false;}
+}
+bool ZZSelector::Z4lSelection() {
+    if (Mass > 80.0 && Mass < 100.0){
+        return true;}
+    else{
+        return false;}
+}
+bool ZZSelector::HZZSelection(){
+    if ((l1SIP3D < 4.0 && l2SIP3D < 4.0 && l3SIP3D < 4.0 && l4SIP3D < 4.0) && (Z2mass > 12.0)){
         return true;}
     else{
         return false;}
@@ -148,7 +179,8 @@ Bool_t ZZSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
     //std::cout<<"Is it able to load branches"<<std::endl; 
-    if (TightZZLeptons()) {
+    //if (true) {
+    if (HZZSelection()) {
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
 
