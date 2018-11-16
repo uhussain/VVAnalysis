@@ -105,7 +105,7 @@ public :
     // Weight hists must be subset of 1D hists!
     std::map<std::string, TH2D*> weighthists_ = {
         { "backgroundControlYield",  {} },
-        { "MTWZ",  {} },
+        { "Mass",  {} },
         { "yield",  {} },
     };
     

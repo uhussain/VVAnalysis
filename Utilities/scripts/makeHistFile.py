@@ -53,22 +53,25 @@ tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
 #fScales = ROOT.TFile('data/scaleFactors.root')
-#mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
-#eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
+#mZZTightFakeRate = fScales.Get("mZZTightFakeRate")
+#eZZTightFakeRate = fScales.Get("eZZTightFakeRate")
+fakeRateFile=ROOT.TFile('data/FakeRates_ZZ.root')
+eZZTightFakeRate=fakeRateFile.Get('DataEWKCorrected/ratio2D_allE')
+mZZTightFakeRate=fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu')
 #useSvenjasFRs = False
 #useJakobsFRs = False
 #if useSvenjasFRs:
-#    mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
-#    eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
+#    mZZTightFakeRate = fScales.Get("mZZTightFakeRate_Svenja")
+#    eZZTightFakeRate = fScales.Get("eZZTightFakeRate_Svenja")
 #elif useJakobsFRs:
-#    mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Jakob")
-#    eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Jakob")
+#    mZZTightFakeRate = fScales.Get("mZZTightFakeRate_Jakob")
+#    eZZTightFakeRate = fScales.Get("eZZTightFakeRate_Jakob")
 ## For medium muons
-##mCBMedFakeRate.SetName("fakeRate_allMu")
-#if mCBTightFakeRate:
-#    mCBTightFakeRate.SetName("fakeRate_allMu")
-#if eCBTightFakeRate:
-#    eCBTightFakeRate.SetName("fakeRate_allE")
+##mZZMedFakeRate.SetName("fakeRate_allMu")
+if mZZTightFakeRate:
+    mZZTightFakeRate.SetName("fakeRate_allMu")
+if eZZTightFakeRate:
+    eZZTightFakeRate.SetName("fakeRate_allE")
 #
 #muonIsoSF = fScales.Get('muonIsoSF')
 #muonIdSF = fScales.Get('muonTightIdSF')
@@ -76,8 +79,9 @@ fOut = ROOT.TFile(tmpFileName, "recreate")
 #electronGsfSF = fScales.Get('electronGsfSF')
 #pileupSF = fScales.Get('pileupSF')
 
-#fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
+fr_inputs = [eZZTightFakeRate, mZZTightFakeRate,]
 #sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
+#sf_inputs=[pileupSF]
 selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
 if selection == "":
@@ -96,20 +100,20 @@ print "tselection: ",tselection
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
-#if "FakeRate" not in args['output_selection'] and not args['test']:
-#   # background = SelectorTools.applySelector(["ZZ4l2018data"] +
-#   #     ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
-#   #     ConfigureJobs.getListOfNonpromptFilenames(),channels, 
-#   #         "WZBackgroundSelector", args['selection'], fOut, 
-#   #         extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
-#   #         addSumweights=False,
-#   #         proof=args['proof'])
-#    background = SelectorTools.applySelector(["ZZ4l2018data"] +
-#        ConfigureJobs.getListOfEWKFilenames(),channels, 
-#            "ZZBackgroundSelector", args['selection'], fOut, 
-#            extra_inputs=hist_inputs+tselection, 
-#            addSumweights=False,
-#            proof=args['proof'])
+if "FakeRate" not in args['output_selection'] and not args['test']:
+   # background = SelectorTools.applySelector(["ZZ4l2018data"] +
+   #     ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
+   #     ConfigureJobs.getListOfNonpromptFilenames(),channels, 
+   #         "WZBackgroundSelector", args['selection'], fOut, 
+   #         extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
+   #         addSumweights=False,
+   #         proof=args['proof'])
+    background = SelectorTools.applySelector(["ZZ4l2018data"] +
+        ConfigureJobs.getListOfEWKFilenames(),channels, 
+            "ZZBackgroundSelector", args['selection'], fOut, 
+            extra_inputs=fr_inputs+hist_inputs+tselection, 
+            addSumweights=False,
+            proof=args['proof'])
 mc = SelectorTools.applySelector(args['filenames'],channels, "ZZSelector", args['selection'], fOut, 
         extra_inputs=hist_inputs+tselection,
         #extra_inputs=sf_inputs+hist_inputs+tselection, 

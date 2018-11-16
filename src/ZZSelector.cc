@@ -89,14 +89,14 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
         std::pair<Systematic, std::string> variation) { 
     //bool passesVBS = PassesVBSSelection(noBlind);
     if (hists1D_[getHistName("backgroundControlYield", variation.second)] != nullptr)
-        //if (PassesVBSBackgroundControlSelection())
-        //    hists1D_[getHistName("backgroundControlYield", variation.second)]->Fill(1, weight);
+        if (true)
+            hists1D_[getHistName("backgroundControlYield", variation.second)]->Fill(1, weight);
 
     //if ((variation.first == Central || (doaQGC_ && isaQGC_)) && isMC_) 
     if(isMC_){
         for (size_t i = 0; i < lheWeights.size(); i++) {
-            //if (PassesVBSBackgroundControlSelection())
-            //    SafeHistFill(weighthists_, "backgroundControlYield", 1, i, lheWeights[i]/lheWeights[0]*weight);
+            if (true)
+                SafeHistFill(weighthists_, "backgroundControlYield", 1, i, lheWeights[i]/lheWeights[0]*weight);
             //if (isVBS_ && !passesVBS)
             //    continue;
             SafeHistFill(weighthists_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
@@ -179,11 +179,11 @@ Bool_t ZZSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
     //std::cout<<"Is it able to load branches"<<std::endl; 
-    //if (true) {
-    if (HZZSelection()) {
+    if (TightZZLeptons()) {
+      if (ZZSelection()) {
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
-
+  }
    // if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
    //     for (const auto& systematic : systematics_) {
    //         LoadBranches(entry, systematic);

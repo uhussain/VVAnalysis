@@ -7,8 +7,8 @@
 
 class ZZBackgroundSelector : public ZZSelector {
 public :
-    ScaleFactor * fakeRate_allE_;
-    ScaleFactor * fakeRate_allMu_;
+    TH2D* fakeRate_allE_;
+    TH2D* fakeRate_allMu_;
   
     //PPPF represents 3P1F CR and PPFF represents 2P1F CR
     TH1D* Z1MassHistPPPF_;
