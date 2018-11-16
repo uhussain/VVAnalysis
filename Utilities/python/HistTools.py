@@ -333,4 +333,4 @@ def addaQGCTheoryHists(rtfile_name, plot_groups, base_hist_name):
                 base_hist.Delete()
                 aqgc_hist.Delete()
         aqgc_dir.Delete()
-    rtfile.Close()
+    #rtfile.Close()

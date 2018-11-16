@@ -137,6 +137,7 @@ def getListOfFiles(filelist, selection, manager_path=""):
             dataset_file = manager_path + \
                 "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2018/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
+            print allnames
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
                 names += nodata
@@ -163,6 +164,7 @@ def getListOfFilesWithXSec(filelist, manager_path=""):
         manager_path = getManagerPath()
     data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
     files = getListOfFiles(filelist, "ntuples", manager_path)
+    #files = getListOfFiles(filelist, "2018Data", manager_path)
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     info = {}
     for file_name in files:
