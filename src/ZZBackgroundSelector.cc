@@ -54,7 +54,7 @@ float ZZBackgroundSelector::getEventWeight(Long64_t entry) {
         }
         evtwgt = -1*getl3FakeRate(entry)*getl4FakeRate(entry)*weight;
     }
-    std::cout<<"eventWeight after Fake Rate: "<<evtwgt<<std::endl;
+    //std::cout<<"eventWeight after Fake Rate: "<<evtwgt<<std::endl;
     return evtwgt;
 }
 
@@ -65,13 +65,14 @@ Bool_t ZZBackgroundSelector::Process(Long64_t entry)
     LoadBranches(entry, central_var);
     //if (!PassesBaseSelection(entry, false, selection_))
     //    return true;
-    float event_weight=getEventWeight(entry);
-    if (TightZZLeptons()) {
-      if (HZZSelection()) {
-        std::cout<<"weight before filling: "<<event_weight<<std::endl;
-        FillHistograms(entry, event_weight, true, central_var);
+    //float event_weight=getEventWeight(entry);
+    //if (true) {
+    if (HZZSelection()) {
+      //if(getEventWeight(entry)>0){
+      //std::cout<<"weight before filling: "<<getEventWeight(entry)<<std::endl;}
+      FillHistograms(entry, getEventWeight(entry), true, central_var);
     }
-    }
+    //}
    // if (doSystematics_) {
    //     for (const auto& systematic : systematics_) {
    //         LoadBranches(entry, systematic);
@@ -89,12 +90,14 @@ float ZZBackgroundSelector::getl3FakeRate(Long64_t entry) {
     float fr = 1;
     if (channel_ == eeee || (channel_ == eemm && !(e1e2IsZ1(entry)))){
         fr = fakeRate_allE_->GetBinContent(fakeRate_allE_->FindBin(pt_fillval, std::abs(l3Eta)));
-        std::cout<<"channel: "<<channel_<<std::endl;
-        std::cout<<"l3 E Fake Rate: "<<fr<<std::endl;}
+        //std::cout<<"channel: "<<channel_<<std::endl;
+        //std::cout<<"l3 E Fake Rate: "<<fr<<std::endl;
+    }
     else{
         fr = fakeRate_allMu_->GetBinContent(fakeRate_allMu_->FindBin(pt_fillval, std::abs(l3Eta)));
         std::cout<<"channel: "<<channel_<<std::endl;
-        std::cout<<"l3 Mu Fake Rate: "<<fr<<std::endl;}
+        std::cout<<"l3 Mu Fake Rate: "<<fr<<std::endl;
+    }
     return fr/(1-fr); 
 }
 
@@ -103,19 +106,21 @@ float ZZBackgroundSelector::getl4FakeRate(Long64_t entry) {
     float fr = 1;
     if (channel_ == eeee || (channel_ == eemm && !(e1e2IsZ1(entry)))){
         fr = fakeRate_allE_->GetBinContent(fakeRate_allE_->FindBin(pt_fillval, std::abs(l4Eta)));
-        std::cout<<"channel: "<<channel_<<std::endl;
-        std::cout<<"l4 E Fake Rate: "<<fr<<std::endl;}
+        //std::cout<<"channel: "<<channel_<<std::endl;
+        //std::cout<<"l4 E Fake Rate: "<<fr<<std::endl;
+    }
     else{
         fr = fakeRate_allMu_->GetBinContent(fakeRate_allMu_->FindBin(pt_fillval, std::abs(l4Eta)));
         std::cout<<"channel: "<<channel_<<std::endl;
-        std::cout<<"l4 Mu Fake Rate: "<<fr<<std::endl;}
+        std::cout<<"l4 Mu Fake Rate: "<<fr<<std::endl;
+    }
     return fr/(1-fr); 
 }
 bool ZZBackgroundSelector::IsPPPFRegion() {
-    return tightZ1Leptons() && lep3IsTight() && lep4IsLoose() ;
+    return tightZ1Leptons() && lep3IsTight() && !lep4IsTight();
 }
 
 bool ZZBackgroundSelector::IsPPFFRegion() {
-    return tightZ1Leptons() && lep3IsLoose() && lep4IsLoose();
+    return tightZ1Leptons() && !lep3IsTight() && !lep4IsTight();
 }
 

@@ -54,7 +54,6 @@ void ZZSelectorBase::Init(TTree *tree)
         TNamed* chan = (TNamed *) GetInputList()->FindObject("channel");
         //std::cout<<"channel is added and passed" <<std::endl;
         TNamed* selection = (TNamed *) GetInputList()->FindObject("selection");
-        //std::cout<<"channelName: "<<channelName_<<std::endl;
         if (name != nullptr) {
             name_ = name->GetTitle();
         }
@@ -71,6 +70,7 @@ void ZZSelectorBase::Init(TTree *tree)
             selectionName_ = selection->GetTitle();
         }
     }
+    //std::cout<<"channelName: "<<channelName_<<std::endl;
     //std::cout<<"fChain: "<< fChain->Print() <<std::endl;
     if (selectionName_ == "tightleptons")
         selection_ = tightleptons;
@@ -514,16 +514,8 @@ bool ZZSelectorBase::lep2IsTight() {
 bool ZZSelectorBase::tightZ1Leptons() {
     return lep1IsTight() && lep2IsTight(); 
 }
-//This is explicitly for 2P2F CR
-bool ZZSelectorBase::lep3IsLoose() {
-    return (!(l3IsTight) && !(l3IsIso));
-}
 bool ZZSelectorBase::lep3IsTight() {
     return (l3IsTight && l3IsIso);
-}
-//This is explicitly for 2P2F CR and 3P1F CR
-bool ZZSelectorBase::lep4IsLoose() {
-    return (!(l4IsTight) && !(l4IsIso));
 }
 bool ZZSelectorBase::lep4IsTight() {
     return (l4IsTight && l4IsIso);

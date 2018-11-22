@@ -179,8 +179,8 @@ Bool_t ZZSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
     //std::cout<<"Is it able to load branches"<<std::endl; 
-    if (TightZZLeptons()) {
-      if (ZZSelection()) {
+    if (true) {
+      if (HZZSelection()) {
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
   }

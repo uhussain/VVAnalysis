@@ -198,8 +198,6 @@ protected:
     bool lep2IsTight();
     bool lep3IsTight();
     bool lep4IsTight();
-    bool lep3IsLoose();
-    bool lep4IsLoose();
     bool tightZ1Leptons();
     bool tightZ2Leptons();
     //bool IsGenMatched3l();
