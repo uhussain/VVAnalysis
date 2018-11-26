@@ -13,6 +13,8 @@ public :
     //PPPF represents 3P1F CR and PPFF represents 2P1F CR
     TH1D* Z1MassHistPPPF_;
     TH1D* Z1MassHistPPFF_;
+    TH1D* Z2MassHistPPPF_;
+    TH1D* Z2MassHistPPFF_;
     //4lMass Histogram
     TH1D* MassHistPPPF_;
     TH1D* MassHistPPFF_;

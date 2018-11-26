@@ -135,8 +135,8 @@ void ZZSelectorBase::Init(TTree *tree)
         }
     }
     UpdateDirectory();
-    //std::cout<<"channelName: "<<channelName_<<std::endl;
-    //std::cout<<"enum channel_: "<<channel_<<std::endl;
+    std::cout<<"channelName: "<<channelName_<<std::endl;
+    std::cout<<"enum channel_: "<<channel_<<std::endl;
     //std::cout<<"isMC: "<<isMC_<<std::endl;
     if (channelName_ == "eeee") {
         channel_ = eeee;
@@ -167,6 +167,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2SIP3D", &l2SIP3D, &b_l2SIP3D);
         fChain->SetBranchAddress("e3SIP3D", &l3SIP3D, &b_l3SIP3D);
         fChain->SetBranchAddress("e4SIP3D", &l4SIP3D, &b_l4SIP3D);
+        fChain->SetBranchAddress("e1PdgId", &l1PdgId, &b_l1PdgId);
+        fChain->SetBranchAddress("e2PdgId", &l2PdgId, &b_l2PdgId);
+        fChain->SetBranchAddress("e3PdgId", &l3PdgId, &b_l3PdgId);
+        fChain->SetBranchAddress("e4PdgId", &l4PdgId, &b_l4PdgId);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -204,6 +208,49 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m2Phi", &l4Phi, &b_l4Phi);
         fChain->SetBranchAddress("m1SIP3D", &l3SIP3D, &b_l3SIP3D);
         fChain->SetBranchAddress("m2SIP3D", &l4SIP3D, &b_l4SIP3D);
+        fChain->SetBranchAddress("e1PdgId", &l1PdgId, &b_l1PdgId);
+        fChain->SetBranchAddress("e2PdgId", &l2PdgId, &b_l2PdgId);
+        fChain->SetBranchAddress("m1PdgId", &l3PdgId, &b_l3PdgId);
+        fChain->SetBranchAddress("m2PdgId", &l4PdgId, &b_l4PdgId);
+        //if (isMC_) {
+        //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
+        //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
+        //    fChain->SetBranchAddress("e3GenPt", &l3GenPt, &b_l3GenPt);
+        //    fChain->SetBranchAddress("e4GenPt", &l4GenPt, &b_l4GenPt);
+        //}
+    }
+    else if (channelName_ == "mmee") {
+        channel_ = mmee;
+        fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
+        fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("e2ZZIsoPass", &l2IsIso, &b_l2IsIso);
+        fChain->SetBranchAddress("m1ZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("m1ZZIsoPass", &l3IsIso, &b_l3IsIso);
+        fChain->SetBranchAddress("m2ZZTightIDNoVtx", &l4IsTight, &b_l4IsTight);
+        fChain->SetBranchAddress("m2ZZIsoPass", &l4IsIso, &b_l4IsIso);
+        fChain->SetBranchAddress("e1_e2_Mass", &Z1mass, &b_Z1mass);
+        fChain->SetBranchAddress("m1_m2_Mass", &Z2mass, &b_Z2mass);
+        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("m1Pt", &l3Pt, &b_l3Pt);
+        fChain->SetBranchAddress("m2Pt", &l4Pt, &b_l4Pt);
+        fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
+        fChain->SetBranchAddress("m1Eta", &l3Eta, &b_l3Eta);
+        fChain->SetBranchAddress("m2Eta", &l4Eta, &b_l4Eta);
+        fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
+        fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
+        fChain->SetBranchAddress("e1SIP3D", &l1SIP3D, &b_l1SIP3D);
+        fChain->SetBranchAddress("e2SIP3D", &l2SIP3D, &b_l2SIP3D);
+        fChain->SetBranchAddress("m1Phi", &l3Phi, &b_l3Phi);
+        fChain->SetBranchAddress("m2Phi", &l4Phi, &b_l4Phi);
+        fChain->SetBranchAddress("m1SIP3D", &l3SIP3D, &b_l3SIP3D);
+        fChain->SetBranchAddress("m2SIP3D", &l4SIP3D, &b_l4SIP3D);
+        fChain->SetBranchAddress("e1PdgId", &l1PdgId, &b_l1PdgId);
+        fChain->SetBranchAddress("e2PdgId", &l2PdgId, &b_l2PdgId);
+        fChain->SetBranchAddress("m1PdgId", &l3PdgId, &b_l3PdgId);
+        fChain->SetBranchAddress("m2PdgId", &l4PdgId, &b_l4PdgId);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -239,6 +286,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m2SIP3D", &l2SIP3D, &b_l2SIP3D);
         fChain->SetBranchAddress("m3SIP3D", &l3SIP3D, &b_l3SIP3D);
         fChain->SetBranchAddress("m4SIP3D", &l4SIP3D, &b_l4SIP3D);
+        fChain->SetBranchAddress("m1PdgId", &l1PdgId, &b_l1PdgId);
+        fChain->SetBranchAddress("m2PdgId", &l2PdgId, &b_l2PdgId);
+        fChain->SetBranchAddress("m3PdgId", &l3PdgId, &b_l3PdgId);
+        fChain->SetBranchAddress("m4PdgId", &l4PdgId, &b_l4PdgId);
         //if (isMC_) {
         //    fChain->SetBranchAddress("m1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("m2GenPt", &l2GenPt, &b_l2GenPt);
@@ -382,6 +433,9 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     b_l1SIP3D->GetEntry(entry);
     b_l2SIP3D->GetEntry(entry);
     b_l3SIP3D->GetEntry(entry);
+    b_l1PdgId->GetEntry(entry);
+    b_l2PdgId->GetEntry(entry);
+    b_l3PdgId->GetEntry(entry);
     //std::cout<<"IsMC: "<<isMC_<<std::endl;
     if (isMC_) {
         //b_duplicated->GetEntry(entry);
@@ -434,11 +488,12 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
         //b_Flag_badMuonsPass->GetEntry(entry);          
     }
     //std::cout<<"Is the ZZSelectorBase fine until here"<<std::endl;
-    if (channel_ == eeee || channel_ == eemm || channel_ == mmmm) {
+    if (channel_ == eeee || channel_ == eemm || channel_ == mmee || channel_ == mmmm) {
       b_l4Pt->GetEntry(entry);
       b_l4Eta->GetEntry(entry);
       b_l4Phi->GetEntry(entry);
       b_l4SIP3D->GetEntry(entry);
+      b_l4PdgId->GetEntry(entry);
       b_l4IsTight->GetEntry(entry);
       b_l4IsIso->GetEntry(entry);
       //b_l4PVDXY->GetEntry(entry);
@@ -463,6 +518,16 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
 
     if (channel_ == eee || channel_ == eem || channel_ == emm || channel_ == mmm) {
       b_l3MtToMET->GetEntry(entry);
+    }
+    if(channel_ == mmee){
+      if(e1e2IsZ1(entry))
+        weight=0.0;
+        //Makes weight 0 if Z1 is ee hence should not go in _mmee histos
+    }
+    else if(channel_ == eemm){
+      if(!(e1e2IsZ1(entry)))
+        weight=0.0;
+        //Makes weight 0 if Z1 is mm hence should not go in _eemm 
     }
     //b_Flag_BadPFMuonFilterPass->GetEntry(entry);                    
     //b_Flag_BadChargedCandidateFilterPass->GetEntry(entry);          
@@ -496,10 +561,10 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
 //I think this part might need to be added to the ZZSelector and BackgroundSelector and the condition checked at
 //process time for each event.
 bool ZZSelectorBase::e1e2IsZ1(Long64_t entry){
-      if(fabs(Z1mass-91.1876) < fabs(Z2mass-91.1876)){
-        return true;}
-      else{
-        return false;}
+  if(fabs(Z1mass-91.1876) < fabs(Z2mass-91.1876))
+    return true;
+  else
+    return false;
 }
 // Meant to be a wrapper for the tight ID just in case it changes
 // To be a function of multiple variables
