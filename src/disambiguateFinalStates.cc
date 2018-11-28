@@ -28,8 +28,8 @@ void disambiguateFinalStates::Init(TTree *tree)
   fChain->SetBranchAddress(l2_Cand_Iso, &l2IsIso, &b_l2IsIso);
   fChain->SetBranchAddress(l3_Cand_Tight, &l3IsTight, &b_l3IsTight);
   fChain->SetBranchAddress(l3_Cand_Iso, &l3IsIso, &b_l3IsIso);
-  fChain->SetBranchAddress(l4_Cand_Tight, &l3IsTight, &b_l3IsTight);
-  fChain->SetBranchAddress(l4_Cand_Iso, &l3IsIso, &b_l3IsIso);
+  fChain->SetBranchAddress(l4_Cand_Tight, &l4IsTight, &b_l4IsTight);
+  fChain->SetBranchAddress(l4_Cand_Iso, &l4IsIso, &b_l4IsIso);
   fChain->SetBranchAddress("evt", &evt, &b_evt);
   fChain->SetBranchAddress("run", &run, &b_run);
 
@@ -66,7 +66,6 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
 
   fCurrentRun = run;
   fCurrentEvt = evt;
-  
   // TODO Understand why this gives segfault for chains
   // with multiple entries
   if ( fCutFormula && fCutFormula->EvalInstance() > 0. )
@@ -77,7 +76,6 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
     b_l3_l4_Mass->GetEntry(entry);
     b_l3_Pt->GetEntry(entry); 
     b_l4_Pt->GetEntry(entry);
-
     b_l1IsTight->GetEntry(entry);
     b_l1IsIso->GetEntry(entry);
     b_l2IsTight->GetEntry(entry);
@@ -166,7 +164,7 @@ void disambiguateFinalStates::findBestEntry()
     {
       fBestCandidateEntryList->Enter(bestEntryTight);
     }
-    else{ 
+    else if ( bestEntryLoose >=0 ){ 
       fBestCandidateEntryList->Enter(bestEntryLoose);
     }
 

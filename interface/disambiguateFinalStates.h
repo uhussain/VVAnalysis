@@ -30,14 +30,14 @@ public :
   float           l3_l4_Mass;
   float           l3_Pt;
   float           l4_Pt;
-  Bool_t l1IsTight;
-  Bool_t l2IsTight;
-  Bool_t l3IsTight;
-  Bool_t l4IsTight;
-  Bool_t l1IsIso;
-  Bool_t l2IsIso;
-  Bool_t l3IsIso;
-  Bool_t l4IsIso;
+  bool l1IsTight;
+  bool l2IsTight;
+  bool l3IsTight;
+  bool l4IsTight;
+  bool l1IsIso;
+  bool l2IsIso;
+  bool l3IsIso;
+  bool l4IsIso;
   ULong64_t        evt;
   UInt_t           run;
 
@@ -82,8 +82,7 @@ public :
   virtual TList  *GetOutputList() const { return fOutput; }
   virtual void    SlaveTerminate();
   virtual void    Terminate();
-  void setZCandidateBranchName(const char* name1,const char* name2, const char* name3,const char* name4,const char* name5,const char* name6,const char* name7,
-      const char* name8, const char* name9,const char* name10,const char* name11,const char* name12,const char* name13,const char* name14) { 
+  void setZCandidateBranchName(const char* name1,const char* name2, const char* name3,const char* name4,const char* name5,const char* name6,const char* name7,const char* name8, const char* name9,const char* name10,const char* name11,const char* name12,const char* name13,const char* name14) { 
     l1_l2_Cand_mass = const_cast<char*>(name1);  
     l1_Cand_pt = const_cast<char*>(name2);  
     l2_Cand_pt = const_cast<char*>(name3); 
