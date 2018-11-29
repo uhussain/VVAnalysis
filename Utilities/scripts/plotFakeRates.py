@@ -2,7 +2,7 @@
 import ROOT
 import datetime
 import os
-#import makeSimpleHtml
+import makeSimpleHtml
 import array
 
 ROOT.gROOT.SetBatch(True)
@@ -34,12 +34,12 @@ def getTextBox(obj, extra_text=""):
     return text_box
 
 def getLumiTextBox():
-    texS = ROOT.TLatex(0.65,0.907173,"#sqrt{s} = 13 TeV, 41.5 fb^{-1}")
+    texS = ROOT.TLatex(0.615,0.95,"#sqrt{s} = 13 TeV, 41.5 fb^{-1}")
     texS.SetNDC()
     texS.SetTextFont(42)
     texS.SetTextSize(0.040)
     texS.Draw()
-    texS1 = ROOT.TLatex(0.12092,0.907173,"#bf{UW} #it{Internal}")
+    texS1 = ROOT.TLatex(0.15,0.95,"#bf{UW} #it{Internal}")
     texS1.SetNDC()
     texS1.SetTextFont(42)
     texS1.SetTextSize(0.040)
@@ -70,11 +70,11 @@ def makeDataPlots(param, obj, outdir):
         data_ewkcorr_graph = invert2DHist(data_ewkcorr_graph)
         #data_ewkcorr_graph.GetYaxis().SetTitle("#eta")
         data_ewkcorr_graph.GetYaxis().SetTitle("p_{T} [GeV]")
-        data_ewkcorr_graph.GetXaxis().SetTitle("#eta")
+        data_ewkcorr_graph.GetXaxis().SetTitle("|#eta|")
     else:
         data_ewkcorr_graph.SetTitle("")
         data_ewkcorr_graph.GetYaxis().SetTitle("Passing Tight / Passing Loose")
-        xlabel = "p_{T} [GeV]" if "Pt" in param else "#eta"
+        xlabel = "p_{T} [GeV]" if "Pt" in param else "|#eta|"
         data_ewkcorr_graph.GetXaxis().SetTitle(xlabel)
     data_ewkcorr_graph.Draw(draw_opt)
 
@@ -96,15 +96,15 @@ def makeDataPlots(param, obj, outdir):
     canvas.Print("%s/ratio%s_all%s.pdf" % (outdir, param, obj))
 
 def makeMCPlots(param, obj, outdir):
-    graph = frfile.Get("DYJetsToLLM-50/ratio%s_all%s" % (param, obj)) \
+    graph = frfile.Get("DYMC/ratio%s_all%s" % (param, obj)) \
         if "2D" in param else getTGraphAsymmErrors(frfile, "DYMC", param, obj)
     graph.SetLineColor(ROOT.kRed)
     draw_opt = "PA" if "2D" not in param else "colz text"
     if "2D" in param:
-        graph.GetYaxis().SetTitle("#eta")
+        graph.GetYaxis().SetTitle("|#eta|")
     else:
         graph.GetYaxis().SetTitle("Passing Tight / Passing Loose")
-        xlabel = "p_{T} [GeV]" if "Pt" in param else "#eta"
+        xlabel = "p_{T} [GeV]" if "Pt" in param else "|#eta|"
         graph.GetXaxis().SetTitle(xlabel)
     graph.Draw(draw_opt)
 
@@ -117,7 +117,7 @@ def makeMCPlots(param, obj, outdir):
         data_ewkcorr_graph.SetLineColor(ROOT.kBlue)
         data_ewkcorr_graph.SetTitle("")
         data_ewkcorr_graph.Draw("P")
-        legend = ROOT.TLegend(0.2,.85,.55,.70)
+        legend = ROOT.TLegend(0.2,.80,.40,.70)
         legend.AddEntry(data_ewkcorr_graph, "Data - EWK", "l")
         legend.AddEntry(graph, "DYJets MC", "l")
         legend.Draw()
@@ -126,10 +126,10 @@ def makeMCPlots(param, obj, outdir):
     canvas.Print("%s/ratio%s_all%s.png" % (outdir, param, obj))
     canvas.Print("%s/ratio%s_all%s.pdf" % (outdir, param, obj))
 
-frfile = ROOT.TFile("/data/uhussain/ZZTo4l/ZZ2018/VVAnalysisTools/CMSSW_9_4_2/src/Analysis/VVAnalysis/FakeRates_DY.root")
+frfile = ROOT.TFile("/data/uhussain/ZZTo4l/ZZ2018/VVAnalysisTools/CMSSW_9_4_2/src/Analysis/VVAnalysis/data/fakeRate27Nov2018-ZplusLSkim.root")
 
 
-data_folder_name = datetime.date.today().strftime("%Y%b"+"_Basic") 
+data_folder_name = datetime.date.today().strftime("%Y%b"+"_HZZ") 
 data_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2018/FakeRatesFromData/" + data_folder_name + "/plots"
 mc_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2018/FakeRates/" + data_folder_name + "-MC/plots"
 
@@ -140,10 +140,10 @@ for outdir in [data_outdir, mc_outdir]:
         print e
         pass
 
-#for param in ["1DPt", "1DEta", "2D"]:
-for param in ["1DPt", "1DEta"]:
+for param in ["1DPt", "1DEta", "2D"]:
+#for param in ["1DPt", "1DEta"]:
     for obj in ["Mu", "E"]:
-        #makeDataPlots(param, obj, data_outdir)
+        makeDataPlots(param, obj, data_outdir)
         makeMCPlots(param, obj, mc_outdir)
-#makeSimpleHtml.writeHTML(os.path.expanduser(data_outdir.replace("/plots", "")), "Fake Rates (from data)")
-#makeSimpleHtml.writeHTML(os.path.expanduser(mc_outdir.replace("/plots", "")), "Fake Rates (from MC)")
+makeSimpleHtml.writeHTML(os.path.expanduser(data_outdir.replace("/plots", "")), "Fake Rates (from data)")
+makeSimpleHtml.writeHTML(os.path.expanduser(mc_outdir.replace("/plots", "")), "Fake Rates (from MC)")

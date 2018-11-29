@@ -52,14 +52,14 @@ float ZZBackgroundSelector::getEventWeight(Long64_t entry) {
    //     weight=0;
    //     //Makes weight 0 if Z1 is mm hence should not go in _eemm 
    // }
-    std::cout<<"Weight in Bkg Seletor getEventWeight function: "<<weight<<std::endl;
+    //std::cout<<"Weight in Bkg Seletor getEventWeight function: "<<weight<<std::endl;
     if (IsPPPFRegion()) {
         if (true){
             Z1MassHistPPPF_->Fill(Z1mass, weight);
             Z2MassHistPPPF_->Fill(Z2mass, weight);
             MassHistPPPF_->Fill(Mass,weight);
         }
-        evtwgt = getl4FakeRate(entry)*weight;
+        evtwgt = (getl4FakeRate(entry)*weight);
     }
     else if (IsPPFFRegion()) {
         if (true) {
@@ -67,7 +67,7 @@ float ZZBackgroundSelector::getEventWeight(Long64_t entry) {
             Z2MassHistPPFF_->Fill(Z2mass, weight);
             MassHistPPFF_->Fill(Mass,weight);
         }
-        evtwgt = -1*getl3FakeRate(entry)*getl4FakeRate(entry)*weight;
+        evtwgt = ((-1*getl3FakeRate(entry)*getl4FakeRate(entry))*weight);
     }
     //std::cout<<"eventWeight after Fake Rate: "<<evtwgt<<std::endl;
     return evtwgt;
@@ -81,13 +81,13 @@ Bool_t ZZBackgroundSelector::Process(Long64_t entry)
     //if (!PassesBaseSelection(entry, false, selection_))
     //    return true;
     //float event_weight=getEventWeight(entry);
-    //if (true) {
     if (HZZSelection()) {
+      if (TestMuons()) {
       //if(getEventWeight(entry)>0){
       //std::cout<<"weight before filling: "<<getEventWeight(entry)<<std::endl;}
-      FillHistograms(entry, getEventWeight(entry), true, central_var);
+        FillHistograms(entry, getEventWeight(entry), true, central_var);
     }
-    //}
+    }
    // if (doSystematics_) {
    //     for (const auto& systematic : systematics_) {
    //         LoadBranches(entry, systematic);

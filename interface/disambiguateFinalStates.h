@@ -30,6 +30,14 @@ public :
   float           l3_l4_Mass;
   float           l3_Pt;
   float           l4_Pt;
+  Bool_t l1IsTight;
+  Bool_t l2IsTight;
+  Bool_t l3IsTight;
+  Bool_t l4IsTight;
+  Bool_t l1IsIso;
+  Bool_t l2IsIso;
+  Bool_t l3IsIso;
+  Bool_t l4IsIso;
   ULong64_t        evt;
   UInt_t           run;
 
@@ -39,21 +47,29 @@ public :
   TBranch        *b_l3_l4_Mass;
   TBranch        *b_l3_Pt;
   TBranch        *b_l4_Pt;
+  TBranch* b_l1IsTight;
+  TBranch* b_l2IsTight;
+  TBranch* b_l3IsTight;
+  TBranch* b_l4IsTight; 
+  TBranch* b_l1IsIso;
+  TBranch* b_l2IsIso;
+  TBranch* b_l3IsIso;
+  TBranch* b_l4IsIso;
 
   TBranch        *b_evt;
   TBranch        *b_run;
 
-  TEntryList     *fBestCandidateEntryList;
-  
+  TEntryList     *fBestCandidateTightEntryList; 
+  TEntryList     *fBestCandidateLooseEntryList;
   // TODO Add TTreeFormula, fix issue when using chain.Process 
   // over multiple files (currently segfaults)
   TTreeFormula   *fCutFormula;
 
 
   //disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0), /*fCutFormula(0),*/ fCurrentRun(-1), fCurrentEvt(-1) { }
-  disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateEntryList(0), fCutFormula(0), fCurrentRun(-1), fCurrentEvt(-1) { }
+  disambiguateFinalStates(TTree * /*tree*/ =0) : fChain(0), fBestCandidateTightEntryList(0), fBestCandidateLooseEntryList(0), fCutFormula(0), fCurrentRun(-1), fCurrentEvt(-1) { }
   //virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList); /*SafeDelete(fCutFormula)*/; }
-  virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateEntryList); SafeDelete(fCutFormula); }
+  virtual ~disambiguateFinalStates() { SafeDelete(fBestCandidateTightEntryList); SafeDelete(fBestCandidateLooseEntryList); SafeDelete(fCutFormula); }
   virtual Int_t   Version() const { return 2; }
   virtual void    Begin(TTree *tree);
   virtual void    SlaveBegin(TTree *tree);
@@ -67,30 +83,55 @@ public :
   virtual TList  *GetOutputList() const { return fOutput; }
   virtual void    SlaveTerminate();
   virtual void    Terminate();
-  void setZCandidateBranchName(const char* name1,const char* name2, const char* name3,const char* name4,const char* name5,const char* name6) { 
+  void setZCandidateBranchName(const char* name1,const char* name2, const char* name3,const char* name4,const char* name5,const char* name6,const char* name7,
+      const char* name8, const char* name9,const char* name10,const char* name11,const char* name12,const char* name13,const char* name14) { 
     l1_l2_Cand_mass = const_cast<char*>(name1);  
     l1_Cand_pt = const_cast<char*>(name2);  
     l2_Cand_pt = const_cast<char*>(name3); 
     l3_l4_Cand_mass = const_cast<char*>(name4); 
     l3_Cand_pt = const_cast<char*>(name5);
-    l4_Cand_pt = const_cast<char*>(name6); 
+    l4_Cand_pt = const_cast<char*>(name6);
+    l1_Cand_Tight = const_cast<char*>(name7);  
+    l2_Cand_Tight = const_cast<char*>(name8); 
+    l3_Cand_Tight = const_cast<char*>(name9);
+    l4_Cand_Tight = const_cast<char*>(name10);
+    l1_Cand_Iso = const_cast<char*>(name11);  
+    l2_Cand_Iso = const_cast<char*>(name12); 
+    l3_Cand_Iso = const_cast<char*>(name13);
+    l4_Cand_Iso = const_cast<char*>(name14); 
   }
 
   ClassDef(disambiguateFinalStates,0);
 
 private :
   void findBestEntry();
+  bool lep1IsTight();
+  bool lep2IsTight();
+  bool lep3IsTight();
+  bool lep4IsTight();
+  bool tightZ1Leptons();
+  bool tightZ2Leptons();
   UInt_t fCurrentRun;
   ULong64_t fCurrentEvt;
-  std::vector<Long64_t> fEntriesToCompare;
-  std::vector<float> fEntryDiscriminants; 
-  std::vector<float> fEntryZ2PtSum;
+  std::vector<Long64_t> fEntriesToCompareTight;
+  std::vector<float> fEntryDiscriminantsTight; 
+  std::vector<float> fEntryZ2PtSumTight;
+  std::vector<Long64_t> fEntriesToCompareLoose;
+  std::vector<float> fEntryDiscriminantsLoose; 
   char* l1_l2_Cand_mass; 
   char* l1_Cand_pt;
   char* l2_Cand_pt; 
   char* l3_l4_Cand_mass; 
   char* l3_Cand_pt;
-  char* l4_Cand_pt; 
+  char* l4_Cand_pt;
+  char* l1_Cand_Tight;
+  char* l2_Cand_Tight; 
+  char* l3_Cand_Tight;
+  char* l4_Cand_Tight; 
+  char* l1_Cand_Iso;
+  char* l2_Cand_Iso; 
+  char* l3_Cand_Iso;
+  char* l4_Cand_Iso; 
 };
 
 #endif

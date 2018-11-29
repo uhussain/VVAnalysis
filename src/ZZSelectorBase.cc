@@ -135,8 +135,8 @@ void ZZSelectorBase::Init(TTree *tree)
         }
     }
     UpdateDirectory();
-    std::cout<<"channelName: "<<channelName_<<std::endl;
-    std::cout<<"enum channel_: "<<channel_<<std::endl;
+    //std::cout<<"channelName: "<<channelName_<<std::endl;
+    //std::cout<<"enum channel_: "<<channel_<<std::endl;
     //std::cout<<"isMC: "<<isMC_<<std::endl;
     if (channelName_ == "eeee") {
         channel_ = eeee;
@@ -315,6 +315,12 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e1Phi", &l1Phi, &b_l1Phi);
         fChain->SetBranchAddress("e2Phi", &l2Phi, &b_l2Phi);
         fChain->SetBranchAddress("e3Phi", &l3Phi, &b_l3Phi);
+        fChain->SetBranchAddress("e1SIP3D", &l1SIP3D, &b_l1SIP3D);
+        fChain->SetBranchAddress("e2SIP3D", &l2SIP3D, &b_l2SIP3D);
+        fChain->SetBranchAddress("e3SIP3D", &l3SIP3D, &b_l3SIP3D);
+        fChain->SetBranchAddress("e1PdgId", &l1PdgId, &b_l1PdgId);
+        fChain->SetBranchAddress("e2PdgId", &l2PdgId, &b_l2PdgId);
+        fChain->SetBranchAddress("e3PdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
@@ -340,6 +346,12 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("mPt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("mEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("mPhi", &l3Phi, &b_l3Phi);
+        fChain->SetBranchAddress("e1SIP3D", &l1SIP3D, &b_l1SIP3D);
+        fChain->SetBranchAddress("e2SIP3D", &l2SIP3D, &b_l2SIP3D);
+        fChain->SetBranchAddress("mSIP3D", &l3SIP3D, &b_l3SIP3D);
+        fChain->SetBranchAddress("e1PdgId", &l1PdgId, &b_l1PdgId);
+        fChain->SetBranchAddress("e2PdgId", &l2PdgId, &b_l2PdgId);
+        fChain->SetBranchAddress("mPdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
         //if (isMC_) {
         //    fChain->SetBranchAddress("mGenPt", &l3GenPt, &b_l3GenPt);
@@ -365,6 +377,12 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("ePt", &l3Pt, &b_l3Pt);
         fChain->SetBranchAddress("eEta", &l3Eta, &b_l3Eta);
         fChain->SetBranchAddress("ePhi", &l3Phi, &b_l3Phi);
+        fChain->SetBranchAddress("m1SIP3D", &l1SIP3D, &b_l1SIP3D);
+        fChain->SetBranchAddress("m2SIP3D", &l2SIP3D, &b_l2SIP3D);
+        fChain->SetBranchAddress("eSIP3D", &l3SIP3D, &b_l3SIP3D);
+        fChain->SetBranchAddress("m1PdgId", &l1PdgId, &b_l1PdgId);
+        fChain->SetBranchAddress("m2PdgId", &l2PdgId, &b_l2PdgId);
+        fChain->SetBranchAddress("ePdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
         //if (isMC_) {
         //    fChain->SetBranchAddress("eGenPt", &l3GenPt, &b_l3GenPt);
@@ -390,6 +408,12 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m1Phi", &l1Phi, &b_l1Phi);
         fChain->SetBranchAddress("m2Phi", &l2Phi, &b_l2Phi);
         fChain->SetBranchAddress("m3Phi", &l3Phi, &b_l3Phi);
+        fChain->SetBranchAddress("m1SIP3D", &l1SIP3D, &b_l1SIP3D);
+        fChain->SetBranchAddress("m2SIP3D", &l2SIP3D, &b_l2SIP3D);
+        fChain->SetBranchAddress("m3SIP3D", &l3SIP3D, &b_l3SIP3D);
+        fChain->SetBranchAddress("m1PdgId", &l1PdgId, &b_l1PdgId);
+        fChain->SetBranchAddress("m2PdgId", &l2PdgId, &b_l2PdgId);
+        fChain->SetBranchAddress("m3PdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
         //if (isMC_) {
         //    fChain->SetBranchAddress("m1GenPt", &l1GenPt, &b_l1GenPt);

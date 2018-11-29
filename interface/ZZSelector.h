@@ -87,15 +87,19 @@ public :
         { "Z1lep1_Eta",  {} },
         { "Z1lep1_Phi",  {} },
         { "Z1lep1_Pt",  {} },
+        { "Z1lep1_PdgId",  {} },
         { "Z1lep2_Eta",  {} },
         { "Z1lep2_Phi",  {} },
         { "Z1lep2_Pt",  {} },
+        { "Z1lep2_PdgId",  {} },
         { "Z2lep1_Eta",  {} },
         { "Z2lep1_Phi",  {} },
         { "Z2lep1_Pt",  {} },
+        { "Z2lep1_PdgId",  {} },
         { "Z2lep2_Eta",  {} },
         { "Z2lep2_Phi",  {} },
         { "Z2lep2_Pt",  {} },
+        { "Z2lep2_PdgId",  {} },
         { "Mass", {} },
        // { "Pt", {} },
        // { "nJets", {} },
@@ -110,8 +114,12 @@ public :
     };
     
     std::map<std::string, TH2D*> hists2D_ = {
-        {"mjj_etajj_2D", {}},
-        {"mjj_dRjj_2D", {}}
+        {"Z1lep1_Z1lep2_Pt", {}},
+        {"Z1lep1_Z1lep2_Eta", {}},
+        {"Z1lep1_Z1lep2_Phi", {}},
+        {"Z2lep1_Z2lep2_Pt", {}},
+        {"Z2lep1_Z2lep2_Eta", {}},
+        {"Z2lep1_Z2lep2_Phi", {}}
     };
 
     std::vector<std::string> systHists2D_ = {
@@ -272,6 +280,7 @@ protected:
     bool ZZSelection();
     bool Z4lSelection();
     bool HZZSelection();
+    bool TestMuons();
     //void ShiftEfficiencies(Systematic variation);
     //float GetMuonScaleUncertainty(float muEta);
     //void SetShiftedMasses();

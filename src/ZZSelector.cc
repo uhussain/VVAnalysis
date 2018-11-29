@@ -66,29 +66,36 @@ void ZZSelector::SetVariables(Long64_t entry) {
     }
 }
 bool ZZSelector::TightZZLeptons() {
-    if (tightZ1Leptons() && tightZ2Leptons()){
-        return true;}
-    else{
-        return false;}
+    if (tightZ1Leptons() && tightZ2Leptons())
+        return true;
+    else
+        return false;
 }
 bool ZZSelector::ZZSelection() {
-    if ((Z1mass > 60.0 && Z1mass < 120.0) && (Z2mass > 60.0 && Z2mass < 120.0)){
-        return true;}
-    else{
-        return false;}
+    if ((Z1mass > 60.0 && Z1mass < 120.0) && (Z2mass > 60.0 && Z2mass < 120.0))
+        return true;
+    else
+        return false;
 }
 bool ZZSelector::Z4lSelection() {
-    if (Mass > 80.0 && Mass < 100.0){
-        return true;}
-    else{
-        return false;}
+    if (Mass > 80.0 && Mass < 100.0)
+        return true;
+    else
+        return false;
 }
 bool ZZSelector::HZZSelection(){
-    if ((l1SIP3D < 4.0 && l2SIP3D < 4.0 && l3SIP3D < 4.0 && l4SIP3D < 4.0) && (Z2mass > 12.0)){
-        return true;}
-    else{
-        return false;}
+    if ((l1SIP3D < 4.0 && l2SIP3D < 4.0 && l3SIP3D < 4.0 && l4SIP3D < 4.0) && (Z2mass > 12.0))
+        return true;
+    else
+        return false;
 }
+bool ZZSelector::TestMuons(){
+    if ((Z1mass > 82.0 && Z1mass < 102.0) && (Z2mass < 40.0))
+        return true;
+    else
+        return false;
+}
+
 std::string ZZSelector::getHistName(std::string histName, std::string variationName) {
     return variationName == "" ? histName : histName + "_" + variationName;
 }
@@ -116,15 +123,25 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("Z1lep1_Pt", variation.second), l1Pt, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Eta", variation.second), l1Eta, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Phi", variation.second), l1Phi, weight);
+    SafeHistFill(hists1D_, getHistName("Z1lep1_PdgId", variation.second), l1PdgId, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep2_Pt", variation.second), l2Pt, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep2_Eta", variation.second), l2Eta, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep2_Phi", variation.second), l2Phi, weight);
+    SafeHistFill(hists1D_, getHistName("Z1lep2_PdgId", variation.second), l2PdgId, weight);
     SafeHistFill(hists1D_, getHistName("Z2lep1_Pt", variation.second), l3Pt, weight);
     SafeHistFill(hists1D_, getHistName("Z2lep1_Eta", variation.second), l3Eta, weight);
     SafeHistFill(hists1D_, getHistName("Z2lep1_Phi", variation.second), l3Phi, weight);
+    SafeHistFill(hists1D_, getHistName("Z2lep1_PdgId", variation.second), l3PdgId, weight);
     SafeHistFill(hists1D_, getHistName("Z2lep2_Pt", variation.second), l4Pt, weight);
     SafeHistFill(hists1D_, getHistName("Z2lep2_Eta", variation.second), l4Eta, weight);
     SafeHistFill(hists1D_, getHistName("Z2lep2_Phi", variation.second), l4Phi, weight);
+    SafeHistFill(hists1D_, getHistName("Z2lep2_PdgId", variation.second), l4PdgId, weight);
+    SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Pt",variation.second),l1Pt,l2Pt,weight);
+    SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Eta",variation.second),l1Eta,l2Eta,weight);
+    SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Phi",variation.second),l1Phi,l2Phi,weight);
+    SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Pt",variation.second),l3Pt,l4Pt,weight);
+    SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Eta",variation.second),l3Eta,l4Eta,weight);
+    SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Phi",variation.second),l3Phi,l4Phi,weight);
 
     if (hists1D_[getHistName("nvtx", variation.second)] != nullptr) {
         b_nvtx->GetEntry(entry);
@@ -139,9 +156,9 @@ Bool_t ZZSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
     //Define weight of event based on channel in case of eemm or mmee
-    if (true) {
-      if (HZZSelection()) {
-        std::cout<<"Weight in ZZSelector inside HZZ: "<<weight<<std::endl;
+    if (HZZSelection() && TightZZLeptons()) {
+      if (TestMuons()) {
+        //std::cout<<"Weight in ZZSelector inside HZZ: "<<weight<<std::endl;
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
   }

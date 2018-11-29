@@ -7,8 +7,9 @@ from python import ConfigureJobs
 from python import HistTools
 import os
 import sys
-
-channels = ["eeee", "eemm","mmmm"]
+import datetime
+channels = ["eeee", "eemm","mmee","mmmm"]
+#channels = ["mmee"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 
@@ -16,7 +17,9 @@ def getComLineArgs():
     parser.add_argument("--lumi", "-l", type=float,
         default=41.5, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
-        default="test.root", help="Output file name")
+        default="", help="Output file name")
+    parser.add_argument("--leptonSelections", "-ls", type=str,
+        default="TightLeptons", help="Either All Loose or Tight")
     parser.add_argument("--test", action='store_true',
         help="Run test job (no background estimate)")
     parser.add_argument("--output_selection", type=str,
@@ -49,13 +52,15 @@ sys.path.append("/".join([manager_path,
     "ZZ4lAnalysisDatasetManager", "Utilities/python"]))
 import ConfigHistTools 
 
-tmpFileName = args['output_file']
+today = datetime.date.today().strftime("%d%b%Y")
+tmpFileName = "HistFiles/Hists%s-%s.root" % (today, args['leptonSelections']) if args['output_file'] == "" \
+        else args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
 
 #fScales = ROOT.TFile('data/scaleFactors.root')
 #mZZTightFakeRate = fScales.Get("mZZTightFakeRate")
 #eZZTightFakeRate = fScales.Get("eZZTightFakeRate")
-fakeRateFile=ROOT.TFile('data/FakeRates_ZZ.root')
+fakeRateFile=ROOT.TFile('data/fakeRate27Nov2018-ZplusLSkim.root')
 eZZTightFakeRate=fakeRateFile.Get('DataEWKCorrected/ratio2D_allE')
 mZZTightFakeRate=fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu')
 #useSvenjasFRs = False
@@ -69,8 +74,10 @@ mZZTightFakeRate=fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu')
 ## For medium muons
 ##mZZMedFakeRate.SetName("fakeRate_allMu")
 if mZZTightFakeRate:
+    print "Yes muon fake rates"
     mZZTightFakeRate.SetName("fakeRate_allMu")
 if eZZTightFakeRate:
+    print "Yes electron fake rates"
     eZZTightFakeRate.SetName("fakeRate_allE")
 #
 #muonIsoSF = fScales.Get('muonIsoSF')
@@ -109,7 +116,7 @@ if "FakeRate" not in args['output_selection'] and not args['test']:
    #         addSumweights=False,
    #         proof=args['proof'])
     background = SelectorTools.applySelector(["ZZ4l2018data"] +
-        ConfigureJobs.getListOfEWKFilenames(),channels, 
+            ConfigureJobs.getListOfEWKFilenames()+ConfigureJobs.getListOfDYFilenames()+ConfigureJobs.getListOfNonpromptFilenames(),channels, 
             "ZZBackgroundSelector", args['selection'], fOut, 
             extra_inputs=fr_inputs+hist_inputs+tselection, 
             addSumweights=False,

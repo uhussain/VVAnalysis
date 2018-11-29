@@ -120,10 +120,10 @@ SelectorTools.applySelector(args["filenames"],channels,
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["ZZ4l2018data"]))
 OutputTools.writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
-    ConfigureJobs.getListOfEWKFilenames()), False)
+    ConfigureJobs.getListOfEWKFilenames()), True)
 OutputTools.writeOutputListItem(allewk, fOut)
 allDYJets = makeCompositeHists("DYMC", ConfigureJobs.getListOfFilesWithXSec(
-    ConfigureJobs.getListOfDYFilenames()),False)
+    ConfigureJobs.getListOfDYFilenames()),True)
 OutputTools.writeOutputListItem(allDYJets, fOut)
 #allnonprompt = makeCompositeHists("NonpromptMC", ConfigureJobs.getListOfFilesWithXSec(
 #    ConfigureJobs.getListOfNonpromptFilenames()))
