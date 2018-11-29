@@ -67,6 +67,8 @@ def getListOfEWKFilenames():
         "ggZZ4e",
         "ggZZ4m",
         "ggZZ2e2mu",
+        "ggZZ2e2tau",
+        "ggZZ2mu2tau",
     ]
 def getListOfDYFilenames():
     return[
@@ -75,16 +77,17 @@ def getListOfDYFilenames():
         ]
 def getListOfNonpromptFilenames():
     return ["tt-lep",
-        "st-schan",
-        "st-tchan-t",
-        "st-tchan-tbar",
-        "st-tw",
-        "st-tbarw",
-        #"DYm50",
-        "DYm50-1j",
-        "DYm50-2j",
-        "DYm50-3j",
-        "DYm50-4j",
+            "tt-jets",
+        #"st-schan",
+        #"st-tchan-t",
+        #"st-tchan-tbar",
+        #"st-tw",
+        #"st-tbarw",
+        ##"DYm50",
+        #"DYm50-1j",
+        #"DYm50-2j",
+        #"DYm50-3j",
+        #"DYm50-4j",
     ]
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
