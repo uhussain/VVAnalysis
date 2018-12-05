@@ -1,0 +1,19 @@
+{
+    "Object" : {
+        "e" : [ 
+        ],
+        "m" : [
+        ]
+    },
+    "State" : {
+        "eeee" : ["(e1ZZTightIDNoVtx > 0.5 && e2ZZTightIDNoVtx > 0.5 && e1_e2_SS < 1)"
+        ],
+        "eemm" : ["((abs(e1_e2_Mass-91.1876) < abs(m1_m2_Mass-91.1876)) ? (e1ZZTightIDNoVtx > 0.5 && e2ZZTightIDNoVtx > 0.5 && e1_e2_SS < 1) : (m1ZZTightIDNoVtx > 0.5 && m2ZZTightIDNoVtx > 0.5 && m1ZZIsoPass > 0.5 && m2ZZIsoPass > 0.5 && m1_m2_SS < 1))"
+        ],
+        "mmmm" : ["(m1ZZTightIDNoVtx > 0.5 && m2ZZTightIDNoVtx > 0.5 && m1ZZIsoPass > 0.5 && m2ZZIsoPass > 0.5 && m1_m2_SS < 1)"
+        ]
+    },
+    "Event" : [
+        
+    ]
+}
