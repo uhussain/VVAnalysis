@@ -171,6 +171,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2PdgId", &l2PdgId, &b_l2PdgId);
         fChain->SetBranchAddress("e3PdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("e4PdgId", &l4PdgId, &b_l4PdgId);
+        fChain->SetBranchAddress("e1Mass", &l1Mass, &b_l1Mass);
+        fChain->SetBranchAddress("e2Mass", &l2Mass, &b_l2Mass);
+        fChain->SetBranchAddress("e3Mass", &l3Mass, &b_l3Mass);
+        fChain->SetBranchAddress("e4Mass", &l4Mass, &b_l4Mass);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -212,6 +216,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2PdgId", &l2PdgId, &b_l2PdgId);
         fChain->SetBranchAddress("m1PdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("m2PdgId", &l4PdgId, &b_l4PdgId);
+        fChain->SetBranchAddress("e1Mass", &l1Mass, &b_l1Mass);
+        fChain->SetBranchAddress("e2Mass", &l2Mass, &b_l2Mass);
+        fChain->SetBranchAddress("m1Mass", &l3Mass, &b_l3Mass);
+        fChain->SetBranchAddress("m2Mass", &l4Mass, &b_l4Mass);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -251,6 +259,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2PdgId", &l2PdgId, &b_l2PdgId);
         fChain->SetBranchAddress("m1PdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("m2PdgId", &l4PdgId, &b_l4PdgId);
+        fChain->SetBranchAddress("e1Mass", &l1Mass, &b_l1Mass);
+        fChain->SetBranchAddress("e2Mass", &l2Mass, &b_l2Mass);
+        fChain->SetBranchAddress("m1Mass", &l3Mass, &b_l3Mass);
+        fChain->SetBranchAddress("m2Mass", &l4Mass, &b_l4Mass);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -290,6 +302,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m2PdgId", &l2PdgId, &b_l2PdgId);
         fChain->SetBranchAddress("m3PdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("m4PdgId", &l4PdgId, &b_l4PdgId);
+        fChain->SetBranchAddress("m1Mass", &l1Mass, &b_l1Mass);
+        fChain->SetBranchAddress("m2Mass", &l2Mass, &b_l2Mass);
+        fChain->SetBranchAddress("m3Mass", &l3Mass, &b_l3Mass);
+        fChain->SetBranchAddress("m4Mass", &l4Mass, &b_l4Mass);
         //if (isMC_) {
         //    fChain->SetBranchAddress("m1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("m2GenPt", &l2GenPt, &b_l2GenPt);
@@ -460,6 +476,9 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     b_l1PdgId->GetEntry(entry);
     b_l2PdgId->GetEntry(entry);
     b_l3PdgId->GetEntry(entry);
+    b_l1Mass->GetEntry(entry);
+    b_l2Mass->GetEntry(entry);
+    b_l3Mass->GetEntry(entry);
     //std::cout<<"IsMC: "<<isMC_<<std::endl;
     if (isMC_) {
         //b_duplicated->GetEntry(entry);
@@ -518,6 +537,7 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
       b_l4Phi->GetEntry(entry);
       b_l4SIP3D->GetEntry(entry);
       b_l4PdgId->GetEntry(entry);
+      b_l4Mass->GetEntry(entry);
       b_l4IsTight->GetEntry(entry);
       b_l4IsIso->GetEntry(entry);
       //b_l4PVDXY->GetEntry(entry);
@@ -585,8 +605,19 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
 //I think this part might need to be added to the ZZSelector and BackgroundSelector and the condition checked at
 //process time for each event.
 bool ZZSelectorBase::e1e2IsZ1(Long64_t entry){
-  if(fabs(Z1mass-91.1876) < fabs(Z2mass-91.1876))
-    return true;
+  //4P Signal region logic where I need to differentiate between two tight pairs and assign Z1 depending on which is closer to mZ
+  if(tightZ1Leptons() && tightZ2Leptons()){
+    if(fabs(Z1mass-91.1876) < fabs(Z2mass-91.1876))
+      return true;
+    else
+      return false;
+  }
+  //In CRs it doesn't matter, the tight pair builds the Z and the other pair is X in Z+X.
+  else if(tightZ1Leptons() && !tightZ2Leptons()){
+    return true;}
+
+  else if(!tightZ1Leptons() && tightZ2Leptons()){
+    return false;}
   else
     return false;
 }
@@ -611,6 +642,42 @@ bool ZZSelectorBase::lep4IsTight() {
 }
 bool ZZSelectorBase::tightZ2Leptons() {
     return lep3IsTight() && lep4IsTight(); 
+}
+bool ZZSelectorBase::Z1PF(){
+  if(lep1IsTight() && !lep2IsTight())
+    return true;
+  else
+    return false;
+}
+bool ZZSelectorBase::Z1FP(){
+  if(lep2IsTight() && !lep1IsTight())
+    return true;
+  else
+    return false;
+}
+bool ZZSelectorBase::Z1FF(){
+  if(!lep1IsTight() && !lep2IsTight())
+    return true;
+  else
+    return false;
+}
+bool ZZSelectorBase::Z2PF(){
+  if(lep3IsTight() && !lep4IsTight())
+    return true;
+  else
+    return false;
+}
+bool ZZSelectorBase::Z2FP(){
+  if(lep4IsTight() && !lep3IsTight())
+    return true;
+  else
+    return false;
+}
+bool ZZSelectorBase::Z2FF(){
+  if(!lep3IsTight() && !lep4IsTight())
+    return true;
+  else
+    return false;
 }
 //bool ZZSelectorBase::IsGenMatched3l() {
 //    //return true;

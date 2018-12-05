@@ -18,6 +18,9 @@ public :
     //4lMass Histogram
     TH1D* MassHistPPPF_;
     TH1D* MassHistPPFF_;
+
+    TH1D* WeightsHistPPPF_;
+    TH1D* WeightsHistPPFF_;
     
     ZZBackgroundSelector(TTree * /*tree*/ =0) { }
     virtual ~ZZBackgroundSelector() { }
@@ -32,6 +35,7 @@ private:
     //In ZZ we only care about 3P1F and 2P2F, contributions are extremely low from other regions like FFFF,PFFF etc
     bool IsPPPFRegion();
     bool IsPPFFRegion();
+    void SetZ1Z2Masses();
     float getEventWeight(Long64_t entry);
 };
 

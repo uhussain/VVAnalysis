@@ -88,6 +88,10 @@ public :
     Int_t l2PdgId;
     Int_t l3PdgId;
     Int_t l4PdgId;
+    Float_t l1Mass;
+    Float_t l2Mass;
+    Float_t l3Mass;
+    Float_t l4Mass;
 
     Float_t l1PVDXY;
     Float_t l2PVDXY;
@@ -137,6 +141,10 @@ public :
     TBranch* b_l2SIP3D;
     TBranch* b_l3SIP3D;
     TBranch* b_l4SIP3D;
+    TBranch* b_l1Mass;
+    TBranch* b_l2Mass;
+    TBranch* b_l3Mass;
+    TBranch* b_l4Mass;
     TBranch* b_l1PdgId;
     TBranch* b_l2PdgId;
     TBranch* b_l3PdgId;
@@ -206,6 +214,12 @@ protected:
     bool lep2IsTight();
     bool lep3IsTight();
     bool lep4IsTight();
+    bool Z1PF();
+    bool Z1FP();
+    bool Z1FF();
+    bool Z2PF();
+    bool Z2FP();
+    bool Z2FF();
     bool tightZ1Leptons();
     bool tightZ2Leptons();
     //bool IsGenMatched3l();

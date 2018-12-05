@@ -29,10 +29,22 @@ void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
 //Similar to Kenneth's SetShiftedMasses function which i will need later as well
 void ZZSelector::SetVariables(Long64_t entry) {
     if(!(e1e2IsZ1(entry))){
-      std::cout<<"e1e2IsZ1 is working"<<std::endl;
+      //std::cout<<"e1e2IsZ1 is working"<<std::endl;
       float tempMass = Z1mass;
       Z1mass = Z2mass;
       Z2mass = tempMass;
+      bool templ1IsTight = l1IsTight;
+      l1IsTight = l3IsTight;
+      l3IsTight = templ1IsTight;
+      bool templ2IsTight = l2IsTight;
+      l2IsTight = l4IsTight;
+      l4IsTight = templ2IsTight;
+      bool templ1IsIso = l1IsIso;
+      l1IsIso = l3IsIso;
+      l3IsIso = templ1IsIso;
+      bool templ2IsIso = l2IsIso;
+      l2IsIso = l4IsIso;
+      l4IsIso = templ2IsIso;
       float templ1Pt = l1Pt;
       l1Pt = l3Pt;
       l3Pt = templ1Pt;
@@ -57,12 +69,18 @@ void ZZSelector::SetVariables(Long64_t entry) {
       float templ2SIP3D = l2SIP3D;
       l2SIP3D = l4SIP3D;
       l4SIP3D = templ2SIP3D;
-      float templ1PdgId = l1PdgId;
+      int templ1PdgId = l1PdgId;
       l1PdgId = l3PdgId;
       l3PdgId = templ1PdgId;
-      float templ2PdgId = l2PdgId;
+      int templ2PdgId = l2PdgId;
       l2PdgId = l4PdgId;
       l4PdgId = templ2PdgId;
+      float templ1Mass = l1Mass;
+      l1Mass = l3Mass;
+      l3Mass = templ1Mass;
+      float templ2Mass = l2Mass;
+      l2Mass = l4Mass;
+      l4Mass = templ2Mass;
     }
 }
 bool ZZSelector::TightZZLeptons() {
@@ -157,7 +175,7 @@ Bool_t ZZSelector::Process(Long64_t entry)
     LoadBranches(entry, central_var);
     //Define weight of event based on channel in case of eemm or mmee
     if (HZZSelection() && TightZZLeptons()) {
-      if (TestMuons()) {
+      if (true) {
         //std::cout<<"Weight in ZZSelector inside HZZ: "<<weight<<std::endl;
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
