@@ -28,8 +28,10 @@ jevariations = [i for x in ["CMS_scale_j", "CMS_res_j",] for i in [x+"Up", x+"Do
 variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
     "CMS_eff_m", "CMS_scale_m", "CMS_eff_e", "CMS_scale_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
 aqgc_hists = HistTools.make1DaQGCHists(input_file, 
-        #["mjj_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
-        #    ["Mass_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+        ["mjj_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["Mass_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["m_l1l3_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
+            ["m_l2l3_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
         #    ["Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
         #    ["llPt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \
         #    ["l2Pt_lheWeights_%s" % c for c in ConfigureJobs.getChannels()] + \

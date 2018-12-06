@@ -585,6 +585,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
                 continue;
             SafeHistFill(weighthists_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthists_, getHistName("mjj", variation.second), mjj, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, getHistName("m_l1l3", variation.second), Zlep1_Wlep_Mass, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthists_, getHistName("m_l2l3", variation.second), Zlep2_Wlep_Mass, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthists_, getHistName("Mass", variation.second), Mass, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthists_, getHistName("MTWZ", variation.second), MtWZ, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthists_, getHistName("M3lMET", variation.second), M3lMET, i, lheWeights[i]/lheWeights[0]*weight);
@@ -606,6 +608,8 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("Mass", variation.second), Mass, 
         weight*(isMC_ || Mass < 400 || noBlind));
     SafeHistFill(hists1D_, getHistName("ZMass", variation.second), ZMass, weight);
+    SafeHistFill(hists1D_, getHistName("m_l1l3", variation.second), Zlep1_Wlep_Mass, weight);
+    SafeHistFill(hists1D_, getHistName("m_l2l3", variation.second), Zlep2_Wlep_Mass, weight);
     SafeHistFill(hists1D_, getHistName("ZPhi", variation.second), ZPhi, weight);
     SafeHistFill(hists1D_, getHistName("ZEta", variation.second), ZEta, weight);
     SafeHistFill(hists1D_, getHistName("Zlep1_Pt", variation.second), l1Pt, weight);

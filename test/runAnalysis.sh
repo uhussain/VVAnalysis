@@ -90,7 +90,9 @@ if [ "$2" != "noCombine" ]; then
     fi
 
     if [[ "$2" != "combineOnly" && "$1" == "VBSselection"* ]]; then
-        #python ./Utilities/scripts/addaQGCHistsToFile.py -i $histfile
+        if [[ "$3" == "*aQGC" ]]; then
+            python ./Utilities/scripts/addaQGCHistsToFile.py -i $histfile
+        fi
         python ./Utilities/scripts/addUnrolledHistsToFile.py -i $histfile
     fi
     if [ "$1" != "FakeRate"* ]; then

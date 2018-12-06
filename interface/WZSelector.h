@@ -7,7 +7,7 @@
 
 class WZSelector : public WZSelectorBase {
 public :
-    bool doSystematics_ = true;
+    bool doSystematics_ = false;
     bool applyFullSelection_ = true;
     bool isaQGC_ = false;
     bool doaQGC_ = false;
@@ -113,11 +113,16 @@ public :
         { "zep3l",  {} },
         { "zepj3",  {} },
         { "Eta",  {} },
+        { "m_l1l3",  {} },
+        { "m_l2l3",  {} },
     };
 
     // Weight hists must be subset of 1D hists!
     std::map<std::string, TH2D*> weighthists_ = {
         { "backgroundControlYield",  {} },
+        { "mjj",  {} },
+        { "m_l1l3",  {} },
+        { "m_l2l3",  {} },
         { "MTWZ",  {} },
         { "yield",  {} },
     };
