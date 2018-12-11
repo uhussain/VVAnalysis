@@ -47,7 +47,7 @@ def makeCompositeHists(name, members, addRatios=True, overflow=True):
             hist = fOut.Get("/".join([directory, histname]))
             if hist:
                 sumhist = composite.FindObject(hist.GetName())
-                if "data" not in directory and hist.GetEntries() > 0:
+                if "Run" not in directory and hist.GetEntries() > 0:
                     sumweights_hist = fOut.Get("/".join([directory, "sumweights"]))
                     sumweights = sumweights_hist.Integral()
                     hist.Scale(members[directory]*1000*args['lumi']/sumweights)
@@ -136,7 +136,7 @@ fileName = "data/fakeRate%s-%s.root" % (today, args['selection']) if args['outpu
 fOut = ROOT.TFile(fileName, "recreate")
 selector_name = "FakeRateSelector"
 path = ConfigureJobs.getManagerPath()
-for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selection']):
+for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path):
     for chan in channels: 
         select = getattr(ROOT, selector_name)()
         inputs = ROOT.TList()
@@ -161,10 +161,11 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selec
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     path, args['selection'], args['analysis'])
+                print "Is this file_path"
                 print file_path
                 chain.Add(file_path)
                 chain.Process(select, "")
-                if "data" not in dataset and chan == "eee":
+                if "Run" not in dataset and chan == "eee":
                     meta_chain.Add(file_path)
                     meta_chain.Draw("1>>sumweights", "summedWeights")
                     sumweights_hist.SetDirectory(0)
@@ -186,7 +187,7 @@ for dataset in ConfigureJobs.getListOfFiles(args['filenames'], path, args['selec
             item.Delete()
         if hasattr(sumweights_hist, "Delete"):
             sumweights_hist.Delete()
-alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], path))
+alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["ZplusL2018SkimRun"], path))
 writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames(), path), False)
