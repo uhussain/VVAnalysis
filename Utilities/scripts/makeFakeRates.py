@@ -20,8 +20,8 @@ def getComLineArgs():
     return vars(parser.parse_args())
 
 def getHistNames(channels):
-    base_hists = [x+y for x in ["passingLoose", "passingTight"] \
-            for y in "1DEta", "1DPt", "2D"]
+    base_hists = [x+y for x in ["passingLooseE", "passingTightE","passingLooseMu", "passingTightMu"] \
+            for y in "1DEta", "1DPt_barrel","1DPt_endcap", "2D"]
     if len(channels) == 0:
         return base_hists
     return [x+"_"+y for x in base_hists for y in channels]
