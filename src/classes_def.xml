@@ -6,4 +6,5 @@
   <class name="ZLSelectorBase"/>
   <class name="ScaleFactor"/>
   <class name="disambiguateFinalStates"/>
+  <class name="disambiguateFinalStatesZL"/>
 </lcgdict>

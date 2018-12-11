@@ -103,6 +103,7 @@ public :
 
 private :
   void findBestEntry();
+  bool l1l2IsZ1(Long64_t entry);
   bool lep1IsTight();
   bool lep2IsTight();
   bool lep3IsTight();
@@ -117,6 +118,9 @@ private :
   std::vector<Long64_t> fEntriesToCompareLoose;
   std::vector<float> fEntryDiscriminantsLoose;
   std::vector<float> fEntryZ2PtSumLoose;
+  //std::vector<Long64_t> fEntriesToCompareVLoose;
+  //std::vector<float> fEntryDiscriminantsVLoose;
+  //std::vector<float> fEntryZ2PtSumVLoose;
   char* l1_l2_Cand_mass; 
   char* l1_Cand_pt;
   char* l2_Cand_pt; 

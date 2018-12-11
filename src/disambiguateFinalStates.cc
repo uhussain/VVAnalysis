@@ -85,15 +85,30 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
     b_l4IsTight->GetEntry(entry);
     b_l4IsIso->GetEntry(entry); 
     
-    float mass_discriminant,Z2ptSum; 
+    float mass_discriminant,Z2ptSum;
+
     //This condition identifies the Z1 candidate
     //Required for the 2e2mu state but redundant for the 4e,4mu state however it should be quick comparison
     if(fabs(l1_l2_Mass-91.1876) < fabs(l3_l4_Mass-91.1876)){
+    //if(l1l2IsZ1(entry)){
       mass_discriminant = fabs(l1_l2_Mass-91.1876);
       Z2ptSum = l3_Pt+l4_Pt;}
     else{ 
       mass_discriminant = fabs(l3_l4_Mass-91.1876);
-      Z2ptSum = l1_Pt+l2_Pt;}  
+      Z2ptSum = l1_Pt+l2_Pt;
+      //bool templ1IsTight = l1IsTight;
+      //l1IsTight = l3IsTight;
+      //l3IsTight = templ1IsTight;
+      //bool templ2IsTight = l2IsTight;
+      //l2IsTight = l4IsTight;
+      //l4IsTight = templ2IsTight;
+      //bool templ1IsIso = l1IsIso;
+      //l1IsIso = l3IsIso;
+      //l3IsIso = templ1IsIso;
+      //bool templ2IsIso = l2IsIso;
+      //l2IsIso = l4IsIso;
+      //l4IsIso = templ2IsIso;
+    }  
    
     if(tightZ1Leptons() && tightZ2Leptons()){ 
       fEntriesToCompareTight.push_back(entry);
@@ -101,11 +116,17 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
       fEntryZ2PtSumTight.push_back(Z2ptSum);
     }
     //
-    else{ 
+    //else if(tightZ1Leptons()){
+    else{
       fEntriesToCompareLoose.push_back(entry);
       fEntryDiscriminantsLoose.push_back(mass_discriminant);
       fEntryZ2PtSumLoose.push_back(Z2ptSum);
     }
+    //else{ 
+    //  fEntriesToCompareVLoose.push_back(entry);
+    //  fEntryDiscriminantsVLoose.push_back(mass_discriminant);
+    //  fEntryZ2PtSumVLoose.push_back(Z2ptSum);
+    //}
   }
 
   if ( entry == fChain->GetEntries()-1 ) {
@@ -140,6 +161,10 @@ void disambiguateFinalStates::findBestEntry()
   float lowestDiscriminantLoose = 1e100;
   float MaxPtSumLoose = 0.0;
   
+  //Long64_t bestEntryVLoose = -1L;
+  //float lowestDiscriminantVLoose = 1e100;
+  //float MaxPtSumVLoose = 0.0;
+
   for (size_t i=0; i<fEntriesToCompareTight.size(); ++i)
   {
     if ((fEntryDiscriminantsTight[i] < lowestDiscriminantTight) || ((fEntryDiscriminantsTight[i] == lowestDiscriminantTight) && (fEntryZ2PtSumTight[i] > MaxPtSumTight)))
@@ -160,6 +185,15 @@ void disambiguateFinalStates::findBestEntry()
     }
   }
 
+ // for (size_t i=0; i<fEntriesToCompareVLoose.size(); ++i)
+ // {
+ //   if ((fEntryDiscriminantsVLoose[i] < lowestDiscriminantVLoose) || ((fEntryDiscriminantsVLoose[i] == lowestDiscriminantVLoose) && (fEntryZ2PtSumVLoose[i] > MaxPtSumVLoose)))
+ //   {
+ //     MaxPtSumVLoose = fEntryZ2PtSumVLoose[i];
+ //     lowestDiscriminantVLoose = fEntryDiscriminantsVLoose[i];
+ //     bestEntryVLoose = fEntriesToCompareVLoose[i];
+ //   }
+ // }
     if ( bestEntryTight >= 0 )
     {
       fBestCandidateEntryList->Enter(bestEntryTight);
@@ -167,6 +201,9 @@ void disambiguateFinalStates::findBestEntry()
     else if ( bestEntryLoose >=0 ){ 
       fBestCandidateEntryList->Enter(bestEntryLoose);
     }
+    //else if ( bestEntryVLoose >=0 ){ 
+    //  fBestCandidateEntryList->Enter(bestEntryVLoose);
+    //}
 
     fEntriesToCompareTight.clear();
     fEntryDiscriminantsTight.clear();
@@ -175,8 +212,18 @@ void disambiguateFinalStates::findBestEntry()
     fEntriesToCompareLoose.clear();
     fEntryDiscriminantsLoose.clear();
     fEntryZ2PtSumLoose.clear();
+
+    //fEntriesToCompareVLoose.clear();
+    //fEntryDiscriminantsVLoose.clear();
+    //fEntryZ2PtSumVLoose.clear();
 }
 
+bool disambiguateFinalStates::l1l2IsZ1(Long64_t entry){
+  if(fabs(l1_l2_Mass-91.1876) < fabs(l3_l4_Mass-91.1876))
+    return true;
+  else
+    return false;
+}
 bool disambiguateFinalStates::lep1IsTight() {
     return (l1IsTight && l1IsIso); 
 }
