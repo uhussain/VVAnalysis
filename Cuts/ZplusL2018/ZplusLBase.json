@@ -5,7 +5,7 @@
             "(abs({object_name}Eta) <  2.5)",
             "(abs({object_name}PVDXY) < 0.5)",
             "(abs({object_name}PVDZ) < 1.0)",
-            "({object_name}SIP3D < 10.0)"
+            "({object_name}SIP3D < 4.0)"
         ],
         "m" : [
             "({object_name}Pt > 5.0)",
@@ -14,7 +14,7 @@
             "(abs({object_name}PVDXY) < 0.5)",
             "(abs({object_name}PVDZ) < 1.0)",
             "({object_name}BestTrackType !=2)",
-            "({object_name}SIP3D < 10.0)"
+            "({object_name}SIP3D < 4.0)"
         ]
     },
     "State" : {
