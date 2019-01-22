@@ -1,0 +1,41 @@
+Combination of eeee=ZZ_template_eeee.txt  eemm=ZZ_template_eemm.txt  mmee=ZZ_template_mmee.txt  mmmm=ZZ_template_mmmm.txt
+imax 4 number of bins
+jmax 3 number of processes minus 1
+kmax 7 number of nuisance parameters
+----------------------------------------------------------------------------------------------------------------------------------
+shapes HZZ-signal   eeee         Hists22Jan2019-ZZ4l.root HZZ-signal/yield_eeee HZZ-signal/yield_$SYSTEMATIC_eeee
+shapes data_obs     eeee         Hists22Jan2019-ZZ4l.root AllData/yield_eeee
+shapes ggZZ         eeee         Hists22Jan2019-ZZ4l.root ggZZ/yield_eeee ggZZ/yield_$SYSTEMATIC_eeee
+shapes nonprompt    eeee         Hists22Jan2019-ZZ4l.root DataEWKCorrected/yield_Fakes_eeee DataEWKCorrected/yield_Fakes_$SYSTEMATIC_eeee
+shapes zz4l-powheg  eeee         Hists22Jan2019-ZZ4l.root zz4l-powheg/yield_eeee zz4l-powheg/yield_$SYSTEMATIC_eeee
+shapes HZZ-signal   eemm         Hists22Jan2019-ZZ4l.root HZZ-signal/yield_eemm HZZ-signal/yield_$SYSTEMATIC_eemm
+shapes data_obs     eemm         Hists22Jan2019-ZZ4l.root AllData/yield_eemm
+shapes ggZZ         eemm         Hists22Jan2019-ZZ4l.root ggZZ/yield_eemm ggZZ/yield_$SYSTEMATIC_eemm
+shapes nonprompt    eemm         Hists22Jan2019-ZZ4l.root DataEWKCorrected/yield_Fakes_eemm DataEWKCorrected/yield_Fakes_$SYSTEMATIC_eemm
+shapes zz4l-powheg  eemm         Hists22Jan2019-ZZ4l.root zz4l-powheg/yield_eemm zz4l-powheg/yield_$SYSTEMATIC_eemm
+shapes HZZ-signal   mmee         Hists22Jan2019-ZZ4l.root HZZ-signal/yield_mmee HZZ-signal/yield_$SYSTEMATIC_mmee
+shapes data_obs     mmee         Hists22Jan2019-ZZ4l.root AllData/yield_mmee
+shapes ggZZ         mmee         Hists22Jan2019-ZZ4l.root ggZZ/yield_mmee ggZZ/yield_$SYSTEMATIC_mmee
+shapes nonprompt    mmee         Hists22Jan2019-ZZ4l.root DataEWKCorrected/yield_Fakes_mmee DataEWKCorrected/yield_Fakes_$SYSTEMATIC_mmee
+shapes zz4l-powheg  mmee         Hists22Jan2019-ZZ4l.root zz4l-powheg/yield_mmee zz4l-powheg/yield_$SYSTEMATIC_mmee
+shapes HZZ-signal   mmmm         Hists22Jan2019-ZZ4l.root HZZ-signal/yield_mmmm HZZ-signal/yield_$SYSTEMATIC_mmmm
+shapes data_obs     mmmm         Hists22Jan2019-ZZ4l.root AllData/yield_mmmm
+shapes ggZZ         mmmm         Hists22Jan2019-ZZ4l.root ggZZ/yield_mmmm ggZZ/yield_$SYSTEMATIC_mmmm
+shapes nonprompt    mmmm         Hists22Jan2019-ZZ4l.root DataEWKCorrected/yield_Fakes_mmmm DataEWKCorrected/yield_Fakes_$SYSTEMATIC_mmmm
+shapes zz4l-powheg  mmmm         Hists22Jan2019-ZZ4l.root zz4l-powheg/yield_mmmm zz4l-powheg/yield_$SYSTEMATIC_mmmm
+----------------------------------------------------------------------------------------------------------------------------------
+bin          eeee   eemm   mmee   mmmm 
+observation  -1     -1     -1     -1   
+----------------------------------------------------------------------------------------------------------------------------------
+bin                                        eeee         eeee         eeee         eeee         eemm         eemm         eemm         eemm         mmee         mmee         mmee         mmee         mmmm         mmmm         mmmm         mmmm       
+process                                    HZZ-signal   ggZZ         zz4l-powheg  nonprompt    HZZ-signal   ggZZ         zz4l-powheg  nonprompt    HZZ-signal   ggZZ         zz4l-powheg  nonprompt    HZZ-signal   ggZZ         zz4l-powheg  nonprompt  
+process                                    0            1            2            3            0            1            2            3            0            1            2            3            0            1            2            3          
+rate                                       -1           -1           -1           -1           -1           -1           -1           -1           -1           -1           -1           -1           -1           -1           -1           -1         
+----------------------------------------------------------------------------------------------------------------------------------
+CMS_eff_e               shape              1.0          1.0          1.0          -            1.0          1.0          1.0          -            1.0          1.0          1.0          -            1.0          1.0          1.0          -          
+CMS_eff_m               shape              1.0          1.0          1.0          -            1.0          1.0          1.0          -            1.0          1.0          1.0          -            1.0          1.0          1.0          -          
+CMS_norm_nonprompt_eeee   lnN              -            -            -            1.4          -            -            -            -            -            -            -            -            -            -            -            -          
+CMS_norm_nonprompt_eemm   lnN              -            -            -            -            -            -            -            1.4          -            -            -            -            -            -            -            -          
+CMS_norm_nonprompt_mmee   lnN              -            -            -            -            -            -            -            -            -            -            -            1.4          -            -            -            -          
+CMS_norm_nonprompt_mmmm   lnN              -            -            -            -            -            -            -            -            -            -            -            -            -            -            -            1.4        
+lumi2016_13TeV          lnN                1.025        1.025        1.025        -            1.025        1.025        1.025        -            1.025        1.025        1.025        -            1.025        1.025        1.025        -          

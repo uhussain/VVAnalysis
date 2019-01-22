@@ -1,0 +1,33 @@
+imax 1  number of channels
+jmax 3  number of backgrounds
+kmax 7 number of nuisance parameters (sources of systematical uncertainties)
+------------
+
+shapes HZZ-signal * Hists22Jan2019-ZZ4l.root HZZ-signal/yield_$$CHANNEL       HZZ-signal/yield_$$SYSTEMATIC_$$CHANNEL 
+shapes zz4l-powheg * Hists22Jan2019-ZZ4l.root zz4l-powheg/yield_$$CHANNEL     zz4l-powheg/yield_$$SYSTEMATIC_$$CHANNEL 
+shapes ggZZ * Hists22Jan2019-ZZ4l.root ggZZ/yield_$$CHANNEL                   ggZZ/yield_$$SYSTEMATIC_$$CHANNEL 
+
+shapes nonprompt * Hists22Jan2019-ZZ4l.root DataEWKCorrected/yield_Fakes_$$CHANNEL DataEWKCorrected/yield_Fakes_$$SYSTEMATIC_$$CHANNEL
+shapes data_obs  * Hists22Jan2019-ZZ4l.root AllData/yield_$$CHANNEL
+
+bin          eemm   
+observation  -1
+
+------------
+#nonprompt is data-driven Z+X background
+# now we list the expected events for signal and all backgrounds in that bin
+# the second 'process' line must have a positive number for backgrounds, and 0 for signal
+# then we list the independent sources of uncertainties, and give their effect (syst. error)
+# on each process and bin
+bin                                eemm              eemm               eemm              eemm         
+process                         HZZ-signal        zz4l-powheg           ggZZ            nonprompt  
+process                            0                  1                   2                 3
+rate                              -1                  -1                 -1                -1
+--------------------------------------------------------------------------------------------------------                                                                                                                                                                                                                    
+lumi2016_13TeV           lnN       1.025             1.025             1.025              - 
+CMS_norm_nonprompt_eeee  lnN        -                  -                 -                -
+CMS_norm_nonprompt_eemm  lnN        -                  -                 -                1.4
+CMS_norm_nonprompt_mmee  lnN        -                  -                 -                -
+CMS_norm_nonprompt_mmmm  lnN        -                  -                 -                -
+CMS_eff_e               shape       1                 1                 1                 0
+CMS_eff_m               shape       1                 1                 1                 0
