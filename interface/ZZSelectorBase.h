@@ -17,9 +17,9 @@
 class ZZSelectorBase : public TSelector {
 public :
     //ScaleFactor* pileupSF_;
-    //ScaleFactor* eIdSF_;
-    //ScaleFactor* eGsfSF_;
-    //ScaleFactor* mIdSF_;
+    ScaleFactor* eIdSF_;
+    ScaleFactor* eGapIdSF_;
+    ScaleFactor* mIdSF_;
     //ScaleFactor* mIsoSF_;
     
     TTree          *fChain = 0;   //!pointer to the analyzed TTree or TChain
@@ -68,6 +68,11 @@ public :
     Bool_t l3IsIso;
     Bool_t l4IsIso;
 
+    Bool_t l1IsGap;
+    Bool_t l2IsGap;
+    Bool_t l3IsGap;
+    Bool_t l4IsGap;
+    
     Float_t l1Pt;
     Float_t l2Pt;
     Float_t l3Pt;
@@ -124,6 +129,11 @@ public :
     TBranch* b_l2IsIso;
     TBranch* b_l3IsIso;
     TBranch* b_l4IsIso;
+
+    TBranch* b_l1IsGap;
+    TBranch* b_l2IsGap;
+    TBranch* b_l3IsGap;
+    TBranch* b_l4IsGap;
 
     TBranch* b_l1Pt;
     TBranch* b_l2Pt;

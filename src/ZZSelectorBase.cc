@@ -13,15 +13,15 @@ void ZZSelectorBase::SlaveBegin(TTree * /*tree*/)
     //pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
     //if (pileupSF_ == nullptr ) 
     //    Abort("Must pass pileup weights SF");
-    //eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronTightIdSF");
-    //if (eIdSF_ == nullptr ) 
-    //    Abort("Must pass electron ID SF");
-    //eGsfSF_ = (ScaleFactor *) GetInputList()->FindObject("electronGsfSF");
-    //if (eGsfSF_ == nullptr ) 
-    //    Abort("Must pass electron GSF SF");
-    //mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonTightIdSF");
-    //if (mIdSF_ == nullptr ) 
-    //    Abort("Must pass muon ID SF");
+    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriond18SF");
+    if (eIdSF_ == nullptr ) 
+        Abort("Must pass electron Moriond18 SF");
+    eGapIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriond18GapSF");
+    if (eGapIdSF_ == nullptr ) 
+        Abort("Must pass electronGap Moriond18 SF");
+    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonMoriond18SF");
+    if (mIdSF_ == nullptr ) 
+        Abort("Must pass muon Moriond18 SF");
     //mIsoSF_ = (ScaleFactor *) GetInputList()->FindObject("muonIsoSF");
     //if (mIsoSF_ == nullptr ) 
     //    Abort("Must pass muon Iso SF");
@@ -33,7 +33,7 @@ void ZZSelectorBase::SlaveBegin(TTree * /*tree*/)
 }
 
 std::string ZZSelectorBase::GetNameFromFile() {
-    std::regex expr = std::regex("201[0-9]-[0-9][0-9]-[0-9][0-9]-(.*)-WZxsec2016");
+    std::regex expr = std::regex("201[0-9]-[0-9][0-9]-[0-9][0-9]-(.*)-ZZ4l2018");
     std::smatch matches;
     std::string fileName = fChain->GetTree()->GetDirectory()->GetFile()->GetName(); 
 
@@ -175,6 +175,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2Mass", &l2Mass, &b_l2Mass);
         fChain->SetBranchAddress("e3Mass", &l3Mass, &b_l3Mass);
         fChain->SetBranchAddress("e4Mass", &l4Mass, &b_l4Mass);
+        fChain->SetBranchAddress("e1IsGap", &l1IsGap, &b_l1IsGap);
+        fChain->SetBranchAddress("e2IsGap", &l2IsGap, &b_l2IsGap);
+        fChain->SetBranchAddress("e3IsGap", &l3IsGap, &b_l3IsGap);
+        fChain->SetBranchAddress("e4IsGap", &l4IsGap, &b_l4IsGap);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -220,6 +224,12 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2Mass", &l2Mass, &b_l2Mass);
         fChain->SetBranchAddress("m1Mass", &l3Mass, &b_l3Mass);
         fChain->SetBranchAddress("m2Mass", &l4Mass, &b_l4Mass);
+        fChain->SetBranchAddress("e1IsGap", &l1IsGap, &b_l1IsGap);
+        fChain->SetBranchAddress("e2IsGap", &l2IsGap, &b_l2IsGap);
+        //There are 2 different SFs for electrons depending on whether the electron is from the crack 
+        //in ECAL crystals or not but we need a dummy for the muons? Makes life easier later
+        fChain->SetBranchAddress("m1IsLoose", &l3IsGap, &b_l3IsGap);
+        fChain->SetBranchAddress("m2IsLoose", &l4IsGap, &b_l4IsGap);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -263,6 +273,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2Mass", &l2Mass, &b_l2Mass);
         fChain->SetBranchAddress("m1Mass", &l3Mass, &b_l3Mass);
         fChain->SetBranchAddress("m2Mass", &l4Mass, &b_l4Mass);
+        fChain->SetBranchAddress("e1IsGap", &l1IsGap, &b_l1IsGap);
+        fChain->SetBranchAddress("e2IsGap", &l2IsGap, &b_l2IsGap);
+        fChain->SetBranchAddress("m1IsLoose", &l3IsGap, &b_l3IsGap);
+        fChain->SetBranchAddress("m2IsLoose", &l4IsGap, &b_l4IsGap);
         //if (isMC_) {
         //    fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //    fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -476,9 +490,12 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     b_l1PdgId->GetEntry(entry);
     b_l2PdgId->GetEntry(entry);
     b_l3PdgId->GetEntry(entry);
-    b_l1Mass->GetEntry(entry);
-    b_l2Mass->GetEntry(entry);
-    b_l3Mass->GetEntry(entry);
+    if (channel_ == eeee || channel_ == eemm || channel_ == mmee){
+      b_l1IsGap->GetEntry(entry); 
+      b_l2IsGap->GetEntry(entry); 
+      b_l3IsGap->GetEntry(entry); 
+      b_l4IsGap->GetEntry(entry);
+    }
     //std::cout<<"IsMC: "<<isMC_<<std::endl;
     if (isMC_) {
         //b_duplicated->GetEntry(entry);
@@ -492,38 +509,54 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
         //  b_l4GenPt->GetEntry(entry);}
         //std::cout<<"It fails before weight=genWeight assignment" <<std::endl;
         weight = genWeight;
-        //if (channel_ == eee) {
-        //    weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        //    weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        //    weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        //    weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        //    weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        //    weight *= eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        //}
-        //else if (channel_ == eem) {
-        //    weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        //    weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        //    weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        //    weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        //    weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        //    weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        //}
-        //else if (channel_ == emm) {
-        //    weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        //    weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        //    weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        //    weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        //    weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        //    weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        //}
-        //else {
-        //    weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        //    weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        //    weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        //    weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        //    weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        //    weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        //}
+        if (channel_ == eeee) {
+            if(l1IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            if(l2IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            if(l3IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            }
+            if(l4IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+            }
+        }
+        else if (channel_ == eemm || channel_ == mmee) {
+            if(l1IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            if(l2IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+        }
+        else {
+            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+        }
         //weight *= pileupSF_->Evaluate1D(nTruePU);
     }
     else {
@@ -537,6 +570,9 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
       b_l4Phi->GetEntry(entry);
       b_l4SIP3D->GetEntry(entry);
       b_l4PdgId->GetEntry(entry);
+      b_l1Mass->GetEntry(entry);
+      b_l2Mass->GetEntry(entry);
+      b_l3Mass->GetEntry(entry);
       b_l4Mass->GetEntry(entry);
       b_l4IsTight->GetEntry(entry);
       b_l4IsIso->GetEntry(entry);

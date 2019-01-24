@@ -24,7 +24,18 @@ void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     b_Mass->GetEntry(entry);
     //std::cout<<"channel in LoadBranches function: "<<channel_<<std::endl;
     if(channel_ == eemm || channel_ == mmee){
-      SetVariables(entry);}
+      if(TightZZLeptons()){
+        SetVariables(entry);}
+    }
+    
+    //Systematic uncertainties and creating shiftUp and shiftDown histograms
+    if (isMC_) {
+      //Starting with lepton Efficiencies
+      if (variation.first == electronEfficiencyUp || variation.first == electronEfficiencyDown ||
+                  variation.first == muonEfficiencyUp || variation.first == muonEfficiencyDown) {
+          ShiftEfficiencies(variation.first);
+      }
+    }
 }
 //Similar to Kenneth's SetShiftedMasses function which i will need later as well
 void ZZSelector::SetVariables(Long64_t entry) {
@@ -45,6 +56,12 @@ void ZZSelector::SetVariables(Long64_t entry) {
       bool templ2IsIso = l2IsIso;
       l2IsIso = l4IsIso;
       l4IsIso = templ2IsIso;
+      bool templ1IsGap = l1IsGap;
+      l1IsGap = l3IsGap;
+      l3IsGap = templ1IsGap;
+      bool templ2IsGap = l2IsGap;
+      l2IsGap = l4IsGap;
+      l4IsGap = templ2IsGap;
       float templ1Pt = l1Pt;
       l1Pt = l3Pt;
       l3Pt = templ1Pt;
@@ -83,6 +100,85 @@ void ZZSelector::SetVariables(Long64_t entry) {
       l4Mass = templ2Mass;
     }
 }
+
+void ZZSelector::ShiftEfficiencies(Systematic variation) {
+    ScaleFactor::Variation shift = ScaleFactor::Variation::ShiftUp;
+    if (variation == electronEfficiencyDown || variation == muonEfficiencyDown)
+        shift = ScaleFactor::Variation::ShiftDown;
+
+    if (channel_ == eeee && (variation == electronEfficiencyUp || variation == electronEfficiencyDown)) {
+        if(l1IsGap){
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        }
+        else{
+          weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        }
+        if(l2IsGap){
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        else{
+          weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        if(l3IsGap){
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        else{
+          weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        if(l4IsGap){
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+        }
+        else{
+          weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+        }
+    }
+    else if (channel_ == eemm) {
+        if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
+          if(l1IsGap){
+            weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+          }
+          else{
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+          }
+          if(l2IsGap){
+            weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+          }
+          else{
+            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+          }
+        }
+        else if (variation == muonEfficiencyUp || variation == muonEfficiencyDown) {
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+        }
+    }
+    else if (channel_ == mmee) {
+        if (variation == muonEfficiencyUp || variation == muonEfficiencyDown) {
+            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        else if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
+          if(l3IsGap){
+            weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+          }
+          else{
+            weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+          }
+          if(l4IsGap){
+            weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+          }
+          else{
+            weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+          }
+        }
+    }
+    else if (channel_ == mmmm && (variation == muonEfficiencyUp || variation == muonEfficiencyDown)) {
+        weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+    }
+}
 bool ZZSelector::TightZZLeptons() {
     if (tightZ1Leptons() && tightZ2Leptons())
         return true;
@@ -95,14 +191,21 @@ bool ZZSelector::ZZSelection() {
     else
         return false;
 }
+//We already require 4 < Z1,Z2 < 120  in the "Loose Skim"
+bool ZZSelector::ZSelection() {
+    if (Z1mass > 40.0 && Z2mass > 12.0)
+        return true;
+    else
+        return false;
+}
 bool ZZSelector::Z4lSelection() {
     if (Mass > 80.0 && Mass < 100.0)
         return true;
     else
         return false;
 }
-bool ZZSelector::HZZSelection(){
-    if ((l1SIP3D < 4.0 && l2SIP3D < 4.0 && l3SIP3D < 4.0 && l4SIP3D < 4.0) && (Z2mass > 12.0))
+bool ZZSelector::HZZSIPSelection(){
+    if ((l1SIP3D < 4.0 && l2SIP3D < 4.0 && l3SIP3D < 4.0 && l4SIP3D < 4.0))
         return true;
     else
         return false;
@@ -135,7 +238,8 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
         }
     }
     SafeHistFill(hists1D_, getHistName("yield", variation.second), 1, weight);
-    SafeHistFill(hists1D_, getHistName("Mass", variation.second), Mass,weight); 
+    SafeHistFill(hists1D_, getHistName("Mass", variation.second), Mass,weight);
+    SafeHistFill(hists1D_, getHistName("ZMass", variation.second), (Z1mass+Z2mass)*weight, weight);
     SafeHistFill(hists1D_, getHistName("Z1Mass", variation.second), Z1mass, weight);
     SafeHistFill(hists1D_, getHistName("Z2Mass", variation.second), Z2mass, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Pt", variation.second), l1Pt, weight);
@@ -174,20 +278,20 @@ Bool_t ZZSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
     //Define weight of event based on channel in case of eemm or mmee
-    if (HZZSelection() && TightZZLeptons()) {
+    if (ZZSelection() && TightZZLeptons()) {
       if (true) {
         //std::cout<<"Weight in ZZSelector inside HZZ: "<<weight<<std::endl;
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
   }
-   // if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
-   //     for (const auto& systematic : systematics_) {
-   //         LoadBranches(entry, systematic);
-   //         if (PassesBaseSelection(entry, true, selection_)) {
-   //             FillHistograms(entry, weight, !blindVBS, systematic);
-   //         }
-   //     }
-   // }
+    if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
+        for (const auto& systematic : systematics_) {
+            LoadBranches(entry, systematic);
+            if (ZZSelection() && TightZZLeptons()) {
+                FillHistograms(entry, weight, !blindVBS, systematic);
+            }
+        }
+    }
     
     return true;
 }
@@ -224,20 +328,20 @@ void ZZSelector::InitialzeHistogram(std::string name, std::vector<std::string> h
 
     if (histData.size() == 4) {
           AddObject<TH1D>(hists1D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax);
-       // if (doSystematics_ && std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
-       //     for (auto& syst : systematics_) {
-       //         std::string syst_hist_name = name+"_"+syst.second;
-       //         hists1D_[syst_hist_name] = {};
-       //         AddObject<TH1D>(hists1D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
-       //             histData[0].c_str(),nbins, xmin, xmax);
-       //         if (isaQGC_ && doaQGC_ && (weighthists_.find(name) != weighthists_.end())) { 
-       //             std::string weightsyst_hist_name = name+"_lheWeights_"+syst.second;
-       //             AddObject<TH2D>(weighthists_[syst_hist_name], 
-       //                 (weightsyst_hist_name+"_"+channelName_).c_str(), histData[0].c_str(),
-       //                 nbins, xmin, xmax, 1000, 0, 1000);
-       //         }
-       //     }
-       // }
+        if (doSystematics_ && std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
+            for (auto& syst : systematics_) {
+                std::string syst_hist_name = name+"_"+syst.second;
+                hists1D_[syst_hist_name] = {};
+                AddObject<TH1D>(hists1D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
+                    histData[0].c_str(),nbins, xmin, xmax);
+                //if (isaQGC_ && doaQGC_ && (weighthists_.find(name) != weighthists_.end())) { 
+                //    std::string weightsyst_hist_name = name+"_lheWeights_"+syst.second;
+                //    AddObject<TH2D>(weighthists_[syst_hist_name], 
+                //        (weightsyst_hist_name+"_"+channelName_).c_str(), histData[0].c_str(),
+                //        nbins, xmin, xmax, 1000, 0, 1000);
+                //}
+            }
+        }
         // Weight hists must be subset of 1D hists!
         if (isMC_ && (weighthists_.find(name) != weighthists_.end())) { 
               AddObject<TH2D>(weighthists_[name], 

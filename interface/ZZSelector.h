@@ -14,70 +14,41 @@ public :
 
     enum Systematic {
         Central,
-        jetEnergyScaleUp,
-        jetEnergyScaleDown,
-        jetEnergyResolutionUp,
-        jetEnergyResolutionDown,
-        metUnclusteredEnergyUp,
-        metUnclusteredEnergyDown,
         muonEfficiencyUp,
         muonEfficiencyDown,
-        muonScaleUp,
-        muonScaleDown,
         electronEfficiencyUp,
         electronEfficiencyDown,
-        electronScaleUp,
-        electronScaleDown,
-        pileupUp,
-        pileupDown,
     }; 
 
-   // std::vector<std::string> systHists_ = {
-   //     "yield",
-   //     "backgroundControlYield",
-   //     "mjj",
-   //     "dEtajj",
-   //     "MTWZ",
-   //     "zep3l",
-   //     "ZMass",
-   //     "jetPt[0]",
-   //     "jetPt[1]",
-   //     "jetEta[0]",
-   //     "jetEta[1]",
-   //     //"nTruePU",
-   //     //"nvtx",
-   //     //"Zlep1_Pt",
-   //     //"Zlep2_Pt",
-   //     //"Wlep_Pt",
-   //     //"Zlep1_Eta",
-   //     //"Zlep2_Eta",
-   //     //"Wlep_Eta",
-   // };
+    std::vector<std::string> systHists_ = {
+        "yield",
+        "backgroundControlYield",
+        "Mass",
+        "Z1Mass",
+        "Z2Mass",
+        //"nTruePU",
+        //"nvtx",
+        //"Zlep1_Pt",
+        //"Zlep2_Pt",
+        //"Wlep_Pt",
+        //"Zlep1_Eta",
+        //"Zlep2_Eta",
+        //"Wlep_Eta",
+    };
 
-   // std::map<Systematic, std::string> systematics_ = {
-   //     {jetEnergyScaleUp, "CMS_scale_jUp"}, 
-   //     {jetEnergyScaleDown, "CMS_scale_jDown"}, 
-   //     {jetEnergyResolutionUp, "CMS_res_jUp"},
-   //     {jetEnergyResolutionDown, "CMS_res_jDown"},
-   //     {metUnclusteredEnergyUp, "CMS_scale_unclEnergyUp"},
-   //     {metUnclusteredEnergyDown, "CMS_scale_unclEnergyDown"},
-   //     {muonScaleUp, "CMS_scale_mUp"},
-   //     {muonScaleDown, "CMS_scale_mDown"},
-   //     {electronScaleUp, "CMS_scale_eUp"},
-   //     {electronScaleDown, "CMS_scale_eDown"},
-   //     {pileupUp, "CMS_pileupUp"},
-   //     {pileupDown, "CMS_pileupDown"},
-   //     {electronEfficiencyUp, "CMS_eff_eUp"},
-   //     {electronEfficiencyDown, "CMS_eff_eDown"},
-   //     {muonEfficiencyUp, "CMS_eff_mUp"},
-   //     {muonEfficiencyDown, "CMS_eff_mDown"},
-   // };
+    std::map<Systematic, std::string> systematics_ = {
+        {electronEfficiencyUp, "CMS_eff_eUp"},
+        {electronEfficiencyDown, "CMS_eff_eDown"},
+        {muonEfficiencyUp, "CMS_eff_mUp"},
+        {muonEfficiencyDown, "CMS_eff_mDown"},
+    };
 
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
         { "backgroundControlYield",  {} },
         //{ "nTruePU",  {} },
         { "nvtx",  {} },
+        { "ZMass",  {} },
         { "Z1Mass",  {} },
         { "Z2Mass",  {} },
        // { "ZPt",  {} },
@@ -279,9 +250,10 @@ protected:
     bool TightZZLeptons();
     bool ZZSelection();
     bool Z4lSelection();
-    bool HZZSelection();
+    bool ZSelection();
+    bool HZZSIPSelection();
     bool TestMuons();
-    //void ShiftEfficiencies(Systematic variation);
+    void ShiftEfficiencies(Systematic variation);
     //float GetMuonScaleUncertainty(float muEta);
     //void SetShiftedMasses();
     template<typename T, typename... Args>
