@@ -7,11 +7,12 @@ void ZZSelector::Init(TTree *tree)
     ZZSelectorBase::Init(tree);
 
     //weight_info_ = 0;
-    //if (isMC_) {
-    //    fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
-        //weight_info_ = GetLheWeightInfo();
-    //}
+    if (isMC_) {
+        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
+      //weight_info_ = GetLheWeightInfo();
+    }
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
+    fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
     //std::cout<<"Is it able to initialize"<<std::endl; 
 }
 void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { 
@@ -22,6 +23,7 @@ void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     //b_l2Pt->GetEntry(entry);
     //b_l3Pt->GetEntry(entry);
     b_Mass->GetEntry(entry);
+    b_Pt->GetEntry(entry);
     //std::cout<<"channel in LoadBranches function: "<<channel_<<std::endl;
     if(channel_ == eemm || channel_ == mmee){
       if(TightZZLeptons()){
@@ -35,6 +37,12 @@ void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
                   variation.first == muonEfficiencyUp || variation.first == muonEfficiencyDown) {
           ShiftEfficiencies(variation.first);
       }
+      else if (variation.first == pileupUp) {
+           weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftUp)/pileupSF_->Evaluate1D(nTruePU);
+      }
+      else if (variation.first == pileupDown) {
+          weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftDown)/pileupSF_->Evaluate1D(nTruePU);
+      }
     }
 }
 //Similar to Kenneth's SetShiftedMasses function which i will need later as well
@@ -44,6 +52,9 @@ void ZZSelector::SetVariables(Long64_t entry) {
       float tempMass = Z1mass;
       Z1mass = Z2mass;
       Z2mass = tempMass;
+      float tempPt = Z1pt;
+      Z1pt = Z2pt;
+      Z2pt = tempPt;
       bool templ1IsTight = l1IsTight;
       l1IsTight = l3IsTight;
       l3IsTight = templ1IsTight;
@@ -242,6 +253,10 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("ZMass", variation.second), (Z1mass+Z2mass)*weight, weight);
     SafeHistFill(hists1D_, getHistName("Z1Mass", variation.second), Z1mass, weight);
     SafeHistFill(hists1D_, getHistName("Z2Mass", variation.second), Z2mass, weight);
+    SafeHistFill(hists1D_, getHistName("ZPt", variation.second), (Z1pt+Z2pt)*weight, weight);
+    SafeHistFill(hists1D_, getHistName("Z1Pt", variation.second), Z1pt, weight);
+    SafeHistFill(hists1D_, getHistName("Z2Pt", variation.second), Z2pt, weight);
+    SafeHistFill(hists1D_, getHistName("ZZPt", variation.second), Pt, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Pt", variation.second), l1Pt, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Eta", variation.second), l1Eta, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Phi", variation.second), l1Phi, weight);
@@ -264,6 +279,8 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Pt",variation.second),l3Pt,l4Pt,weight);
     SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Eta",variation.second),l3Eta,l4Eta,weight);
     SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Phi",variation.second),l3Phi,l4Phi,weight);
+    //2D Z1 vs Z2
+    SafeHistFill(hists2D_, getHistName("Z1Mass_Z2Mass",variation.second),Z1mass,Z2mass,weight);
 
     if (hists1D_[getHistName("nvtx", variation.second)] != nullptr) {
         b_nvtx->GetEntry(entry);

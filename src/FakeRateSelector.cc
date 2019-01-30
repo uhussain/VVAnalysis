@@ -10,7 +10,7 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
     if (type1_pfMETEt > 25)
         return true;
     if (l3MtToMET > 30)
-        return false;
+        return true;
     if (!tightZ1Leptons())
         return true;
     

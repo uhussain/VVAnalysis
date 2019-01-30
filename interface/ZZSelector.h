@@ -18,6 +18,8 @@ public :
         muonEfficiencyDown,
         electronEfficiencyUp,
         electronEfficiencyDown,
+        pileupUp,
+        pileupDown,
     }; 
 
     std::vector<std::string> systHists_ = {
@@ -26,6 +28,11 @@ public :
         "Mass",
         "Z1Mass",
         "Z2Mass",
+        "ZMass",
+        "ZZPt",
+        "Z1Pt",
+        "Z2Pt"
+        "ZPt",
         //"nTruePU",
         //"nvtx",
         //"Zlep1_Pt",
@@ -41,6 +48,8 @@ public :
         {electronEfficiencyDown, "CMS_eff_eDown"},
         {muonEfficiencyUp, "CMS_eff_mUp"},
         {muonEfficiencyDown, "CMS_eff_mDown"},
+        {pileupUp, "CMS_pileupUp"},
+        {pileupDown, "CMS_pileupDown"},
     };
 
     std::map<std::string, TH1D*> hists1D_ = {
@@ -51,6 +60,10 @@ public :
         { "ZMass",  {} },
         { "Z1Mass",  {} },
         { "Z2Mass",  {} },
+        { "ZZPt",  {} },
+        { "Z1Pt",  {} },
+        { "Z2Pt",  {} },
+        { "ZPt",  {} },
        // { "ZPt",  {} },
        // { "ZEta",  {} },
        // { "ZPhi",  {} },
@@ -90,7 +103,8 @@ public :
         {"Z1lep1_Z1lep2_Phi", {}},
         {"Z2lep1_Z2lep2_Pt", {}},
         {"Z2lep1_Z2lep2_Eta", {}},
-        {"Z2lep1_Z2lep2_Phi", {}}
+        {"Z2lep1_Z2lep2_Phi", {}},
+        {"Z1Mass_Z2Mass",{}},
     };
 
     std::vector<std::string> systHists2D_ = {
@@ -139,6 +153,7 @@ public :
     std::vector<float>* jetCSVv2 = NULL;
     UInt_t nvtx;
     Float_t Mass;
+    Float_t Pt;
     //Float_t Zlep1_Wlep_Mass;
     //Float_t Zlep2_Wlep_Mass;
     //Float_t Eta;
@@ -193,13 +208,14 @@ public :
     //TBranch* b_jetPt_jerDown;
     TBranch* b_nvtx;
     TBranch* b_Mass;
+    TBranch* b_Pt;
     //TBranch* b_Zlep1_Wlep_Mass;
     //TBranch* b_Zlep2_Wlep_Mass;
     //TBranch* b_Eta;
     //TBranch* b_Pt;
-    //TBranch* b_ZPt;
+    //TBranch* b_Z1Pt;
     //TBranch* b_ZPhi;
-    //TBranch* b_ZEta;
+    //TBranch* b_Z1Eta;
     //TBranch* b_mjj;
     //TBranch* b_mjj_jesUp;
     //TBranch* b_mjj_jesDown;

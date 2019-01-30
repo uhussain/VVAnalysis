@@ -16,7 +16,7 @@
 
 class ZZSelectorBase : public TSelector {
 public :
-    //ScaleFactor* pileupSF_;
+    ScaleFactor* pileupSF_;
     ScaleFactor* eIdSF_;
     ScaleFactor* eGapIdSF_;
     ScaleFactor* mIdSF_;
@@ -49,9 +49,11 @@ public :
     //Int_t duplicated;
     Float_t weight;
     Float_t genWeight;
-    //Float_t nTruePU;
+    Float_t nTruePU;
     Float_t Z1mass;
     Float_t Z2mass;
+    Float_t Z1pt;
+    Float_t Z2pt;
     Float_t type1_pfMETEt;
     Float_t type1_pfMETPhi;
     Float_t l1GenPt;
@@ -113,7 +115,9 @@ public :
     TBranch* b_genWeight;
     TBranch* b_Z1mass;
     TBranch* b_Z2mass;
-    //TBranch* b_nTruePU;
+    TBranch* b_Z1pt;
+    TBranch* b_Z2pt;
+    TBranch* b_nTruePU;
     TBranch* b_type1_pfMETEt;
     TBranch* b_type1_pfMETPhi;
     TBranch* b_l1GenPt;

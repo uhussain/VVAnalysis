@@ -7,8 +7,8 @@
 
 class ZZBackgroundSelector : public ZZSelector {
 public :
-    TH2D* fakeRate_allE_;
-    TH2D* fakeRate_allMu_;
+    ScaleFactor * fakeRate_allE_;
+    ScaleFactor * fakeRate_allMu_;
   
     //PPPF represents 3P1F CR and PPFF represents 2P1F CR
     TH1D* Z1MassHistPPPF_;
@@ -19,9 +19,8 @@ public :
     TH1D* MassHistPPPF_;
     TH1D* MassHistPPFF_;
 
-    TH1D* WeightsHistPPPF_;
-    TH1D* WeightsHistPPFF_;
-    
+    TH1D* WeightsHistmmee_;
+    TH1D* WeightsHisteemm_;
     ZZBackgroundSelector(TTree * /*tree*/ =0) { }
     virtual ~ZZBackgroundSelector() { }
     virtual Bool_t  Process(Long64_t entry) override;
