@@ -2,7 +2,6 @@ import datetime
 import UserInput
 import fnmatch
 import glob
-import subprocess
 import os
 import json
 import array
@@ -27,9 +26,9 @@ def get2DBinning(xvar="mjj", yvar="etajj", analysis='WZ'):
         ybinning = [0, 5, 6, 20]
     return (xbinning, ybinning)
 
-def getChannels(analysis='WZ'):
-    if analysis == 'WZ':
-        return ["eee", "eem", "emm", "mmm"]
+def getChannels(analysis='ZZ'):
+    if analysis == 'ZZ':
+        return ["eeee", "eemm", "mmee", "mmmm"]
 def getManagerPath():
     config = configparser.ConfigParser()
     config.read_file(open("Templates/config.%s" % os.environ["USER"]))
@@ -46,7 +45,7 @@ def getCombinePath():
     return config['Setup']['combine_path'] + "/"
 def getListOfEWKFilenames():
     return [
-        "wz3lnu-mg5amcnlo",
+        "wz3lnu-amcnlo",
     # Use jet binned WZ samples for subtraction by default
         #"wz3lnu-mgmlm-0j",
         #"wz3lnu-mgmlm-1j",
@@ -64,6 +63,16 @@ def getListOfEWKFilenames():
         #"www",
         #"ww",
         #"zg",
+        "ggZZ4e",
+        "ggZZ4m",
+        "ggZZ2e2mu",
+        "ggZZ2e2tau",
+        "ggZZ2mu2tau",
+    ]
+
+def getListOfEWK():
+    return [
+        "zz4l-powheg",
         "ggZZ4e",
         "ggZZ4m",
         "ggZZ2e2mu",
@@ -89,6 +98,21 @@ def getListOfNonpromptFilenames():
         #"DYm50-3j",
         #"DYm50-4j",
     ]
+def getListOfHZZFilenames():
+    return ["ggHZZ",
+            #"vbfHZZ",
+            "ttH_HToZZ_4L",
+            "WminusHToZZ",
+            "WplusHToZZ",
+            "ZHToZZ_4L"
+    ]
+def getListOfggZZFilenames():
+    return ["ggZZ4e",
+        "ggZZ4m",
+        "ggZZ2e2mu",
+        "ggZZ2e2tau",
+        "ggZZ2mu2tau"
+        ]
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
     selection = selection.replace(";",",")
@@ -101,11 +125,6 @@ def getNumberAndSizeOfLocalFiles(path_to_files):
     file_list = glob.glob(path_to_files)
     return (len(file_list), sum([os.path.getsize(f)/1000000 for f in file_list]))
 def getNumberAndSizeOfHDFSFiles(file_path):
-    p = subprocess.Popen(["hdfs", "dfs", "-ls", "-h", file_path.replace("/hdfs", "")],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-    out,err = p.communicate()
     file_info = []
     for line in out.splitlines():
         split = line.split()
@@ -139,6 +158,18 @@ def getListOfFiles(filelist, selection, manager_path=""):
         if "ZZ4l2018" in name:
             dataset_file = manager_path + \
                 "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2018/%s.json" % selection
+            allnames = json.load(open(dataset_file)).keys()
+            print allnames
+            if "nodata" in name:
+                nodata = [x for x in allnames if "data" not in x]
+                names += nodata
+            elif "data" in name:
+                names += [x for x in allnames if "data" in x]
+            else:
+                names += allnames
+        elif "ZZ4l2019" in name:
+            dataset_file = manager_path + \
+                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2019/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
             print allnames
             if "nodata" in name:
@@ -186,6 +217,15 @@ def getPreviousStep(selection, analysis):
                 "4lCRBase" : "ntuples"
         }
     elif analysis == "ZplusL2018":
+        selection_map = { "ntuples": "ntuples",
+                "ZplusLBase" : "ntuples"
+        }
+    elif analysis == "ZZ4l2019":
+        selection_map = { "ntuples" : "ntuples",
+                "preselection" : "ntuples",
+                "4lCRBase" : "ntuples"
+        }
+    elif analysis == "ZplusL2019":
         selection_map = { "ntuples": "ntuples",
                 "ZplusLBase" : "ntuples"
         }

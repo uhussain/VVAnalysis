@@ -7,7 +7,7 @@ import sys
 import os
 def applySelector(filelist, channels,selector_name, selection, 
         rootfile,
-        analysis="ZZ4l2018", 
+        analysis, 
         extra_inputs = [],
         addSumweights=True,
         proof=False):
