@@ -113,11 +113,11 @@ fOut = ROOT.TFile(fileName, "recreate")
 #sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
 
 SelectorTools.applySelector(args["filenames"],channels,
-        "FakeRateSelector", args['selection'], fOut,
+        "FakeRateSelector", args['selection'], fOut,args['analysis'],
         proof=args['proof'], addSumweights=True)
         #extra_inputs=sf_inputs, proof=args['proof'],
 
-alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec(["ZZ4l2018data"]))
+alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"]))
 OutputTools.writeOutputListItem(alldata, fOut)
 allewk = makeCompositeHists("AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWKFilenames()), True)

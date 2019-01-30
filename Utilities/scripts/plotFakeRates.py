@@ -16,11 +16,11 @@ def getTGraphAsymmErrors(frfile, folder, param, obj):
     graph = ROOT.TGraphAsymmErrors(tight_hist, loose_hist)
     graph.SetMarkerStyle(6)
     if obj=="E":
-        graph.SetMinimum(0)
-        graph.SetMaximum(0.16) if "Pt" in param else graph.SetMaximum(0.1)
+        graph.SetMinimum(0.01)
+        graph.SetMaximum(0.35) if "Pt" in param else graph.SetMaximum(0.1)
     else:
-        graph.SetMinimum(0)
-        graph.SetMaximum(0.4) if "Pt" in param else graph.SetMaximum(0.3)
+        graph.SetMinimum(0.04)
+        graph.SetMaximum(0.35) if "Pt" in param else graph.SetMaximum(0.3)
     return graph
 
 def getTGraphAsymmErrorsPt(frfile, folder, param, obj):
@@ -39,15 +39,15 @@ def getTGraphAsymmErrorsPt(frfile, folder, param, obj):
     endcap.SetMarkerStyle(6)
     endcap.SetLineColor(ROOT.kRed)
     if obj=="E":
-        barrel.SetMinimum(0)
-        barrel.SetMaximum(0.16) if "Pt" in param else barrel.SetMaximum(0.1)
-        endcap.SetMinimum(0)
-        endcap.SetMaximum(0.16) if "Pt" in param else endcap.SetMaximum(0.1)
+        barrel.SetMinimum(0.01)
+        barrel.SetMaximum(0.35) if "Pt" in param else barrel.SetMaximum(0.1)
+        endcap.SetMinimum(0.01)
+        endcap.SetMaximum(0.35) if "Pt" in param else endcap.SetMaximum(0.1)
     else:
-        barrel.SetMinimum(0)
-        barrel.SetMaximum(0.4) if "Pt" in param else barrel.SetMaximum(0.3)
-        endcap.SetMinimum(0)
-        endcap.SetMaximum(0.4) if "Pt" in param else endcap.SetMaximum(0.3)
+        barrel.SetMinimum(0.04)
+        barrel.SetMaximum(0.35) if "Pt" in param else barrel.SetMaximum(0.3)
+        endcap.SetMinimum(0.04)
+        endcap.SetMaximum(0.35) if "Pt" in param else endcap.SetMaximum(0.3)
     return barrel,endcap
 def getTextBox(obj, extra_text=""):
     text_box = ROOT.TPaveText(0.2, 0.88, 0.4+0.02*len(extra_text), 0.81, "blNDC")
@@ -60,12 +60,12 @@ def getTextBox(obj, extra_text=""):
     return text_box
 
 def getLumiTextBox():
-    texS = ROOT.TLatex(0.615,0.95,"#sqrt{s} = 13 TeV, 41.5 fb^{-1}")
+    texS = ROOT.TLatex(0.615,0.95,"#sqrt{s} = 13 TeV, 52.1 fb^{-1}")
     texS.SetNDC()
     texS.SetTextFont(42)
     texS.SetTextSize(0.040)
     texS.Draw()
-    texS1 = ROOT.TLatex(0.15,0.95,"#bf{UW} #it{Internal}")
+    texS1 = ROOT.TLatex(0.15,0.95,"#bf{UW} #it{Internal} 2018 Data")
     texS1.SetNDC()
     texS1.SetTextFont(42)
     texS1.SetTextSize(0.040)
@@ -225,12 +225,12 @@ def makeMCPlots(param, obj, outdir):
     canvas.Print("%s/ratio%s_all%s.png" % (outdir, param, obj))
     canvas.Print("%s/ratio%s_all%s.pdf" % (outdir, param, obj))
 
-frfile = ROOT.TFile("/data/uhussain/ZZTo4l/ZZ2018/VVAnalysisTools/CMSSW_9_4_2/src/Analysis/VVAnalysis/data/fakeRate07Dec2018-ZplusLSkim.root")
+frfile = ROOT.TFile("/data/uhussain/ZZTo4l/ZZ2018/VVAnalysisTools/CMSSW_9_4_2/src/Analysis/VVAnalysis/data/fakeRate18Dec2018-ZplusLSkimZZ2018Data.root")
 
 
-data_folder_name = datetime.date.today().strftime("%Y%b"+"_HZZ") 
-data_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2018/FakeRatesFromData/" + data_folder_name + "/plots"
-mc_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2018/FakeRates/" + data_folder_name + "-MC/plots"
+data_folder_name = datetime.date.today().strftime("%Y%b%d"+"_ZZ4l") 
+data_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2019/FakeRatesFromData/" + data_folder_name + "/plots"
+mc_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2019/FakeRates/" + data_folder_name + "-MC/plots"
 
 for outdir in [data_outdir, mc_outdir]:
     try:
