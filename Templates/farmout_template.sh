@@ -3,8 +3,8 @@
 #     ${command}
 #
 # To resubmit failed jobs: ./farmout.sh --resubmit-failed-jobs
-DATE=`date +%Y-%m-%d`
-#DATE=2018-03-06
+#DATE=`date +%Y-%m-%d`
+DATE=2019-01-28
 pushd ${base_dir}
 if [ ! -f ${job_dir}/analysis_code.tar.gz ]; then
     tar \
@@ -26,7 +26,7 @@ farmoutAnalysisJobs \
     --output-dir=gsiftp://cms-lvs-gridftp.hep.wisc.edu:2811//hdfs/store/user/$$USER/ZZAnalysisJobs2019_$$DATE/${job_name} \
     --input-file-list=${job_dir}/input_file_list.txt \
     --submit-dir=${job_dir}/submit \
-    --input-files-per-job=${files_per_job} \
+    --input-files-per-job=1 \
     --input-dir=root://cmsxrootd.hep.wisc.edu/ \
     --assume-input-files-exist \
     --extra-inputs=${job_dir}/analysis_code.tar.gz \
