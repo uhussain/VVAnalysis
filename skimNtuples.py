@@ -44,32 +44,62 @@ def writeNtupleToFile(output_file, tree, state, cut_string, deduplicate):
     #save_tree.Delete()
     return entries
 def getDeduplicatedListForTree(tree, analysis, state, cut_string):
-    selector = ROOT.disambiguateFinalStates()
-    if state.count('e') > 2:
-        l1_l2_cand_mass = "e1_e2_Mass"
-        l1_cand_pt = "e1Pt"
-        l2_cand_pt = "e2Pt"
-        l3_l4_cand_mass = "e3_e4_Mass"
-        l3_cand_pt = "e3Pt"
-        l4_cand_pt = "e4Pt"
-    elif state.count('m') > 2:
-        l1_l2_cand_mass = "m1_m2_Mass"
-        l1_cand_pt = "m1Pt"
-        l2_cand_pt = "m2Pt"
-        l3_l4_cand_mass = "m3_m4_Mass"
-        l3_cand_pt = "m3Pt"
-        l4_cand_pt = "m4Pt"
-    else: 
-        l1_l2_cand_mass = "e1_e2_Mass"
-        l1_cand_pt = "e1Pt"
-        l2_cand_pt = "e2Pt"
-        l3_l4_cand_mass = "m1_m2_Mass"
-        l3_cand_pt = "m1Pt"
-        l4_cand_pt = "m2Pt"
-    selector.setZCandidateBranchName(l1_l2_cand_mass,l1_cand_pt,l2_cand_pt,l3_l4_cand_mass,l3_cand_pt,l4_cand_pt)
+    if "WZ" in analysis or "ZplusL" in analysis:
+        selector = ROOT.disambiguateFinalStatesZL()
+        zcand_name = "e1_e2_Mass" if state.count('e') >= 2 else "m1_m2_Mass"
+        selector.setZCandidateBranchName(zcand_name)
+    else:
+        selector = ROOT.disambiguateFinalStates()
+        if state.count('e') > 2:
+            l1_l2_cand_mass = "e1_e2_Mass"
+            l1_cand_pt = "e1Pt"
+            l2_cand_pt = "e2Pt"
+            l3_l4_cand_mass = "e3_e4_Mass"
+            l3_cand_pt = "e3Pt"
+            l4_cand_pt = "e4Pt"
+            l1_cand_Tight = "e1IsFall17isoV2wpHZZ"
+            l2_cand_Tight = "e2IsFall17isoV2wpHZZ"
+            l3_cand_Tight = "e3IsFall17isoV2wpHZZ"
+            l4_cand_Tight = "e4IsFall17isoV2wpHZZ"
+            l1_cand_Iso = "e1ZZIsoPass"
+            l2_cand_Iso = "e2ZZIsoPass"
+            l3_cand_Iso = "e3ZZIsoPass"
+            l4_cand_Iso = "e4ZZIsoPass"
+        elif state.count('m') > 2:
+            l1_l2_cand_mass = "m1_m2_Mass"
+            l1_cand_pt = "m1Pt"
+            l2_cand_pt = "m2Pt"
+            l3_l4_cand_mass = "m3_m4_Mass"
+            l3_cand_pt = "m3Pt"
+            l4_cand_pt = "m4Pt"
+            l1_cand_Tight = "m1ZZTightIDNoVtx"
+            l2_cand_Tight = "m2ZZTightIDNoVtx"
+            l3_cand_Tight = "m3ZZTightIDNoVtx"
+            l4_cand_Tight = "m4ZZTightIDNoVtx"
+            l1_cand_Iso = "m1ZZIsoPass"
+            l2_cand_Iso = "m2ZZIsoPass"
+            l3_cand_Iso = "m3ZZIsoPass"
+            l4_cand_Iso = "m4ZZIsoPass"
+        else: 
+            l1_l2_cand_mass = "e1_e2_Mass"
+            l1_cand_pt = "e1Pt"
+            l2_cand_pt = "e2Pt"
+            l1_cand_Tight = "e1IsFall17isoV2wpHZZ"
+            l2_cand_Tight = "e2IsFall17isoV2wpHZZ"
+            l1_cand_Iso = "e1ZZIsoPass"
+            l2_cand_Iso = "e2ZZIsoPass"
+            l3_l4_cand_mass = "m1_m2_Mass"
+            l3_cand_pt = "m1Pt"
+            l4_cand_pt = "m2Pt"
+            l3_cand_Tight = "m1ZZTightIDNoVtx"
+            l4_cand_Tight = "m2ZZTightIDNoVtx"
+            l3_cand_Iso = "m1ZZIsoPass"
+            l4_cand_Iso = "m2ZZIsoPass"
+        selector.setZCandidateBranchName(l1_l2_cand_mass,l1_cand_pt,l2_cand_pt,l3_l4_cand_mass,l3_cand_pt,l4_cand_pt,l1_cand_Tight,l2_cand_Tight,l3_cand_Tight,l4_cand_Tight,l1_cand_Iso,l2_cand_Iso,l3_cand_Iso,l4_cand_Iso)
     ApplySelection.setAliases(tree, state, "Cuts/%s/aliases.json" % analysis)
     tree.Process(selector, cut_string)
     entryList = selector.GetOutputList().FindObject('bestCandidates')
+    print "selector: ",selector.GetStatus()
     return entryList
 def getDeduplicatedListForChain(input_files, analysis, state, cut_string):
     fullEntryList = ROOT.TEntryList() 
@@ -104,7 +134,7 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     for selection_group in selections.split(";"):
         event_counts[selection_group] = {}
     states = []
-    if "WZ" in analysis or "ZL" in analysis:
+    if "WZ" in analysis or "ZplusL" in analysis:
         states = ["eee", "eem", "emm", "mmm"]
     elif "ZZ" in analysis:
         states = ["eeee", "eemm", "mmmm"]
@@ -151,9 +181,16 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
         if tmpfile:
             tmpfile.Close()
     writeMetaTreeToFile(output_file, metaTree)
-    event_info = PrettyTable(["Selection", "eeee", "eemm", "mmmm"])
-    for selection, events in event_counts.iteritems():
-        event_info.add_row([selection, events["eeee"], events["eemm"],events["mmmm"]])
+    
+    if "WZ" in analysis or "ZplusL" in analysis:
+        event_info = PrettyTable(["Selection", "eee", "eem", "emm", "mmm"])
+        for selection, events in event_counts.iteritems():
+            event_info.add_row([selection, events["eee"], events["eem"], events["emm"], events["mmm"]])
+    elif "ZZ" in analysis:
+        event_info = PrettyTable(["Selection", "eeee", "eemm", "mmmm"])
+        for selection, events in event_counts.iteritems():
+            event_info.add_row([selection, events["eeee"], events["eemm"],events["mmmm"]])
+
     print "\nResults for selection: %s" % selections
     if deduplicate:
         print "NOTE: Events deduplicated by choosing the ordering with m_l1_l2 " \
