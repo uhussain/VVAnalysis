@@ -241,6 +241,7 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
 
     //if ((variation.first == Central || (doaQGC_ && isaQGC_)) && isMC_) 
     if(isMC_){
+        //SafeHistFill(hists1D_, getHistName("duplicated", variation.second), duplicated, 1);
         for (size_t i = 0; i < lheWeights.size(); i++) {
               SafeHistFill(weighthists_, "backgroundControlYield", 1, i, lheWeights[i]/lheWeights[0]*weight);
               SafeHistFill(weighthists_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
@@ -250,10 +251,12 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     }
     SafeHistFill(hists1D_, getHistName("yield", variation.second), 1, weight);
     SafeHistFill(hists1D_, getHistName("Mass", variation.second), Mass,weight);
-    SafeHistFill(hists1D_, getHistName("ZMass", variation.second), (Z1mass+Z2mass)*weight, weight);
+    SafeHistFill(hists1D_, getHistName("ZMass", variation.second), Z1mass, weight);
+    SafeHistFill(hists1D_, getHistName("ZMass", variation.second), Z2mass, weight);
     SafeHistFill(hists1D_, getHistName("Z1Mass", variation.second), Z1mass, weight);
     SafeHistFill(hists1D_, getHistName("Z2Mass", variation.second), Z2mass, weight);
-    SafeHistFill(hists1D_, getHistName("ZPt", variation.second), (Z1pt+Z2pt)*weight, weight);
+    SafeHistFill(hists1D_, getHistName("ZPt", variation.second), Z1pt, weight);
+    SafeHistFill(hists1D_, getHistName("ZPt", variation.second), Z2pt, weight);
     SafeHistFill(hists1D_, getHistName("Z1Pt", variation.second), Z1pt, weight);
     SafeHistFill(hists1D_, getHistName("Z2Pt", variation.second), Z2pt, weight);
     SafeHistFill(hists1D_, getHistName("ZZPt", variation.second), Pt, weight);
@@ -295,8 +298,9 @@ Bool_t ZZSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
     //Define weight of event based on channel in case of eemm or mmee
-    if (ZZSelection() && TightZZLeptons()) {
+    if (HZZSIPSelection() && ZZSelection() && TightZZLeptons()) {
       if (true) {
+        //std::cout<<run<<":"<<lumi<<":"<<evt<<std::endl;
         //std::cout<<"Weight in ZZSelector inside HZZ: "<<weight<<std::endl;
         FillHistograms(entry, weight, !blindVBS, central_var);
     }
@@ -304,7 +308,7 @@ Bool_t ZZSelector::Process(Long64_t entry)
     if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
         for (const auto& systematic : systematics_) {
             LoadBranches(entry, systematic);
-            if (ZZSelection() && TightZZLeptons()) {
+            if (ZZSelection() && HZZSIPSelection() && TightZZLeptons()) {
                 FillHistograms(entry, weight, !blindVBS, systematic);
             }
         }

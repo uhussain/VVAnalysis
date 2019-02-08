@@ -17,6 +17,8 @@
 class ZZSelectorBase : public TSelector {
 public :
     ScaleFactor* pileupSF_;
+    ScaleFactor* eLowRecoSF_;
+    ScaleFactor* eRecoSF_;
     ScaleFactor* eIdSF_;
     ScaleFactor* eGapIdSF_;
     ScaleFactor* mIdSF_;
@@ -45,7 +47,10 @@ public :
 
     bool addSumweights_;
     //bool isVBS_;
-    //MC variable to check for duplication(this is a flag to differentiate between channels)
+    //MC variable to check for duplication(this is a flag to differentiate between channels) 
+    UInt_t run;
+    UInt_t lumi;
+    ULong64_t evt;
     //Int_t duplicated;
     Float_t weight;
     Float_t genWeight;
@@ -125,6 +130,10 @@ public :
     TBranch* b_l3GenPt;
     TBranch* b_l4GenPt;
     
+    TBranch* b_run;
+    TBranch* b_lumi;
+    TBranch* b_evt;
+
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
     TBranch* b_l3IsTight;
@@ -234,6 +243,7 @@ protected:
     bool Z2PF();
     bool Z2FP();
     bool Z2FF();
+    bool tightSIP();
     bool tightZ1Leptons();
     bool tightZ2Leptons();
     //bool IsGenMatched3l();

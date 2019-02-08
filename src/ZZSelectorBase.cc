@@ -13,6 +13,12 @@ void ZZSelectorBase::SlaveBegin(TTree * /*tree*/)
     pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
     if (pileupSF_ == nullptr ) 
         Abort("Must pass pileup weights SF");
+    eLowRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronLowReco18SF");
+    if (eLowRecoSF_ == nullptr ) 
+        Abort("Must pass electron LowReco18 SF");
+    eRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronReco18SF");
+    if (eRecoSF_ == nullptr ) 
+        Abort("Must pass electron Reco18 SF");
     eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriond18SF");
     if (eIdSF_ == nullptr ) 
         Abort("Must pass electron Moriond18 SF");
@@ -140,18 +146,22 @@ void ZZSelectorBase::Init(TTree *tree)
     //std::cout<<"isMC: "<<isMC_<<std::endl;
     if (channelName_ == "eeee") {
         channel_ = eeee;
+        fChain->SetBranchAddress("run", &run, &b_run);
+        fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+        fChain->SetBranchAddress("evt", &evt, &b_evt);
+        //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         //std::cout<<"enum channel_: "<<channel_<<std::endl;
-        //fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
+        //fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
-        //fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
+        //fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e2ZZIsoPass", &l2IsIso, &b_l2IsIso);
-        //fChain->SetBranchAddress("e3ZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
-        fChain->SetBranchAddress("e3IsFall17isoV2wpHZZ", &l3IsTight, &b_l3IsTight);
+        fChain->SetBranchAddress("e3ZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
+        //fChain->SetBranchAddress("e3IsFall17isoV2wpHZZ", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("e3ZZIsoPass", &l3IsIso, &b_l3IsIso);
-        //fChain->SetBranchAddress("e4ZZTightIDNoVtx", &l4IsTight, &b_l4IsTight);
-        fChain->SetBranchAddress("e4IsFall17isoV2wpHZZ", &l4IsTight, &b_l4IsTight);
+        fChain->SetBranchAddress("e4ZZTightIDNoVtx", &l4IsTight, &b_l4IsTight);
+        //fChain->SetBranchAddress("e4IsFall17isoV2wpHZZ", &l4IsTight, &b_l4IsTight);
         fChain->SetBranchAddress("e4ZZIsoPass", &l4IsIso, &b_l4IsIso);
         fChain->SetBranchAddress("e1_e2_Mass", &Z1mass, &b_Z1mass);
         fChain->SetBranchAddress("e3_e4_Mass", &Z2mass, &b_Z2mass);
@@ -196,11 +206,15 @@ void ZZSelectorBase::Init(TTree *tree)
     //This is done with a flag at the time of Process for each event on the fly
     else if (channelName_ == "eemm") {
         channel_ = eemm;
-        //fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("run", &run, &b_run);
+        fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+        fChain->SetBranchAddress("evt", &evt, &b_evt);
+        //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
+        fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
+        //fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
-        //fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
-        fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
+        //fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e2ZZIsoPass", &l2IsIso, &b_l2IsIso);
         fChain->SetBranchAddress("m1ZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m1ZZIsoPass", &l3IsIso, &b_l3IsIso);
@@ -249,11 +263,15 @@ void ZZSelectorBase::Init(TTree *tree)
     }
     else if (channelName_ == "mmee") {
         channel_ = mmee;
-        //fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
-        fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("run", &run, &b_run);
+        fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+        fChain->SetBranchAddress("evt", &evt, &b_evt);
+        //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
+        fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
+        //fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
-        //fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight); 
-        fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight); 
+        //fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e2ZZIsoPass", &l2IsIso, &b_l2IsIso);
         fChain->SetBranchAddress("m1ZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m1ZZIsoPass", &l3IsIso, &b_l3IsIso);
@@ -300,6 +318,10 @@ void ZZSelectorBase::Init(TTree *tree)
     }
     else if (channelName_ == "mmmm") {
         channel_ = mmmm;
+        fChain->SetBranchAddress("run", &run, &b_run);
+        fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+        fChain->SetBranchAddress("evt", &evt, &b_evt);
+        //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         fChain->SetBranchAddress("m1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("m2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
@@ -345,6 +367,10 @@ void ZZSelectorBase::Init(TTree *tree)
     }
     else if (channelName_ == "eee") {
         channel_ = eee;
+        fChain->SetBranchAddress("run", &run, &b_run);
+        fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+        fChain->SetBranchAddress("evt", &evt, &b_evt);
+        //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
@@ -377,6 +403,10 @@ void ZZSelectorBase::Init(TTree *tree)
     }
     else if (channelName_ == "eem") { 
         channel_ = eem;
+        fChain->SetBranchAddress("run", &run, &b_run);
+        fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+        fChain->SetBranchAddress("evt", &evt, &b_evt);
+        //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
@@ -409,6 +439,10 @@ void ZZSelectorBase::Init(TTree *tree)
     }
     else if (channelName_ == "emm") { 
         channel_ = emm;
+        fChain->SetBranchAddress("run", &run, &b_run);
+        fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+        fChain->SetBranchAddress("evt", &evt, &b_evt);
+        //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         fChain->SetBranchAddress("eZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("eZZIsoPass", &l3IsIso, &b_l3IsIso);
         fChain->SetBranchAddress("m1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
@@ -441,6 +475,10 @@ void ZZSelectorBase::Init(TTree *tree)
     }
     else if (channelName_ == "mmm") { 
         channel_ = mmm;
+        fChain->SetBranchAddress("run", &run, &b_run);
+        fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+        fChain->SetBranchAddress("evt", &evt, &b_evt);
+        //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         fChain->SetBranchAddress("m1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("m1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("m2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
@@ -510,6 +548,9 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     b_l1PdgId->GetEntry(entry);
     b_l2PdgId->GetEntry(entry);
     b_l3PdgId->GetEntry(entry);
+    b_run->GetEntry(entry);
+    b_lumi->GetEntry(entry);
+    b_evt->GetEntry(entry);
     if (channel_ == eeee || channel_ == eemm || channel_ == mmee){
       b_l1IsGap->GetEntry(entry); 
       b_l2IsGap->GetEntry(entry); 
@@ -556,6 +597,31 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
             else{
               weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
             }
+            //Applying Electron Reco SFs
+            if(l1Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            if(l2Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            if(l3Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            }
+            if(l4Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+            }
         }
         else if (channel_ == eemm || channel_ == mmee) {
             if(l1IsGap){
@@ -569,6 +635,19 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
             }
             else{
               weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            //Applying Electron Reco SFs
+            if(l1Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            if(l2Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
             }
             weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
             weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
@@ -692,6 +771,12 @@ bool ZZSelectorBase::lep2IsTight() {
     return (l2IsTight && l2IsIso); 
 }
 
+bool ZZSelectorBase::tightSIP() {
+    if ((l1SIP3D < 4.0 && l2SIP3D < 4.0 && l3SIP3D < 4.0))
+        return true;
+    else
+        return false;
+}
 bool ZZSelectorBase::tightZ1Leptons() {
     return lep1IsTight() && lep2IsTight(); 
 }
