@@ -84,12 +84,16 @@ if eZZTightFakeRate:
 #
 #muonIsoSF = fScales.Get('muonIsoSF')
 muonMoriond18SF= fScales.Get('muonMoriond18SF')
+#Electron Reco SF (POG) https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2017DataRecommendations
+electronLowReco18SF = fScales.Get('electronLowReco18SF')
+electronReco18SF = fScales.Get('electronReco18SF')
+#Electron ID + SIP HZZ Scale factors
 electronMoriond18SF = fScales.Get('electronMoriond18SF')
 electronMoriond18GapSF = fScales.Get('electronMoriond18GapSF')
 pileupSF = fScales.Get('pileupSF')
 
 fr_inputs = [eZZTightFakeRate, mZZTightFakeRate,]
-sf_inputs = [electronMoriond18SF, electronMoriond18GapSF,muonMoriond18SF,pileupSF]
+sf_inputs = [electronLowReco18SF,electronReco18SF,electronMoriond18SF, electronMoriond18GapSF,muonMoriond18SF,pileupSF]
 #sf_inputs=[pileupSF]
 selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
