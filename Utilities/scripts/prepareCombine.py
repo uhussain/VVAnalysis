@@ -12,6 +12,9 @@ import logging
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
+    parser.add_argument("--latex", action='store_true', help='table in latex format')
+    parser.add_argument("--year", type=str,
+        default="2017", help="Output file name")
     parser.add_argument("--vbfnlo",
         action='store_true', help="Use VBFNLO for signal")
     parser.add_argument("--noTheory",
@@ -84,6 +87,7 @@ card_info = {
         "HZZ_signal" : 0,
         "zz4l_powheg" : 0,
         "ggZZ" : 0,
+        "VVV": 0,
         "AllData" : 0,
     } for chan in (chans + ["all"])
 }
@@ -124,12 +128,13 @@ scaleWZ = False
 manualStatUnc = args['manualStats']
 #variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
 #    "CMS_eff_m", "CMS_scale_m", "CMS_eff_e", "CMS_scale_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
-variations = [i for x in ["CMS_eff_m","CMS_eff_e"] for i in [x+"Up", x+"Down"]]
+#variations = [i for x in ["CMS_eff_m","CMS_eff_e"] for i in [x+"Up", x+"Down"]]
+variations=[]
 #print(variations)
 #jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Down"]]
 #variations = jeVariations 
 
-output_info = PrettyTable(["Filename", "eeee", "eemm", "mmee", "mmmm", "All states"])
+output_info = PrettyTable([args['year'], "$\Pe\Pe\Pe\Pe$ ", "$\Pe\Pe\Pgm\Pgm$ ", "$\Pgm\Pgm\Pgm\Pgm$", "All states"])
 
 #signal = "wzjj_vbfnlo" if args['vbfnlo'] else "EW_WZjj"
 signal = "HZZ_signal"
@@ -156,11 +161,12 @@ rebin = mjj_binning if base_variable == "mjj" else None
 if variable == "MTWZ":
     rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
-    ConfigureJobs.getListOfFilesWithXSec(["ZZ4l2018data"], manager_path), args['lumi'],
+    ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans], rebin=rebin)
 for chan in chans:
     hist = alldata.FindObject(variable+"_"+chan)
-    card_info[chan]["AllData"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
+    card_info[chan]["AllData"] = round(hist.Integral(), 1) if hist.Integral() > 0 else 0.001
+
 combineChannels(alldata, chans)
 
 OutputTools.writeOutputListItem(alldata, fOut)
@@ -178,21 +184,21 @@ nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorre
 combineChannels(nonprompt, chans, ["Fakes"], False)
 for h in nonprompt:
     HistTools.removeZeros(h)
-for chan in chans + ["all"]:
+for chan in chans+["all"]:
     #print(chan)
     hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
     if chan == "all":
         hist = nonprompt.FindObject(variable+"_Fakes")
-    card_info[chan]["nonprompt"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
+    card_info[chan]["nonprompt"] = round(hist.Integral(), 1) if hist.Integral() > 0 else 0.001
     if manualStatUnc:
         stat_hists,variation_names = HistTools.getStatHists(hist, "nonprompt", chan, signal)
         stat_variations[chan].extend(variation_names)
         nonprompt.extend(stat_hists[:])
 
 OutputTools.writeOutputListItem(nonprompt, fOut)
-significance_info = PrettyTable(["Filename", "eeee", "eemm", "mmee", "mmmm", "All states"])
+significance_info = PrettyTable([args['year'], "eeee", "eemm", "mmee", "mmmm", "All states"])
 
-plot_groups = ["HZZ-signal","qqZZ-powheg","ggZZ"]
+plot_groups = ["HZZ-signal","qqZZ-powheg","VVV","ggZZ"]
 
 aqgc_groups =  []
 if args['aqgc']:
@@ -210,11 +216,11 @@ for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
     if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
         plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
-    print("variations:",variations)
+    #print("variations:",variations)
     plots += ["_".join([variable, var, c]) for var in variations for c in chans]
     #if args['addControlRegion'] and not isaQGCpoint:
     #    plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
-    print(plots)
+    #print(plots)
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots, rebin=rebin)
     if scaleWZ and plot_group in wz_scalefacs.keys():
@@ -303,48 +309,99 @@ for plot_group in plot_groups:
         HistTools.removeZeros(hist)
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
-        card_info[chan][name] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
+        card_info[chan][name] = round(hist.Integral(), 1) if hist.Integral() > 0 else 0.001
     OutputTools.writeOutputListItem(group, fOut)
     yields = [card_info[c][name] for c in chans]
     yields.append(sum([card_info[c][name] for c in chans]))
-    output_info.add_row([plot_group] + yields)
 
-output_info.add_row(["nonprompt", card_info["eeee"]["nonprompt"], 
-    card_info["eemm"]["nonprompt"], 
-    card_info["mmee"]["nonprompt"], 
+output_info.add_row(["VVV", card_info["eeee"]["VVV"], 
+    card_info["eemm"]["VVV"]+card_info["mmee"]["VVV"],
+    #card_info["mmee"]["VVV"],
+    card_info["mmmm"]["VVV"],
+    sum([card_info[c]["VVV"] for c in chans])],
+)
+output_info.add_row(["Nonprompt", card_info["eeee"]["nonprompt"],
+    card_info["eemm"]["VVV"]+card_info["mmee"]["VVV"],
+    #card_info["eemm"]["nonprompt"], 
+    #card_info["mmee"]["nonprompt"],
     card_info["mmmm"]["nonprompt"], 
     sum([card_info[c]["nonprompt"] for c in chans])]
 )
-background = {c : 0 for c in chans}
+background = {c : 0 for c in chans} 
+for chan,yields in card_info.iteritems():
+    if chan == "all":
+        continue
+    for name,value in yields.iteritems():
+        if name in ["VVV", "nonprompt"]:
+            background[chan] += float(value)
+output_info.add_row(["Total backgrounds", 
+    round(background["eeee"], 1), 
+    round(background["eemm"], 1)+round(background["mmee"], 1),
+    round(background["mmmm"], 1),
+    round(sum([background[c] for c in chans]), 1), 
+])
+
+output_info.add_row(["HZZ", card_info["eeee"]["HZZ_signal"], 
+    card_info["eemm"]["HZZ_signal"]+card_info["mmee"]["HZZ_signal"],
+    card_info["mmmm"]["HZZ_signal"],
+    sum([card_info[c]["HZZ_signal"] for c in chans])],
+)
+output_info.add_row(["ggZZ", card_info["eeee"]["ggZZ"], 
+    card_info["eemm"]["ggZZ"]+card_info["mmee"]["ggZZ"],
+    card_info["mmmm"]["ggZZ"], 
+    sum([card_info[c]["ggZZ"] for c in chans])]
+)
+output_info.add_row(["qqZZ", card_info["eeee"]["zz4l_powheg"], 
+    card_info["eemm"]["zz4l_powheg"]+card_info["mmee"]["zz4l_powheg"],
+    card_info["mmmm"]["zz4l_powheg"], 
+    sum([card_info[c]["zz4l_powheg"] for c in chans])]
+)
+Signal = {c : 0 for c in chans} 
+for chan,yields in card_info.iteritems():
+    if chan == "all":
+        continue
+    for name,value in yields.iteritems():
+        if name in ["HZZ_signal", "ggZZ","zz4l_powheg"]:
+            Signal[chan] += float(value)
+output_info.add_row(["Total signal", 
+    round(Signal["eeee"], 1), 
+    round(Signal["eemm"], 1)+round(Signal["mmee"], 1),
+    round(Signal["mmmm"], 1),
+    round(sum([Signal[c] for c in chans]), 1), 
+])
+Total = {c : 0 for c in chans}
 for chan,yields in card_info.iteritems():
     if chan == "all":
         continue
     for name,value in yields.iteritems():
         if "data" in name:
             continue
-        if name not in ["HZZ_signal","zz4l_powheg","AllData", "output_file"]:
-            background[chan] += float(value)
-output_info.add_row(["Total background", 
-    round(background["eeee"], 4), 
-    round(background["eemm"], 4), 
-    round(background["mmee"], 4), 
-    round(background["mmmm"], 4),
-    round(sum([background[c] for c in chans]), 4), 
+        if name not in ["AllData", "output_file"]:
+            Total[chan] += float(value)
+output_info.add_row(["Total expected", 
+    round(Total["eeee"], 1), 
+    round(Total["eemm"], 1)+round(Total["mmee"], 1),
+    round(Total["mmmm"], 1),
+    round(sum([Total[c] for c in chans]), 1), 
 ])
 
 yields = [card_info[c]["AllData"] for c in chans]
 yields.append(sum([card_info[c]["AllData"] for c in chans]))
-output_info.add_row(["Data"] + yields)
+output_info.add_row(["Data", int(card_info["eeee"]["AllData"]), 
+    int(card_info["eemm"]["AllData"]+card_info["mmee"]["AllData"]),
+    int(card_info["mmmm"]["AllData"]), 
+    int(sum([card_info[c]["AllData"] for c in chans]))]
+)
+#output_info.add_row(["Data"] + yields)
 
 #for name in ["EW_WZjj", "wzjj_vbfnlo"]:
-for name in ["HZZ_signal"]:
-    significance_info.add_row([name, 
-        round(card_info["eeee"][name]/math.sqrt(background["eeee"]), 4), 
-        round(card_info["eemm"][name]/math.sqrt(background["eemm"]), 4), 
-        round(card_info["mmee"][name]/math.sqrt(background["mmee"]), 4), 
-        round(card_info["mmmm"][name]/math.sqrt(background["mmmm"]), 4), 
+for name in ["AllData"]:
+    output_info.add_row(["Sign.strength", 
+        round(card_info["eeee"][name]/(Total["eeee"]), 2), 
+        round((card_info["eemm"][name]+card_info["mmee"][name])/(Total["eemm"]+Total["mmee"]), 2),
+        round(card_info["mmmm"][name]/(Total["mmmm"]), 2), 
         round(sum([card_info[c][name] for c in chans])
-            /math.sqrt(sum([background[c] for c in chans])), 4), 
+            /(sum([Total[c] for c in chans])), 2), 
     ])
 
 combine_dir = ConfigureJobs.getCombinePath() 
@@ -358,26 +415,28 @@ except OSError as e:
     logging.warning(e)
     pass
 
-webdir='/afs/cern.ch/user/u/uhussain/www/ZZAnalysisData/PlottingResults'
-Yields_dir = '/'.join([webdir,args['selection'], 'CombineYields',folder_name])
+webdir='/afs/cern.ch/user/u/uhussain/public/forSascha/'
+Yields_dir = '/'.join([webdir,'YieldsTable'])
 try:
     os.makedirs(Yields_dir)
 except OSError as e:
     logging.warning(e)
     pass
 
-signal_abv = "_vbfnlo" if args['vbfnlo'] else "HZZ"
-with open("/".join([Yields_dir, "Yields%s.out" % signal_abv]), "w") as yields:
-    yields.write("\n" + " "*30 + "Event Yields")
-    yields.write("\n" + str(output_info))
-    yields.write("\n" + " "*30 + "S/sqrt(B)")
-    yields.write("\n" + str(significance_info))
-
+signal_abv = "_vbfnlo" if args['vbfnlo'] else "ZZ4lMu18SF"+args['year']
 with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
     yields.write("\n" + " "*30 + "Event Yields")
     yields.write("\n" + str(output_info))
-    yields.write("\n" + " "*30 + "S/sqrt(B)")
-    yields.write("\n" + str(significance_info))
+    #yields.write("\n" + " "*30 + "Data/(S+B)")
+    #yields.write("\n" + str(significance_info))
+
+with open("/".join([Yields_dir, "Yields%s.tex" % signal_abv]), "w") as yields:
+    #yields.write("\n" + " "*30 + "Event Yields")
+    yields.write("\n"+(output_info.get_string() if not args['latex'] else output_info.get_latex_string())+"\n")
+    #yields.write("\n" + str(output_info))
+    #yields.write("\n" + " "*30 + "Data/(S+B)")
+    #yields.write("\n"+(significance_info.get_string() if not args['latex'] else significance_info.get_latex_string())+"\n")
+    #yields.write("\n" + str(significance_info))
 
 if not args['noCards']:
     if args['combineChannels']:
@@ -426,7 +485,8 @@ if not args['noCards']:
                             "%s     shape   %i               %i               %i           %i               %i\n" \
                                 % (hist_name, 
                                     "HZZ-signal" in hist_name,
-                                    "zz4l-powheg" in hist_name,
+                                    "zz4l-powheg" in hist_name, 
+                                    "VVV" in hist_name,
                                     "ggZZ" in hist_name,
                                     "nonprompt" in hist_name,
                                 )
