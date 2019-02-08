@@ -104,18 +104,22 @@ fileName = "data/fakeRate%s-%s.root" % (today, args['selection']) if args['outpu
         else args['output_file']
 fOut = ROOT.TFile(fileName, "recreate")
 
-#fScales = ROOT.TFile('data/scaleFactors.root')
-#muonIsoSF = fScales.Get('muonIsoSF')
-#muonIdSF = fScales.Get('muonTightIdSF')
-#electronTightIdSF = fScales.Get('electronTightIdSF')
-#electronGsfSF = fScales.Get('electronGsfSF')
-#pileupSF = fScales.Get('pileupSF')
-#sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF]
 
+fScales = ROOT.TFile('data/scaleFactorsZZ4l2017.root')
+muonMoriond18SF= fScales.Get('muonMoriond18SF')
+#Electron Reco SF (POG) https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2017DataRecommendations
+electronLowReco18SF = fScales.Get('electronLowReco18SF')
+electronReco18SF = fScales.Get('electronReco18SF')
+#Electron ID + SIP HZZ Scale factors
+electronMoriond18SF = fScales.Get('electronMoriond18SF')
+electronMoriond18GapSF = fScales.Get('electronMoriond18GapSF')
+pileupSF = fScales.Get('pileupSF')
+
+sf_inputs = [electronLowReco18SF,electronReco18SF,electronMoriond18SF, electronMoriond18GapSF,muonMoriond18SF,pileupSF]
 SelectorTools.applySelector(args["filenames"],channels,
         "FakeRateSelector", args['selection'], fOut,args['analysis'],
-        proof=args['proof'], addSumweights=True)
-        #extra_inputs=sf_inputs, proof=args['proof'],
+        proof=args['proof'], addSumweights=True,
+        extra_inputs=sf_inputs)
 
 alldata = makeCompositeHists("AllData", ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"]))
 OutputTools.writeOutputListItem(alldata, fOut)

@@ -62,6 +62,10 @@ def applySelector(filelist, channels,selector_name, selection,
                 inputs = ROOT.TList()
                 select.SetInputList(inputs)
                 #This part is introduced to work out the fact that I dont have "extra_inputs" such as SFs yet.
+                #It doesn't hurt to have this put in by hand
+                for inp in extra_inputs:
+                    inputs.Add(inp)
+                    print "inputs getting added: ",inp
                 tchan=ROOT.TNamed("channel",chan)
                 tname=ROOT.TNamed("name",dataset) 
                 inputs.Add(tname)

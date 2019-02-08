@@ -13,6 +13,9 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
         return true;
     if (!tightZ1Leptons())
         return true;
+    //We are going with SIP < 4 everywhere in ZZ as well #Moriond
+    if (!tightSIP())
+        return true;
     
     float pt_fillval = l3Pt;
     float eta_fillval = std::abs(l3Eta);
@@ -71,6 +74,10 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
 void FakeRateSelector::Init(TTree *tree)
 {
     ZZSelectorBase::Init(tree);
+    if (isMC_) {
+        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
+      //weight_info_ = GetLheWeightInfo();
+    }
 }
 
 void FakeRateSelector::SetupNewDirectory()
