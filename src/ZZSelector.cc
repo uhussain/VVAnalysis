@@ -253,6 +253,25 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("Mass", variation.second), Mass,weight);
     SafeHistFill(hists1D_, getHistName("ZMass", variation.second), Z1mass, weight);
     SafeHistFill(hists1D_, getHistName("ZMass", variation.second), Z2mass, weight);
+    //Making LeptonPt and Eta plots
+    SafeHistFill(hists1D_, getHistName("LepPt", variation.second), l1Pt, weight);
+    SafeHistFill(hists1D_, getHistName("LepPt", variation.second), l2Pt, weight);
+    SafeHistFill(hists1D_, getHistName("LepPt", variation.second), l3Pt, weight);
+    SafeHistFill(hists1D_, getHistName("LepPt", variation.second), l4Pt, weight);
+    SafeHistFill(hists1D_, getHistName("LepEta", variation.second), l1Eta, weight);
+    SafeHistFill(hists1D_, getHistName("LepEta", variation.second), l2Eta, weight);
+    SafeHistFill(hists1D_, getHistName("LepEta", variation.second), l3Eta, weight);
+    SafeHistFill(hists1D_, getHistName("LepEta", variation.second), l4Eta, weight);
+    // Summing 12,34 leptons
+    SafeHistFill(hists1D_, getHistName("Lep12Pt", variation.second), l1Pt, weight);
+    SafeHistFill(hists1D_, getHistName("Lep12Pt", variation.second), l2Pt, weight);
+    SafeHistFill(hists1D_, getHistName("Lep34Pt", variation.second), l3Pt, weight);
+    SafeHistFill(hists1D_, getHistName("Lep34Pt", variation.second), l4Pt, weight);
+    SafeHistFill(hists1D_, getHistName("Lep12Eta", variation.second), l1Eta, weight);
+    SafeHistFill(hists1D_, getHistName("Lep12Eta", variation.second), l2Eta, weight);
+    SafeHistFill(hists1D_, getHistName("Le34Eta", variation.second), l3Eta, weight);
+    SafeHistFill(hists1D_, getHistName("Lep34Eta", variation.second), l4Eta, weight);
+
     SafeHistFill(hists1D_, getHistName("Z1Mass", variation.second), Z1mass, weight);
     SafeHistFill(hists1D_, getHistName("Z2Mass", variation.second), Z2mass, weight);
     SafeHistFill(hists1D_, getHistName("ZPt", variation.second), Z1pt, weight);
