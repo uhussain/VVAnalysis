@@ -271,7 +271,6 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("Lep12Eta", variation.second), l2Eta, weight);
     SafeHistFill(hists1D_, getHistName("Le34Eta", variation.second), l3Eta, weight);
     SafeHistFill(hists1D_, getHistName("Lep34Eta", variation.second), l4Eta, weight);
-
     SafeHistFill(hists1D_, getHistName("Z1Mass", variation.second), Z1mass, weight);
     SafeHistFill(hists1D_, getHistName("Z2Mass", variation.second), Z2mass, weight);
     SafeHistFill(hists1D_, getHistName("ZPt", variation.second), Z1pt, weight);

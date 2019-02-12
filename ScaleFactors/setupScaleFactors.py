@@ -38,7 +38,7 @@ def invert2DHist(hist):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", "--tightfr_file", type=str,
-        default='data/fakeRate17Dec2018-ZplusLSkimZZ.root')
+        default='data/fakeRate08Feb2019-ZplusLSkimZZ.root')
 #parser.add_argument("-m", "--medfr_file", type=str,
 #        default='data/fakeRate18Apr2017-3LooseLeptons-MediumMuons.root')
 args = parser.parse_args()

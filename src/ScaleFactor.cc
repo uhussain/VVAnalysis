@@ -110,7 +110,7 @@ double ScaleFactor::Evaluate2D(double x, double y, Variation var) const
   }
   else if ( var == ShiftUp && histShiftUp2D_ != nullptr ) {
     auto bin = histShiftUp2D_->FindBin(x, y);
-    return histShiftUp2D_->GetBinContent(bin);
+    return histCentral2D_->GetBinContent(bin) + histShiftUp2D_->GetBinContent(bin);
   }
   else if ( var == ShiftUp && histCentral2D_ != nullptr ) {
     auto bin = histCentral2D_->FindBin(x, y);
@@ -118,7 +118,7 @@ double ScaleFactor::Evaluate2D(double x, double y, Variation var) const
   }
   else if ( var == ShiftDown && histShiftDown2D_ != nullptr ) {
     auto bin = histShiftDown2D_->FindBin(x, y);
-    return histShiftDown2D_->GetBinContent(bin);
+    return histCentral2D_->GetBinContent(bin) - histShiftDown2D_->GetBinContent(bin);
   }
   else if ( var == ShiftDown && histCentral2D_ != nullptr ) {
     auto bin = histCentral2D_->FindBin(x, y);
