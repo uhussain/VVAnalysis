@@ -110,12 +110,17 @@ double ScaleFactor::Evaluate2D(double x, double y, Variation var) const
   }
   else if ( var == ShiftUp && histShiftUp2D_ != nullptr ) {
     auto bin = histShiftUp2D_->FindBin(x, y);
+    //Don't forget this is done only to deal with special Muon "ERROR" histogram in 2017,2018
+    //If you actually have a ShiftUp histogram then this would be wrong!
     return histCentral2D_->GetBinContent(bin) + histShiftUp2D_->GetBinContent(bin);
   }
   else if ( var == ShiftUp && histCentral2D_ != nullptr ) {
     auto bin = histCentral2D_->FindBin(x, y);
     return histCentral2D_->GetBinContent(bin) + histCentral2D_->GetBinError(bin);
   }
+
+  //Don't forget this is done only to deal with special Muon "ERROR" histogram in 2017,2018
+  //If you actually have a ShiftUp histogram then this would be wrong!
   else if ( var == ShiftDown && histShiftDown2D_ != nullptr ) {
     auto bin = histShiftDown2D_->FindBin(x, y);
     return histCentral2D_->GetBinContent(bin) - histShiftDown2D_->GetBinContent(bin);
