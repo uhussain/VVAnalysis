@@ -1,0 +1,1 @@
+./Utilities/scripts/prepareCombine.py -a ZZ4l2019 --input_file /afs/cern.ch/user/u/uhussain/ZZ4lHistFiles/Hists06Mar2019-ZZ4l2018.root -s ZZ4l2019/ZZSelectionsTightLeps --folder_name 2018/06Mar19_SignalStrength -l 59.95 --combineChannels --output_file /eos/user/u/uhussain/ZZAnalysisData/CombineData/ZZselection_2018-06Mar2019.root --fit_variable yield --latex --year 2018
