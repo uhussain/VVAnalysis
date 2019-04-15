@@ -1,0 +1,10 @@
+[Setup]
+user = uhussain
+analysis = ZZ
+dataset_manager_path = /afs/cern.ch/user/u/%(user)s/work 
+combine_path = /data/uhussain/ZZTo4l/ZZ2018/HiggsCombine/CMSSW_8_1_0/src/HiggsAnalysis/CombinedLimit
+harvester_path = /data/uhussain/ZZTo4l/ZZ2018/HiggsCombine/CMSSW_8_1_0/src/CombineHarvester
+output_path = /eos/user/u/%(user)s/%(analysis)sAnalysisData
+fakeRate_output = %(output_path)s/FakesRates
+hist_output = %(output_path)s/HistFiles
+combine_output = %(output_path)s/CombineData

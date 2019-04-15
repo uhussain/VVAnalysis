@@ -5,7 +5,6 @@ from python import UserInput,OutputTools,ConfigureJobs
 from python.prettytable import PrettyTable
 import datetime
 import os
-import shutil
 import sys
 import math
 import array
@@ -13,9 +12,6 @@ import logging
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
-    parser.add_argument("--latex", action='store_true', help='table in latex format')
-    parser.add_argument("--year", type=str,
-        default="2017", help="Output file name")
     parser.add_argument("--vbfnlo",
         action='store_true', help="Use VBFNLO for signal")
     parser.add_argument("--noTheory",
@@ -47,12 +43,6 @@ def getComLineArgs():
                         "by commas")
     return vars(parser.parse_args())
 
-def getYield(hist):
-    error = array.array('d',[0])
-    events = hist.IntegralAndError(0,hist.GetNbinX,error)
-    hist.Delete()
-    return (events,error[0])
-
 def combineChannels(group, chans, variations=[], central=True):
     if central:
         variations.append("")
@@ -77,12 +67,12 @@ stat_variations = { chan : [] for chan in (chans + ["all"])}
 args = getComLineArgs()
 
 manager_path = ConfigureJobs.getManagerPath() 
-sys.path.append("/".join([manager_path, "ZZ4lAnalysisDatasetManager",
+sys.path.append("/".join([manager_path, "AnalysisDatasetManager",
     "Utilities/python"]))
 
 from ConfigHistFactory import ConfigHistFactory
 config_factory = ConfigHistFactory(
-    "%s/ZZ4lAnalysisDatasetManager" % manager_path,
+    "%s/AnalysisDatasetManager" % manager_path,
     args['selection'],
 )
 
@@ -91,27 +81,20 @@ fIn = ROOT.TFile(args['input_file'])
 
 card_info = {
     chan : { 
-        "HZZ_signal" : 0,
-        "zz4l_powheg" : 0,
-        "ggZZ" : 0,
-        "VVV": 0,
-        "AllData" : 0,
-    } for chan in (chans + ["all"])
-}
-card_error = {
-    chan : { 
-        "HZZ_signal" : 0,
-        "zz4l_powheg" : 0,
-        "ggZZ" : 0,
-        "VVV": 0,
+        "wzjj_vbfnlo" : 0,
+        "EW_WZjj" : 0,
+        "QCD_WZjj" : 0,
+        "wz" : 0,
+        "wz_powheg" : 0,
+        "vv_powheg" : 0,
+        "top_ewk" : 0,
+        "zg" : 0,
+        "vv" : 0,
         "AllData" : 0,
     } for chan in (chans + ["all"])
 }
 
 pdf_entries = {
-    "HZZ-signal" : 0,
-    "zz4l_powheg" : 0,
-    "ggZZ" : 0,
     "wzjj-vbfnlo" : 0,
     "EW-WZjj" : [1]+range(11,112),
     "wzjj-aqgcfm" : [1]+range(11,112),
@@ -142,19 +125,15 @@ wz_scalefacs = {
 
 scaleWZ = False
 manualStatUnc = args['manualStats']
-#variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
-#    "CMS_eff_m", "CMS_scale_m", "CMS_eff_e", "CMS_scale_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
-variations = [i for x in ["CMS_RecoEff_e", "CMS_eff_m","CMS_eff_e","CMS_pileup"] for i in [x+"Up", x+"Down"]]
-#variations=[]
-print(variations)
-#jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Down"]]
+variations = [i for x in ["CMS_scale_j", "CMS_res_j", \
+    "CMS_eff_m", "CMS_scale_m", "CMS_eff_e", "CMS_scale_e", "CMS_pileup", "CMS_scale_unclEnergy"] for i in [x+"Up", x+"Down"]]
+jeVariations = [i for x in ["CMS_scale_j", "CMS_res_j"] for i in [x+"Up", x+"Down"]]
 #variations = jeVariations 
 
-output_info = PrettyTable([args['year'], "$\Pe\Pe\Pe\Pe$ ", "$\Pe\Pe\Pgm\Pgm$ ", "$\Pgm\Pgm\Pgm\Pgm$", "All states"])
+output_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
-#signal = "wzjj_vbfnlo" if args['vbfnlo'] else "EW_WZjj"
-signal = "HZZ_signal"
-initNumvars = 22 if "VBS" in args['selection'] else 4
+signal = "wzjj_vbfnlo" if args['vbfnlo'] else "EW_WZjj"
+initNumvars = 22 if "VBS" in args['selection'] else 17
 isVBS = "VBS" in args['selection'] 
 #variable = "mjj" if isVBS else "yield"
 #variable = "yield"
@@ -177,45 +156,40 @@ rebin = mjj_binning if base_variable == "mjj" else None
 if variable == "MTWZ":
     rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1500,2000]) 
 alldata = HistTools.makeCompositeHists(fIn, "AllData", 
-    ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"], manager_path), args['lumi'],
+    ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
     [variable +"_"+ c for c in chans], rebin=rebin)
 for chan in chans:
     hist = alldata.FindObject(variable+"_"+chan)
-    card_info[chan]["AllData"] = round(hist.Integral(), 1) if hist.Integral() > 0 else 0.001
-
+    card_info[chan]["AllData"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
 combineChannels(alldata, chans)
 
 OutputTools.writeOutputListItem(alldata, fOut)
 nonprompt = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
     [variable+"_Fakes_" + c for c in chans], rebin=rebin)
-#for var in jeVariations:
-#    hists = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
-#            ["_".join([variable, var, "Fakes", c]) for c in chans], rebin=rebin)
-#    for h in hists:
-#        h.SetName(h.GetName().replace(var+"_Fakes", "Fakes_"+var))
-#    nonprompt.extend(hists[:])
+for var in jeVariations:
+    hists = HistTools.makeCompositeHists(fIn, "DataEWKCorrected", {"DataEWKCorrected" : 1}, args['lumi'],
+            ["_".join([variable, var, "Fakes", c]) for c in chans], rebin=rebin)
+    for h in hists:
+        h.SetName(h.GetName().replace(var+"_Fakes", "Fakes_"+var))
+    nonprompt.extend(hists[:])
 
-#combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
-
-combineChannels(nonprompt, chans, ["Fakes"], False)
+combineChannels(nonprompt, chans, ["Fakes"]+["Fakes_"+i for i in jeVariations], False)
 for h in nonprompt:
     HistTools.removeZeros(h)
-for chan in chans+["all"]:
-    #print(chan)
+for chan in chans + ["all"]:
     hist = nonprompt.FindObject(variable+"_Fakes_"+chan)
     if chan == "all":
         hist = nonprompt.FindObject(variable+"_Fakes")
-    #card_info[chan]["nonprompt"] = round(hist.Integral(), 1) if hist.Integral() > 0 else 0.001
-    card_info[chan]["nonprompt"] = hist.Integral() if hist.Integral() > 0 else 0.001
+    card_info[chan]["nonprompt"] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     if manualStatUnc:
         stat_hists,variation_names = HistTools.getStatHists(hist, "nonprompt", chan, signal)
         stat_variations[chan].extend(variation_names)
         nonprompt.extend(stat_hists[:])
 
 OutputTools.writeOutputListItem(nonprompt, fOut)
-significance_info = PrettyTable([args['year'], "eeee", "eemm", "mmee", "mmmm", "All states"])
+significance_info = PrettyTable(["Filename", "eee", "eem", "emm", "mmm", "All states"])
 
-plot_groups = ["HZZ-signal","qqZZ-powheg","VVV","ggZZ"]
+plot_groups = ["QCD-WZjj", "wz", "wz-powheg", "EW-WZjj", "top-ewk", "zg", "vv-powheg", "vv"]
 
 aqgc_groups =  []
 if args['aqgc']:
@@ -233,19 +207,16 @@ for plot_group in plot_groups:
     plots = [variable+"_" + c for c in chans]
     if "data" not in plot_group and not isaQGCpoint and not args['noTheory']:
         plots += ["_".join([base_variable.replace("unrolled", "2D"), "lheWeights", c]) for c in chans]
-    #print("variations:",variations)
     plots += ["_".join([variable, var, c]) for var in variations for c in chans]
-    #if args['addControlRegion'] and not isaQGCpoint:
-    #    plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
-    #print(plots)
+    if args['addControlRegion'] and not isaQGCpoint:
+        plots += ["backgroundControlYield_lheWeights_" + c for c in chans]
+
     group = HistTools.makeCompositeHists(fIn, plot_group, ConfigureJobs.getListOfFilesWithXSec(
         config_factory.getPlotGroupMembers(plot_group), manager_path), args['lumi'], plots, rebin=rebin)
     if scaleWZ and plot_group in wz_scalefacs.keys():
         for h in group:
             if h.InheritsFrom("TH1"):
                 h.Scale(wz_scalefacs[plot_group])
-    if plot_group=="qqZZ-powheg":
-        plot_group="zz4l-powheg"
     name = plot_group.replace("-", "_")
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
@@ -268,21 +239,21 @@ for plot_group in plot_groups:
                 elif "MTWZ" in variable:
                     rebin = array.array('d', [0,50,100,200,300,400,500,700,1000,1200]) 
                 scale_hists = HistTools.getScaleHists(weight_hist, plot_group, rebin)
-                #if pdf_entries[plot_group]:
-                #    pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, rebin)
+                if pdf_entries[plot_group]:
+                    pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, rebin)
             elif "TH3" in weight_hist.ClassName(): 
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
                     HistTools.makeUnrolledHist,
                     ConfigureJobs.get2DBinning(yvar="etajj" if "dRjj" not in variable else "dRjj"),
                     plot_group
                 )
-                #if pdf_entries[plot_group]:
-                #    pdf_hists = HistTools.getTransformed3DPDFHists(weight_hist, 
-                #        HistTools.makeUnrolledHist, 
-                #        ConfigureJobs.get2DBinning(yvar="etajj" if "dRjj" not in variable else "dRjj"),
-                #        pdf_entries[plot_group],
-                #        plot_group
-                #    )
+                if pdf_entries[plot_group]:
+                    pdf_hists = HistTools.getTransformed3DPDFHists(weight_hist, 
+                        HistTools.makeUnrolledHist, 
+                        ConfigureJobs.get2DBinning(yvar="etajj" if "dRjj" not in variable else "dRjj"),
+                        pdf_entries[plot_group],
+                        plot_group
+                    )
             else:
                 raise RuntimeError("Invalid weight hist %s" % weight_hist_name +
                         " for %s. Can't make scale variations" % plot_group)
@@ -320,167 +291,93 @@ for plot_group in plot_groups:
     theory_vars = []
     if "aqgc" not in plot_group and "__" not in plot_group: 
         theory_vars = ["_".join([var, plot_group + shift]) for var in ["QCDscale", "pdf"] for shift in ["Up", "Down"]]
-    #combineChannels(group, chans, variations + theory_vars, True)
-    combineChannels(group, chans, variations, False)
+    combineChannels(group, chans, variations + theory_vars, True)
     for hist in group:
         HistTools.removeZeros(hist)
     for chan in chans:
         hist = group.FindObject(variable+"_"+chan)
-        #card_info[chan][name] = round(hist.Integral(), 1) if hist.Integral() > 0 else 0.001
-        card_info[chan][name] = hist.Integral() if hist.Integral() > 0 else 0.001
+        card_info[chan][name] = round(hist.Integral(), 4) if hist.Integral() > 0 else 0.001
     OutputTools.writeOutputListItem(group, fOut)
     yields = [card_info[c][name] for c in chans]
     yields.append(sum([card_info[c][name] for c in chans]))
+    output_info.add_row([plot_group] + yields)
 
-output_info.add_row(["VVV", round(card_info["eeee"]["VVV"],1), 
-    round((card_info["eemm"]["VVV"]+card_info["mmee"]["VVV"]),1),
-    #card_info["mmee"]["VVV"],
-    round(card_info["mmmm"]["VVV"],1),
-    round((sum([card_info[c]["VVV"] for c in chans])),1)],
+output_info.add_row(["nonprompt", card_info["eee"]["nonprompt"], 
+    card_info["eem"]["nonprompt"], 
+    card_info["emm"]["nonprompt"], 
+    card_info["mmm"]["nonprompt"], 
+    sum([card_info[c]["nonprompt"] for c in chans])]
 )
-output_info.add_row(["Nonprompt", round(card_info["eeee"]["nonprompt"],1),
-    round((card_info["eemm"]["nonprompt"]+card_info["mmee"]["nonprompt"]),1),
-    #card_info["eemm"]["nonprompt"], 
-    #card_info["mmee"]["nonprompt"],
-    round(card_info["mmmm"]["nonprompt"],1), 
-    round((sum([card_info[c]["nonprompt"] for c in chans])),1)]
-)
-background = {c : 0 for c in chans} 
-for chan,yields in card_info.iteritems():
-    if chan == "all":
-        continue
-    for name,value in yields.iteritems():
-        if name in ["VVV", "nonprompt"]:
-            background[chan] += float(value)
-output_info.add_row(["Total backgrounds", 
-    round(background["eeee"], 1), 
-    round(background["eemm"], 1)+round(background["mmee"], 1),
-    round(background["mmmm"], 1),
-    round(sum([background[c] for c in chans]), 1), 
-])
-
-output_info.add_row(["HZZ", round(card_info["eeee"]["HZZ_signal"],1), 
-    round((card_info["eemm"]["HZZ_signal"]+card_info["mmee"]["HZZ_signal"]),1),
-    round(card_info["mmmm"]["HZZ_signal"],1),
-    round((sum([card_info[c]["HZZ_signal"] for c in chans])),1)],
-)
-output_info.add_row(["ggZZ", round(card_info["eeee"]["ggZZ"],1), 
-    round((card_info["eemm"]["ggZZ"]+card_info["mmee"]["ggZZ"]),1),
-    round(card_info["mmmm"]["ggZZ"],1), 
-    round((sum([card_info[c]["ggZZ"] for c in chans])),1)]
-)
-output_info.add_row(["qqZZ", round(card_info["eeee"]["zz4l_powheg"],1), 
-    round((card_info["eemm"]["zz4l_powheg"]+card_info["mmee"]["zz4l_powheg"]),1),
-    round(card_info["mmmm"]["zz4l_powheg"],1), 
-    round((sum([card_info[c]["zz4l_powheg"] for c in chans])),1)]
-)
-Signal = {c : 0 for c in chans} 
-for chan,yields in card_info.iteritems():
-    if chan == "all":
-        continue
-    for name,value in yields.iteritems():
-        if name in ["HZZ_signal", "ggZZ","zz4l_powheg"]:
-            Signal[chan] += float(value)
-output_info.add_row(["Total signal", 
-    round(Signal["eeee"], 1), 
-    round(Signal["eemm"], 1)+round(Signal["mmee"], 1),
-    round(Signal["mmmm"], 1),
-    round(sum([Signal[c] for c in chans]), 1), 
-])
-Total = {c : 0 for c in chans}
+background = {c : 0 for c in chans}
 for chan,yields in card_info.iteritems():
     if chan == "all":
         continue
     for name,value in yields.iteritems():
         if "data" in name:
             continue
-        if name not in ["AllData", "output_file"]:
-            Total[chan] += float(value)
-output_info.add_row(["Total expected", 
-    round(Total["eeee"], 1), 
-    round(Total["eemm"], 1)+round(Total["mmee"], 1),
-    round(Total["mmmm"], 1),
-    round(sum([Total[c] for c in chans]), 1), 
+        if name not in ["EW_WZjj", "wz", 
+                "AllData", "wz_powheg", "wzjj_vbfnlo", "output_file"]:
+            background[chan] += float(value)
+output_info.add_row(["Total background", 
+    round(background["eee"], 4), 
+    round(background["eem"], 4), 
+    round(background["emm"], 4), 
+    round(background["mmm"], 4),
+    round(sum([background[c] for c in chans]), 4), 
 ])
 
 yields = [card_info[c]["AllData"] for c in chans]
 yields.append(sum([card_info[c]["AllData"] for c in chans]))
-output_info.add_row(["Data", int(card_info["eeee"]["AllData"]), 
-    int(card_info["eemm"]["AllData"]+card_info["mmee"]["AllData"]),
-    int(card_info["mmmm"]["AllData"]), 
-    int(sum([card_info[c]["AllData"] for c in chans]))]
-)
-#output_info.add_row(["Data"] + yields)
+output_info.add_row(["Data"] + yields)
 
-#for name in ["EW_WZjj", "wzjj_vbfnlo"]:
-for name in ["AllData"]:
-    output_info.add_row(["Sign.strength", 
-        round(card_info["eeee"][name]/(Total["eeee"]), 2), 
-        round((card_info["eemm"][name]+card_info["mmee"][name])/(Total["eemm"]+Total["mmee"]), 2),
-        round(card_info["mmmm"][name]/(Total["mmmm"]), 2), 
+for name in ["EW_WZjj", "wzjj_vbfnlo"]:
+    significance_info.add_row([name, 
+        round(card_info["eee"][name]/math.sqrt(background["eee"]), 4), 
+        round(card_info["eem"][name]/math.sqrt(background["eem"]), 4), 
+        round(card_info["emm"][name]/math.sqrt(background["emm"]), 4), 
+        round(card_info["mmm"][name]/math.sqrt(background["mmm"]), 4), 
         round(sum([card_info[c][name] for c in chans])
-            /(sum([Total[c] for c in chans])), 2), 
+            /math.sqrt(sum([background[c] for c in chans])), 4), 
     ])
 
 combine_dir = ConfigureJobs.getCombinePath() 
-harvester_dir = ConfigureJobs.getHarvesterPath() 
 folder_name = args['folder_name'] if args['folder_name'] != "" else \
                 datetime.date.today().strftime("%d%b%Y") 
 
 output_dir = '/'.join([combine_dir,args['selection'], folder_name])
-
-harvester_dir = '/'.join([harvester_dir,args['selection'], folder_name])
 try:
     os.makedirs(output_dir)
 except OSError as e:
     logging.warning(e)
     pass
 
-try:
-    os.makedirs(harvester_dir)
-except OSError as e:
-    logging.warning(e)
-    pass
-webdir='/afs/cern.ch/user/u/uhussain/public/forSascha/'
-Yields_dir = '/'.join([webdir,'YieldsTable'])
-try:
-    os.makedirs(Yields_dir)
-except OSError as e:
-    logging.warning(e)
-    pass
-
-signal_abv = "_vbfnlo" if args['vbfnlo'] else "ZZ4l"+args['year']
+signal_abv = "_vbfnlo" if args['vbfnlo'] else ""
 with open("/".join([output_dir, "Yields%s.out" % signal_abv]), "w") as yields:
     yields.write("\n" + " "*30 + "Event Yields")
     yields.write("\n" + str(output_info))
-    #yields.write("\n" + " "*30 + "Data/(S+B)")
-    #yields.write("\n" + str(significance_info))
-
-with open("/".join([Yields_dir, "Yields%s.tex" % signal_abv]), "w") as yields:
-    #yields.write("\n" + " "*30 + "Event Yields")
-    yields.write("\n"+(output_info.get_string() if not args['latex'] else output_info.get_latex_string())+"\n")
-    #yields.write("\n" + str(output_info))
-    #yields.write("\n" + " "*30 + "Data/(S+B)")
-    #yields.write("\n"+(significance_info.get_string() if not args['latex'] else significance_info.get_latex_string())+"\n")
-    #yields.write("\n" + str(significance_info))
+    yields.write("\n" + " "*30 + "S/sqrt(B)")
+    yields.write("\n" + str(significance_info))
 
 if not args['noCards']:
     if args['combineChannels']:
         card_info["all"]["output_file"] = args['output_file']
+        for chan in chans:
+            for process, rate in card_info[chan].iteritems():
+                if process == "nonprompt" or "aqgc" in process: continue
+                if type(rate) is float:
+                    card_info["all"][process] += rate
     for chan, chan_dict in card_info.iteritems():
-        print chan_dict
         chan_dict["signal_name"] = signal.replace("_", "-")
         chan_dict["fit_variable"] = variable
         chan_dict["signal_yield"] = chan_dict[signal]
         numvars = initNumvars+len(chans)*(chan != "all")*len(stat_variations[chan]) 
         if chan != "all":
             numvars += 3
-        #chan_dict["nuisances"] = numvars-1
-        chan_dict["nuisances"] = "*"
-        file_name = '%s/ZZ%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
-                else '%s/ZZ%s_%s.txt' % (output_dir,args['year'],chan)
-        template_name = 'Templates/CombineCards/%s/%s_template%s_%s.txt' % \
-            (args['selection'].split("/")[-1], ("WZjj_EWK" if isVBS else "ZZ"), args['year'],chan)
+        chan_dict["nuisances"] = numvars
+        file_name = '%s/WZjj%s_%s.txt' % (output_dir, signal_abv, chan) if isVBS \
+                else '%s/WZ_%s.txt' % (output_dir, chan)
+        template_name = 'Templates/CombineCards/%s/%s_template_%s.txt' % \
+            (args['selection'].split("/")[-1], ("WZjj_EWK" if isVBS else "WZ"), chan)
         ConfigureJobs.fillTemplatedFile(template_name,
             file_name,
             chan_dict
@@ -511,33 +408,24 @@ if not args['noCards']:
                         chan_file.write(
                             "%s     shape   %i               %i               %i           %i               %i\n" \
                                 % (hist_name, 
-                                    "HZZ-signal" in hist_name,
-                                    "zz4l-powheg" in hist_name, 
-                                    "VVV" in hist_name,
-                                    "ggZZ" in hist_name,
+                                    "wz-powheg" in hist_name,
+                                    "vv" in hist_name,
+                                    "top-ewk" in hist_name,
+                                    "zg" in hist_name,
                                     "nonprompt" in hist_name,
                                 )
                     )
             chan_file.write("mc_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
-            if "eeee" in file_name:
-                chan_file.write("lepton_unc group = CMS_RecoEff_e CMS_eff_e\n")
-            elif ("eemm" in file_name or "mmee" in file_name):
-                chan_file.write("lepton_unc group = CMS_RecoEff_e CMS_eff_e CMS_eff_m\n")
-            else:
-                chan_file.write("lepton_unc group = CMS_eff_m\n")
+            chan_file.write("lepton_unc group = CMS_eff_e CMS_eff_m CMS_scale_e CMS_scale_m\n")
             if isVBS:
                 chan_file.write("nonprompt_stat group = %s\n" % " ".join([h for h in stat_variations[chan] if "nonprompt" not in h]))
                 chan_file.write("wz_qcd_all group = QCDscale_QCD-WZjj pdf_QCD-WZjj CMS_norm_QCD-WZjj %s\n" % " ".join([h for h in stat_variations[chan] if "QCD-WZjj" in h]))
     ConfigureJobs.fillTemplatedFile(
-        'Templates/CombineCards/%s/runCombine_Template%s.sh' % (args['selection'].split("/")[-1],args['year']),
+        'Templates/CombineCards/%s/runCombine_Template.sh' % args['selection'].split("/")[-1],
         '%s/runCombine%s.sh' % (output_dir, signal_abv), 
         {"sample" : signal_abv}
     )
-copyFiles=os.listdir(output_dir)
-for f in copyFiles:
-    full_file_name=os.path.join(output_dir,f)
-    if os.path.isfile(full_file_name):
-        shutil.copy(full_file_name,harvester_dir)
+
 if args['aqgc']:
     fOut.Close()
     HistTools.addaQGCTheoryHists(args['output_file'], aqgc_groups, variable)

@@ -95,8 +95,9 @@ pileupSF = fScales.Get('pileupSF')
 fr_inputs = [eZZTightFakeRate, mZZTightFakeRate,]
 sf_inputs = [electronLowReco18SF,electronReco18SF,electronMoriond18SF, electronMoriond18GapSF,muonMoriond18SF,pileupSF]
 #sf_inputs=[pileupSF]
-selection = args['selection'].replace("LooseLeptons", "") \
-    if args['output_selection'] == "" else args['output_selection'].split("_")[0]
+#selection = args['selection'].replace("LooseLeptons", "") \
+#    if args['output_selection'] == "" else args['output_selection'].split("_")[0]
+selection = args['selection']
 if selection == "":
     selection = "LooseLeptons"
     print "Info: Using BasicZZSelections for hist defintions"
@@ -130,6 +131,10 @@ if "FakeRate" not in args['output_selection'] and not args['test']:
 mc = SelectorTools.applySelector(args['filenames'],channels, "ZZSelector", args['selection'], fOut,args['analysis'],
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         addSumweights=True, proof=args['proof'])
+#Get the Gen Histograms
+gen = SelectorTools.applyGenSelector(args['filenames'],channels, "ZZGenSelector", args['selection'], fOut,args['analysis'],
+        extra_inputs=hist_inputs+tselection, 
+        addSumweights=False, proof=args['proof'])
 if args['test']:
     exit(0)
 
