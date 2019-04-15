@@ -7,7 +7,7 @@
 
 class ZZSelector : public ZZSelectorBase {
 public :
-    bool doSystematics_ = true;
+    bool doSystematics_ = false;
     bool applyFullSelection_ = true;
     bool isaQGC_ = false;
     bool doaQGC_ = false;
@@ -16,6 +16,8 @@ public :
         Central,
         muonEfficiencyUp,
         muonEfficiencyDown,
+        electronRecoEffUp,
+        electronRecoEffDown,
         electronEfficiencyUp,
         electronEfficiencyDown,
         pileupUp,
@@ -35,7 +37,10 @@ public :
         "ZPt",
         "LepPt",
         "Z1lep1_Pt",
-        //"nTruePU",
+        "Z1lep2_Pt",
+        "Z2lep1_Pt",
+        "Z2lep2_Pt",
+        "nTruePU",
         //"nvtx",
         //"Zlep1_Pt",
         //"Zlep2_Pt",
@@ -46,6 +51,8 @@ public :
     };
 
     std::map<Systematic, std::string> systematics_ = {
+        {electronRecoEffUp,"CMS_RecoEff_eUp"},
+        {electronRecoEffDown,"CMS_RecoEff_eDown"},
         {electronEfficiencyUp, "CMS_eff_eUp"},
         {electronEfficiencyDown, "CMS_eff_eDown"},
         {muonEfficiencyUp, "CMS_eff_mUp"},
@@ -57,7 +64,7 @@ public :
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
         { "backgroundControlYield",  {} },
-        //{ "nTruePU",  {} },
+        { "nTruePU",  {} },
         { "nvtx",  {} },
         { "ZMass",  {} },
         { "Z1Mass",  {} },
@@ -66,6 +73,9 @@ public :
         { "Z1Pt",  {} },
         { "Z2Pt",  {} },
         { "ZPt",  {} },
+        { "Z1Phi",  {} },
+        { "Z2Phi",  {} },
+        {"dPhiZ1Z2",{}},
        // { "ZPt",  {} },
        // { "ZEta",  {} },
        // { "ZPhi",  {} },
@@ -162,6 +172,7 @@ public :
     UInt_t nvtx;
     Float_t Mass;
     Float_t Pt;
+    float dPhiZZ; //DeltaPhi between Z1 and Z2
     //Float_t Zlep1_Wlep_Mass;
     //Float_t Zlep2_Wlep_Mass;
     //Float_t Eta;

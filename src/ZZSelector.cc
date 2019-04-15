@@ -26,24 +26,175 @@ void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
     b_Pt->GetEntry(entry);
     //std::cout<<"channel in LoadBranches function: "<<channel_<<std::endl;
     if(channel_ == eemm || channel_ == mmee){
+      //if(TightZZLeptons()){//i don't think this condition is needed even though it might save time but it messes up sf application for CRs in eemm,mmee states
       if(TightZZLeptons()){
         SetVariables(entry);}
-    }
-    
-    //Systematic uncertainties and creating shiftUp and shiftDown histograms
+    } 
     if (isMC_) {
-      //Starting with lepton Efficiencies
-      if (variation.first == electronEfficiencyUp || variation.first == electronEfficiencyDown ||
-                  variation.first == muonEfficiencyUp || variation.first == muonEfficiencyDown) {
+        //In order to get around the Overflow issue, set the Pt, not ideal.
+        //std::cout<<"weight before SF: "<<weight<<std::endl;
+        if (channel_ == eeee) {
+            //In order to get around the Overflow issue, set the Pt, not ideal.
+            float pt_e1 = l1Pt < EleSF_MAX_PT_ ? l1Pt : EleSF_MAX_PT_ - 0.01;
+            float pt_e2 = l2Pt < EleSF_MAX_PT_ ? l2Pt : EleSF_MAX_PT_ - 0.01;
+            float pt_e3 = l3Pt < EleSF_MAX_PT_ ? l3Pt : EleSF_MAX_PT_ - 0.01;
+            float pt_e4 = l4Pt < EleSF_MAX_PT_ ? l4Pt : EleSF_MAX_PT_ - 0.01;
+            if(l1IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+              //std::cout<<"weight for GapE: "<<weight<<std::endl;
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+            }
+            if(l2IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+            }
+            if(l3IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
+            }
+            if(l4IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+            }
+            //Applying Electron Reco SFs
+            if(l1Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+            }
+            if(l2Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+            }
+            if(l3Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
+            }
+            if(l4Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+            }
+        }
+        else if (channel_ == eemm) {
+            //In order to get around the Overflow issue, set the Pt, not ideal.
+            float pt_e1 = l1Pt < EleSF_MAX_PT_ ? l1Pt : EleSF_MAX_PT_ - 0.01;
+            float pt_e2 = l2Pt < EleSF_MAX_PT_ ? l2Pt : EleSF_MAX_PT_ - 0.01;
+            float pt_m3 = l3Pt < MuSF_MAX_PT_ ? l3Pt : MuSF_MAX_PT_ - 0.01;
+            float pt_m4 = l4Pt < MuSF_MAX_PT_ ? l4Pt : MuSF_MAX_PT_ - 0.01;
+            if(l1IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+            }
+            if(l2IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+            }
+            //Applying Electron Reco SFs
+            if(l1Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+            }
+            if(l2Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+            }
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), pt_m3);
+            weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), pt_m4);
+        }
+        else if (channel_ == mmee) {
+            float pt_m1 = l1Pt < MuSF_MAX_PT_ ? l1Pt : MuSF_MAX_PT_ - 0.01;
+            float pt_m2 = l2Pt < MuSF_MAX_PT_ ? l2Pt : MuSF_MAX_PT_ - 0.01;
+            float pt_e3 = l3Pt < EleSF_MAX_PT_ ? l3Pt : EleSF_MAX_PT_ - 0.01;
+            float pt_e4 = l4Pt < EleSF_MAX_PT_ ? l4Pt : EleSF_MAX_PT_ - 0.01;
+
+            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), pt_m1);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), pt_m2);
+            if(l3IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
+            }
+            if(l4IsGap){
+              weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+            }
+            else{
+              weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+            }
+            //Applying Electron Reco SFs
+            if(l3Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
+            }
+            if(l4Pt < 20){ 
+              weight *= eLowRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+            }
+            else{ 
+              weight *= eRecoSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+            }
+        }
+        else {
+            float pt_m1 = l1Pt < MuSF_MAX_PT_ ? l1Pt : MuSF_MAX_PT_ - 0.01;
+            float pt_m2 = l2Pt < MuSF_MAX_PT_ ? l2Pt : MuSF_MAX_PT_ - 0.01;
+            float pt_m3 = l3Pt < MuSF_MAX_PT_ ? l3Pt : MuSF_MAX_PT_ - 0.01;
+            float pt_m4 = l4Pt < MuSF_MAX_PT_ ? l4Pt : MuSF_MAX_PT_ - 0.01;
+            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), pt_m1);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), pt_m2);
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), pt_m3);
+            weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), pt_m4);
+        }
+        weight *= pileupSF_->Evaluate1D(nTruePU);
+        //std::cout<<"weight after muon sf applied: "<<weight<<std::endl;
+      //Systematic uncertainties and creating shiftUp and shiftDown histograms
+      //Starting with lepton Efficiencies  
+        if (variation.first == electronEfficiencyUp || variation.first == electronEfficiencyDown || variation.first == electronRecoEffUp || variation.first == electronRecoEffDown || 
+          variation.first == muonEfficiencyUp || variation.first == muonEfficiencyDown) {
+          //std::cout<<"weight before mu sys is applied: "<<weight<<std::endl;
           ShiftEfficiencies(variation.first);
-      }
-      else if (variation.first == pileupUp) {
-           weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftUp)/pileupSF_->Evaluate1D(nTruePU);
-      }
-      else if (variation.first == pileupDown) {
-          weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftDown)/pileupSF_->Evaluate1D(nTruePU);
+          //std::cout<<"l1Pt: "<<l1Pt<<" l2Pt: "<<l2Pt<<" l3Pt: "<<l3Pt<<" l4Pt: "<<l4Pt<<std::endl;
+          //std::cout<<"weight after 4mu sys is applied: "<<weight<<std::endl;
+        }
+        else if (variation.first == pileupUp) {
+             weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftUp)/pileupSF_->Evaluate1D(nTruePU);
+        }
+        else if (variation.first == pileupDown) {
+            weight *= pileupSF_->Evaluate1D(nTruePU, ScaleFactor::ShiftDown)/pileupSF_->Evaluate1D(nTruePU);
       }
     }
+    auto deltaPhiZZ = [](float phi1, float phi2) {
+      float pi = TMath::Pi();
+      float dphi = fabs(phi1-phi2);
+      if(dphi>pi)
+          dphi = 2.0*pi - dphi;
+      return dphi;
+    };
+
+    dPhiZZ = deltaPhiZZ(Z1Phi,Z2Phi);
 }
 //Similar to Kenneth's SetShiftedMasses function which i will need later as well
 void ZZSelector::SetVariables(Long64_t entry) {
@@ -111,83 +262,165 @@ void ZZSelector::SetVariables(Long64_t entry) {
       l4Mass = templ2Mass;
     }
 }
-
 void ZZSelector::ShiftEfficiencies(Systematic variation) {
     ScaleFactor::Variation shift = ScaleFactor::Variation::ShiftUp;
-    if (variation == electronEfficiencyDown || variation == muonEfficiencyDown)
+    if (variation == electronEfficiencyDown || variation == electronRecoEffDown || variation == muonEfficiencyDown)
         shift = ScaleFactor::Variation::ShiftDown;
 
-    if (channel_ == eeee && (variation == electronEfficiencyUp || variation == electronEfficiencyDown)) {
+    if (channel_ == eeee){ 
+      float pt_e1 = l1Pt < EleSF_MAX_PT_ ? l1Pt : EleSF_MAX_PT_ - 0.01;
+      float pt_e2 = l2Pt < EleSF_MAX_PT_ ? l2Pt : EleSF_MAX_PT_ - 0.01;
+      float pt_e3 = l3Pt < EleSF_MAX_PT_ ? l3Pt : EleSF_MAX_PT_ - 0.01;
+      float pt_e4 = l4Pt < EleSF_MAX_PT_ ? l4Pt : EleSF_MAX_PT_ - 0.01;
+      if (variation == electronRecoEffUp || variation == electronRecoEffDown) {
+        //Applying Electron Reco SFs Up/Down for ElectronRecoSyst
+        if(l1Pt < 20){ 
+          weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        }
+        else{ 
+          weight *= eRecoSF_->Evaluate2D(std::abs(l1Eta), pt_e1,shift)/eRecoSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+        }
+        if(l2Pt < 20){ 
+          weight *= eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        else{ 
+          weight *= eRecoSF_->Evaluate2D(std::abs(l2Eta), pt_e2,shift)/eRecoSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+        }
+        if(l3Pt < 20){ 
+          weight *= eLowRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        else{ 
+          weight *= eRecoSF_->Evaluate2D(std::abs(l3Eta), pt_e3,shift)/eRecoSF_->Evaluate2D(std::abs(l3Eta), pt_e3) ;
+        }
+        if(l4Pt < 20){ 
+          weight *= eLowRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+        }
+        else{ 
+          weight *= eRecoSF_->Evaluate2D(std::abs(l4Eta), pt_e4,shift)/eRecoSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+        }
+      }
+      //Applying Electron ID SFs Up/Down for ElectronIDEffSyst
+      else if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
         if(l1IsGap){
-          weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1, shift)/eGapIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
         }
         else{
-          weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+          weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
         }
         if(l2IsGap){
-          weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2, shift)/eGapIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
         }
         else{
-          weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+          weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2, shift)/eIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
         }
         if(l3IsGap){
-          weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3, shift)/eGapIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
         }
         else{
-          weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+          weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3, shift)/eIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
         }
         if(l4IsGap){
-          weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4, shift)/eGapIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
         }
         else{
-          weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+          weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4, shift)/eIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
         }
     }
+  }//channel eeee
     else if (channel_ == eemm) {
-        if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
-          if(l1IsGap){
-            weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-          }
-          else{
-            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-          }
-          if(l2IsGap){
-            weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-          }
-          else{
-            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-          }
+      //In order to get around the Overflow issue, set the Pt, not ideal.
+      float pt_e1 = l1Pt < EleSF_MAX_PT_ ? l1Pt : EleSF_MAX_PT_ - 0.01;
+      float pt_e2 = l2Pt < EleSF_MAX_PT_ ? l2Pt : EleSF_MAX_PT_ - 0.01;
+      float pt_m3 = l3Pt < MuSF_MAX_PT_ ? l3Pt : MuSF_MAX_PT_ - 0.01;
+      float pt_m4 = l4Pt < MuSF_MAX_PT_ ? l4Pt : MuSF_MAX_PT_ - 0.01;
+      if (variation == electronRecoEffUp || variation == electronRecoEffDown) {
+        //Applying Electron Reco SFs Up/Down for ElectronRecoEffSyst
+        if(l1Pt < 20){ 
+          weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
         }
-        else if (variation == muonEfficiencyUp || variation == muonEfficiencyDown) {
-            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+        else{ 
+          weight *= eRecoSF_->Evaluate2D(std::abs(l1Eta), pt_e1,shift)/eRecoSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
         }
+        if(l2Pt < 20){ 
+          weight *= eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        else{ 
+          weight *= eRecoSF_->Evaluate2D(std::abs(l2Eta), pt_e2,shift)/eRecoSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+        }
+      }
+      //Applying Electron ID SFs Up/Down for ElectronIDEffSyst
+      else if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
+        if(l1IsGap){
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1, shift)/eGapIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+        }
+        else{
+          weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1, shift)/eIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
+        }
+        if(l2IsGap){
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2, shift)/eGapIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+        }
+        else{
+          weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2, shift)/eIdSF_->Evaluate2D(std::abs(l2Eta), pt_e2);
+        }
+      }
+      else if (variation == muonEfficiencyUp || variation == muonEfficiencyDown) {
+          weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), pt_m3, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), pt_m3);
+          weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), pt_m4, shift)/mIdSF_->Evaluate2D(std::abs(l4Eta), pt_m4);
+      }
     }
     else if (channel_ == mmee) {
-        if (variation == muonEfficiencyUp || variation == muonEfficiencyDown) {
-            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+      float pt_m1 = l1Pt < MuSF_MAX_PT_ ? l1Pt : MuSF_MAX_PT_ - 0.01;
+      float pt_m2 = l2Pt < MuSF_MAX_PT_ ? l2Pt : MuSF_MAX_PT_ - 0.01;
+      float pt_e3 = l3Pt < EleSF_MAX_PT_ ? l3Pt : EleSF_MAX_PT_ - 0.01;
+      float pt_e4 = l4Pt < EleSF_MAX_PT_ ? l4Pt : EleSF_MAX_PT_ - 0.01;
+      if (variation == muonEfficiencyUp || variation == muonEfficiencyDown) {
+          weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), pt_m1, shift)/mIdSF_->Evaluate2D(std::abs(l1Eta), pt_m1);
+          weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), pt_m2, shift)/mIdSF_->Evaluate2D(std::abs(l2Eta), pt_m2);
+      }
+      else if (variation == electronRecoEffUp || variation == electronRecoEffDown) {
+        //Applying Electron Reco SFs Up/Down for ElectronRecoEffSyst 
+        if(l3Pt < 20){ 
+          weight *= eLowRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
         }
-        else if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
-          if(l3IsGap){
-            weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-          }
-          else{
-            weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-          }
-          if(l4IsGap){
-            weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
-          }
-          else{
-            weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
-          }
+        else{ 
+          weight *= eRecoSF_->Evaluate2D(std::abs(l3Eta), pt_e3,shift)/eRecoSF_->Evaluate2D(std::abs(l3Eta), pt_e3) ;
         }
+        if(l4Pt < 20){ 
+          weight *= eLowRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+        }
+        else{ 
+          weight *= eRecoSF_->Evaluate2D(std::abs(l4Eta), pt_e4,shift)/eRecoSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+        }
+      }
+      //Applying Electron ID SFs Up/Down for ElectronIDEffSyst
+      else if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
+        if(l3IsGap){
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3, shift)/eGapIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
+        }
+        else{
+          weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3, shift)/eIdSF_->Evaluate2D(std::abs(l3Eta), pt_e3);
+        }
+        if(l4IsGap){
+          weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4, shift)/eGapIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+        }
+        else{
+          weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4, shift)/eIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
+        }
+      }
     }
     else if (channel_ == mmmm && (variation == muonEfficiencyUp || variation == muonEfficiencyDown)) {
-        weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt, shift)/mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt, shift)/mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt, shift)/mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
+      float pt_m1 = l1Pt < MuSF_MAX_PT_ ? l1Pt : MuSF_MAX_PT_ - 0.01;
+      float pt_m2 = l2Pt < MuSF_MAX_PT_ ? l2Pt : MuSF_MAX_PT_ - 0.01;
+      float pt_m3 = l3Pt < MuSF_MAX_PT_ ? l3Pt : MuSF_MAX_PT_ - 0.01;
+      float pt_m4 = l4Pt < MuSF_MAX_PT_ ? l4Pt : MuSF_MAX_PT_ - 0.01;
+      weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), pt_m1, shift)/mIdSF_->Evaluate2D(std::abs(l1Eta), pt_m1);
+      //std::cout<<"l1 Shift: "<< mIdSF_->Evaluate2D(std::abs(l1Eta), pt_m1, shift)<<std::endl;
+      //std::cout<<"l1 sf: "<< mIdSF_->Evaluate2D(std::abs(l1Eta), pt_m1)<<std::endl;
+      weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), pt_m2, shift)/mIdSF_->Evaluate2D(std::abs(l2Eta), pt_m2);
+      weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), pt_m3, shift)/mIdSF_->Evaluate2D(std::abs(l3Eta), pt_m3);
+      //std::cout<<"l3 Shift: "<< mIdSF_->Evaluate2D(std::abs(l3Eta), pt_m3, shift)<<std::endl;
+      //std::cout<<"l3 sf: "<< mIdSF_->Evaluate2D(std::abs(l3Eta), pt_m3)<<std::endl;
+      weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), pt_m4, shift)/mIdSF_->Evaluate2D(std::abs(l4Eta), pt_m4);
     }
 }
 bool ZZSelector::TightZZLeptons() {
@@ -249,6 +482,7 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
 
         }
     }
+    SafeHistFill(hists1D_, getHistName("nTruePU", variation.second), nTruePU, weight);
     SafeHistFill(hists1D_, getHistName("yield", variation.second), 1, weight);
     SafeHistFill(hists1D_, getHistName("Mass", variation.second), Mass,weight);
     SafeHistFill(hists1D_, getHistName("ZMass", variation.second), Z1mass, weight);
@@ -269,7 +503,7 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("Lep34Pt", variation.second), l4Pt, weight);
     SafeHistFill(hists1D_, getHistName("Lep12Eta", variation.second), l1Eta, weight);
     SafeHistFill(hists1D_, getHistName("Lep12Eta", variation.second), l2Eta, weight);
-    SafeHistFill(hists1D_, getHistName("Le34Eta", variation.second), l3Eta, weight);
+    SafeHistFill(hists1D_, getHistName("Lep34Eta", variation.second), l3Eta, weight);
     SafeHistFill(hists1D_, getHistName("Lep34Eta", variation.second), l4Eta, weight);
     SafeHistFill(hists1D_, getHistName("Z1Mass", variation.second), Z1mass, weight);
     SafeHistFill(hists1D_, getHistName("Z2Mass", variation.second), Z2mass, weight);
@@ -278,6 +512,9 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("Z1Pt", variation.second), Z1pt, weight);
     SafeHistFill(hists1D_, getHistName("Z2Pt", variation.second), Z2pt, weight);
     SafeHistFill(hists1D_, getHistName("ZZPt", variation.second), Pt, weight);
+    SafeHistFill(hists1D_, getHistName("Z1Phi", variation.second), Z1Phi, weight);
+    SafeHistFill(hists1D_, getHistName("Z2Phi", variation.second), Z2Phi, weight);
+    SafeHistFill(hists1D_, getHistName("dPhiZ1Z2", variation.second), dPhiZZ, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Pt", variation.second), l1Pt, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Eta", variation.second), l1Eta, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Phi", variation.second), l1Phi, weight);
@@ -325,13 +562,15 @@ Bool_t ZZSelector::Process(Long64_t entry)
   }
     if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
         for (const auto& systematic : systematics_) {
-            LoadBranches(entry, systematic);
-            if (ZZSelection() && HZZSIPSelection() && TightZZLeptons()) {
-                FillHistograms(entry, weight, !blindVBS, systematic);
-            }
+          //if(systematic.first==pileupUp || systematic.first==pileupDown){ 
+          LoadBranches(entry, systematic);
+          if (ZZSelection() && HZZSIPSelection() && TightZZLeptons()) {
+              //std::cout<<run<<":"<<lumi<<":"<<evt<<std::endl;
+              FillHistograms(entry, weight, !blindVBS, systematic);
+              }
         }
-    }
-    
+    //}
+    } 
     return true;
 }
 

@@ -43,6 +43,13 @@ def getCombinePath():
         raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
                             % os.environ["USER"])
     return config['Setup']['combine_path'] + "/"
+def getHarvesterPath():
+    config = configparser.ConfigParser()
+    config.read_file(open("Templates/config.%s" % os.environ["USER"]))
+    if "harvester_path" not in config['Setup']:
+        raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
+                            % os.environ["USER"])
+    return config['Setup']['harvester_path'] + "/"
 def getListOfEWKFilenames():
     return [
         "wz3lnu-mg5amcnlo",
@@ -65,7 +72,7 @@ def getListOfEWKFilenames():
         #"zg",
         "ggZZ4e",
         "ggZZ4m",
-        #"ggZZ4t",
+        "ggZZ4t",
         "ggZZ2e2mu",
         "ggZZ2e2tau",
         "ggZZ2mu2tau",
@@ -76,7 +83,7 @@ def getListOfEWK():
         "zz4l-powheg",
         "ggZZ4e",
         "ggZZ4m",
-        #"ggZZ4t",
+        "ggZZ4t",
         "ggZZ2e2mu",
         "ggZZ2e2tau",
         "ggZZ2mu2tau",
@@ -87,8 +94,7 @@ def getListOfDYFilenames():
         "DYJetsToLLM-50",
         ]
 def getListOfNonpromptFilenames():
-    return ["tt-lep",
-            "tt-jets",
+    return ["tt-jets",
         #"st-schan",
         #"st-tchan-t",
         #"st-tchan-tbar",
@@ -102,7 +108,7 @@ def getListOfNonpromptFilenames():
     ]
 def getListOfHZZFilenames():
     return ["ggHZZ",
-            #"vbfHZZ",
+            "vbfHZZ",
             "ttH_HToZZ_4L",
             "WminusHToZZ",
             "WplusHToZZ",
@@ -111,7 +117,7 @@ def getListOfHZZFilenames():
 def getListOfggZZFilenames():
     return ["ggZZ4e",
         "ggZZ4m",
-        #"ggZZ4t",
+        "ggZZ4t",
         "ggZZ2e2mu",
         "ggZZ2e2tau",
         "ggZZ2mu2tau"

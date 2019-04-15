@@ -59,6 +59,8 @@ public :
     Float_t Z2mass;
     Float_t Z1pt;
     Float_t Z2pt;
+    Float_t Z1Phi;
+    Float_t Z2Phi;
     Float_t type1_pfMETEt;
     Float_t type1_pfMETPhi;
     Float_t l1GenPt;
@@ -122,6 +124,8 @@ public :
     TBranch* b_Z2mass;
     TBranch* b_Z1pt;
     TBranch* b_Z2pt;
+    TBranch* b_Z1Phi;
+    TBranch* b_Z2Phi;
     TBranch* b_nTruePU;
     TBranch* b_type1_pfMETEt;
     TBranch* b_type1_pfMETPhi;
@@ -230,8 +234,10 @@ protected:
     bool isNonpromptEstimate_;
     bool isNonpromptMC_;
     bool isZgamma_;
-    const float FR_MAX_PT_ = 200;
+    const float FR_MAX_PT_ = 80;
     const float FR_MAX_ETA_ = 2.5;
+    const float MuSF_MAX_PT_ = 200;
+    const float EleSF_MAX_PT_ = 500;
     bool e1e2IsZ1(Long64_t entry);
     bool lep1IsTight();
     bool lep2IsTight();

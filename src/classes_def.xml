@@ -2,10 +2,12 @@
   <class name="FakeRateSelector"/>
   <class name="WZSelector"/>
   <class name="ZZSelector"/>
+  <class name="ZZGenSelector"/>
   <class name="WZBackgroundSelector"/>
   <class name="ZZBackgroundSelector"/>
   <class name="WZSelectorBase"/>
   <class name="ZZSelectorBase"/>
+  <class name="ZZGenSelectorBase"/>
   <class name="ScaleFactor"/>
   <class name="disambiguateFinalStates"/>
 </lcgdict>

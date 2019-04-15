@@ -175,8 +175,9 @@ bool ZZBackgroundSelector::IsPPFFRegion() {
 }
 //Remember that we only build Z1 (Real Z) out of OS-SF tight leptons
 //This is only for 4e,4mu channels as eemm/mmee channels is already taken care of by SetVariables function which gets
-//called in LoadBranches() from ZZSelector. The SetVariables function should work in CRs, SR equally. We only need
-//SetZ1Z2Masses function for 4e/4mu in CRs.
+//called in LoadBranches() from ZZSelector. The SetVariables function should work in CRs, SR equally.Well if I require TightZZLeptons()
+//then the SetVariables function doesn't work for CRs.
+//So We  need SetZ1Z2Masses function for 4e/4mu/2e2mu in CRs.
 void ZZBackgroundSelector::SetZ1Z2Masses() {
     TLorentzVector lepton1;
     lepton1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, l1Mass);

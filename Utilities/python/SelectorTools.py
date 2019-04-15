@@ -42,8 +42,7 @@ def applySelector(filelist, channels,selector_name, selection,
                 #print select
                 #If its a real issue don't just skip the files, especially data and that's why this try and except is important
                 #try:
-                file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                        selection, analysis)
+                file_path = ConfigureJobs.getInputFilesPath(dataset,selection, analysis)
                 processLocalFiles(select, file_path, chan)
                     #countfiles=processLocalFiles(select, file_path, chan)
                     #print "CountFiles: ",countfiles
@@ -118,48 +117,59 @@ def applySelector(filelist, channels,selector_name, selection,
         #proof_path = "_".join([analysis, selection+("#/%s/ntuple" % chan)])
         #ROOT.gProof.Process(proof_path, select, "")
 #This is a version that has extra_inputs in the shape of fakeRates for Bkgs. This will be the function used for everything once I have sfs setup.
-def applyBkgSelector(filelist, channels,selector_name, selection, 
+def applyGenSelector(filelist, channels,selector_name, selection, 
         rootfile,
         analysis="ZZ4l2018", 
         extra_inputs = [],
-        addSumweights=True,
+        addSumweights=False,
         proof=False):
-    print "Background Selector"
+    print "Gen Selector"
     for i, chan in enumerate(channels):
-        inputs = ROOT.TList()
-        for inp in extra_inputs:
-            inputs.Add(inp)
-            print "inputs getting added: ",inp
+        print "channel length: ",len(chan)
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
             select = getattr(ROOT, selector_name)()
-            select.SetInputList(inputs)
-            print "inputs: ",inputs.Print()
-            print "Processing channel %s for dataset %s" % (chan, dataset)
-            print select
-            #If its a real issue don't just skip the files, especially data and that's why this try and except is important
-            try:
+            if len(chan)==4:
+                inputs = ROOT.TList()
+                select.SetInputList(inputs)
+                for inp in extra_inputs:
+                    inputs.Add(inp)
+                    print "inputs getting added: ",inp
+                tchan=ROOT.TNamed("channel",chan)
+                tname=ROOT.TNamed("name",dataset) 
+                inputs.Add(tname)
+                inputs.Add(tchan)
+                ROOT.gROOT.cd()
+                print "Processing channel %s for dataset %s" % (chan, dataset)
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                    selection, analysis)
-                processLocalFiles(select, file_path, chan)
-                #countfiles=processLocalFiles(select, file_path, chan)
-                #print "CountFiles: ",countfiles
-            except ValueError as e:
-                print e
-                continue
-            output_list = select.GetOutputList()
-            print "BkgSelector Output_list: ", output_list
-            dataset_list = output_list.FindObject(dataset)
-            if not dataset_list or dataset_list.ClassName() != "TList":
-                print "WARNING: No output found for dataset %s" % dataset
-                continue
-            # Only add for one channel
-            if addSumweights and i == 0:
-                meta_chain = ROOT.TChain("metaInfo/metaInfo")
-                meta_chain.Add(file_path)
-                sumweights = ROOT.TH1D("sumweights", "sumweights", 1, 0, 10)
-                meta_chain.Draw("1>>sumweights", "summedWeights")
-                dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
-            OutputTools.writeOutputListItem(dataset_list, rootfile)
+                        selection, analysis)
+                processGenLocalFiles(select, file_path, chan)
+                output_list = select.GetOutputList()
+                print "Output_list: ", output_list
+            else:
+                inputs = ROOT.TList()
+                select.SetInputList(inputs)
+                for inp in extra_inputs:
+                    inputs.Add(inp)
+                    print "inputs getting added: ",inp
+                tchan=ROOT.TNamed("channel",chan)
+                tname=ROOT.TNamed("name",dataset) 
+                inputs.Add(tname)
+                inputs.Add(tchan)
+                ROOT.gROOT.cd()
+                print "Processing channel %s for dataset %s" % (chan, dataset)
+                try:
+                    file_path = ConfigureJobs.getInputFilesPath(dataset, 
+                        selection, analysis)
+                    processGenLocalFiles(select, file_path, chan)
+                except ValueError as e:
+                    print e
+                    continue
+                output_list = select.GetOutputList()
+                print "Output_list: ", output_list
+            for item in output_list:
+                OutputTools.writeOutputListItem(item, rootfile)
+                ROOT.SetOwnership(item,False)
+                item.Delete()
             output_list.Delete()
             ROOT.gROOT.GetList().Delete()
 def processLocalFiles(selector, file_path, chan):
@@ -187,3 +197,23 @@ def processLocalFiles(selector, file_path, chan):
         tree.Process(selector, "")
         #countfiles=countfiles+1
     #return countfiles
+#Different GenTrees
+def processGenLocalFiles(selector, file_path, chan):
+    if not os.path.isdir(file_path.rsplit("/", 1)[0]):
+        raise ValueError("Invalid path! Path was %s" 
+            % file_path)
+    for filename in glob.glob(file_path):
+        rtfile = ROOT.TFile(filename)
+        if(chan=="eemm" or chan=="mmee"):
+            tree = rtfile.Get("eemmGen/ntuple")
+        else:
+            tree = rtfile.Get("%sGen/ntuple" % chan)
+        #try:
+        if not tree:
+            raise ValueError(("tree %s/ntuple not found for file %s. " \
+                "Probably it is corrupted") % (chan, filename)
+            )
+        #except ValueError as e:
+        #    print e
+        #    continue
+        tree.Process(selector, "")

@@ -152,21 +152,23 @@ void ZZSelectorBase::Init(TTree *tree)
         //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         //std::cout<<"enum channel_: "<<channel_<<std::endl;
         fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
-        //fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
+        //fChain->SetBranchAddress("e1ZZTightIDNoVtxHZZWP", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
-        //fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
+        //fChain->SetBranchAddress("e2ZZTightIDNoVtxHZZWP", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e2ZZIsoPass", &l2IsIso, &b_l2IsIso);
         fChain->SetBranchAddress("e3ZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
-        //fChain->SetBranchAddress("e3IsFall17isoV2wpHZZ", &l3IsTight, &b_l3IsTight);
+        //fChain->SetBranchAddress("e3ZZTightIDNoVtxHZZWP", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("e3ZZIsoPass", &l3IsIso, &b_l3IsIso);
         fChain->SetBranchAddress("e4ZZTightIDNoVtx", &l4IsTight, &b_l4IsTight);
-        //fChain->SetBranchAddress("e4IsFall17isoV2wpHZZ", &l4IsTight, &b_l4IsTight);
+        //fChain->SetBranchAddress("e4ZZTightIDNoVtxHZZWP", &l4IsTight, &b_l4IsTight);
         fChain->SetBranchAddress("e4ZZIsoPass", &l4IsIso, &b_l4IsIso);
         fChain->SetBranchAddress("e1_e2_Mass", &Z1mass, &b_Z1mass);
         fChain->SetBranchAddress("e3_e4_Mass", &Z2mass, &b_Z2mass);
         fChain->SetBranchAddress("e1_e2_Pt", &Z1pt, &b_Z1pt);
         fChain->SetBranchAddress("e3_e4_Pt", &Z2pt, &b_Z2pt);
+        fChain->SetBranchAddress("e1_e2_Phi", &Z1Phi, &b_Z1Phi);
+        fChain->SetBranchAddress("e3_e4_Phi", &Z2Phi, &b_Z2Phi);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
@@ -211,10 +213,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("evt", &evt, &b_evt);
         //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
-        //fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
+        //fChain->SetBranchAddress("e1ZZTightIDNoVtxHZZWP", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
-        //fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
+        //fChain->SetBranchAddress("e2ZZTightIDNoVtxHZZWP", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e2ZZIsoPass", &l2IsIso, &b_l2IsIso);
         fChain->SetBranchAddress("m1ZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m1ZZIsoPass", &l3IsIso, &b_l3IsIso);
@@ -224,6 +226,8 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m1_m2_Mass", &Z2mass, &b_Z2mass);
         fChain->SetBranchAddress("e1_e2_Pt", &Z1pt, &b_Z1pt);
         fChain->SetBranchAddress("m1_m2_Pt", &Z2pt, &b_Z2pt);
+        fChain->SetBranchAddress("e1_e2_Phi", &Z1Phi, &b_Z1Phi);
+        fChain->SetBranchAddress("m1_m2_Phi", &Z2Phi, &b_Z2Phi);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m1Pt", &l3Pt, &b_l3Pt);
@@ -268,10 +272,10 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("evt", &evt, &b_evt);
         //fChain->SetBranchAddress("duplicated", &duplicated, &b_duplicated);
         fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
-        //fChain->SetBranchAddress("e1IsFall17isoV2wpHZZ", &l1IsTight, &b_l1IsTight);
+        //fChain->SetBranchAddress("e1ZZTightIDNoVtxHZZWP", &l1IsTight, &b_l1IsTight);
         fChain->SetBranchAddress("e1ZZIsoPass", &l1IsIso, &b_l1IsIso);
         fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight); 
-        //fChain->SetBranchAddress("e2IsFall17isoV2wpHZZ", &l2IsTight, &b_l2IsTight);
+        //fChain->SetBranchAddress("e2ZZTightIDNoVtxHZZWP", &l2IsTight, &b_l2IsTight);
         fChain->SetBranchAddress("e2ZZIsoPass", &l2IsIso, &b_l2IsIso);
         fChain->SetBranchAddress("m1ZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("m1ZZIsoPass", &l3IsIso, &b_l3IsIso);
@@ -281,6 +285,8 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m1_m2_Mass", &Z2mass, &b_Z2mass);
         fChain->SetBranchAddress("e1_e2_Pt", &Z1pt, &b_Z1pt);
         fChain->SetBranchAddress("m1_m2_Pt", &Z2pt, &b_Z2pt);
+        fChain->SetBranchAddress("e1_e2_Phi", &Z1Phi, &b_Z1Phi);
+        fChain->SetBranchAddress("m1_m2_Phi", &Z2Phi, &b_Z2Phi);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m1Pt", &l3Pt, &b_l3Pt);
@@ -334,6 +340,8 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m3_m4_Mass", &Z2mass, &b_Z2mass);
         fChain->SetBranchAddress("m1_m2_Pt", &Z1pt, &b_Z1pt);
         fChain->SetBranchAddress("m3_m4_Pt", &Z2pt, &b_Z2pt);
+        fChain->SetBranchAddress("m1_m2_Phi", &Z1Phi, &b_Z1Phi);
+        fChain->SetBranchAddress("m3_m4_Phi", &Z2Phi, &b_Z2Phi);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
@@ -379,6 +387,7 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e3ZZIsoPass", &l3IsIso, &b_l3IsIso);
         fChain->SetBranchAddress("e1_e2_Mass", &Z1mass, &b_Z1mass);
         fChain->SetBranchAddress("e1_e2_Pt", &Z1pt, &b_Z1pt);
+        fChain->SetBranchAddress("e1_e2_Phi", &Z1Phi, &b_Z1Phi);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
@@ -414,7 +423,8 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("mZZTightIDNoVtx", &l3IsTight, &b_l3IsTight);
         fChain->SetBranchAddress("mZZIsoPass", &l3IsIso, &b_l3IsIso);
         fChain->SetBranchAddress("e1_e2_Mass", &Z1mass, &b_Z1mass);
-        fChain->SetBranchAddress("e1_e2_Pt", &Z1pt, &b_Z1pt); 
+        fChain->SetBranchAddress("e1_e2_Pt", &Z1pt, &b_Z1pt);
+        fChain->SetBranchAddress("e1_e2_Phi", &Z1Phi, &b_Z1Phi);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
@@ -451,6 +461,7 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m2ZZIsoPass", &l2IsIso, &b_l2IsIso);
         fChain->SetBranchAddress("m1_m2_Mass", &Z1mass, &b_Z1mass);
         fChain->SetBranchAddress("m1_m2_Pt", &Z1pt, &b_Z1pt);
+        fChain->SetBranchAddress("m1_m2_Phi", &Z1Phi, &b_Z1Phi);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
@@ -487,6 +498,7 @@ void ZZSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m3ZZIsoPass", &l3IsIso, &b_l3IsIso);
         fChain->SetBranchAddress("m1_m2_Mass", &Z1mass, &b_Z1mass);
         fChain->SetBranchAddress("m1_m2_Pt", &Z1pt, &b_Z1pt);
+        fChain->SetBranchAddress("m1_m2_Phi", &Z1Phi, &b_Z1Phi);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
@@ -551,120 +563,6 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     b_run->GetEntry(entry);
     b_lumi->GetEntry(entry);
     b_evt->GetEntry(entry);
-    if (channel_ == eeee || channel_ == eemm || channel_ == mmee){
-      b_l1IsGap->GetEntry(entry); 
-      b_l2IsGap->GetEntry(entry); 
-      b_l3IsGap->GetEntry(entry); 
-      b_l4IsGap->GetEntry(entry);
-    }
-    //std::cout<<"IsMC: "<<isMC_<<std::endl;
-    if (isMC_) {
-        //b_duplicated->GetEntry(entry);
-        b_genWeight->GetEntry(entry);
-        //b_l1GenPt->GetEntry(entry);
-        //b_l2GenPt->GetEntry(entry);
-        //b_l3GenPt->GetEntry(entry);
-        //std::cout<<"Its fine before nTruePU" <<std::endl;
-        b_nTruePU->GetEntry(entry);
-        //if (channel_ == eeee || channel_ == eemm || channel_ == mmmm) {
-        //  b_l4GenPt->GetEntry(entry);}
-        //std::cout<<"It fails before weight=genWeight assignment" <<std::endl;
-        weight = genWeight;
-        //std::cout<<"weight before SF: "<<weight<<std::endl;
-        if (channel_ == eeee) {
-            if(l1IsGap){
-              weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-              //std::cout<<"weight for GapE: "<<weight<<std::endl;
-            }
-            else{
-              weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            }
-            if(l2IsGap){
-              weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            }
-            else{
-              weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            }
-            if(l3IsGap){
-              weight *= eGapIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            }
-            else{
-              weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            }
-            if(l4IsGap){
-              weight *= eGapIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
-            }
-            else{
-              weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
-            }
-            //Applying Electron Reco SFs
-            if(l1Pt < 20){ 
-              weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            }
-            else{ 
-              weight *= eRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            }
-            if(l2Pt < 20){ 
-              weight *= eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            }
-            else{ 
-              weight *= eRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            }
-            if(l3Pt < 20){ 
-              weight *= eLowRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            }
-            else{ 
-              weight *= eRecoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            }
-            if(l4Pt < 20){ 
-              weight *= eLowRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
-            }
-            else{ 
-              weight *= eRecoSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
-            }
-        }
-        else if (channel_ == eemm || channel_ == mmee) {
-            if(l1IsGap){
-              weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            }
-            else{
-              weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            }
-            if(l2IsGap){
-              weight *= eGapIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            }
-            else{
-              weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            }
-            //Applying Electron Reco SFs
-            if(l1Pt < 20){ 
-              weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            }
-            else{ 
-              weight *= eRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            }
-            if(l2Pt < 20){ 
-              weight *= eLowRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            }
-            else{ 
-              weight *= eRecoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            }
-            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
-        }
-        else {
-            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), l4Pt);
-        }
-        weight *= pileupSF_->Evaluate1D(nTruePU);
-        //std::cout<<"weight after SF applied: "<<weight<<std::endl;
-    }
-    else {
-        //b_Flag_duplicateMuonsPass->GetEntry(entry);          
-        //b_Flag_badMuonsPass->GetEntry(entry);          
-    }
     //std::cout<<"Is the ZZSelectorBase fine until here"<<std::endl;
     if (channel_ == eeee || channel_ == eemm || channel_ == mmee || channel_ == mmmm) {
       b_l4Pt->GetEntry(entry);
@@ -682,9 +580,11 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
       //b_l4PVDZ->GetEntry(entry);
       b_Z2mass->GetEntry(entry);
       b_Z2pt->GetEntry(entry);
+      b_Z2Phi->GetEntry(entry);
     }
     b_Z1mass->GetEntry(entry);
     b_Z1pt->GetEntry(entry);
+    b_Z1Phi->GetEntry(entry);
     b_type1_pfMETEt->GetEntry(entry); 
     b_l1IsTight->GetEntry(entry);
     b_l1IsIso->GetEntry(entry);
@@ -692,17 +592,33 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
     b_l2IsIso->GetEntry(entry);
     b_l3IsTight->GetEntry(entry);
     b_l3IsIso->GetEntry(entry); 
-    
-    //b_l1PVDXY->GetEntry(entry);
-    //b_l2PVDXY->GetEntry(entry);
-    //b_l3PVDXY->GetEntry(entry);
-    //b_l1PVDZ->GetEntry(entry);
-    //b_l2PVDZ->GetEntry(entry);
-    //b_l3PVDZ->GetEntry(entry);
-
+    if (channel_ == eeee || channel_ == eemm || channel_ == mmee){
+      b_l1IsGap->GetEntry(entry); 
+      b_l2IsGap->GetEntry(entry); 
+      b_l3IsGap->GetEntry(entry); 
+      b_l4IsGap->GetEntry(entry);
+    }
     if (channel_ == eee || channel_ == eem || channel_ == emm || channel_ == mmm) {
       b_l3MtToMET->GetEntry(entry);
     }
+    //std::cout<<"IsMC: "<<isMC_<<std::endl;
+    if (isMC_) {
+        //b_duplicated->GetEntry(entry);
+        b_genWeight->GetEntry(entry);
+        //b_l1GenPt->GetEntry(entry);
+        //b_l2GenPt->GetEntry(entry);
+        //b_l3GenPt->GetEntry(entry);
+        //std::cout<<"Its fine before nTruePU" <<std::endl;
+        b_nTruePU->GetEntry(entry);
+        //if (channel_ == eeee || channel_ == eemm || channel_ == mmmm) {
+        //  b_l4GenPt->GetEntry(entry);}
+        //std::cout<<"It fails before weight=genWeight assignment" <<std::endl;
+        weight = genWeight;
+    }
+    else {
+        //b_Flag_duplicateMuonsPass->GetEntry(entry);          
+        //b_Flag_badMuonsPass->GetEntry(entry);          
+    } 
     if(channel_ == mmee){
       if(e1e2IsZ1(entry))
         weight=0.0;
@@ -713,6 +629,13 @@ Bool_t ZZSelectorBase::Process(Long64_t entry)
         weight=0.0;
         //Makes weight 0 if Z1 is mm hence should not go in _eemm 
     }
+    //b_l1PVDXY->GetEntry(entry);
+    //b_l2PVDXY->GetEntry(entry);
+    //b_l3PVDXY->GetEntry(entry);
+    //b_l1PVDZ->GetEntry(entry);
+    //b_l2PVDZ->GetEntry(entry);
+    //b_l3PVDZ->GetEntry(entry);
+
     //b_Flag_BadPFMuonFilterPass->GetEntry(entry);                    
     //b_Flag_BadChargedCandidateFilterPass->GetEntry(entry);          
     //b_Flag_HBHENoiseFilterPass->GetEntry(entry);                    
