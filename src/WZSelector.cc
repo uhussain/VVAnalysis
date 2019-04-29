@@ -439,6 +439,8 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
         if (jetPt->at(0) < 50 || jetPt->at(1) < 50)
             return false;
     }
+    else if (jetPt->at(0) < 40 || jetPt->at(1) < 40)
+        return false;
     if (selection_ == VBSselection_Tight ||
                 selection_ == VBSselection_Tight_Full) { 
         if (std::abs(zep3l) > 2.5)
@@ -457,7 +459,9 @@ bool WZSelector::PassesVBSSelection(bool noBlind) {
              selection_ == VBSBackgroundControlLoose_Full) { 
         return PassesVBSBackgroundControlSelection();
     }
-    return mjj > 500 && dEtajj > 2.5;
+    //return mjj > 500 && dEtajj > 2.5;
+    // ATLAS
+    return mjj > 150;
 }
 
 bool WZSelector::PassesFullWZSelection(Long64_t entry) {
@@ -467,8 +471,8 @@ bool WZSelector::PassesFullWZSelection(Long64_t entry) {
         return false;
     if (Mass < 100)
         return false;
-    //if (MET < 30)
-    //    return false;
+    if (MET < 30)
+        return false;
 
     b_jetCSVv2->GetEntry(entry);
     for (const auto& jetCSVval : *jetCSVv2) {

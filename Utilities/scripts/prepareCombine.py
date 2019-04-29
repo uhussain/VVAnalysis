@@ -206,7 +206,8 @@ if args['addControlRegion']:
     variable = base_variable + "_wCR"
 
 #mjj_binning = ConfigureJobs.get2DBinning()[0]
-mjj_binning = array.array('d', [i*100 for i in range(0,25)]) 
+#mjj_binning = array.array('d', [i*100 for i in range(0,25)]) 
+mjj_binning = array.array('d', [150,200,250,300,350,400,450,500,750,1000,1250,1500,2000,3000]) 
 rebin = mjj_binning if base_variable == "mjj" else None
 if variable == "MTWZ":
     rebin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS, isHiggs=args['higgs']))
@@ -296,11 +297,15 @@ for plot_group in plot_groups:
             pdf_hists = []
             if "TH2" in weight_hist.ClassName():
                 threbin = 0
-                if "MTWZ" in variable:
-                    threbin = array.array('d', ConfigureJobs.getBinning(isVBS=isVBS, isHiggs=args['higgs']))
+                if "MTWZ" in variable or "mjj" in variable:
+                    threbin = rebin
                 scale_hists = HistTools.getScaleHists(weight_hist, plot_group, threbin)
                 if pdf_entries[plot_group]:
-                    pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, threbin)
+                    try:
+                        pdf_hists = HistTools.getPDFHists(weight_hist, pdf_entries[plot_group], plot_group, threbin)
+                    except RuntimeError as e:
+                        print e 
+                        pass
             elif "TH3" in weight_hist.ClassName(): 
                 scale_hists = HistTools.getTransformed3DScaleHists(weight_hist, 
                     HistTools.makeUnrolledHist,

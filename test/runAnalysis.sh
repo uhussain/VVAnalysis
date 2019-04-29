@@ -98,7 +98,7 @@ if [ "$2" != "noCombine" ]; then
     if [ "$1" != "FakeRate"* ]; then
         combine_path=$(./Utilities/scripts/getConfigValue.py combine_output)
         combine_file=${combine_path}/$(basename $histfile) 
-        ./Utilities/scripts/prepareCombine.py \
+        echo ./Utilities/scripts/prepareCombine.py \
             --input_file $histfile \
             -s $combine_selection \
             --folder_name $combine_folder \

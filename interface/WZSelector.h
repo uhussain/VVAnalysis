@@ -7,7 +7,7 @@
 
 class WZSelector : public WZSelectorBase {
 public :
-    bool doSystematics_ = false;
+    bool doSystematics_ = true;
     bool applyFullSelection_ = true;
     bool isaQGC_ = false;
     bool doaQGC_ = false;
@@ -121,8 +121,6 @@ public :
     std::map<std::string, TH2D*> weighthists_ = {
         { "backgroundControlYield",  {} },
         { "mjj",  {} },
-        { "m_l1l3",  {} },
-        { "m_l2l3",  {} },
         { "MTWZ",  {} },
         { "yield",  {} },
     };
