@@ -21,7 +21,7 @@ style = Style()
 ROOT.gStyle.SetLineScalePS(1.8)
 
 #channels = ["eeee", "eemm","mmmm"]
-channels = ["eeee"]
+channels = ["eemm"]
 Z_MASS = 91.1876
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
@@ -55,10 +55,10 @@ def getComLineArgs():
     parser.add_argument('--logy', '--logY', '--log', action='store_true',
                         help='Put vertical axis on a log scale.')
     parser.add_argument('--plotDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DummyUnfolding/RooUnfoldMat2017',
+                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DummyUnfolding/TUnfoldMat2017',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--unfoldDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DummyUnfolding/RooUnfoldedDistributions2017',
+                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DummyUnfolding/TUnfoldedDistributions2017',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--nIter', type=int, nargs='?', default=1,
                         help='Number of iterations for D\'Agostini method')
@@ -478,7 +478,10 @@ def generateResponseClass(varName, channel,sumW):
 _printCounter = 0
 #Load the RooUnfold library into ROOT
 ROOT.gSystem.Load("RooUnfold/libRooUnfold")
-def getResponse(varName,chan,sigHists,sumW,trueHists,nIter,plotDir='',unfoldDir=''):
+#Load the TUnfold library into ROOT
+ROOT.gSystem.Load("TUnfold/libunfold")
+#def getResponse(varName,chan,sigHists,sumW,trueHists,nIter,plotDir='',unfoldDir=''):
+def getResponse(varName,chan,sigHists,sumW,trueHists,plotDir=''):
     global _printCounter
     #get responseMakers from the function above- this is the whole game.
     responseMakers = generateResponseClass(varName, chan,sumW)
@@ -531,11 +534,14 @@ def getResponse(varName,chan,sigHists,sumW,trueHists,nIter,plotDir='',unfoldDir=
     #hResp = hResponse
     #print "hResp out of response: ",hResp
 
-    #RooUnfoldIter = getattr(ROOT,"RooUnfoldBayes")
+    TUnfoldDensity = getattr(ROOT,"TUnfoldDensity")
 
-    RooUnfoldInv = getattr(ROOT,"RooUnfoldInvert")
+    #RooUnfoldInv = getattr(ROOT,"RooUnfoldInvert")
+
     try:
         svd = ROOT.TDecompSVD(response.Mresponse())
+        rows = svd.GetNrows()
+        cols = svd.GetNcols()
         sig = svd.GetSig()
         try:
             condition = sig.Max() / max(0., sig.Min())
@@ -546,6 +552,7 @@ def getResponse(varName,chan,sigHists,sumW,trueHists,nIter,plotDir='',unfoldDir=
         print "channel: ",chan
         print "variable: ",varNames[varName]
         print "hResp out of response: ",hResp
+        print "rows x cols: ",rows," x ",cols
         print ''
         print 'condition: {}'.format(condition)
         print ''
@@ -568,142 +575,156 @@ def getResponse(varName,chan,sigHists,sumW,trueHists,nIter,plotDir='',unfoldDir=
         _printCounter += 1
 
 
-    c = ROOT.TCanvas("c1","canvas",1200,1200)
-    hSig.GetXaxis().SetTitle('Reco '+prettyVars[varName]+''+units[varName])
-    hSig.Draw()
-    style.setCMSStyle(c, '', dataType='Debug', intLumi=41500.)
-    c.Print("DebugPlots/sig{}.png".format(_printCounter))
-    hTrue.GetXaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
-    hTrue.Draw()
-    style.setCMSStyle(c, '', dataType='Debug', intLumi=41500.)
-    c.Print("DebugPlots/true{}.png".format(_printCounter))
-    draw_opt = "colz text45"
-    hResponse.GetXaxis().SetTitle('Reco '+prettyVars[varName]+''+units[varName])
-    hResponse.GetYaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
-    hResponse.Draw(draw_opt)
-    style.setCMSStyle(c, '', dataType='Debug', intLumi=41500.)
-    c.Print("DebugPlots/resp{}.png".format(_printCounter))
-    c.Print("DebugPlots/resp{}.root".format(_printCounter))
+    #c = ROOT.TCanvas("c1","canvas",1200,1200)
+    #hSig.GetXaxis().SetTitle('Reco '+prettyVars[varName]+''+units[varName])
+    #hSig.Draw()
+    #style.setCMSStyle(c, '', dataType='Debug', intLumi=41500.)
+    #c.Print("DebugPlots/sig{}.png".format(_printCounter))
+    #hTrue.GetXaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
+    #hTrue.Draw()
+    #style.setCMSStyle(c, '', dataType='Debug', intLumi=41500.)
+    #c.Print("DebugPlots/true{}.png".format(_printCounter))
+    #draw_opt = "colz text45"
+    #hResponse.GetXaxis().SetTitle('Reco '+prettyVars[varName]+''+units[varName])
+    #hResponse.GetYaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
+    #hResponse.Draw(draw_opt)
+    #style.setCMSStyle(c, '', dataType='Debug', intLumi=41500.)
+    #c.Print("DebugPlots/resp{}.png".format(_printCounter))
+    #c.Print("DebugPlots/resp{}.root".format(_printCounter))
 
     #unf = RooUnfoldIter(response, hSig, nIter)
     
-    #Simply inverting the matrix
-    unf = RooUnfoldInv(response, hSig)
-
-    #This is the unfolded "true" distribution
-    hOut = unf.Hreco()
-    if not hOut:
-        print hOut
-        raise ValueError("The unfolded histogram got screwed up somehow!")
+    #Constructor for TUnfoldDensity.
+    #Ingredients
+    #truth level on y-axis of the response matrix
+    histMap = TUnfoldDensity.kHistMapOutputVert
+    #RegMode->no regularisation, or defined later by RegularizeXXX() methods
+    RegMode = TUnfoldDensity.kRegModeNone
+    #constraint (default=kEConstraintArea) type of constraint
+    #preserve the area
+    Constraint = TUnfoldDensity.kEConstraintArea
+    #density flags - bin content is divided by the bin width
+    densityFlags=TUnfoldDensity.kDensityModeBinWidth
+    unf = TUnfoldDensity(hResp, histMap,RegMode,Constraint,densityFlags)
+    unf.SetInput(hSig.Clone())
     
-    UnfHists=[]
-    TrueHists=[]
-    if unfoldDir:
-        cUnfold = ROOT.TCanvas("c","canvas",1200,1200)
-        hOut.GetXaxis().SetTitle('UnfTrue '+prettyVars[varName]+''+units[varName])
-        hOut.GetXaxis().SetTitleSize(0.75*xaxisSize)
-        hOut.Draw("HIST")
-        UnfHists.append(hOut)
-        leg = makeLegend(cUnfold,*(UnfHists),**legParams[varName])
-        leg.SetFillStyle(1001)
-        leg.Draw("SAME")
-        style.setCMSStyle(cUnfold, '', dataType='  Work in Progress', intLumi=41500.)
-        print "unfoldDir: ",unfoldDir
-        cUnfold.Print("%s/UnfDist_%s.png" % (unfoldDir,varName))
-        cUnfold.Print("%s/UnfDist_%s.pdf" % (unfoldDir,varName))
-        del cUnfold
+    #Probability matrix
+    name="ProbMatrix"+varNames[varName] 
+    ProResp = unf.GetProbabilityMatrix(name)
+    #This is the unfolded "true" distribution
+    #hOut = unf.Hreco()
+    #if not hOut:
+    #    print hOut
+    #    raise ValueError("The unfolded histogram got screwed up somehow!")
+    #
+    #UnfHists=[]
+    #TrueHists=[]
+    #if unfoldDir:
+    #    cUnfold = ROOT.TCanvas("c","canvas",1200,1200)
+    #    hOut.GetXaxis().SetTitle('UnfTrue '+prettyVars[varName]+''+units[varName])
+    #    hOut.GetXaxis().SetTitleSize(0.75*xaxisSize)
+    #    hOut.Draw("HIST")
+    #    UnfHists.append(hOut)
+    #    leg = makeLegend(cUnfold,*(UnfHists),**legParams[varName])
+    #    leg.SetFillStyle(1001)
+    #    leg.Draw("SAME")
+    #    style.setCMSStyle(cUnfold, '', dataType='  Work in Progress', intLumi=41500.)
+    #    print "unfoldDir: ",unfoldDir
+    #    cUnfold.Print("%s/UnfDist_%s.png" % (unfoldDir,varName))
+    #    cUnfold.Print("%s/UnfDist_%s.pdf" % (unfoldDir,varName))
+    #    del cUnfold
 
-        cTrue = ROOT.TCanvas("c","canvas",1200,1200)
-        hTrue.GetXaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
-        hTrue.GetXaxis().SetTitleSize(0.75*yaxisSize)
-        hTrue.SetLineColor(ROOT.kRed)
-        hTrue.Draw("HIST")
-        TrueHists.append(hTrue)
-        leg = makeLegend(cTrue,*(TrueHists),**legParams[varName])
-        leg.SetFillStyle(1001)
-        leg.Draw("SAME")
-        style.setCMSStyle(cTrue, '', dataType='  Work in Progress', intLumi=41500.)
-        print "unfoldDir: ",unfoldDir
-        cTrue.Print("%s/TrueDist_%s.png" % (unfoldDir,varName))
-        cTrue.Print("%s/TrueDist_%s.pdf" % (unfoldDir,varName))
-        del cTrue
-        
-        #Create a ratio plot
-        c,pad1 = createCanvasPads()
+    #    cTrue = ROOT.TCanvas("c","canvas",1200,1200)
+    #    hTrue.GetXaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
+    #    hTrue.GetXaxis().SetTitleSize(0.75*yaxisSize)
+    #    hTrue.SetLineColor(ROOT.kRed)
+    #    hTrue.Draw("HIST")
+    #    TrueHists.append(hTrue)
+    #    leg = makeLegend(cTrue,*(TrueHists),**legParams[varName])
+    #    leg.SetFillStyle(1001)
+    #    leg.Draw("SAME")
+    #    style.setCMSStyle(cTrue, '', dataType='  Work in Progress', intLumi=41500.)
+    #    print "unfoldDir: ",unfoldDir
+    #    cTrue.Print("%s/TrueDist_%s.png" % (unfoldDir,varName))
+    #    cTrue.Print("%s/TrueDist_%s.pdf" % (unfoldDir,varName))
+    #    del cTrue
+    #    
+    #    #Create a ratio plot
+    #    c,pad1 = createCanvasPads()
 
-        Unfmaximum = hOut.GetMaximum()
-        hTrue.SetFillColor(ROOT.kRed)
-        print "Total Truth Integral",hTrue.Integral()
-        print "Total Unf Truth Integral",hOut.Integral()
-        Truthmaximum = hTrue.GetMaximum()
-        hTrue.Draw("HIST")
-        if(Unfmaximum > Truthmaximum):
-            hTrue.SetMaximum(Unfmaximum*1.2)
-        else:
-            hTrue.SetMaximum(Truthmaximum*1.2)
+    #    Unfmaximum = hOut.GetMaximum()
+    #    hTrue.SetFillColor(ROOT.kRed)
+    #    print "Total Truth Integral",hTrue.Integral()
+    #    print "Total Unf Truth Integral",hOut.Integral()
+    #    Truthmaximum = hTrue.GetMaximum()
+    #    hTrue.Draw("HIST")
+    #    if(Unfmaximum > Truthmaximum):
+    #        hTrue.SetMaximum(Unfmaximum*1.2)
+    #    else:
+    #        hTrue.SetMaximum(Truthmaximum*1.2)
 
-        hTrue.GetXaxis().SetTitle("")
+    #    hTrue.GetXaxis().SetTitle("")
 
-        hTrue.GetXaxis().SetLabelSize(0)
-        hTrue.GetXaxis().SetTitleSize(0)
-        hTrue.GetYaxis().SetTitle("Events")
-        hTrue.GetYaxis().SetTitleOffset(1.0)
-        hTrue.Draw("HIST")
-        hOut.SetLineColor(ROOT.kBlack)
-        hOut.SetMarkerStyle(20)
-        hOut.SetMarkerSize(0.7)
-        hOut.GetXaxis().SetTitle("")
-        hOut.GetXaxis().SetLabelSize(0)
-        hOut.GetXaxis().SetTitleSize(0)
-        hOut.Draw("px0same")
-        
-        leg = ROOT.TLegend(0.68,0.54,0.88,0.84,"")
-        leg.AddEntry(hOut,"Unf Gen")
-        leg.AddEntry(hTrue, "True Gen")
-        leg.SetFillColor(ROOT.kWhite)
-        leg.SetFillStyle(0)
-        leg.SetTextSize(0.025)
-        leg.Draw()
+    #    hTrue.GetXaxis().SetLabelSize(0)
+    #    hTrue.GetXaxis().SetTitleSize(0)
+    #    hTrue.GetYaxis().SetTitle("Events")
+    #    hTrue.GetYaxis().SetTitleOffset(1.0)
+    #    hTrue.Draw("HIST")
+    #    hOut.SetLineColor(ROOT.kBlack)
+    #    hOut.SetMarkerStyle(20)
+    #    hOut.SetMarkerSize(0.7)
+    #    hOut.GetXaxis().SetTitle("")
+    #    hOut.GetXaxis().SetLabelSize(0)
+    #    hOut.GetXaxis().SetTitleSize(0)
+    #    hOut.Draw("px0same")
+    #    
+    #    leg = ROOT.TLegend(0.68,0.54,0.88,0.84,"")
+    #    leg.AddEntry(hOut,"Unf Gen")
+    #    leg.AddEntry(hTrue, "True Gen")
+    #    leg.SetFillColor(ROOT.kWhite)
+    #    leg.SetFillStyle(0)
+    #    leg.SetTextSize(0.025)
+    #    leg.Draw()
 
-        #SecondPad
-        pad2 = createPad2(c)
-        #Starting the ratio proceedure
-        Ratio,line = createRatio(hOut, hTrue)
-        Ratio.Draw("px0")
-        line.SetLineColor(ROOT.kBlack)
-        line.Draw("same")
+    #    #SecondPad
+    #    pad2 = createPad2(c)
+    #    #Starting the ratio proceedure
+    #    Ratio,line = createRatio(hOut, hTrue)
+    #    Ratio.Draw("px0")
+    #    line.SetLineColor(ROOT.kBlack)
+    #    line.Draw("same")
 
-        #redraw axis
-        xaxis = ROOT.TGaxis(hOut.GetXaxis().GetXmin(),0,hOut.GetXaxis().GetXmax(),0,hOut.GetXaxis().GetXmin(),hOut.GetXaxis().GetXmax(),510)
-        xaxis.SetTitle(prettyVars[varName]+''+units[varName])
-        xaxis.SetLabelFont(42)
-        xaxis.SetLabelSize(0.10)
-        xaxis.SetTitleFont(42)
-        xaxis.SetTitleSize(0.12)
-        xaxis.SetTitleOffset(0.70)
-        xaxis.Draw("SAME")
+    #    #redraw axis
+    #    xaxis = ROOT.TGaxis(hOut.GetXaxis().GetXmin(),0,hOut.GetXaxis().GetXmax(),0,hOut.GetXaxis().GetXmin(),hOut.GetXaxis().GetXmax(),510)
+    #    xaxis.SetTitle(prettyVars[varName]+''+units[varName])
+    #    xaxis.SetLabelFont(42)
+    #    xaxis.SetLabelSize(0.10)
+    #    xaxis.SetTitleFont(42)
+    #    xaxis.SetTitleSize(0.12)
+    #    xaxis.SetTitleOffset(0.70)
+    #    xaxis.Draw("SAME")
 
-        yaxis = ROOT.TGaxis(hOut.GetXaxis().GetXmin(),0,hOut.GetXaxis().GetXmin(),2.2,0,2.2,6,"")
-        yaxis.SetTitle("UnfGen/TrueGen")
-        yaxis.SetLabelFont(42)
-        yaxis.SetLabelSize(0.10)
-        yaxis.SetTitleFont(42)
-        yaxis.SetTitleSize(0.12)
-        yaxis.SetTitleOffset(0.35)
-        yaxis.Draw("SAME")
-        style.setCMSStyle(c, '', dataType='  Work in Progress', intLumi=41500.)
-        c.Print("%s/Ratio_%s.png" % (unfoldDir,varName))
-        c.Print("%s/Ratio_%s.pdf" % (unfoldDir,varName))
-        c.Update()
+    #    yaxis = ROOT.TGaxis(hOut.GetXaxis().GetXmin(),0,hOut.GetXaxis().GetXmin(),2.2,0,2.2,6,"")
+    #    yaxis.SetTitle("UnfGen/TrueGen")
+    #    yaxis.SetLabelFont(42)
+    #    yaxis.SetLabelSize(0.10)
+    #    yaxis.SetTitleFont(42)
+    #    yaxis.SetTitleSize(0.12)
+    #    yaxis.SetTitleOffset(0.35)
+    #    yaxis.Draw("SAME")
+    #    style.setCMSStyle(c, '', dataType='  Work in Progress', intLumi=41500.)
+    #    c.Print("%s/Ratio_%s.png" % (unfoldDir,varName))
+    #    c.Print("%s/Ratio_%s.pdf" % (unfoldDir,varName))
+    #    c.Update()
 
-        del c
+    #    del c
 
-    #Returns covariance matrices for error calculation of type withError
-    #0: Errors are the square root of the bin content
-    #1: Errors from the diagonals of the covariance matrix given by the unfolding
-    #2: Errors from the covariance matrix given by the unfolding => We use this one for now
-    #3: Errors from the covariance matrix from the variation of the results in toy MC tests
-    hCov = unf.Ereco(0)
+    ##Returns covariance matrices for error calculation of type withError
+    ##0: Errors are the square root of the bin content
+    ##1: Errors from the diagonals of the covariance matrix given by the unfolding
+    ##2: Errors from the covariance matrix given by the unfolding => We use this one for now
+    ##3: Errors from the covariance matrix from the variation of the results in toy MC tests
+    #hCov = unf.Ereco(0)
 
     # plot covariance and response
     if plotDir:
@@ -723,16 +744,33 @@ def getResponse(varName,chan,sigHists,sumW,trueHists,nIter,plotDir='',unfoldDir=
         cRes.Print("%s/response_%s.pdf" % (plotDir,varName))
     
         del cRes
-        cCov = ROOT.TCanvas("c","canvas",1200,1200)
+
+        ProRes = ROOT.TCanvas("c","canvas",1200,1200)
         if varName == 'massFull':
-            cCov.SetLogx()
-            cCov.SetLogy()
+            ProRes.SetLogx()
+            ProRes.SetLogy()
         draw_opt = "colz text45"
-        hCov.Draw(draw_opt)
-        style.setCMSStyle(cCov, '', dataType='Internal', intLumi=41500.)
-        cCov.Print("%s/covariance_%s.png" % (plotDir,varName))
-        cCov.Print("%s/covariance_%s.pdf" % (plotDir,varName))
-        del cCov
+        ProResp.GetXaxis().SetTitle('Reco '+prettyVars[varName]+''+units[varName])
+        ProResp.GetYaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
+        ProResp.GetXaxis().SetTitleSize(0.75*xaxisSize)
+        ProResp.GetYaxis().SetTitleSize(0.75*yaxisSize)
+        ProResp.Draw(draw_opt)
+        style.setCMSStyle(ProRes, '', dataType='  Internal', intLumi=41500.)
+        print "plotDir: ",plotDir
+        ProRes.Print("%s/ProbResponse_%s.png" % (plotDir,varName))
+        ProRes.Print("%s/ProbResponse_%s.pdf" % (plotDir,varName))
+    
+        del ProRes
+        #cCov = ROOT.TCanvas("c","canvas",1200,1200)
+        #if varName == 'massFull':
+        #    cCov.SetLogx()
+        #    cCov.SetLogy()
+        #draw_opt = "colz text45"
+        #hCov.Draw(draw_opt)
+        #style.setCMSStyle(cCov, '', dataType='Internal', intLumi=41500.)
+        #cCov.Print("%s/covariance_%s.png" % (plotDir,varName))
+        #cCov.Print("%s/covariance_%s.pdf" % (plotDir,varName))
+        #del cCov
 #if __name__ == "__main__":
 
 def mkdir(plotDir):
@@ -744,8 +782,8 @@ def mkdir(plotDir):
             pass
 
 plotDir=args['plotDir']
-UnfoldDir=args['unfoldDir']
-nIterations=args['nIter']
+#UnfoldDir=args['unfoldDir']
+#nIterations=args['nIter']
 
 #varNames={'mass': 'Mass'}
 
@@ -771,15 +809,15 @@ for varName in varNames.keys():
         OutputDir=plotDir+"/"+chan+"/plots"
         if not os.path.exists(OutputDir):
             mkdir(OutputDir)
-        UnfoldOutDir=UnfoldDir+"/"+chan+"/plots"
-        if not os.path.exists(UnfoldOutDir):
-            mkdir(UnfoldOutDir)
-        getResponse(varName,chan,mc,sumW,gen,nIterations,OutputDir,UnfoldOutDir)
-
+        #UnfoldOutDir=UnfoldDir+"/"+chan+"/plots"
+        #if not os.path.exists(UnfoldOutDir):
+        #    mkdir(UnfoldOutDir)
+        #getResponse(varName,chan,mc,sumW,gen,nIterations,OutputDir,UnfoldOutDir)
+        getResponse(varName,chan,mc,sumW,gen,OutputDir)
 print(os.path.expanduser(OutputDir.replace("/plots", "")))
 print(os.path.expanduser(OutputDir.replace("/plots", "")).split("/")[-1])
 makeSimpleHtml.writeHTML(os.path.expanduser(OutputDir.replace("/plots", "")), "2D ResponseMatrices (from MC)")
-makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDir.replace("/plots", "")), "Unfolded Distributions (from MC)")
+#makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDir.replace("/plots", "")), "Unfolded Distributions (from MC)")
 
 if args['test']:
     exit(0)
