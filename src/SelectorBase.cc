@@ -20,15 +20,6 @@ void SelectorBase::SlaveBegin(TTree * /*tree*/)
     //    SetScaleFactors();
 }
 
-std::string SelectorBase::GetNameFromFile() {
-    std::regex expr = std::regex("201[0-9]-[0-9][0-9]-[0-9][0-9]-(.*)-xsec2016");
-    std::smatch matches;
-    std::string fileName = fChain->GetTree()->GetDirectory()->GetFile()->GetName(); 
-
-    std::regex_search(fileName, matches, expr);
-    return std::string(matches.str(1));
-}
-
 void SelectorBase::Init(TTree *tree)
 {
     if (!tree) return;
@@ -52,7 +43,7 @@ void SelectorBase::Init(TTree *tree)
                 throw std::invalid_argument("You have to specify an ntuple type!");
         }
         else 
-            std::cerr << "INFO: Assuming NanoAOD ntuples";
+            std::cerr << "INFO: Assuming UWVV ntuples" << std::endl;
 
         if (name != nullptr) {
             name_ = name->GetTitle();
@@ -60,6 +51,11 @@ void SelectorBase::Init(TTree *tree)
         else {
             name_ = GetNameFromFile();
         }
+        if (name_ == ""){
+            std::cerr << "INFO: Using default name \"Unknown\" for file" << std::endl;
+            name_ == "Unknown";
+        }
+
         if (chan != nullptr) {
             channelName_ = chan->GetTitle();
         }
@@ -70,8 +66,9 @@ void SelectorBase::Init(TTree *tree)
         }
     }
 
-    if (selectionMap_.find(selectionName_) != selectionMap_.end())
+    if (selectionMap_.find(selectionName_) != selectionMap_.end()) {
         selection_ = selectionMap_[selectionName_];
+    }
     else
         throw std::invalid_argument("Invalid selection!");
     
@@ -122,7 +119,6 @@ float SelectorBase::GetPrefiringEfficiencyWeight(
     }
     return prefire_weight;
 }
-
 
 void SelectorBase::Terminate()
 {

@@ -714,7 +714,7 @@ std::vector<std::string> WZSelector::ReadHistData(std::string histDataString) {
     return histData;
 }
 
-void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> histData) {
+void WZSelector::InitializeHistogram(std::string name, std::vector<std::string> histData) {
     if (histData.size() != 4 && histData.size() != 7) {
         std::cerr << "Malformed data string for histogram '" << name
                     << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'"
@@ -775,7 +775,7 @@ void WZSelector::InitialzeHistogram(std::string name, std::vector<std::string> h
 
 void WZSelector::SetupNewDirectory()
 {
-    WZSelectorBase::SetupNewDirectory();
+    SelectorBase::SetupNewDirectory();
     isaQGC_ = name_.find("aqgc") != std::string::npos;
     applyFullSelection_ = (selection_ == VBSselection_Loose_Full ||
                       selection_ == VBSselection_Tight_Full || 
@@ -796,7 +796,7 @@ void WZSelector::SetupNewDirectory()
         std::string name = currentHistInfo->GetName();
         std::vector<std::string> histData = ReadHistData(currentHistInfo->GetTitle());
         if (hists2D_.find(name) != hists2D_.end() || hists1D_.find(name) != hists1D_.end()) { 
-            InitialzeHistogram(name, histData);
+            InitializeHistogram(name, histData);
         }
         else
             std::cerr << "Skipping invalid histogram " << name << std::endl;

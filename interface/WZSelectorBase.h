@@ -147,6 +147,7 @@ protected:
     bool lepton3IsTight();
     bool tightZLeptons();
     bool IsGenMatched3l();
+    virtual std::string GetNameFromFile() override;
 };
 
 #endif

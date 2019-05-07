@@ -277,7 +277,7 @@ protected:
     bool PassesVBSSelection(bool noBlind);
     bool PassesVBSBackgroundControlSelection();
     bool PassesFullWZSelection(Long64_t entry);
-    void InitialzeHistogram(std::string name, std::vector<std::string> histData);
+    void InitializeHistogram(std::string name, std::vector<std::string> histData);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
     std::string getHistName(std::string histName, std::string variationName);

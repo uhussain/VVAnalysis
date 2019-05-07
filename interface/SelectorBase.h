@@ -140,7 +140,7 @@ protected:
     Selection selection_ = tightleptons;
     bool isMC_;
     float GetPrefiringEfficiencyWeight(std::vector<float>* jetPt, std::vector<float>* jetEta);
-    std::string GetNameFromFile();
+    virtual std::string GetNameFromFile() { return ""; }
 };
 
 #endif

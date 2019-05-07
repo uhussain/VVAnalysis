@@ -3,6 +3,16 @@
 #include <regex>
 #include "TParameter.h"
 
+// This is very WZ specific and should really be improved or likely removed
+std::string WZSelectorBase::GetNameFromFile() {
+    std::regex expr = std::regex("201[0-9]-[0-9][0-9]-[0-9][0-9]-(.*)-WZxsec2016");
+    std::smatch matches;
+    std::string fileName = fChain->GetTree()->GetDirectory()->GetFile()->GetName(); 
+
+    std::regex_search(fileName, matches, expr);
+    return std::string(matches.str(1));
+}
+
 void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
 {
     pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
