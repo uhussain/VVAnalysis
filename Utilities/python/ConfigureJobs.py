@@ -7,7 +7,11 @@ import os
 import json
 import array
 import string
+#try:
 import configparser
+#except:
+    #import ConfigParser as configparser
+    #from six.moves import configparser
 
 def get2DBinning(xvar="mjj", yvar="etajj", analysis='WZ'):
     #return (array.array('d', [500, 1000,1500, 2000, 2500]),

@@ -1,4 +1,5 @@
 #include "Analysis/VVAnalysis/interface/FakeRateSelector.h"
+#include "Analysis/VVAnalysis/interface/SelectorBase.h"
 #include "Analysis/VVAnalysis/interface/WZSelector.h"
 #include "Analysis/VVAnalysis/interface/WZSelectorBase.h"
 #include "Analysis/VVAnalysis/interface/WZBackgroundSelector.h"
@@ -10,6 +11,7 @@ namespace{
   namespace{
     FakeRateSelector pFakeRateSelector;
     WZSelectorBase pWZSelectorBase;
+    SelectorBase pSelectorBase;
     WZSelector pWZSelector;
     WZBackgroundSelector pWZBackgroundSelector;
     ScaleFactor pScaleFactor;
