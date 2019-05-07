@@ -16,6 +16,7 @@ def applySelector(filelist, selector_name, selection,
         inputs = ROOT.TList()
         for inp in extra_inputs:
             inputs.Add(inp)
+        ROOT.TParameter
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
             select = getattr(ROOT, selector_name)()
             select.SetInputList(inputs)

@@ -40,10 +40,12 @@ void SelectorBase::Init(TTree *tree)
             else if (ntupleName  == "UWVV")
                 ntupleType_ = UWVV;
             else
-                throw std::invalid_argument("You have to specify an ntuple type!");
+                throw std::invalid_argument("Unsupported ntuple type!");
         }
-        else 
-            std::cerr << "INFO: Assuming UWVV ntuples" << std::endl;
+        else {
+            std::cerr << "INFO: Assuming NanoAOD ntuples" << std::endl;
+            ntupleType_ = NanoAOD;
+        }
 
         if (name != nullptr) {
             name_ = name->GetTitle();

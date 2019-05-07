@@ -92,6 +92,7 @@ hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
 hists = [h for h in hists if "unrolled" not in h and "wCR" not in h and h not in  ["YieldByChannel", "CutFlow"]]
 hist_inputs = [getHistExpr(hists, analysis)]
 tselection = [ROOT.TNamed("selection", args['output_selection'])]
+ntuple = [ROOT.TNamed("ntupleType", "UWVV")]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
@@ -101,11 +102,11 @@ if "FakeRate" not in args['output_selection'] and not args['test']:
         ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
         ConfigureJobs.getListOfNonpromptFilenames(), 
             "WZBackgroundSelector", args['selection'], fOut, 
-            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
+            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection+ntuple, 
             addSumweights=False,
             proof=args['proof'])
 mc = SelectorTools.applySelector(args['filenames'], "WZSelector", args['selection'], fOut, 
-        extra_inputs=sf_inputs+hist_inputs+tselection, 
+        extra_inputs=sf_inputs+hist_inputs+tselection+ntuple, 
         addSumweights=True, proof=args['proof'])
 if args['test']:
     exit(0)
