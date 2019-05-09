@@ -227,7 +227,7 @@ public :
     ClassDefOverride(WZSelector,0);
 protected:
     virtual void    SetBranchesUWVV() override;
-    void LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) override;
+    void LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void FillVBSHistograms(float weight, bool noBlind, 
             std::pair<Systematic, std::string> variation);

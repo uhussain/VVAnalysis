@@ -176,7 +176,11 @@ void WZSelectorBase::SetBranchesNanoAOD() {
     return;
 }
 
-void WZSelectorBase::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation){ 
+void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) { 
+    throw std::domain_error("Reading from NanoAOD ntuples is not defined for WZSelector");
+}
+
+void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation){ 
     weight = 1;
     b_l1Pt->GetEntry(entry);
     b_l2Pt->GetEntry(entry);

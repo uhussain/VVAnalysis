@@ -101,7 +101,7 @@ float WZBackgroundSelector::getEventWeight() {
     return evtwgt;
 }
 
-void WZBackgroundSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) {
+void WZBackgroundSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) {
     WZSelector::LoadBranches(entry, variation);
     weight = getEventWeight();
 }

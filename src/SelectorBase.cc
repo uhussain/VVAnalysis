@@ -111,6 +111,14 @@ void SelectorBase::SetBranches() {
         SetBranchesNanoAOD();
 }
 
+void SelectorBase::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) {
+    if (ntupleType_ == UWVV) {
+        LoadBranchesUWVV(entry, variation);
+    }
+    else if (ntupleType_ == NanoAOD)
+        LoadBranchesNanoAOD(entry, variation);
+}
+
 Bool_t SelectorBase::Process(Long64_t entry)
 {
     for (const auto& variation : variations_) {

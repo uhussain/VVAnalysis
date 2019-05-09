@@ -155,7 +155,9 @@ protected:
     void    SetBranches();
     virtual void    SetBranchesUWVV() { }
     virtual void    SetBranchesNanoAOD() { }
-    virtual void    LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { }
+    void    LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation);
+    virtual void    LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) { }
+    virtual void    LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) { }
     virtual void    FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { }
     std::string name_ = "Unnamed";
     std::string channelName_ = "Unnamed";

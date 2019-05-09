@@ -146,7 +146,8 @@ protected:
     virtual std::string GetNameFromFile() override;
     virtual void    SetBranchesNanoAOD() override;
     virtual void    SetBranchesUWVV() override;
-    void LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) override;
+    void LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
+    void LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) override;
 };
 
 #endif

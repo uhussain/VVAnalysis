@@ -193,8 +193,8 @@ unsigned int WZSelector::GetLheWeightInfo() {
     return 1;
 }
 
-void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { 
-    WZSelectorBase::LoadBranches(entry, variation);
+void WZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) { 
+    WZSelectorBase::LoadBranchesUWVV(entry, variation);
     weight *= GetPrefiringEfficiencyWeight(jetPt, jetEta);
 
     //b_MtToMET->GetEntry(entry);

@@ -41,7 +41,7 @@ private:
     bool IsPFFRegion();
     bool IsFFFRegion();
     float getEventWeight();
-    void LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) override;
+    void LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
 };
 
 #endif
