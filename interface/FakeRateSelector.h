@@ -35,11 +35,8 @@ public :
     TBranch* b_nWZLooseMuon;
 
     // Readers to access the data (delete the ones you do not need).
-    FakeRateSelector(TTree * /*tree*/ =0) { }
-    virtual ~FakeRateSelector() { }
-    virtual void    Init(TTree *tree) override;
-    virtual Bool_t  Process(Long64_t entry) override;
     virtual void    SetupNewDirectory() override;
+    virtual void    FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) override;
 
     ClassDefOverride(FakeRateSelector,0);
 };

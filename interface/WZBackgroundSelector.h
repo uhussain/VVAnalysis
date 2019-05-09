@@ -25,9 +25,6 @@ public :
     TH1D* ZMassHistPFF_;
     TH1D* ZMassHistFFF_;
     
-    WZBackgroundSelector(TTree * /*tree*/ =0) { }
-    virtual ~WZBackgroundSelector() { }
-    virtual Bool_t  Process(Long64_t entry) override;
     virtual void    SetupNewDirectory() override;
     virtual void    SlaveBegin(TTree *tree) override;
 
@@ -44,6 +41,7 @@ private:
     bool IsPFFRegion();
     bool IsFFFRegion();
     float getEventWeight();
+    void LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) override;
 };
 
 #endif

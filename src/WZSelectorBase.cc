@@ -53,12 +53,9 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ == VBSBackgroundControlLoose_Full
         );
 
-    
-    isNonpromptEstimate_ = false;
     if (isMC_){
         isNonpromptMC_ = false;
         isZgamma_ = false;
-        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
         if (std::find(nonprompt3l_.begin(), nonprompt3l_.end(), name_) != nonprompt3l_.end()) {
             isNonpromptMC_ = true;
         }
@@ -74,6 +71,12 @@ void WZSelectorBase::Init(TTree *tree)
                 metaInfo->Draw("1>>sumweights", "summedWeights");
             }
         }
+    }
+}
+
+void WZSelectorBase::SetBranchesUWVV() {
+    if (isMC_){
+        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     }
     else {
         fChain->SetBranchAddress("Flag_duplicateMuonsPass", &Flag_duplicateMuonsPass, &b_Flag_duplicateMuonsPass);
@@ -152,8 +155,6 @@ void WZSelectorBase::Init(TTree *tree)
             fChain->SetBranchAddress("m3GenPt", &l3GenPt, &b_l3GenPt);
         }
     }
-    else
-        throw std::invalid_argument("Invalid channel choice!");
 
     fChain->SetBranchAddress("type1_pfMETEt", &MET, &b_MET);
     fChain->SetBranchAddress("type1_pfMETPhi", &type1_pfMETPhi, &b_type1_pfMETPhi);
@@ -171,9 +172,11 @@ void WZSelectorBase::Init(TTree *tree)
     fChain->SetBranchAddress("Flag_globalTightHalo2016FilterPass", &Flag_globalTightHalo2016FilterPass, &b_Flag_globalTightHalo2016FilterPass);
 }
 
+void WZSelectorBase::SetBranchesNanoAOD() {
+    return;
+}
 
-Bool_t WZSelectorBase::Process(Long64_t entry)
-{
+void WZSelectorBase::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation){ 
     weight = 1;
     b_l1Pt->GetEntry(entry);
     b_l2Pt->GetEntry(entry);
@@ -255,8 +258,7 @@ Bool_t WZSelectorBase::Process(Long64_t entry)
 
     // Veto on loose leptons
     passesLeptonVeto = (nWZMediumMuon + nCBVIDHLTSafeElec) == 3;
-    
-    return kTRUE;
+ 
 }
 
 // Meant to be a wrapper for the tight ID just in case it changes

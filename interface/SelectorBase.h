@@ -82,18 +82,42 @@ public :
         {"mmm", mmm},
     };
 
+    enum Systematic {
+        Central,
+        jetEnergyScaleUp,
+        jetEnergyScaleDown,
+        jetEnergyResolutionUp,
+        jetEnergyResolutionDown,
+        metUnclusteredEnergyUp,
+        metUnclusteredEnergyDown,
+        muonEfficiencyUp,
+        muonEfficiencyDown,
+        muonScaleUp,
+        muonScaleDown,
+        electronEfficiencyUp,
+        electronEfficiencyDown,
+        electronScaleUp,
+        electronScaleDown,
+        pileupUp,
+        pileupDown,
+    }; 
+
+
+    std::map<Systematic, std::string> variations_ = {{Central, ""}};
+    std::map<Systematic, std::string> systematics_ = {};
+
     TList *currentHistDir_{nullptr};
     TH1D* sumWeightsHist_;
 
+    bool doSystematics_;
     bool addSumweights_;
     bool applyScaleFactors_;
     bool applyPrefiringCorr_;
     
     // Readers to access the data (delete the ones you do not need).
     SelectorBase(TTree * /*tree*/ =0) { }
-    //virtual void    SetScaleFactors() { };
-    //virtual void    SetBranches() { };
     virtual ~SelectorBase() { }
+    //virtual void    SetScaleFactors() { };
     virtual Int_t   Version() const { return 2; }
     virtual void    Begin(TTree *tree);
     virtual void    SlaveBegin(TTree *tree);
@@ -116,10 +140,6 @@ public :
     // With AddObject<Type>(localPtr, ...);
     virtual void SetupNewDirectory();
 
-    //void AddObject(T* &ptr, const char* name, Args... args) {
-        //ptr = (T*) gROOT->FindObject(name);
-        //SafeDelete(ptr);
-        //ptr = new T(name, args...);
     template<typename T, typename... Args>
     void AddObject(T* &ptr, Args... args) {
         static_assert(std::is_base_of<TNamed, T>::value, "Objects must inheirit from ROOT TNamed to be streamable from PROOF sessions");
@@ -132,6 +152,11 @@ public :
     ClassDef(SelectorBase,0);
 
 protected:
+    void    SetBranches();
+    virtual void    SetBranchesUWVV() { }
+    virtual void    SetBranchesNanoAOD() { }
+    virtual void    LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { }
+    virtual void    FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { }
     std::string name_ = "Unnamed";
     std::string channelName_ = "Unnamed";
     Channel channel_ = Unknown;

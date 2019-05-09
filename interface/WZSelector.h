@@ -12,26 +12,6 @@ public :
     bool isaQGC_ = false;
     bool doaQGC_ = false;
 
-    enum Systematic {
-        Central,
-        jetEnergyScaleUp,
-        jetEnergyScaleDown,
-        jetEnergyResolutionUp,
-        jetEnergyResolutionDown,
-        metUnclusteredEnergyUp,
-        metUnclusteredEnergyDown,
-        muonEfficiencyUp,
-        muonEfficiencyDown,
-        muonScaleUp,
-        muonScaleDown,
-        electronEfficiencyUp,
-        electronEfficiencyDown,
-        electronScaleUp,
-        electronScaleDown,
-        pileupUp,
-        pileupDown,
-    }; 
-
     std::vector<std::string> systHists_ = {
         "yield",
         "backgroundControlYield",
@@ -52,25 +32,6 @@ public :
         //"Zlep1_Eta",
         //"Zlep2_Eta",
         //"Wlep_Eta",
-    };
-
-    std::map<Systematic, std::string> systematics_ = {
-        {jetEnergyScaleUp, "CMS_scale_jUp"}, 
-        {jetEnergyScaleDown, "CMS_scale_jDown"}, 
-        {jetEnergyResolutionUp, "CMS_res_jUp"},
-        {jetEnergyResolutionDown, "CMS_res_jDown"},
-        {metUnclusteredEnergyUp, "CMS_scale_unclEnergyUp"},
-        {metUnclusteredEnergyDown, "CMS_scale_unclEnergyDown"},
-        {muonScaleUp, "CMS_scale_mUp"},
-        {muonScaleDown, "CMS_scale_mDown"},
-        {electronScaleUp, "CMS_scale_eUp"},
-        {electronScaleDown, "CMS_scale_eDown"},
-        {pileupUp, "CMS_pileupUp"},
-        {pileupDown, "CMS_pileupDown"},
-        {electronEfficiencyUp, "CMS_eff_eUp"},
-        {electronEfficiencyDown, "CMS_eff_eDown"},
-        {muonEfficiencyUp, "CMS_eff_mUp"},
-        {muonEfficiencyDown, "CMS_eff_mDown"},
     };
 
     std::map<std::string, TH1D*> hists1D_ = {
@@ -260,17 +221,14 @@ public :
     TBranch* b_type1_pfMETEt_unclusteredEnDown;
 
     // Readers to access the data (delete the ones you do not need).
-    WZSelector(TTree * /*tree*/ =0) { }
-    virtual ~WZSelector() { }
     virtual void    Init(TTree *tree) override;
-    virtual Bool_t  Process(Long64_t entry) override;
     virtual void    SetupNewDirectory() override;
 
     ClassDefOverride(WZSelector,0);
 protected:
-    void LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation);
-    void FillHistograms(Long64_t entry, float weight, bool noBlind,
-            std::pair<Systematic, std::string> variation);
+    virtual void    SetBranchesUWVV() override;
+    void LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) override;
+    void FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void FillVBSHistograms(float weight, bool noBlind, 
             std::pair<Systematic, std::string> variation);
     bool PassesBaseSelection(Long64_t entry, bool tightLeps, Selection selection);

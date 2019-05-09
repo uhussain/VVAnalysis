@@ -120,11 +120,7 @@ public :
     TBranch* b_Flag_globalTightHalo2016FilterPass;
 
     // Readers to access the data (delete the ones you do not need).
-    WZSelectorBase(TTree * /*tree*/ =0) { }
-    virtual ~WZSelectorBase() { }
     //virtual void    SetScaleFactors() override;
-    //virtual void    SetBranches() override;
-    virtual Bool_t  Process(Long64_t entry) override;
     virtual void    SlaveBegin(TTree *tree) override;
     virtual void    Init(TTree *tree) override;
 
@@ -148,6 +144,9 @@ protected:
     bool tightZLeptons();
     bool IsGenMatched3l();
     virtual std::string GetNameFromFile() override;
+    virtual void    SetBranchesNanoAOD() override;
+    virtual void    SetBranchesUWVV() override;
+    void LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) override;
 };
 
 #endif

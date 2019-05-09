@@ -4,16 +4,54 @@
 
 void WZSelector::Init(TTree *tree)
 {
-    WZSelectorBase::Init(tree);
-
     weight_info_ = 0;
     if (isMC_) {
-        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
         weight_info_ = GetLheWeightInfo();
+    }
+
+    systematics_ = {
+        {jetEnergyScaleUp, "CMS_scale_jUp"}, 
+        {jetEnergyScaleDown, "CMS_scale_jDown"}, 
+        {jetEnergyResolutionUp, "CMS_res_jUp"},
+        {jetEnergyResolutionDown, "CMS_res_jDown"},
+        {metUnclusteredEnergyUp, "CMS_scale_unclEnergyUp"},
+        {metUnclusteredEnergyDown, "CMS_scale_unclEnergyDown"},
+        {muonScaleUp, "CMS_scale_mUp"},
+        {muonScaleDown, "CMS_scale_mDown"},
+        {electronScaleUp, "CMS_scale_eUp"},
+        {electronScaleDown, "CMS_scale_eDown"},
+        {pileupUp, "CMS_pileupUp"},
+        {pileupDown, "CMS_pileupDown"},
+        {electronEfficiencyUp, "CMS_eff_eUp"},
+        {electronEfficiencyDown, "CMS_eff_eDown"},
+        {muonEfficiencyUp, "CMS_eff_mUp"},
+        {muonEfficiencyDown, "CMS_eff_mDown"},
+    };
+
+    WZSelectorBase::Init(tree);
+}
+
+// Values from https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceScaleResolRun2
+float WZSelector::GetMuonScaleUncertainty(float muEta) {
+    if (muEta < -2.1)
+        return 0.027;
+    if (std::abs(muEta) < 2.1 && std::abs(muEta) > 1.2)
+        return 0.009;
+    if (std::abs(muEta) < 1.2)
+        return 0.004;
+    if (muEta > 2.1)
+        return 0.0017;
+    throw std::out_of_range("Muon eta out of range of possible values! Range was " + std::to_string(muEta));
+}
+
+void WZSelector::SetBranchesUWVV() {
+    WZSelectorBase::SetBranchesUWVV();
+    if (isMC_) {
         if (weight_info_ > 0)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
         if ((weight_info_ == 2 || weight_info_ == 3) && doSystematics_)
             fChain->SetBranchAddress("pdfWeights", &pdfWeights, &b_pdfWeights);
+        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
         fChain->SetBranchAddress("mjj_jesUp", &mjj_jesUp, &b_mjj_jesUp);
         fChain->SetBranchAddress("mjj_jesDown", &mjj_jesDown, &b_mjj_jesDown);
         fChain->SetBranchAddress("mjj_jerUp", &mjj_jerUp, &b_mjj_jerUp);
@@ -113,20 +151,9 @@ void WZSelector::Init(TTree *tree)
         fChain->SetBranchAddress("m2Mass", &l2Mass, &b_l2Mass);
         fChain->SetBranchAddress("m3Mass", &l3Mass, &b_l3Mass);
     }
+
 }
 
-// Values from https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonReferenceScaleResolRun2
-float WZSelector::GetMuonScaleUncertainty(float muEta) {
-    if (muEta < -2.1)
-        return 0.027;
-    if (std::abs(muEta) < 2.1 && std::abs(muEta) > 1.2)
-        return 0.009;
-    if (std::abs(muEta) < 1.2)
-        return 0.004;
-    if (muEta > 2.1)
-        return 0.0017;
-    throw std::out_of_range("Muon eta out of range of possible values! Range was " + std::to_string(muEta));
-}
 void WZSelector::SetShiftedMasses() {
     TLorentzVector lepton1;
     lepton1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, l1Mass);
@@ -167,7 +194,8 @@ unsigned int WZSelector::GetLheWeightInfo() {
 }
 
 void WZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) { 
-    WZSelectorBase::Process(entry);
+    WZSelectorBase::LoadBranches(entry, variation);
+    weight *= GetPrefiringEfficiencyWeight(jetPt, jetEta);
 
     //b_MtToMET->GetEntry(entry);
     b_ZPhi->GetEntry(entry);
@@ -574,9 +602,12 @@ std::string WZSelector::getHistName(std::string histName, std::string variationN
     return variationName == "" ? histName : histName + "_" + variationName;
 }
 
-void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind, 
-        std::pair<Systematic, std::string> variation) { 
+void WZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { 
+    bool noBlind = true;
+    if (!PassesBaseSelection(entry, true, selection_))
+        return;
     bool passesVBS = PassesVBSSelection(noBlind);
+
     if (hists1D_[getHistName("backgroundControlYield", variation.second)] != nullptr)
         if (PassesVBSBackgroundControlSelection())
             hists1D_[getHistName("backgroundControlYield", variation.second)]->Fill(1, weight);
@@ -663,38 +694,6 @@ void WZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("M3lMET", variation.second), M3lMET, weight*(isMC_ || M3lMET < 300 || noBlind));
     if (isMC_)
         SafeHistFill(hists1D_, getHistName("nTruePU", variation.second), nTruePU, weight);
-}
-
-Bool_t WZSelector::Process(Long64_t entry)
-{
-    //bool blindVBS = (selection_ == Wselection || 
-    //        (isVBS_ && 
-    //            selection_ != VBSBackgroundControl && 
-    //            selection_ != VBSBackgroundControlLoose));
-    bool blindVBS = false;
-
-
-    std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
-    LoadBranches(entry, central_var);
-    if (PassesBaseSelection(entry, true, selection_)) {
-        float applied_weight = weight;
-        if (isMC_)
-            applied_weight *= GetPrefiringEfficiencyWeight(jetPt, jetEta);
-        FillHistograms(entry, applied_weight, !blindVBS, central_var);
-    }
-
-    if (doSystematics_ && (isMC_ || isNonpromptEstimate_)) {
-        for (const auto& systematic : systematics_) {
-            LoadBranches(entry, systematic);
-            float applied_weight = weight;
-            applied_weight *= GetPrefiringEfficiencyWeight(jetPt, jetEta);
-            if (PassesBaseSelection(entry, true, selection_)) {
-                FillHistograms(entry, applied_weight, !blindVBS, systematic);
-            }
-        }
-    }
-    
-    return true;
 }
 
 std::vector<std::string> WZSelector::ReadHistData(std::string histDataString) {

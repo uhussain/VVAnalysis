@@ -1,25 +1,22 @@
 #include "Analysis/VVAnalysis/interface/FakeRateSelector.h"
 #include <TStyle.h>
 
-Bool_t FakeRateSelector::Process(Long64_t entry)
-{
-    WZSelectorBase::Process(entry);
-
+void FakeRateSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     if (!passesLeptonVeto)
-        return true;
+        return;
     if (l1Pt < 25 || l2Pt < 15)
-        return true;
+        return;
     if (ZMass > 101.1876 || ZMass < 81.1876)
-        return true;
+        return;
     if (type1_pfMETEt > 25)
-        return true;
+        return;
     if (l3MtToMET > 30)
-        return false;
+        return;
     if (!tightZLeptons())
-        return true;
+        return;
 
     if (!IsGenMatched3l())
-        return true;
+        return;
 
     float pt_fillval = l3Pt;
     float eta_fillval = std::abs(l3Eta);
@@ -39,16 +36,9 @@ Bool_t FakeRateSelector::Process(Long64_t entry)
         passingTight1DPt_->Fill(pt_fillval, weight);
         passingTight1DEta_->Fill(eta_fillval, weight);
     }
-    return kTRUE;
 }
 
-void FakeRateSelector::Init(TTree *tree)
-{
-    WZSelectorBase::Init(tree);
-}
-
-void FakeRateSelector::SetupNewDirectory()
-{
+void FakeRateSelector::SetupNewDirectory() {
     WZSelectorBase::SetupNewDirectory();
 
     const int nvarbins = 3;

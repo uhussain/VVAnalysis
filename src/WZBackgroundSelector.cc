@@ -101,25 +101,9 @@ float WZBackgroundSelector::getEventWeight() {
     return evtwgt;
 }
 
-Bool_t WZBackgroundSelector::Process(Long64_t entry)
-{
-    std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
-
-    LoadBranches(entry, central_var);
-    if (!PassesBaseSelection(entry, false, selection_))
-        return true;
-    FillHistograms(entry, getEventWeight(), true, central_var);
-
-    if (doSystematics_) {
-        for (const auto& systematic : systematics_) {
-            LoadBranches(entry, systematic);
-            if (!PassesBaseSelection(entry, false, selection_))
-                return true;
-            FillHistograms(entry, getEventWeight(), true, systematic);
-        }
-    }
-
-    return true;
+void WZBackgroundSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string> variation) {
+    WZSelector::LoadBranches(entry, variation);
+    weight = getEventWeight();
 }
 
 float WZBackgroundSelector::getl1FakeRate() {

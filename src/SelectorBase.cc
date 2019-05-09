@@ -27,6 +27,9 @@ void SelectorBase::Init(TTree *tree)
     
     TString option = GetOption();
 
+    if (doSystematics_ && isMC_) // isNonpromptEstimate?
+        variations_.insert(systematics_.begin(), systematics_.end());
+
     if (GetInputList() != nullptr) {
         TNamed* ntupleType = (TNamed *) GetInputList()->FindObject("ntupleType");
         TNamed* name = (TNamed *) GetInputList()->FindObject("name");
@@ -98,11 +101,22 @@ void SelectorBase::Init(TTree *tree)
     else
         throw std::invalid_argument("Invalid channel choice!");
     
-    //SetBranches();
+    SetBranches();
+}
+
+void SelectorBase::SetBranches() {
+    if (ntupleType_ == UWVV)
+        SetBranchesUWVV();
+    else if (ntupleType_ == NanoAOD)
+        SetBranchesNanoAOD();
 }
 
 Bool_t SelectorBase::Process(Long64_t entry)
 {
+    for (const auto& variation : variations_) {
+        LoadBranches(entry, variation);
+        FillHistograms(entry, variation);
+    }
     return kTRUE;
 }
 
