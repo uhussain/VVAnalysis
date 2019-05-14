@@ -64,7 +64,7 @@ void SelectorBase::Init(TTree *tree)
         if (chan != nullptr) {
             channelName_ = chan->GetTitle();
         }
-        else
+        else if (ntupleType_ == UWVV)
             channelName_ = fChain->GetTree()->GetDirectory()->GetName();
         if (selection != nullptr) {
             selectionName_ = selection->GetTitle();

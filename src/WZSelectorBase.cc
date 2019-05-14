@@ -1,4 +1,5 @@
 #include "Analysis/VVAnalysis/interface/WZSelectorBase.h"
+#include "TLorentzVector.h"
 #include <TStyle.h>
 #include <regex>
 #include "TParameter.h"
@@ -77,6 +78,7 @@ void WZSelectorBase::Init(TTree *tree)
 void WZSelectorBase::SetBranchesUWVV() {
     if (isMC_){
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
     }
     else {
         fChain->SetBranchAddress("Flag_duplicateMuonsPass", &Flag_duplicateMuonsPass, &b_Flag_duplicateMuonsPass);
@@ -173,11 +175,128 @@ void WZSelectorBase::SetBranchesUWVV() {
 }
 
 void WZSelectorBase::SetBranchesNanoAOD() {
-    return;
+    fChain->SetBranchAddress("nElectron", &nElectron, &b_nElectron);
+    fChain->SetBranchAddress("nMuon", &nMuon, &b_nMuon);
+    fChain->SetBranchAddress("Electron_pt", &Electron_pt, &b_Electron_pt);
+    fChain->SetBranchAddress("Electron_eta", &Electron_eta, &b_Electron_eta);
+    fChain->SetBranchAddress("Electron_phi", &Electron_phi, &b_Electron_phi);
+    fChain->SetBranchAddress("Muon_pt", &Muon_pt, &b_Muon_pt);
+    fChain->SetBranchAddress("Muon_eta", &Muon_eta, &b_Muon_eta);
+    fChain->SetBranchAddress("Muon_phi", &Muon_phi, &b_Muon_phi);
+    fChain->SetBranchAddress("Electron_cutBased", &Electron_cutBased, &b_Electron_cutBased);
+    fChain->SetBranchAddress("Muon_tightId", &Muon_tightId, &b_Muon_tightId);
+    fChain->SetBranchAddress("Muon_tkIsoId", &Muon_tkIsoId, &b_Muon_tkIsoId);
+    fChain->SetBranchAddress("MET_pt", &MET, &b_MET);
+    fChain->SetBranchAddress("MET_phi", &type1_pfMETPhi, &b_type1_pfMETPhi);
+    fChain->SetBranchAddress("Electron_charge", &b_Electron_charge, &b_Electron_charge);
+    fChain->SetBranchAddress("Muon_charge", &b_Muon_charge, &b_Muon_charge);
+    fChain->SetBranchAddress("Electron_mass", &b_Electron_mass, &b_Electron_mass);
+    fChain->SetBranchAddress("Muon_mass", &b_Muon_mass, &b_Muon_mass);
+    if (isMC_) {
+        //fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
+        //fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
+        //fChain->SetBranchAddress("e3GenPt", &l3GenPt, &b_l3GenPt);
+        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+        fChain->SetBranchAddress("Pileup_nPU", &numPU, &b_numPU);
+    }
+    //else {
+    //    fChain->SetBranchAddress("Flag_duplicateMuonsPass", &Flag_duplicateMuonsPass, &b_Flag_duplicateMuonsPass);
+    //    fChain->SetBranchAddress("Flag_badMuonsPass", &Flag_badMuonsPass, &b_Flag_badMuonsPass);
+    //}
+    //fChain->SetBranchAddress("Flag_BadChargedCandidateFilterPass", &Flag_BadChargedCandidateFilterPass, &b_Flag_BadChargedCandidateFilterPass);
+    //fChain->SetBranchAddress("Flag_BadPFMuonFilterPass", &Flag_BadPFMuonFilterPass, &b_Flag_BadPFMuonFilterPass);
+    //fChain->SetBranchAddress("Flag_HBHENoiseFilterPass", &Flag_HBHENoiseFilterPass, &b_Flag_HBHENoiseFilterPass);
+    //fChain->SetBranchAddress("Flag_HBHENoiseIsoFilterPass", &Flag_HBHENoiseIsoFilterPass, &b_Flag_HBHENoiseIsoFilterPass);
+    //fChain->SetBranchAddress("Flag_EcalDeadCellTriggerPrimitiveFilterPass", &Flag_EcalDeadCellTriggerPrimitiveFilterPass, &b_Flag_EcalDeadCellTriggerPrimitiveFilterPass);
+    //fChain->SetBranchAddress("Flag_goodVerticesPass", &Flag_goodVerticesPass, &b_Flag_goodVerticesPass);
+    //fChain->SetBranchAddress("Flag_eeBadScFilterPass", &Flag_eeBadScFilterPass, &b_Flag_eeBadScFilterPass);
+    //fChain->SetBranchAddress("Flag_globalTightHalo2016FilterPass", &Flag_globalTightHalo2016FilterPass, &b_Flag_globalTightHalo2016FilterPass);
 }
 
 void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) { 
-    throw std::domain_error("Reading from NanoAOD ntuples is not defined for WZSelector");
+    b_nElectron->GetEntry(entry);
+    b_nMuon->GetEntry(entry);
+    b_Electron_pt->GetEntry(entry);
+    b_Electron_eta->GetEntry(entry);
+    b_Electron_phi->GetEntry(entry);
+    b_Muon_pt->GetEntry(entry);
+    b_Muon_eta->GetEntry(entry);
+    b_Muon_phi->GetEntry(entry);
+    b_Electron_cutBased->GetEntry(entry);
+    b_Muon_tightId->GetEntry(entry);
+    b_Muon_tkIsoId->GetEntry(entry);
+    b_Electron_charge->GetEntry(entry);
+    b_Muon_charge->GetEntry(entry);
+    b_Electron_mass->GetEntry(entry);
+    b_Muon_mass->GetEntry(entry);
+
+    if (nElectron > N_KEEP_MU_E_ || nMuon > N_KEEP_MU_E_)
+        throw std::domain_error("Found more electrons or muons than max read number. Exiting because this could cause problems");
+
+    ZMass = 0;
+    l1Pt = 0;
+    l2Pt = 0;
+    l3Pt = 0;
+    l1Eta = 0;
+    l2Eta = 0;
+    l3Eta = 0;
+    l1Phi = 0;
+    l2Phi = 0;
+    l3Phi = 0;
+    l1Mass = 0;
+    l2Mass = 0;
+    l3Mass = 0;
+    if (nElectron == 2 && nMuon == 1) {
+        channel_ = eem;
+        if (Electron_charge[0] != Electron_charge[1]) {
+            l1Pt = Electron_pt[0];
+            l2Pt = Electron_pt[1];
+            l3Pt = Muon_pt[0];
+            l1Eta = Electron_eta[0];
+            l2Eta = Electron_eta[1];
+            l3Eta = Muon_eta[0];
+            l1Phi = Electron_phi[0];
+            l2Phi = Electron_phi[1];
+            l3Phi = Muon_phi[0];
+            l1Mass = Electron_mass[0];
+            l2Mass = Electron_mass[1];
+            l3Mass = Muon_mass[0];
+            SetShiftedMasses();
+            SetShiftedMasses();
+            SetShiftedMasses();
+        }
+    }
+    else if (nElectron == 1 && nMuon == 2) {
+        channel_ = emm;
+        if (Muon_charge[0] != Muon_charge[1]) {
+            l1Pt = Muon_pt[0];
+            l2Pt = Muon_pt[1];
+            l3Pt = Electron_pt[0];
+            l1Eta = Muon_eta[0];
+            l2Eta = Muon_eta[1];
+            l3Eta = Electron_eta[0];
+            l1Phi = Muon_phi[0];
+            l2Phi = Muon_phi[1];
+            l3Phi = Electron_phi[0];
+            l1Mass = Muon_mass[0];
+            l2Mass = Muon_mass[1];
+            l3Mass = Electron_mass[0];
+            SetShiftedMasses();
+        }
+    }
+
+    if (isMC_) {
+        b_genWeight->GetEntry(entry);
+        b_numPU->GetEntry(entry);
+        //b_l1GenPt->GetEntry(entry);
+        //b_l2GenPt->GetEntry(entry);
+        //b_l3GenPt->GetEntry(entry);
+        //ApplyScaleFactors();
+    }
+    else {
+        b_Flag_duplicateMuonsPass->GetEntry(entry);          
+        b_Flag_badMuonsPass->GetEntry(entry);          
+    }
 }
 
 void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation){ 
@@ -195,40 +314,7 @@ void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
         b_l2GenPt->GetEntry(entry);
         b_l3GenPt->GetEntry(entry);
         b_nTruePU->GetEntry(entry);
-        weight = genWeight;
-        if (channel_ == eee) {
-            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            weight *= eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        }
-        else if (channel_ == eem) {
-            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        }
-        else if (channel_ == emm) {
-            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        }
-        else {
-            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        }
-        weight *= pileupSF_->Evaluate1D(nTruePU);
+        ApplyScaleFactors();
     }
     else {
         b_Flag_duplicateMuonsPass->GetEntry(entry);          
@@ -263,6 +349,54 @@ void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
     // Veto on loose leptons
     passesLeptonVeto = (nWZMediumMuon + nCBVIDHLTSafeElec) == 3;
  
+}
+
+void WZSelectorBase::ApplyScaleFactors() {
+    weight = genWeight;
+    if (channel_ == eee) {
+        weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+    }
+    else if (channel_ == eem) {
+        weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+    }
+    else if (channel_ == emm) {
+        weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+    }
+    else {
+        weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+    }
+    weight *= pileupSF_->Evaluate1D(nTruePU);
+}
+
+void WZSelectorBase::SetShiftedMasses() {
+    TLorentzVector lepton1;
+    lepton1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, l1Mass);
+    TLorentzVector lepton2;
+    lepton2.SetPtEtaPhiM(l2Pt, l2Eta, l2Phi, l2Mass);
+    TLorentzVector lepton3;
+    lepton3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, l3Mass);
+    ZMass = (lepton1+lepton2).M();
+    Mass = (lepton1+lepton2+lepton3).M();
 }
 
 // Meant to be a wrapper for the tight ID just in case it changes

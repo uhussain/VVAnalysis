@@ -92,7 +92,8 @@ hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
 hists = [h for h in hists if "unrolled" not in h and "wCR" not in h and h not in  ["YieldByChannel", "CutFlow"]]
 hist_inputs = [getHistExpr(hists, analysis)]
 tselection = [ROOT.TNamed("selection", args['output_selection'])]
-ntuple = [ROOT.TNamed("ntupleType", "UWVV")]
+nanoAOD = True
+channels = ["Inclusive"] if nanoAOD else ["eee", "eem", "emm", "mmm"]
 
 if args['proof']:
     ROOT.TProof.Open('workers=12')
@@ -102,11 +103,15 @@ if "FakeRate" not in args['output_selection'] and not args['test']:
         ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
         ConfigureJobs.getListOfNonpromptFilenames(), 
             "WZBackgroundSelector", args['selection'], fOut, 
-            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection+ntuple, 
+            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
+            channels=channels,
             addSumweights=False,
+            nanoAOD=nanoAOD,
             proof=args['proof'])
 mc = SelectorTools.applySelector(args['filenames'], "WZSelector", args['selection'], fOut, 
-        extra_inputs=sf_inputs+hist_inputs+tselection+ntuple, 
+        extra_inputs=sf_inputs+hist_inputs+tselection, 
+        channels=channels,
+        nanoAOD=nanoAOD,
         addSumweights=True, proof=args['proof'])
 if args['test']:
     exit(0)

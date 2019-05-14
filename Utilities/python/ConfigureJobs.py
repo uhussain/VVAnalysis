@@ -141,7 +141,9 @@ def getListOfFiles(filelist, selection, manager_path=""):
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
-        if "WZxsec2016" in name:
+        if ".root" in name:
+            names.append(name)
+        elif "WZxsec2016" in name:
             dataset_file = manager_path + \
                 "AnalysisDatasetManager/FileInfo/WZxsec2016/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
@@ -221,6 +223,9 @@ def getPreviousStep(selection, analysis):
 def getInputFilesPath(sample_name, selection, analysis, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
+    if ".root" in sample_name:
+        print "INFO: using simple file %s" % sample_name
+        return sample_name
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
         selection])

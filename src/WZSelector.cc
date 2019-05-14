@@ -51,7 +51,6 @@ void WZSelector::SetBranchesUWVV() {
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
         if ((weight_info_ == 2 || weight_info_ == 3) && doSystematics_)
             fChain->SetBranchAddress("pdfWeights", &pdfWeights, &b_pdfWeights);
-        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
         fChain->SetBranchAddress("mjj_jesUp", &mjj_jesUp, &b_mjj_jesUp);
         fChain->SetBranchAddress("mjj_jesDown", &mjj_jesDown, &b_mjj_jesDown);
         fChain->SetBranchAddress("mjj_jerUp", &mjj_jerUp, &b_mjj_jerUp);
@@ -153,18 +152,6 @@ void WZSelector::SetBranchesUWVV() {
     }
 
 }
-
-void WZSelector::SetShiftedMasses() {
-    TLorentzVector lepton1;
-    lepton1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, l1Mass);
-    TLorentzVector lepton2;
-    lepton2.SetPtEtaPhiM(l2Pt, l2Eta, l2Phi, l2Mass);
-    TLorentzVector lepton3;
-    lepton3.SetPtEtaPhiM(l3Pt, l3Eta, l3Phi, l3Mass);
-    ZMass = (lepton1+lepton2).M();
-    Mass = (lepton1+lepton2+lepton3).M();
-}
-
 
 unsigned int WZSelector::GetLheWeightInfo() {
     std::vector<std::string> noLheWeights = {
@@ -392,6 +379,7 @@ void WZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::str
     dRjj = deltaRjj(jetEta, jetPhi);
     zep3l = zeppenfeld(jetEta, Eta);
 }
+
 bool WZSelector::PassesVBSBackgroundControlSelection() {
     if (jetPt->size() != jetEta->size() || jetPt->size() < 2)
         return false;

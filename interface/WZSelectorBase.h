@@ -25,14 +25,74 @@ public :
     ScaleFactor* mIdSF_;
     ScaleFactor* mIsoSF_;
 
+    // Derived variables
     bool isVBS_;
     bool passesLeptonVeto;
     Float_t weight;
+
+    // Common variables
     Float_t genWeight;
-    Float_t nTruePU;
     Float_t ZMass;
+    Float_t Mass;
     Float_t MET;
     Float_t type1_pfMETPhi;
+    Float_t l1Phi;
+    Float_t l2Phi;
+    Float_t l3Phi;
+    Float_t l1Mass;
+    Float_t l2Mass;
+    Float_t l3Mass;
+
+    TBranch* b_genWeight;
+    TBranch* b_Zmass;
+    TBranch* b_Mass;
+    TBranch* b_MET;
+    TBranch* b_type1_pfMETPhi;
+    TBranch* b_l1Phi;
+    TBranch* b_l2Phi;
+    TBranch* b_l3Phi;
+    TBranch* b_l1Mass;
+    TBranch* b_l2Mass;
+    TBranch* b_l3Mass;
+
+    //NanoAOD variables
+    static const unsigned int N_KEEP_MU_E_ = 5;
+    UInt_t nElectron;
+    UInt_t nMuon;
+    Float_t Electron_pt[N_KEEP_MU_E_];
+    Float_t Electron_eta[N_KEEP_MU_E_];
+    Float_t Electron_phi[N_KEEP_MU_E_];
+    Float_t Electron_mass[N_KEEP_MU_E_];
+    Float_t Muon_pt[N_KEEP_MU_E_];
+    Float_t Muon_eta[N_KEEP_MU_E_];
+    Float_t Muon_phi[N_KEEP_MU_E_];
+    Float_t Muon_mass[N_KEEP_MU_E_];
+    Int_t Electron_cutBased[N_KEEP_MU_E_];
+    Int_t Electron_charge[N_KEEP_MU_E_];
+    Int_t Muon_charge[N_KEEP_MU_E_];
+    Bool_t Muon_tightId[N_KEEP_MU_E_];
+    UChar_t Muon_tkIsoId[N_KEEP_MU_E_];
+    Int_t numPU;
+    
+    TBranch* b_nElectron;
+    TBranch* b_nMuon;
+    TBranch* b_Electron_pt;
+    TBranch* b_Electron_eta;
+    TBranch* b_Electron_phi;
+    TBranch* b_Electron_mass;
+    TBranch* b_Muon_pt;
+    TBranch* b_Muon_eta;
+    TBranch* b_Muon_phi;
+    TBranch* b_Muon_mass;
+    TBranch* b_Electron_cutBased;
+    TBranch* b_Electron_charge;
+    TBranch* b_Muon_charge;
+    TBranch* b_Muon_tightId;
+    TBranch* b_Muon_tkIsoId;
+    TBranch* b_numPU;
+
+    // UWVV variables
+    Float_t nTruePU;
     UInt_t nCBVIDTightElec;
     UInt_t nCBVIDHLTSafeElec;
     UInt_t nWZTightMuon;
@@ -73,11 +133,7 @@ public :
     Bool_t Flag_eeBadScFilterPass;
     Bool_t Flag_globalTightHalo2016FilterPass;
     
-    TBranch* b_genWeight;
     TBranch* b_nTruePU;
-    TBranch* b_Zmass;
-    TBranch* b_MET;
-    TBranch* b_type1_pfMETPhi;
     TBranch* b_nCBVIDTightElec;
     TBranch* b_nCBVIDHLTSafeElec;
     TBranch* b_nWZTightMuon;
@@ -148,6 +204,8 @@ protected:
     virtual void    SetBranchesUWVV() override;
     void LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) override;
+    void ApplyScaleFactors();
+    void SetShiftedMasses();
 };
 
 #endif

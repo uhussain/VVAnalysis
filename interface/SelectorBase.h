@@ -31,6 +31,7 @@ public :
         eem,
         emm,
         mmm,
+        Inclusive,
         Unknown,
     }; 
     enum Selection {
@@ -80,6 +81,7 @@ public :
         {"eem", eem},
         {"emm", emm},
         {"mmm", mmm},
+        {"Inclusive", Inclusive},
     };
 
     enum Systematic {

@@ -10,13 +10,17 @@ def applySelector(filelist, selector_name, selection,
         rootfile,
         analysis="WZxsec2016", channels=["eee", "eem", "emm", "mmm"], 
         extra_inputs = [],
+        nanoAOD=False,
         addSumweights=True,
         proof=False):
+    ntuple = ROOT.TNamed("ntupleType", "NanoAOD" if nanoAOD else "UWVV")
+    extra_inputs.append(ntuple)
     for i, chan in enumerate(channels):
         inputs = ROOT.TList()
         for inp in extra_inputs:
             inputs.Add(inp)
-        ROOT.TParameter
+        tchannel = ROOT.TNamed("channel", chan)
+        inputs.Add(tchannel)
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
             select = getattr(ROOT, selector_name)()
             select.SetInputList(inputs)
@@ -24,7 +28,7 @@ def applySelector(filelist, selector_name, selection,
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     selection, analysis)
-                processLocalFiles(select, file_path, chan)
+                processLocalFiles(select, file_path, chan, nanoAOD)
             except ValueError as e:
                 print e
                 continue
@@ -47,13 +51,14 @@ def applySelector(filelist, selector_name, selection,
         #proof_path = "_".join([analysis, selection+("#/%s/ntuple" % chan)])
         #ROOT.gProof.Process(proof_path, select, "")
 
-def processLocalFiles(selector, file_path, chan):
+def processLocalFiles(selector, file_path, chan, nanoAOD):
     if not os.path.isdir(file_path.rsplit("/", 1)[0]):
         raise ValueError("Invalid path! Path was %s" 
             % file_path)
     for filename in glob.glob(file_path):
         rtfile = ROOT.TFile(filename)
-        tree = rtfile.Get("%s/ntuple" % chan)
+        tree_name = "Events" if nanoAOD else "%s/ntuple" % chan
+        tree = rtfile.Get(tree_name)
         if not tree:
             raise ValueError(("tree %s/ntuple not found for file %s. " \
                     "Probably it is corrupted") % (chan, filename)

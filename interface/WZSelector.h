@@ -136,7 +136,6 @@ public :
     std::vector<float>* jetPt_jerDown = NULL;
     std::vector<float>* jetCSVv2 = NULL;
     UInt_t nvtx;
-    Float_t Mass;
     Float_t Zlep1_Wlep_Mass;
     Float_t Zlep2_Wlep_Mass;
     Float_t Eta;
@@ -149,12 +148,6 @@ public :
     Float_t mjj_jesDown;
     Float_t mjj_jerUp;
     Float_t mjj_jerDown;
-    Float_t l1Phi;
-    Float_t l2Phi;
-    Float_t l3Phi;
-    Float_t l1Mass;
-    Float_t l2Mass;
-    Float_t l3Mass;
     Float_t MtToMET;
     Float_t MtWZ;
     Float_t M3lMET;
@@ -190,7 +183,6 @@ public :
     TBranch* b_jetPt_jerUp;
     TBranch* b_jetPt_jerDown;
     TBranch* b_nvtx;
-    TBranch* b_Mass;
     TBranch* b_Zlep1_Wlep_Mass;
     TBranch* b_Zlep2_Wlep_Mass;
     TBranch* b_Eta;
@@ -203,12 +195,6 @@ public :
     TBranch* b_mjj_jesDown;
     TBranch* b_mjj_jerUp;
     TBranch* b_mjj_jerDown;
-    TBranch* b_l1Phi;
-    TBranch* b_l2Phi;
-    TBranch* b_l3Phi;
-    TBranch* b_l1Mass;
-    TBranch* b_l2Mass;
-    TBranch* b_l3Mass;
     TBranch* b_l1PtScaleCorrErr;
     TBranch* b_l2PtScaleCorrErr;
     TBranch* b_l3PtScaleCorrErr;
@@ -241,7 +227,6 @@ protected:
     std::string getHistName(std::string histName, std::string variationName);
     void ShiftEfficiencies(Systematic variation);
     float GetMuonScaleUncertainty(float muEta);
-    void SetShiftedMasses();
     template<typename T, typename... Args>
     void SafeHistFill(std::map<std::string, T*> container, 
             std::string histname, Args... args) {
