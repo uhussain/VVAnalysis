@@ -58,7 +58,7 @@ void SelectorBase::Init(TTree *tree)
         }
         if (name_ == ""){
             std::cerr << "INFO: Using default name \"Unknown\" for file" << std::endl;
-            name_ == "Unknown";
+            name_ = "Unknown";
         }
 
         if (chan != nullptr) {

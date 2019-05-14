@@ -188,10 +188,10 @@ void WZSelectorBase::SetBranchesNanoAOD() {
     fChain->SetBranchAddress("Muon_tkIsoId", &Muon_tkIsoId, &b_Muon_tkIsoId);
     fChain->SetBranchAddress("MET_pt", &MET, &b_MET);
     fChain->SetBranchAddress("MET_phi", &type1_pfMETPhi, &b_type1_pfMETPhi);
-    fChain->SetBranchAddress("Electron_charge", &b_Electron_charge, &b_Electron_charge);
-    fChain->SetBranchAddress("Muon_charge", &b_Muon_charge, &b_Muon_charge);
-    fChain->SetBranchAddress("Electron_mass", &b_Electron_mass, &b_Electron_mass);
-    fChain->SetBranchAddress("Muon_mass", &b_Muon_mass, &b_Muon_mass);
+    fChain->SetBranchAddress("Electron_charge", &Electron_charge, &b_Electron_charge);
+    fChain->SetBranchAddress("Muon_charge", &Muon_charge, &b_Muon_charge);
+    fChain->SetBranchAddress("Electron_mass", &Electron_mass, &b_Electron_mass);
+    fChain->SetBranchAddress("Muon_mass", &Muon_mass, &b_Muon_mass);
     if (isMC_) {
         //fChain->SetBranchAddress("e1GenPt", &l1GenPt, &b_l1GenPt);
         //fChain->SetBranchAddress("e2GenPt", &l2GenPt, &b_l2GenPt);
@@ -214,6 +214,7 @@ void WZSelectorBase::SetBranchesNanoAOD() {
 }
 
 void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) { 
+    weight = 1;
     b_nElectron->GetEntry(entry);
     b_nMuon->GetEntry(entry);
     b_Electron_pt->GetEntry(entry);
@@ -229,9 +230,18 @@ void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, s
     b_Muon_charge->GetEntry(entry);
     b_Electron_mass->GetEntry(entry);
     b_Muon_mass->GetEntry(entry);
+    b_MET->GetEntry(entry);
 
-    if (nElectron > N_KEEP_MU_E_ || nMuon > N_KEEP_MU_E_)
-        throw std::domain_error("Found more electrons or muons than max read number. Exiting because this could cause problems");
+    if (nElectron > N_KEEP_MU_E_ || nMuon > N_KEEP_MU_E_) {
+        std::string message = "Found more electrons or muons than max read number.\n    Found ";
+        message += std::to_string(nElectron);
+        message += " electrons.\n    Found ";
+        message += std::to_string(nMuon);
+        message += " Muons\n  --> Max read number was ";
+        message += std::to_string(N_KEEP_MU_E_);
+        message += "\nExiting because this can cause problems. Increase N_KEEP_MU_E_ to avoid this error.\n";
+        throw std::domain_error(message);
+    }
 
     ZMass = 0;
     l1Pt = 0;
@@ -262,8 +272,11 @@ void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, s
             l2Mass = Electron_mass[1];
             l3Mass = Muon_mass[0];
             SetShiftedMasses();
-            SetShiftedMasses();
-            SetShiftedMasses();
+            // cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
+            l1IsTight = (Electron_cutBased[0] == 4);
+            l2IsTight = (Electron_cutBased[1] == 4);
+            // cut-based ID, tight WP; TkIso ID (1=TkIsoLoose, 2=TkIsoTight)
+            l3IsTight = (Muon_tightId[0] && (Muon_tkIsoId[0] == 2));
         }
     }
     else if (nElectron == 1 && nMuon == 2) {
@@ -282,6 +295,11 @@ void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, s
             l2Mass = Muon_mass[1];
             l3Mass = Electron_mass[0];
             SetShiftedMasses();
+            // cut-based ID, tight WP; TkIso ID (1=TkIsoLoose, 2=TkIsoTight)
+            l1IsTight = (Muon_tightId[0] && (Muon_tkIsoId[0] == 2));
+            l2IsTight = (Muon_tightId[1] && (Muon_tkIsoId[1] == 2));
+            // cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
+            l3IsTight = (Electron_cutBased[1] == 4);
         }
     }
 
@@ -297,6 +315,8 @@ void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, s
         b_Flag_duplicateMuonsPass->GetEntry(entry);          
         b_Flag_badMuonsPass->GetEntry(entry);          
     }
+
+    passesLeptonVeto = (nMuon + nElectron) == 3;
 }
 
 void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation){ 
@@ -348,6 +368,7 @@ void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
 
     // Veto on loose leptons
     passesLeptonVeto = (nWZMediumMuon + nCBVIDHLTSafeElec) == 3;
+    weight = genWeight;
  
 }
 

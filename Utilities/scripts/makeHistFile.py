@@ -81,7 +81,7 @@ prefireEff = fPrefireEfficiency.Get('prefireEfficiencyMap')
 
 fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
 sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF, prefireEff]
-selection = args['output_selection']
+selection = args['output_selection'].split("_")[0]
 if selection == "Inclusive2Jet":
     selection = "Wselection"
     print "Info: Using Wselection for hist defintions"

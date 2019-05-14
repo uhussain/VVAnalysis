@@ -18,6 +18,10 @@
 
 class WZSelectorBase : public SelectorBase {
 public :
+    std::vector<std::string> allChannels_ = {
+        "eee", "eem", "emm", "mmm"
+    };
+    
     ScaleFactor* pileupSF_;
     ScaleFactor* muonSF_;
     ScaleFactor* eIdSF_ ;
@@ -56,7 +60,7 @@ public :
     TBranch* b_l3Mass;
 
     //NanoAOD variables
-    static const unsigned int N_KEEP_MU_E_ = 5;
+    static const unsigned int N_KEEP_MU_E_ = 10;
     UInt_t nElectron;
     UInt_t nMuon;
     Float_t Electron_pt[N_KEEP_MU_E_];

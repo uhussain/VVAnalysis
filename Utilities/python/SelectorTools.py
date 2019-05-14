@@ -36,7 +36,12 @@ def applySelector(filelist, selector_name, selection,
             dataset_list = output_list.FindObject(dataset)
             if not dataset_list or dataset_list.ClassName() != "TList":
                 print "WARNING: No output found for dataset %s" % dataset
-                continue
+                dataset_list = output_list.FindObject("Unknown")
+                if dataset_list and dataset_list.ClassName() == "TList":
+                    print 'WARNING: Falling back to dataset "Unknown"'
+                else:
+                    print 'WARNING: Skipping dataset %s' % dataset
+                    continue
             # Only add for one channel
             if addSumweights and i == 0:
                 meta_chain = ROOT.TChain("metaInfo/metaInfo")

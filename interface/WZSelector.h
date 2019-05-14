@@ -7,17 +7,17 @@
 
 class WZSelector : public WZSelectorBase {
 public :
-    bool doSystematics_ = true;
+    bool doSystematics_ = false;
     bool applyFullSelection_ = true;
     bool isaQGC_ = false;
     bool doaQGC_ = false;
 
     std::vector<std::string> systHists_ = {
         "yield",
-        "backgroundControlYield",
-        "mjj",
-        "dEtajj",
-        "MTWZ",
+        //"backgroundControlYield",
+        //"mjj",
+        //"dEtajj",
+        //"MTWZ",
         //"zep3l",
         //"ZMass",
         //"jetPt[0]",
@@ -36,14 +36,14 @@ public :
 
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
-        { "backgroundControlYield",  {} },
-        { "nTruePU",  {} },
-        { "nvtx",  {} },
+        //{ "backgroundControlYield",  {} },
+        //{ "nTruePU",  {} },
+        //{ "nvtx",  {} },
         { "ZMass",  {} },
-        { "ZPt",  {} },
-        { "ZEta",  {} },
-        { "ZPhi",  {} },
-        { "dR_lW_Z",  {} },
+        //{ "ZPt",  {} },
+        //{ "ZEta",  {} },
+        //{ "ZPhi",  {} },
+        //{ "dR_lW_Z",  {} },
         { "Zlep1_Eta",  {} },
         { "Zlep1_Phi",  {} },
         { "Zlep1_Pt",  {} },
@@ -54,41 +54,41 @@ public :
         { "Wlep_Pt",  {} },
         { "Wlep_Phi",  {} },
         { "MET", {} },
-        { "MTWZ", {} },
-        { "M3lMET", {} },
-        { "Mass", {} },
-        { "Pt", {} },
-        { "nJets", {} },
-        { "nJetCSVv2T", {} },
-        { "jetPt[0]", {} },
-        { "jetPt[1]", {} },
-        { "jetPt[2]", {} },
-        { "jetEta12", {} },
-        { "jetEta[0]", {} },
-        { "jetEta[1]", {} },
-        { "jetEta[2]", {} },
-        { "mjj",  {} },
-        { "MtW",  {} },
-        { "dEtajj",  {} },
-        { "dRjj",  {} },
-        { "zep3l",  {} },
-        { "zepj3",  {} },
-        { "Eta",  {} },
-        { "m_l1l3",  {} },
-        { "m_l2l3",  {} },
+        //{ "MTWZ", {} },
+        //{ "M3lMET", {} },
+        //{ "Mass", {} },
+        //{ "Pt", {} },
+        //{ "nJets", {} },
+        //{ "nJetCSVv2T", {} },
+        //{ "jetPt[0]", {} },
+        //{ "jetPt[1]", {} },
+        //{ "jetPt[2]", {} },
+        //{ "jetEta12", {} },
+        //{ "jetEta[0]", {} },
+        //{ "jetEta[1]", {} },
+        //{ "jetEta[2]", {} },
+        //{ "mjj",  {} },
+        //{ "MtW",  {} },
+        //{ "dEtajj",  {} },
+        //{ "dRjj",  {} },
+        //{ "zep3l",  {} },
+        //{ "zepj3",  {} },
+        //{ "Eta",  {} },
+        //{ "m_l1l3",  {} },
+        //{ "m_l2l3",  {} },
     };
 
     // Weight hists must be subset of 1D hists!
     std::map<std::string, TH2D*> weighthists_ = {
-        { "backgroundControlYield",  {} },
-        { "mjj",  {} },
-        { "MTWZ",  {} },
+        //{ "backgroundControlYield",  {} },
+        //{ "mjj",  {} },
+        //{ "MTWZ",  {} },
         { "yield",  {} },
     };
     
     std::map<std::string, TH2D*> hists2D_ = {
-        {"mjj_etajj_2D", {}},
-        {"mjj_dRjj_2D", {}}
+        //{"mjj_etajj_2D", {}},
+        //{"mjj_dRjj_2D", {}}
     };
 
     std::vector<std::string> systHists2D_ = {
@@ -96,8 +96,8 @@ public :
     };
 
     std::map<std::string, TH3D*> weighthists2D_ {
-        {"mjj_etajj_2D", {}},
-        {"mjj_dRjj_2D", {}}
+        //{"mjj_etajj_2D", {}},
+        //{"mjj_dRjj_2D", {}}
     };
 
     std::vector<float>* scaleWeights = NULL;
@@ -221,7 +221,7 @@ protected:
     bool PassesVBSSelection(bool noBlind);
     bool PassesVBSBackgroundControlSelection();
     bool PassesFullWZSelection(Long64_t entry);
-    void InitializeHistogram(std::string name, std::vector<std::string> histData);
+    void InitializeHistogram(std::string name, std::string channel, std::vector<std::string> histData);
     unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
     std::string getHistName(std::string histName, std::string variationName);

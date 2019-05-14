@@ -182,7 +182,7 @@ unsigned int WZSelector::GetLheWeightInfo() {
 
 void WZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     WZSelectorBase::LoadBranchesUWVV(entry, variation);
-    weight *= GetPrefiringEfficiencyWeight(jetPt, jetEta);
+    //weight *= GetPrefiringEfficiencyWeight(jetPt, jetEta);
 
     //b_MtToMET->GetEntry(entry);
     b_ZPhi->GetEntry(entry);
@@ -490,36 +490,36 @@ bool WZSelector::PassesFullWZSelection(Long64_t entry) {
     if (MET < 30)
         return false;
 
-    b_jetCSVv2->GetEntry(entry);
-    for (const auto& jetCSVval : *jetCSVv2) {
-        if (jetCSVval > 0.9535)
-            return false;
-    }
-    b_Zlep1_Wlep_Mass->GetEntry(entry);
-    b_Zlep2_Wlep_Mass->GetEntry(entry);
-    if (Zlep1_Wlep_Mass < 4 || Zlep2_Wlep_Mass < 4)
-        return false;
+    //b_jetCSVv2->GetEntry(entry);
+    //for (const auto& jetCSVval : *jetCSVv2) {
+    //    if (jetCSVval > 0.9535)
+    //        return false;
+    //}
+    //b_Zlep1_Wlep_Mass->GetEntry(entry);
+    //b_Zlep2_Wlep_Mass->GetEntry(entry);
+    //if (Zlep1_Wlep_Mass < 4 || Zlep2_Wlep_Mass < 4)
+    //    return false;
 
     return true;
 }
 
 bool WZSelector::PassesBaseSelection(Long64_t entry, bool tightLeps, Selection selection) { 
-    if (!(Flag_BadChargedCandidateFilterPass
-            && Flag_HBHENoiseFilterPass 
-            && Flag_HBHENoiseIsoFilterPass 
-            && Flag_BadPFMuonFilterPass
-            && Flag_EcalDeadCellTriggerPrimitiveFilterPass 
-            && Flag_goodVerticesPass 
-            && Flag_globalTightHalo2016FilterPass
-            && (isMC_ || Flag_eeBadScFilterPass
-                //&& !Flag_duplicateMuonsPass 
-                //&& !Flag_badMuonsPass)
-                // No longer vetoing events failing these filters
-                // (we trust the MET in ReMiniAOD)
-            )
-        )
-    ) 
-        return false;
+    //if (!(Flag_BadChargedCandidateFilterPass
+    //        && Flag_HBHENoiseFilterPass 
+    //        && Flag_HBHENoiseIsoFilterPass 
+    //        && Flag_BadPFMuonFilterPass
+    //        && Flag_EcalDeadCellTriggerPrimitiveFilterPass 
+    //        && Flag_goodVerticesPass 
+    //        && Flag_globalTightHalo2016FilterPass
+    //        && (isMC_ || Flag_eeBadScFilterPass
+    //            //&& !Flag_duplicateMuonsPass 
+    //            //&& !Flag_badMuonsPass)
+    //            // No longer vetoing events failing these filters
+    //            // (we trust the MET in ReMiniAOD)
+    //        )
+    //    )
+    //) 
+    //    return false;
     if (!passesLeptonVeto)
         return false;
     if (applyFullSelection_ && !PassesFullWZSelection(entry))
@@ -544,9 +544,9 @@ bool WZSelector::PassesBaseSelection(Long64_t entry, bool tightLeps, Selection s
     
     if (tightLeps && !(zlep1IsTight() && zlep2IsTight() && lepton3IsTight()))
         return false;
-    if (!IsGenMatched3l()) {
-        return false;
-    }
+    //if (!IsGenMatched3l()) {
+    //    return false;
+    //}
 
     return true;
 }
@@ -594,11 +594,13 @@ void WZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     bool noBlind = true;
     if (!PassesBaseSelection(entry, true, selection_))
         return;
-    bool passesVBS = PassesVBSSelection(noBlind);
+    //bool passesVBS = PassesVBSSelection(noBlind);
+    bool passesVBS = false;
 
-    if (hists1D_[getHistName("backgroundControlYield", variation.second)] != nullptr)
-        if (PassesVBSBackgroundControlSelection())
-            hists1D_[getHistName("backgroundControlYield", variation.second)]->Fill(1, weight);
+    //if (hists1D_[getHistName("backgroundControlYield", variation.second)] != nullptr)
+    //    if (PassesVBSBackgroundControlSelection())
+    //        hists1D_[getHistName("backgroundControlYield", variation.second)]->Fill(1, weight);
+    std::cout << "Reading to fill" << std::endl;
 
     if ((variation.first == Central || (doaQGC_ && isaQGC_)) && isMC_) {
         for (size_t i = 0; i < lheWeights.size(); i++) {
@@ -625,16 +627,14 @@ void WZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     }
     if (isVBS_ && !passesVBS)
         return;
-    FillVBSHistograms(weight, noBlind, variation);
+    //FillVBSHistograms(weight, noBlind, variation);
 
     SafeHistFill(hists1D_, getHistName("yield", variation.second), 1, weight);
     SafeHistFill(hists1D_, getHistName("Mass", variation.second), Mass, 
         weight*(isMC_ || Mass < 400 || noBlind));
     SafeHistFill(hists1D_, getHistName("ZMass", variation.second), ZMass, weight);
-    SafeHistFill(hists1D_, getHistName("m_l1l3", variation.second), Zlep1_Wlep_Mass, weight);
-    SafeHistFill(hists1D_, getHistName("m_l2l3", variation.second), Zlep2_Wlep_Mass, weight);
-    SafeHistFill(hists1D_, getHistName("ZPhi", variation.second), ZPhi, weight);
-    SafeHistFill(hists1D_, getHistName("ZEta", variation.second), ZEta, weight);
+    std::cout << "ZMass is " << ZMass << std::endl;
+    std::cout << "weight is " << weight << std::endl;
     SafeHistFill(hists1D_, getHistName("Zlep1_Pt", variation.second), l1Pt, weight);
     SafeHistFill(hists1D_, getHistName("Zlep1_Eta", variation.second), l1Eta, weight);
     SafeHistFill(hists1D_, getHistName("Zlep1_Phi", variation.second), l1Phi, weight);
@@ -642,10 +642,16 @@ void WZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     SafeHistFill(hists1D_, getHistName("Zlep2_Eta", variation.second), l2Eta, weight);
     SafeHistFill(hists1D_, getHistName("Zlep2_Phi", variation.second), l2Phi, weight);
     SafeHistFill(hists1D_, getHistName("Wlep_Pt", variation.second), l3Pt, weight);
-    SafeHistFill(hists1D_, getHistName("WlepRelPFIsoDBR04", variation.second), l3Pt, weight);
     SafeHistFill(hists1D_, getHistName("Wlep_Eta", variation.second), l3Eta, weight);
     SafeHistFill(hists1D_, getHistName("Wlep_Phi", variation.second), l3Phi, weight);
     SafeHistFill(hists1D_, getHistName("MET", variation.second), MET, weight);
+    std::cout << "Working?" << std::endl;
+    std::cout << "Integral is " << hists1D_["ZMass"]->Integral() << std::endl;
+    return;
+    SafeHistFill(hists1D_, getHistName("m_l1l3", variation.second), Zlep1_Wlep_Mass, weight);
+    SafeHistFill(hists1D_, getHistName("m_l2l3", variation.second), Zlep2_Wlep_Mass, weight);
+    SafeHistFill(hists1D_, getHistName("ZPhi", variation.second), ZPhi, weight);
+    SafeHistFill(hists1D_, getHistName("ZEta", variation.second), ZEta, weight);
     SafeHistFill(hists1D_, getHistName("MtW", variation.second), l3MtToMET, weight);
     SafeHistFill(hists1D_, getHistName("nJets", variation.second), jetPt->size(), weight);
     SafeHistFill(hists1D_, getHistName("Eta", variation.second), Eta, weight);
@@ -701,7 +707,7 @@ std::vector<std::string> WZSelector::ReadHistData(std::string histDataString) {
     return histData;
 }
 
-void WZSelector::InitializeHistogram(std::string name, std::vector<std::string> histData) {
+void WZSelector::InitializeHistogram(std::string name, std::string channel, std::vector<std::string> histData) {
     if (histData.size() != 4 && histData.size() != 7) {
         std::cerr << "Malformed data string for histogram '" << name
                     << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'"
@@ -709,7 +715,7 @@ void WZSelector::InitializeHistogram(std::string name, std::vector<std::string> 
                     << std::endl;
         exit(1);
     }
-    std::string hist_name = name+"_"+channelName_;
+    std::string hist_name = name+"_"+channel;
     int nbins = std::stoi(histData[1]);
     float xmin = std::stof(histData[2]);
     float xmax = std::stof(histData[3]);
@@ -720,12 +726,12 @@ void WZSelector::InitializeHistogram(std::string name, std::vector<std::string> 
             for (auto& syst : systematics_) {
                 std::string syst_hist_name = name+"_"+syst.second;
                 hists1D_[syst_hist_name] = {};
-                AddObject<TH1D>(hists1D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
+                AddObject<TH1D>(hists1D_[syst_hist_name], (syst_hist_name+"_"+channel).c_str(), 
                     histData[0].c_str(),nbins, xmin, xmax);
                 if (isaQGC_ && doaQGC_ && (weighthists_.find(name) != weighthists_.end())) { 
                     std::string weightsyst_hist_name = name+"_lheWeights_"+syst.second;
                     AddObject<TH2D>(weighthists_[syst_hist_name], 
-                        (weightsyst_hist_name+"_"+channelName_).c_str(), histData[0].c_str(),
+                        (weightsyst_hist_name+"_"+channel).c_str(), histData[0].c_str(),
                         nbins, xmin, xmax, 1000, 0, 1000);
                 }
             }
@@ -733,7 +739,7 @@ void WZSelector::InitializeHistogram(std::string name, std::vector<std::string> 
         // Weight hists must be subset of 1D hists!
         if (isMC_ && (weighthists_.find(name) != weighthists_.end())) { 
             AddObject<TH2D>(weighthists_[name], 
-                (name+"_lheWeights_"+channelName_).c_str(), histData[0].c_str(),
+                (name+"_lheWeights_"+channel).c_str(), histData[0].c_str(),
                 nbins, xmin, xmax, 1000, 0, 1000);
         }
     }
@@ -747,14 +753,14 @@ void WZSelector::InitializeHistogram(std::string name, std::vector<std::string> 
             for (auto& syst : systematics_) {
                 std::string syst_hist_name = name+"_"+syst.second;
                 hists2D_[syst_hist_name] = {};
-                AddObject<TH2D>(hists2D_[syst_hist_name], (syst_hist_name+"_"+channelName_).c_str(), 
+                AddObject<TH2D>(hists2D_[syst_hist_name], (syst_hist_name+"_"+channel).c_str(), 
                     histData[0].c_str(),nbins, xmin, xmax, nbinsy, ymin, ymax);
             }
         }
         // 3D weight hists must be subset of 2D hists!
         if (isMC_ && (weighthists2D_.find(name) != weighthists2D_.end())) { 
             AddObject<TH3D>(weighthists2D_[name], 
-                (name+"_lheWeights_"+channelName_).c_str(), histData[0].c_str(),
+                (name+"_lheWeights_"+channel).c_str(), histData[0].c_str(),
                 nbins, xmin, xmax, nbinsy, ymin, ymax, 1000, 0, 1000);
         }
     }
@@ -771,7 +777,7 @@ void WZSelector::SetupNewDirectory()
                       selection_ == Wselection_Full ||
                       selection_ == VBSBackgroundControl_Full ||
                       selection_ == VBSBackgroundControlLoose_Full);
-    doSystematics_ = applyFullSelection_;
+    //doSystematics_ = applyFullSelection_;
     //doSystematics_ = false;
    
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
@@ -783,7 +789,11 @@ void WZSelector::SetupNewDirectory()
         std::string name = currentHistInfo->GetName();
         std::vector<std::string> histData = ReadHistData(currentHistInfo->GetTitle());
         if (hists2D_.find(name) != hists2D_.end() || hists1D_.find(name) != hists1D_.end()) { 
-            InitializeHistogram(name, histData);
+            if (channelName_ == "Inclusive")
+                //for (const auto& chan : allChannels_)
+                InitializeHistogram(name, "emm", histData);
+            else
+                InitializeHistogram(name, channelName_, histData);
         }
         else
             std::cerr << "Skipping invalid histogram " << name << std::endl;
