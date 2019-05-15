@@ -7,6 +7,7 @@
 #include <TSelector.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TH3.h>
 #include <TEfficiency.h>
 #include <exception>
 #include <iostream>
@@ -154,6 +155,16 @@ public :
     ClassDef(SelectorBase,0);
 
 protected:
+    // Maps to the histogram pointers themselves
+    std::map<std::string, TH1D*> hists1D_ = {};
+    std::map<std::string, TH2D*> hists2D_ = {};
+    std::map<std::string, TH2D*> weighthists_ = {};
+    std::map<std::string, TH3D*> weighthists2D_ {};
+
+    // The histograms for which you also want systematic variations
+    std::vector<std::string> systHists_ = {};
+    std::vector<std::string> systHists2D_ = {};
+
     void    SetBranches();
     virtual void    SetBranchesUWVV() { }
     virtual void    SetBranchesNanoAOD() { }
@@ -170,6 +181,9 @@ protected:
     bool isMC_;
     float GetPrefiringEfficiencyWeight(std::vector<float>* jetPt, std::vector<float>* jetEta);
     virtual std::string GetNameFromFile() { return ""; }
+    void InitializeHistogramFromConfig(std::string name, std::string channel, std::vector<std::string> histData);
+    void InitializeHistogramsFromConfig();
+    std::vector<std::string> ReadHistDataFromConfig(std::string histDataString);
 };
 
 #endif
