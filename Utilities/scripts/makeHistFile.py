@@ -98,7 +98,7 @@ channels = ["Inclusive"] if nanoAOD else ["eee", "eem", "emm", "mmm"]
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
-if "FakeRate" not in args['output_selection'] and not args['test']:
+if "WZxsec2016" in analysis and "FakeRate" not in args['output_selection'] and not args['test']:
     background = SelectorTools.applySelector(["WZxsec2016data"] +
         ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
         ConfigureJobs.getListOfNonpromptFilenames(), 
@@ -108,7 +108,14 @@ if "FakeRate" not in args['output_selection'] and not args['test']:
             addSumweights=False,
             nanoAOD=nanoAOD,
             proof=args['proof'])
-mc = SelectorTools.applySelector(args['filenames'], "WZSelector", args['selection'], fOut, 
+
+selector_map = {
+    "WZxsec2016" : "WZSelector",
+    "Zstudy" : "ZSelector",
+}
+
+mc = SelectorTools.applySelector(args['filenames'], selector_map[args['analysis']], 
+        args['selection'], fOut, 
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         channels=channels,
         nanoAOD=nanoAOD,

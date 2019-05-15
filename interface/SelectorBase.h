@@ -28,6 +28,8 @@ public :
     };
 
     enum Channel {
+        ee,
+        mm,
         eee,
         eem,
         emm,
@@ -54,6 +56,7 @@ public :
         VBSBackgroundControlLoose_Full,
         Inclusive2Jet,
         Inclusive2Jet_Full,
+        TightWithLooseVeto,
     };
 
     std::map<std::string, Selection> selectionMap_ = {
@@ -75,9 +78,12 @@ public :
         {"VBSBackgroundControlLoose_Full", VBSBackgroundControlLoose_Full},
         {"Inclusive2Jet", Inclusive2Jet},
         {"Inclusive2Jet_Full", Inclusive2Jet_Full},
+        {"TightWithLooseVeto", TightWithLooseVeto},
     };
 
     std::map<std::string, Channel> channelMap_ = {
+        {"ee", ee},
+        {"mm", mm},
         {"eee", eee},
         {"eem", eem},
         {"emm", emm},

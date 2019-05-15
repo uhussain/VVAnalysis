@@ -173,6 +173,7 @@ void SelectorBase::InitializeHistogramsFromConfig() {
         if (hists2D_.find(name) != hists2D_.end() || hists1D_.find(name) != hists1D_.end()) { 
             if (channelName_ == "Inclusive")
                 //for (const auto& chan : allChannels_)
+                //TODO This needs to be fixed to add all channels
                 InitializeHistogramFromConfig(name, "emm", histData);
             else
                 InitializeHistogramFromConfig(name, channelName_, histData);

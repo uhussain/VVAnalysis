@@ -75,6 +75,7 @@ public :
     Int_t Electron_charge[N_KEEP_MU_E_];
     Int_t Muon_charge[N_KEEP_MU_E_];
     Bool_t Muon_tightId[N_KEEP_MU_E_];
+    Bool_t Muon_mediumId[N_KEEP_MU_E_];
     UChar_t Muon_tkIsoId[N_KEEP_MU_E_];
     Int_t numPU;
     
@@ -92,6 +93,7 @@ public :
     TBranch* b_Electron_charge;
     TBranch* b_Muon_charge;
     TBranch* b_Muon_tightId;
+    TBranch* b_Muon_mediumId;
     TBranch* b_Muon_tkIsoId;
     TBranch* b_numPU;
 

@@ -2,6 +2,7 @@
   <class name="FakeRateSelector"/>
   <class name="SelectorBase"/>
   <class name="WZSelector"/>
+  <class name="ZSelector"/>
   <class name="WZBackgroundSelector"/>
   <class name="WZSelectorBase"/>
   <class name="ScaleFactor"/>

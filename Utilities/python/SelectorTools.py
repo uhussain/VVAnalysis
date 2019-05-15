@@ -44,11 +44,18 @@ def applySelector(filelist, selector_name, selection,
                     continue
             # Only add for one channel
             if addSumweights and i == 0:
-                meta_chain = ROOT.TChain("metaInfo/metaInfo")
+                if nanoAOD:
+                    sumWeightsBranch = "genEventSumw"
+                    metaTreeName = "Runs"
+                else:
+                    sumWeightsBranch = "sumWeights"
+                    metaTreeName = "metaInfo/metaInfo"
+                meta_chain = ROOT.TChain(metaTreeName)
                 meta_chain.Add(file_path)
                 sumweights = ROOT.TH1D("sumweights", "sumweights", 1, 0, 10)
-                meta_chain.Draw("1>>sumweights", "summedWeights")
+                meta_chain.Draw("1>>sumweights", sumWeightsBranch)
                 dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
+
             OutputTools.writeOutputListItem(dataset_list, rootfile)
             output_list.Delete()
             ROOT.gROOT.GetList().Delete()
@@ -57,7 +64,7 @@ def applySelector(filelist, selector_name, selection,
         #ROOT.gProof.Process(proof_path, select, "")
 
 def processLocalFiles(selector, file_path, chan, nanoAOD):
-    if not os.path.isdir(file_path.rsplit("/", 1)[0]):
+    if not os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0]):
         raise ValueError("Invalid path! Path was %s" 
             % file_path)
     for filename in glob.glob(file_path):
