@@ -121,7 +121,8 @@ mc = SelectorTools.applySelector(args['filenames'], selector_map[args['analysis'
         nanoAOD=nanoAOD,
         addSumweights=True, proof=args['proof'])
 if args['test']:
-    exit(0)
+    fOut.Close()
+    sys.exit(0)
 
 alldata = HistTools.makeCompositeHists(fOut,"AllData", 
     ConfigureJobs.getListOfFilesWithXSec(["WZxsec2016data"], manager_path), args['lumi'],
