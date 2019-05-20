@@ -3,12 +3,27 @@ import glob
 import argparse
 import datetime
 from collections import OrderedDict
+import ConfigureJobs
+import sys
+
+def getHistExpr(hist_names, selection):
+    info = ROOT.TList()
+    info.SetName("histinfo")
+    for hist_name in hist_names:
+        bin_info = ConfigHistTools.getHistBinInfo(manager_path, selection, hist_name)
+        if "TH1" in ConfigHistTools.getHistType(manager_path, selection, hist_name):
+            bin_expr = "{nbins}, {xmin}, {xmax}".format(**bin_info)
+        else:
+            bin_expr = "{nbinsx}, {xmin}, {xmax}, {nbinsy}, {ymin}, {ymax}".format(**bin_info)
+        info.Add(ROOT.TNamed(hist_name, " $ ".join([hist_name, bin_expr])))
+    return info
 
 def readAllJson(json_file_path):
     json_info = {}
     for json_file in glob.glob(json_file_path):
         json_info.update(readJson(json_file))
     return json_info
+
 def readJson(json_file_name):
     json_info = {}
     with open(json_file_name) as json_file:
@@ -18,6 +33,7 @@ def readJson(json_file_name):
             print "Error reading JSON file %s. The error message was:" % json_file_name 
             print(err)
     return json_info
+
 def getDefaultParser():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--selection", type=str,
@@ -35,3 +51,24 @@ def getDefaultParser():
                         "as defined in AnalysisDatasetManager, separated "
                         "by commas")
     return parser
+
+def getHistInfo(analysis, input_hists, noConfig=False):
+    if noConfig:
+        print "INFO: assuming histogram information is specified in selector"
+        return (input_hists, [])
+
+    manager_path = ConfigureJobs.getManagerPath()
+    sys.path.append("/".join([manager_path, 
+        "AnalysisDatasetManager", "Utilities/python"]))
+    import ConfigHistTools
+
+    # For histograms produced with some postprocessing on the hist file
+    excludedHistPatterns = ["wCR", "unrolled", "CutFlow", "YieldByChannel"]
+    config_hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
+        if "all" in input_hists else input_hists
+
+    hists = filter(lambda x : any(y in x for y in excludedHistPatterns), config_hists)
+    hist_inputs = [getHistExpr(hists, analysis)]
+
+    return hists, hist_inputs
+

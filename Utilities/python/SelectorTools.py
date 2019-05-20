@@ -64,8 +64,8 @@ def applySelector(filelist, selector_name, selection,
         #ROOT.gProof.Process(proof_path, select, "")
 
 def processLocalFiles(selector, file_path, chan, nanoAOD):
-    if not os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0]):
-        raise ValueError("Invalid path! Path was %s" 
+    if not (os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0])):
+        raise ValueError("Invalid path! Skipping dataset. Path was %s" 
             % file_path)
     for filename in glob.glob(file_path):
         rtfile = ROOT.TFile(filename)

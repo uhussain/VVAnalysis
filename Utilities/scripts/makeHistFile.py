@@ -18,6 +18,8 @@ def getComLineArgs():
         default="test.root", help="Output file name")
     parser.add_argument("--test", action='store_true',
         help="Run test job (no background estimate)")
+    parser.add_argument("--noHistConfig", action='store_true',
+        help="Don't rely on config file to specify hist info")
     parser.add_argument("--output_selection", type=str,
         default="", help="Selection stage of output file "
         "(Same as input if not give)")
@@ -28,25 +30,10 @@ def getComLineArgs():
                         "by commas")
     return vars(parser.parse_args())
 
-def getHistExpr(hist_names, selection):
-    info = ROOT.TList()
-    info.SetName("histinfo")
-    for hist_name in hist_names:
-        bin_info = ConfigHistTools.getHistBinInfo(manager_path, selection, hist_name)
-        if "TH1" in ConfigHistTools.getHistType(manager_path, selection, hist_name):
-            bin_expr = "{nbins}, {xmin}, {xmax}".format(**bin_info)
-        else:
-            bin_expr = "{nbinsx}, {xmin}, {xmax}, {nbinsy}, {ymin}, {ymax}".format(**bin_info)
-        info.Add(ROOT.TNamed(hist_name, " $ ".join([hist_name, bin_expr])))
-    return info
-
 ROOT.gROOT.SetBatch(True)
 
 args = getComLineArgs()
 manager_path = ConfigureJobs.getManagerPath()
-sys.path.append("/".join([manager_path, 
-    "AnalysisDatasetManager", "Utilities/python"]))
-import ConfigHistTools 
 
 tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
@@ -81,16 +68,17 @@ prefireEff = fPrefireEfficiency.Get('prefireEfficiencyMap')
 
 fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
 sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF, prefireEff]
+
+if args['output_selection'] == '':
+    args['output_selection'] = args['selection']
 selection = args['output_selection'].split("_")[0]
+
 if selection == "Inclusive2Jet":
     selection = "Wselection"
     print "Info: Using Wselection for hist defintions"
 analysis = "/".join([args['analysis'], selection])
-hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
-    if "all" in args['hist_names'] else args['hist_names']
+hists, hist_inputs = UserInput.getHistInfo(analysis, args['hist_names'], args['noHistConfig'])
 
-hists = [h for h in hists if "unrolled" not in h and "wCR" not in h and h not in  ["YieldByChannel", "CutFlow"]]
-hist_inputs = [getHistExpr(hists, analysis)]
 tselection = [ROOT.TNamed("selection", args['output_selection'])]
 nanoAOD = True
 channels = ["Inclusive"] if nanoAOD else ["eee", "eem", "emm", "mmm"]
