@@ -5,6 +5,7 @@ import datetime
 from collections import OrderedDict
 import ConfigureJobs
 import sys
+import ROOT
 
 def getHistExpr(hist_names, selection):
     info = ROOT.TList()
