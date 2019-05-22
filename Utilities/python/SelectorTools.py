@@ -30,7 +30,12 @@ def applySelector(filelist, selector_name, selection,
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     selection, analysis)
-                processLocalFiles(select, file_path, chan, nanoAOD)
+                # Only add for one channel
+                addWeights = addSumweights and i == 0
+                if addWeights:
+                    ROOT.gROOT.cd()
+                    sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
+                processLocalFiles(select, file_path, chan, nanoAOD, addSumweights )
             except ValueError as e:
                 print e
                 continue
@@ -44,18 +49,7 @@ def applySelector(filelist, selector_name, selection,
                 else:
                     print 'WARNING: Skipping dataset %s' % dataset
                     continue
-            # Only add for one channel
-            if addSumweights and i == 0:
-                if nanoAOD:
-                    sumWeightsBranch = "genEventSumw"
-                    metaTreeName = "Runs"
-                else:
-                    sumWeightsBranch = "sumWeights"
-                    metaTreeName = "metaInfo/metaInfo"
-                meta_chain = ROOT.TChain(metaTreeName)
-                meta_chain.Add(file_path)
-                sumweights = ROOT.TH1D("sumweights", "sumweights", 1, 0, 10)
-                meta_chain.Draw("1>>sumweights", sumWeightsBranch)
+            if addSumweights:
                 dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
 
             OutputTools.writeOutputListItem(dataset_list, rootfile)
@@ -65,15 +59,16 @@ def applySelector(filelist, selector_name, selection,
         #proof_path = "_".join([analysis, selection+("#/%s/ntuple" % chan)])
         #ROOT.gProof.Process(proof_path, select, "")
 
-def processLocalFiles(selector, file_path, chan, nanoAOD):
+def processLocalFiles(selector, file_path, chan, nanoAOD, addSumweights):
     xrootd = "/store/user" in file_path
     if not (xrootd or os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0])):
         raise ValueError("Invalid path! Skipping dataset. Path was %s" 
             % file_path)
+
     # Assuming these are user files on HDFS, otherwise it won't work
     filenames =  glob.glob(file_path) if not xrootd else \
             ConfigureJobs.getListOfHDFSFiles(file_path)
-    for filename in filenames:
+    for i, filename in enumerate(filenames):
         if "/store/user" in filename:
             filename = 'root://cmsxrootd.hep.wisc.edu/' + filename
         rtfile = ROOT.TFile.Open(filename)
@@ -85,3 +80,21 @@ def processLocalFiles(selector, file_path, chan, nanoAOD):
             )
 
         tree.Process(selector, "")
+        if addSumweights:
+            fillSumweightsHist(rtfile, i+1, nanoAOD)
+        rtfile.Close()
+
+def fillSumweightsHist(rtfile, filenum, isNanoAOD):
+    if isNanoAOD:
+        sumweights_branch = "genEventSumw"
+        meta_tree_name = "Runs"
+    else:
+        sumweights_branch = "sumWeights"
+        meta_tree_name = "metaInfo/metaInfo"
+    meta_tree = rtfile.Get(meta_tree_name)
+    ROOT.gROOT.cd()
+    sumweights_hist = ROOT.gROOT.FindObject("sumweights")
+    tmplabel = sumweights_hist.GetName()+"_i"
+    tmpweights_hist = sumweights_hist.Clone(tmplabel)
+    meta_tree.Draw("%i>>%s" % (filenum, tmplabel), sumweights_branch)
+    sumweights_hist.Add(tmpweights_hist)
