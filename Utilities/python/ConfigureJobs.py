@@ -126,18 +126,18 @@ def getListOfHDFSFiles(file_path):
         return []
     files = []
     for line in out.splitlines():
-        split = line.split(" ", 1)
+        split = line.rsplit(" ", 1)
         if len(split) != 2:
             continue
         elif "root" in split[1]:
-            files.append("/"+split[1])
+            files.append(split[1])
     return files
 def getListOfFiles(filelist, selection, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
-    data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
-    mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
+    data_info = UserInput.readAllInfo("/".join([data_path, "data/*"]))
+    mc_info = UserInput.readAllInfo("/".join([data_path, "montecarlo/*"]))
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
@@ -159,6 +159,7 @@ def getListOfFiles(filelist, selection, manager_path=""):
         else:
             if name.split("__")[0] not in valid_names:
                 print "%s is not a valid name" % name
+                print "Valid names are", valid_names
                 continue
             names += [name]
     return [str(i) for i in names]
@@ -173,7 +174,7 @@ def getListOfFilesWithXSec(filelist, manager_path=""):
         manager_path = getManagerPath()
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
     files = getListOfFiles(filelist, "ntuples", manager_path)
-    mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
+    mc_info = UserInput.readAllInfo("/".join([data_path, "montecarlo/*"]))
     info = {}
     for file_name in files:
         if "data" in file_name:
@@ -220,6 +221,14 @@ def getPreviousStep(selection, analysis):
             raise ValueError("Invalid selection '%s'. Valid selections are:"
                 "%s" % (first_selection, selection_map.keys()))
     return selection_map[first_selection]
+
+def getConfigFileName(config_file_name):
+    for extension in ["json", "py"]:
+        if os.path.isfile(".".join([config_file_name, extension])):
+            return ".".join([config_file_name, extension])
+    raise IOError("Invalid configuration file. Tried to read %s which does not exist" % \
+            config_file_name)
+
 def getInputFilesPath(sample_name, selection, analysis, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
@@ -227,16 +236,18 @@ def getInputFilesPath(sample_name, selection, analysis, manager_path=""):
         print "INFO: using simple file %s" % sample_name
         return sample_name
     data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
-    input_file_name = "/".join([data_path, analysis, "%s.json" %
-        selection])
-    input_files = UserInput.readJson(input_file_name)
+    input_file_base_name = "/".join([data_path, analysis, selection])
+    input_file_name = getConfigFileName(input_file_base_name)
+    input_files = UserInput.readInfo(input_file_name)
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
                " to a definition in %s" % (sample_name, input_file_name))
     filename = input_files[sample_name]['file_path']
     return filename
+
 def getCutsJsonName(selection, analysis):
-    return "/".join(["Cuts", analysis, selection + ".json"]) 
+    return "/".join(["Cuts", analysis, selection])
+
 def getTriggerName(sample_name, analysis, selection):
     trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG", "SingleMuon", "SingleElectron"]
     if "data" in sample_name and getPreviousStep(selection, analysis) == "ntuples":

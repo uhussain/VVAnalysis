@@ -8,7 +8,7 @@ import os
 
 def applySelector(filelist, selector_name, selection, 
         rootfile,
-        analysis="WZxsec2016", channels=["eee", "eem", "emm", "mmm"], 
+        analysis, channels=["eee", "eem", "emm", "mmm"], 
         extra_inputs = [],
         nanoAOD=False,
         addSumweights=True,
@@ -22,6 +22,8 @@ def applySelector(filelist, selector_name, selection,
         tchannel = ROOT.TNamed("channel", chan)
         inputs.Add(tchannel)
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
+            tname = ROOT.TNamed("name", dataset)
+            inputs.Add(tname)
             select = getattr(ROOT, selector_name)()
             select.SetInputList(inputs)
             print "Processing channel %s for dataset %s" % (chan, dataset)
@@ -64,16 +66,22 @@ def applySelector(filelist, selector_name, selection,
         #ROOT.gProof.Process(proof_path, select, "")
 
 def processLocalFiles(selector, file_path, chan, nanoAOD):
-    if not (os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0])):
+    xrootd = "/store/user" in file_path
+    if not (xrootd or os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0])):
         raise ValueError("Invalid path! Skipping dataset. Path was %s" 
             % file_path)
-    for filename in glob.glob(file_path):
-        rtfile = ROOT.TFile(filename)
+    # Assuming these are user files on HDFS, otherwise it won't work
+    filenames =  glob.glob(file_path) if not xrootd else \
+            ConfigureJobs.getListOfHDFSFiles(file_path)
+    for filename in filenames:
+        if "/store/user" in filename:
+            filename = 'root://cmsxrootd.hep.wisc.edu/' + filename
+        rtfile = ROOT.TFile.Open(filename)
         tree_name = "Events" if nanoAOD else "%s/ntuple" % chan
         tree = rtfile.Get(tree_name)
         if not tree:
-            raise ValueError(("tree %s/ntuple not found for file %s. " \
-                    "Probably it is corrupted") % (chan, filename)
+            raise ValueError(("tree %s not found for file %s. " \
+                    "Probably the file is corrupted") % (tree_name, filename)
             )
 
         tree.Process(selector, "")

@@ -34,6 +34,9 @@ ROOT.gROOT.SetBatch(True)
 
 args = getComLineArgs()
 manager_path = ConfigureJobs.getManagerPath()
+if manager_path not in sys.path:
+    sys.path.insert(0, "/".join([manager_path, 
+        "AnalysisDatasetManager", "Utilities/python"]))
 
 tmpFileName = args['output_file']
 fOut = ROOT.TFile(tmpFileName, "recreate")
@@ -100,10 +103,12 @@ if "WZxsec2016" in analysis and "FakeRate" not in args['output_selection'] and n
 selector_map = {
     "WZxsec2016" : "WZSelector",
     "Zstudy" : "ZSelector",
+    "Zstudy_2016" : "ZSelector",
 }
 
 mc = SelectorTools.applySelector(args['filenames'], selector_map[args['analysis']], 
         args['selection'], fOut, 
+        analysis=args['analysis'],
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         channels=channels,
         nanoAOD=nanoAOD,

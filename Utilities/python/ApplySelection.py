@@ -22,7 +22,7 @@ def buildCutString(state, selections, analysis, trigger):
     cut_string = CutString()
     for selection in selections:
         selection_json = ConfigureJobs.getCutsJsonName(selection, analysis)
-        cuts = UserInput.readJson(selection_json)
+        cuts = UserInput.readInfo(selection_json)
         cut_string.append(cuts["Event"])
         cut_string.append(cuts["State"][state])
         if trigger != "":
@@ -38,13 +38,13 @@ def buildCutString(state, selections, analysis, trigger):
                 cut_string.append(cut.format(object_name=lep_name))
     return cut_string
 def setAliases(tree, state, aliases_json):
-    aliases = UserInput.readJson(aliases_json)
+    aliases = UserInput.readInfo(aliases_json)
     for name, value in aliases["State"][state].iteritems():
         tree.SetAlias(name, value)
     for name, value in aliases["Event"].iteritems():
         tree.SetAlias(name, value)
 def getTriggerCutString(trigger, analysis):
-    triggers = UserInput.readJson("Cuts/%s/triggers.json" % analysis)
+    triggers = UserInput.readInfo("Cuts/%s/triggers.json" % analysis)
     return triggers[trigger]
 def applySelection(tree, state, selection, analysis, trigger):
     setAliases(tree, state, "Cuts/aliases.json")
