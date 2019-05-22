@@ -159,7 +159,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
         //b_l1GenPt->GetEntry(entry);
         //b_l2GenPt->GetEntry(entry);
         //b_l3GenPt->GetEntry(entry);
-        ApplyScaleFactors();
+        //ApplyScaleFactors();
     }
     else {
         //TODO: add MET filters
