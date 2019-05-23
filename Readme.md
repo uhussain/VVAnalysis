@@ -20,7 +20,7 @@ Analysis code for WZ/ZZ analyses. Some scripts using selections to skim Ntuples 
 -----------
 CMSSW version: CMSSW_10_4_0 # or CMSSW_9_2_14
 ```bash
-X_Y_Z="10_4_14" # or 9_2_14
+X_Y_Z="10_4_0" # or 9_2_14
 username="kdlong" # or your username
 ```
 
@@ -65,11 +65,15 @@ Each step deserves some degree of explanation. They are also all driven by indep
 
 ## NanoAOD
 
-Documentation
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD
 
 ### Skimming NanoAOD
 
-Link to NanoAOD tools
+https://github.com/cms-nanoAOD/nanoAOD-tools
+
+Dilepton and 3 lepton specific skimming tools:
+
+https://github.com/kdlong/NanoVVSkims
 
 ## Producing UWVV Ntuples
 
