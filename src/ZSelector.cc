@@ -34,7 +34,6 @@ void ZSelector::SetBranchesNanoAOD() {
     fChain->SetBranchAddress("Electron_cutBased", &Electron_cutBased, &b_Electron_cutBased);
     fChain->SetBranchAddress("Muon_tightId", &Muon_tightId, &b_Muon_tightId);
     fChain->SetBranchAddress("Muon_mediumId", &Muon_mediumId, &b_Muon_mediumId);
-    fChain->SetBranchAddress("Muon_pfIsoId", &Muon_pfIsoId, &b_Muon_pfIsoId);
     fChain->SetBranchAddress("Muon_pfRelIso04_all", &Muon_pfRelIso04_all, &b_Muon_pfRelIso04_all);
     fChain->SetBranchAddress("MET_pt", &MET, &b_MET);
     fChain->SetBranchAddress("MET_phi", &type1_pfMETPhi, &b_type1_pfMETPhi);
@@ -175,7 +174,8 @@ void ZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::stri
 }
 
 void ZSelector::ApplyScaleFactors() {
-    weight = genWeight;
+    if (isMC_)
+        weight = genWeight;
     return;
     // This will come later
     if (channel_ == ee) {

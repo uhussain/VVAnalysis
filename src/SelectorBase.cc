@@ -28,9 +28,6 @@ void SelectorBase::Init(TTree *tree)
     
     TString option = GetOption();
 
-    if (doSystematics_ && isMC_) // isNonpromptEstimate?
-        variations_.insert(systematics_.begin(), systematics_.end());
-
     if (GetInputList() != nullptr) {
         TNamed* ntupleType = (TNamed *) GetInputList()->FindObject("ntupleType");
         TNamed* name = (TNamed *) GetInputList()->FindObject("name");
@@ -82,6 +79,9 @@ void SelectorBase::Init(TTree *tree)
     if (name_.find("data") == std::string::npos){
         isMC_ = true;
     }
+    if (doSystematics_ && isMC_) // isNonpromptEstimate?
+        variations_.insert(systematics_.begin(), systematics_.end());
+
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
 
     if ( currentHistDir_ == nullptr ) {

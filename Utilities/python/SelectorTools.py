@@ -21,21 +21,22 @@ def applySelector(filelist, selector_name, selection,
             inputs.Add(inp)
         tchannel = ROOT.TNamed("channel", chan)
         inputs.Add(tchannel)
+        tname = ROOT.TNamed("name", "")
+        inputs.Add(tname)
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
-            tname = ROOT.TNamed("name", dataset)
-            inputs.Add(tname)
             select = getattr(ROOT, selector_name)()
             select.SetInputList(inputs)
+            tname.SetTitle(dataset)
             print "Processing channel %s for dataset %s" % (chan, dataset)
             try:
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                     selection, analysis)
                 # Only add for one channel
-                addWeights = addSumweights and i == 0
+                addWeights = addSumweights and i == 0 and "data" not in dataset
                 if addWeights:
                     ROOT.gROOT.cd()
                     sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
-                processLocalFiles(select, file_path, chan, nanoAOD, addSumweights )
+                processLocalFiles(select, file_path, chan, nanoAOD, addWeights)
             except ValueError as e:
                 print e
                 continue
@@ -49,7 +50,7 @@ def applySelector(filelist, selector_name, selection,
                 else:
                     print 'WARNING: Skipping dataset %s' % dataset
                     continue
-            if addSumweights:
+            if addWeights:
                 dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
 
             OutputTools.writeOutputListItem(dataset_list, rootfile)
