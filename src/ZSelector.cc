@@ -41,6 +41,7 @@ void ZSelector::SetBranchesNanoAOD() {
     fChain->SetBranchAddress("Muon_charge", &Muon_charge, &b_Muon_charge);
     fChain->SetBranchAddress("Electron_mass", &Electron_mass, &b_Electron_mass);
     fChain->SetBranchAddress("Muon_mass", &Muon_mass, &b_Muon_mass);
+    fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", &Dimuon_Trigger, &b_Dimuon_Trigger);
     if (isMC_) {
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
         fChain->SetBranchAddress("Pileup_nPU", &numPU, &b_numPU);
@@ -66,6 +67,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     b_Electron_mass->GetEntry(entry);
     b_Muon_mass->GetEntry(entry);
     b_MET->GetEntry(entry);
+    b_Dimuon_Trigger->GetEntry(entry);
 
     if (nElectron > N_KEEP_MU_E_ || nMuon > N_KEEP_MU_E_) {
         std::string message = "Found more electrons or muons than max read number.\n    Found ";
@@ -98,6 +100,10 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
 
     channel_ = channelMap_[channelName_];
     std::vector<size_t> goodIndices = {};
+
+    if (!Dimuon_Trigger)
+        return;
+
     if (nTightIdMuon >= 2) {
         channel_ = mm;
         if (!(Muon_tightId[0] && Muon_tightId[1])) {
