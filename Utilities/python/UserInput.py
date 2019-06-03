@@ -67,12 +67,16 @@ def getHistInfo(analysis, input_hists, noConfig=False):
     config_hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
         if "all" in input_hists else input_hists
 
-    hists = filter(lambda x : any(y in x for y in excludedHistPatterns), config_hists)
+    hists = filter(lambda x : all(y not in x for y in excludedHistPatterns), config_hists)
     hist_inputs = [getHistExpr(hists, analysis)]
 
     return hists, hist_inputs
 
 def getHistExpr(hist_names, selection):
+    manager_path = ConfigureJobs.getManagerPath()
+    ConfigHistTools = imp.load_source("ConfigHistTools", 
+        "/".join([manager_path, "AnalysisDatasetManager/Utilities/python/ConfigHistTools.py"]))
+
     info = ROOT.TList()
     info.SetName("histinfo")
     for hist_name in hist_names:

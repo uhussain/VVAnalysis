@@ -27,6 +27,9 @@ public :
         NanoAOD,
     };
 
+    std::vector<std::string> allChannels_ = {};
+    std::vector<std::string> hists1D_ = {};
+
     enum Channel {
         ee,
         mm,
@@ -162,7 +165,8 @@ public :
 
 protected:
     // Maps to the histogram pointers themselves
-    std::map<std::string, TH1D*> hists1D_ = {};
+    std::map<std::string, TH1D*> histMap1D_ = {};
+    //TODO change the name to map and don't break things
     std::map<std::string, TH2D*> hists2D_ = {};
     std::map<std::string, TH2D*> weighthists_ = {};
     std::map<std::string, TH3D*> weighthists2D_ {};
@@ -190,6 +194,14 @@ protected:
     void InitializeHistogramFromConfig(std::string name, std::string channel, std::vector<std::string> histData);
     void InitializeHistogramsFromConfig();
     std::vector<std::string> ReadHistDataFromConfig(std::string histDataString);
+    std::string getHistName(std::string histName, std::string variationName, std::string channel);
+    std::string getHistName(std::string histName, std::string variationName);
+    template<typename T, typename... Args>
+    void SafeHistFill(std::map<std::string, T*> container, 
+            std::string histname, Args... args) {
+        if (container[histname] != nullptr)
+            container[histname]->Fill(args...);
+    };
 };
 
 #endif

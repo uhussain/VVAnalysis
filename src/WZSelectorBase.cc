@@ -54,6 +54,8 @@ void WZSelectorBase::Init(TTree *tree)
         selection_ == VBSBackgroundControlLoose_Full
         );
 
+    allChannels_ = {"eee", "eem", "emm", "mmm"};
+
     if (isMC_){
         isNonpromptMC_ = false;
         isZgamma_ = false;

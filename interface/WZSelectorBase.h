@@ -18,10 +18,6 @@
 
 class WZSelectorBase : public SelectorBase {
 public :
-    std::vector<std::string> allChannels_ = {
-        "eee", "eem", "emm", "mmm"
-    };
-    
     ScaleFactor* pileupSF_;
     ScaleFactor* muonSF_;
     ScaleFactor* eIdSF_ ;

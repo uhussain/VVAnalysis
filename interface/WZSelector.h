@@ -134,15 +134,8 @@ protected:
     bool PassesVBSBackgroundControlSelection();
     bool PassesFullWZSelection(Long64_t entry);
     unsigned int GetLheWeightInfo();
-    std::string getHistName(std::string histName, std::string variationName);
     void ShiftEfficiencies(Systematic variation);
     float GetMuonScaleUncertainty(float muEta);
-    template<typename T, typename... Args>
-    void SafeHistFill(std::map<std::string, T*> container, 
-            std::string histname, Args... args) {
-        if (container[histname] != nullptr)
-            container[histname]->Fill(args...);
-    };
 };
 
 #endif

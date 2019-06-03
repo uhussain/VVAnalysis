@@ -25,7 +25,9 @@ public :
     ScaleFactor* mIsoSF_;
 
     // Derived values
+    bool singleLepton_;
     bool passesLeptonVeto;
+    bool passesTrigger;
     UInt_t nCBVIDTightElec;
     UInt_t nCBVIDVetoElec;
     UInt_t nTightIdMuon;
@@ -50,7 +52,7 @@ public :
     Float_t genWeight;
     Float_t MET;
     Float_t type1_pfMETPhi;
-    static const unsigned int N_KEEP_MU_E_ = 10;
+    static const unsigned int N_KEEP_MU_E_ = 15;
     UInt_t nElectron;
     UInt_t nMuon;
     Float_t Electron_pt[N_KEEP_MU_E_];
@@ -68,6 +70,9 @@ public :
     Bool_t Muon_mediumId[N_KEEP_MU_E_];
     Float_t Muon_pfRelIso04_all[N_KEEP_MU_E_];
     Bool_t Dimuon_Trigger;
+    Bool_t Dielectron_Trigger;
+    Bool_t SingleMuon_Trigger;
+    Bool_t SingleElectron_Trigger;
     Int_t numPU;
     
     TBranch* b_genWeight;
@@ -90,17 +95,10 @@ public :
     TBranch* b_Muon_mediumId;
     TBranch* b_Muon_pfRelIso04_all;
     TBranch* b_Dimuon_Trigger;
+    TBranch* b_Dielectron_Trigger;
+    TBranch* b_SingleMuon_Trigger;
+    TBranch* b_SingleElectron_Trigger;
     TBranch* b_numPU;
-
-    // Histograms
-    TH1D* cutflow_ee_;
-    TH1D* cutflow_mm_;
-    TH1D* ZMass_ee_;
-    TH1D* ZMass_mm_;
-    TH1D* ptl1_ee_; 
-    TH1D* ptl1_mm_; 
-    TH1D* ptl2_ee_; 
-    TH1D* ptl2_mm_; 
 
     // Readers to access the data (delete the ones you do not need).
     //virtual void    SetScaleFactors() override;

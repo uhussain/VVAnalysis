@@ -6,16 +6,14 @@
 
 void ZSelector::Init(TTree *tree)
 {
+    allChannels_ = {"ee", "mm", };
+    hists1D_ = {"ZMass", "ptl1", "etal1", "ptl2", "etal2"};
+
     SelectorBase::Init(tree);
-    if (addSumweights_) {
-        TFile* file = fChain->GetTree()->GetDirectory()->GetFile(); 
-        TTree* metaInfo = dynamic_cast<TTree*>(file->Get("metaInfo/metaInfo"));
-        if (metaInfo == nullptr)
-            std::cerr << "WARNING: Failed to add sumWeights histogram" << std::endl;
-        else {
-            metaInfo->Draw("1>>sumweights", "summedWeights");
-        }
-    }
+    
+    singleLepton_ = false;
+    if (!isMC_ && name_.find("Single") != std::string::npos)
+        singleLepton_ = true;
 }
 
 void ZSelector::SetBranchesUWVV() {
@@ -42,6 +40,9 @@ void ZSelector::SetBranchesNanoAOD() {
     fChain->SetBranchAddress("Electron_mass", &Electron_mass, &b_Electron_mass);
     fChain->SetBranchAddress("Muon_mass", &Muon_mass, &b_Muon_mass);
     fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", &Dimuon_Trigger, &b_Dimuon_Trigger);
+    fChain->SetBranchAddress("HLT_Mu27", &SingleMuon_Trigger, &b_SingleMuon_Trigger);
+    fChain->SetBranchAddress("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", &Dielectron_Trigger, &b_Dielectron_Trigger);
+    fChain->SetBranchAddress("HLT_Ele27_WPLoose_Gsf", &SingleElectron_Trigger, &b_SingleElectron_Trigger);
     if (isMC_) {
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
         fChain->SetBranchAddress("Pileup_nPU", &numPU, &b_numPU);
@@ -68,6 +69,9 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     b_Muon_mass->GetEntry(entry);
     b_MET->GetEntry(entry);
     b_Dimuon_Trigger->GetEntry(entry);
+    b_SingleMuon_Trigger->GetEntry(entry);
+    b_Dielectron_Trigger->GetEntry(entry);
+    b_SingleMuon_Trigger->GetEntry(entry);
 
     if (nElectron > N_KEEP_MU_E_ || nMuon > N_KEEP_MU_E_) {
         std::string message = "Found more electrons or muons than max read number.\n    Found ";
@@ -101,11 +105,9 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     channel_ = channelMap_[channelName_];
     std::vector<size_t> goodIndices = {};
 
-    if (!Dimuon_Trigger)
-        return;
-
     if (nTightIdMuon >= 2) {
         channel_ = mm;
+        channelName_ = "mm";
         if (!(Muon_tightId[0] && Muon_tightId[1])) {
             for (size_t i = 0; i < nMuon; i++) {
                 if (Muon_tightId[i])
@@ -132,6 +134,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     }
     else if (nCBVIDTightElec >= 2) {
         channel_ = ee;
+        channelName_ = "ee";
         if (!(Electron_cutBased[0] == 4 && Electron_cutBased[1] == 4)) {
             for (size_t i = 0; i < nElectron; i++) {
                 if (Electron_cutBased[i] == 4)
@@ -171,6 +174,13 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
         //b_Flag_duplicateMuonsPass->GetEntry(entry);          
         //b_Flag_badMuonsPass->GetEntry(entry);          
     }
+
+    if (!singleLepton_)
+        passesTrigger = (Dimuon_Trigger || SingleMuon_Trigger ||
+                Dielectron_Trigger || SingleElectron_Trigger);
+    else
+        passesTrigger = ((!Dimuon_Trigger && SingleMuon_Trigger) ||
+                (!Dielectron_Trigger && SingleElectron_Trigger));
 
     passesLeptonVeto = (std::min(nMediumIdMuon, nLooseIsoMuon) + nCBVIDVetoElec) == 2;
 }
@@ -225,79 +235,67 @@ bool ZSelector::tightZLeptons() {
 }
 
 void ZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { 
-    cutflow_ee_->Fill(0.,weight);
-    cutflow_mm_->Fill(0.,weight);
-    if (channel_ == ee)
-        cutflow_ee_->Fill(1.,weight);
-    else if (channel_ == mm)
-        cutflow_mm_->Fill(1.,weight);
+    //cutflow_ee_->Fill(0.,weight);
+    //SafeHistFill(histMap1D_, getHistName("CutFlow_ee", variation.second), 0., weight);
+    //cutflow_mm_->Fill(0.,weight);
+    //if (channel_ == ee)
+    //    cutflow_ee_->Fill(1.,weight);
+    //else if (channel_ == mm)
+    //    cutflow_mm_->Fill(1.,weight);
 
-    //if (!passesLeptonVeto)
-    //    return;
+    if (!passesTrigger)
+        return;
+    //for (auto& hist : histMap1D_)
+    if (channel_ != mm && channel_ != ee) 
+        return;
 
     if (channel_ == ee && (std::abs(l1Eta) > 2.4 || std::abs(l2Eta) > 2.4 ))
         return;
     else if (channel_ == mm && (std::abs(l1Eta) > 2.5 || std::abs(l2Eta) > 2.5 ))
         return;
-    if (channel_ == ee)
-        cutflow_ee_->Fill(2,weight);
-    else if (channel_ == mm)
-        cutflow_mm_->Fill(2,weight);
+    //if (channel_ == ee)
+    //    cutflow_ee_->Fill(2,weight);
+    //else if (channel_ == mm)
+    //    cutflow_mm_->Fill(2,weight);
 
     if (l1Pt < 25 || l2Pt < 15)
         return;
-    if (channel_ == ee)
-        cutflow_ee_->Fill(3,weight);
-    else if (channel_ == mm)
-        cutflow_mm_->Fill(3,weight);
+    //if (channel_ == ee)
+    //    cutflow_ee_->Fill(3,weight);
+    //else if (channel_ == mm)
+    //    cutflow_mm_->Fill(3,weight);
 
     if (ZMass > 101.1876 || ZMass < 81.1876)
         return;
 
-    if (channel_ == ee)
-        cutflow_ee_->Fill(4,weight);
-    else if (channel_ == mm)
-        cutflow_mm_->Fill(4,weight);
+    //if (channel_ == ee)
+    //    cutflow_ee_->Fill(4,weight);
+    //else if (channel_ == mm)
+    //    cutflow_mm_->Fill(4,weight);
 
     if (MET > 25)
         return;
 
-    if (channel_ == ee)
-        cutflow_ee_->Fill(5,weight);
-    else if (channel_ == mm)
-        cutflow_mm_->Fill(5,weight);
+    //if (channel_ == ee)
+    //    cutflow_ee_->Fill(5,weight);
+    //else if (channel_ == mm)
+    //    cutflow_mm_->Fill(5,weight);
 
     if (!tightZLeptons())
         return;
 
-    if (channel_ == ee)
-        cutflow_ee_->Fill(6,weight);
-    else if (channel_ == mm)
-        cutflow_mm_->Fill(6,weight);
+    //if (channel_ == ee)
+    //    cutflow_ee_->Fill(6,weight);
+    //else if (channel_ == mm)
+    //    cutflow_mm_->Fill(6,weight);
 
-    if (channel_ == ee) {
-        ZMass_ee_->Fill(ZMass, weight);
-        ptl1_ee_->Fill(l1Pt, weight);
-        ptl2_ee_->Fill(l2Pt, weight);
-    }
-    else if (channel_ == mm) {
-        ZMass_mm_->Fill(ZMass, weight);
-        ptl1_mm_->Fill(l1Pt, weight);
-        ptl2_mm_->Fill(l2Pt, weight);
-    }
-    else
-        throw std::domain_error("Invalid channel!");
+    SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), ZMass, weight);
+    SafeHistFill(histMap1D_, getHistName("ptl1", variation.second), l1Pt, weight);
+    SafeHistFill(histMap1D_, getHistName("ptl2", variation.second), l2Pt, weight);
 }
 
 void ZSelector::SetupNewDirectory() {
     SelectorBase::SetupNewDirectory();
 
-    AddObject<TH1D>(cutflow_ee_, "cutflow_ee", "Tight leptons; Cut flow", 7, 0, 7);
-    AddObject<TH1D>(cutflow_mm_, "cutflow_mm", "Tight leptons; Cut flow", 7, 0, 7);
-    AddObject<TH1D>(ZMass_ee_, "ZMass_ee", "Tight leptons; m_{ee} [GeV]", 80, 102, 22);
-    AddObject<TH1D>(ZMass_mm_, "ZMass_mm", "Tight leptons; m_{#mu#mu} [GeV]", 80, 102, 22);
-    AddObject<TH1D>(ptl1_ee_, "ptl1_ee", "Tight leptons; p_{T}(e_{1}) [GeV]", 75, 0, 150);
-    AddObject<TH1D>(ptl1_mm_, "ptl1_mm", "Tight leptons; p_{T}(#mu_{1}) [GeV]", 75, 0, 150);
-    AddObject<TH1D>(ptl2_ee_, "ptl2_ee", "Tight leptons; p_{T}(e_{2}) [GeV]", 100, 0, 100);
-    AddObject<TH1D>(ptl2_mm_, "ptl2_mm", "Tight leptons; p_{T}(#mu_{2}) [GeV]", 100, 0, 100);
+    InitializeHistogramsFromConfig();
 }
