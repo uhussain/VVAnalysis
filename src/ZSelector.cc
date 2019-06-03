@@ -41,8 +41,8 @@ void ZSelector::SetBranchesNanoAOD() {
     fChain->SetBranchAddress("Muon_mass", &Muon_mass, &b_Muon_mass);
     fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", &Dimuon_Trigger, &b_Dimuon_Trigger);
     fChain->SetBranchAddress("HLT_Mu27", &SingleMuon_Trigger, &b_SingleMuon_Trigger);
-    fChain->SetBranchAddress("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", &Dielectron_Trigger, &b_Dielectron_Trigger);
-    fChain->SetBranchAddress("HLT_Ele27_WPLoose_Gsf", &SingleElectron_Trigger, &b_SingleElectron_Trigger);
+    //fChain->SetBranchAddress("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", &Dielectron_Trigger, &b_Dielectron_Trigger);
+    //fChain->SetBranchAddress("HLT_Ele27_WPLoose_Gsf", &SingleElectron_Trigger, &b_SingleElectron_Trigger);
     if (isMC_) {
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
         fChain->SetBranchAddress("Pileup_nPU", &numPU, &b_numPU);
@@ -69,9 +69,9 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     b_Muon_mass->GetEntry(entry);
     b_MET->GetEntry(entry);
     b_Dimuon_Trigger->GetEntry(entry);
-    b_SingleMuon_Trigger->GetEntry(entry);
-    b_Dielectron_Trigger->GetEntry(entry);
-    b_SingleMuon_Trigger->GetEntry(entry);
+    //b_SingleMuon_Trigger->GetEntry(entry);
+    //b_SingleElectron_Trigger->GetEntry(entry);
+    //b_Dielectron_Trigger->GetEntry(entry);
 
     if (nElectron > N_KEEP_MU_E_ || nMuon > N_KEEP_MU_E_) {
         std::string message = "Found more electrons or muons than max read number.\n    Found ";
@@ -175,12 +175,16 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
         //b_Flag_badMuonsPass->GetEntry(entry);          
     }
 
-    if (!singleLepton_)
-        passesTrigger = (Dimuon_Trigger || SingleMuon_Trigger ||
-                Dielectron_Trigger || SingleElectron_Trigger);
-    else
-        passesTrigger = ((!Dimuon_Trigger && SingleMuon_Trigger) ||
-                (!Dielectron_Trigger && SingleElectron_Trigger));
+
+    passesTrigger = isMC_ ? Dimuon_Trigger : true;;
+    //if (!singleLepton_)
+    //    //passesTrigger = (Dimuon_Trigger || SingleMuon_Trigger ||
+    //    //        Dielectron_Trigger || SingleElectron_Trigger);
+    //    passesTrigger = (Dimuon_Trigger || SingleMuon_Trigger);
+    //else
+    //    passesTrigger = (!Dimuon_Trigger && SingleMuon_Trigger);
+    //    //passesTrigger = ((!Dimuon_Trigger && SingleMuon_Trigger) ||
+    //    //        (!Dielectron_Trigger && SingleElectron_Trigger));
 
     passesLeptonVeto = (std::min(nMediumIdMuon, nLooseIsoMuon) + nCBVIDVetoElec) == 2;
 }

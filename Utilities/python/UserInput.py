@@ -1,4 +1,5 @@
 import json
+import copy
 import glob
 import argparse
 import datetime
@@ -29,16 +30,19 @@ def getDefaultParser():
 def readAllInfo(file_path):
     info = {}
     for info_file in glob.glob(file_path):
+        if "__init__" in info_file:
+            continue
         if ".py" not in info_file[-3:] and ".json" not in info_file[-5:]:
             continue
         info.update(readInfo(info_file))
     return info
 
 def readInfo(file_path):
+    info = {}
     if ".py" in file_path[-3:]:
         file_info = imp.load_source("info_file", file_path)
         info = file_info.info
-    else:
+    elif ".json" in file_path[-5]:
         info = readJson(file_path)
     return info
 
