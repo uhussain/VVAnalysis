@@ -456,7 +456,7 @@ def generateAnalysisInputs():
     mIdFile.Close()
 
     return hSF
-ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx')
+#ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx')
 #sigSamples is a dictionary containing sample names and kfactor*cross-section
 #sumW is a dictionary with sigsample:sumweights stored
 def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}):
@@ -465,7 +465,11 @@ def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}
 
     if hSF:
         className = 'SFHist'+className
-    #for example C=<class 'ROOT.BranchValueResponseMatrixMaker<float>'>
+
+    if not hasattr(ROOT,className):
+        ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx','kTRUE')
+    
+    #for example C=<class 'ROOT.BranchValueResponseMatrixMaker<float>'>     
     C = getattr(ROOT, className)
 
     
@@ -545,6 +549,8 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
     for resp in hResponseNominal.values():
         respMat = resp.getResponse()
         hResponse.Add(respMat)
+        respMat.Delete()
+
     print ("The leaks happen in this for loop")
     #hResponseNominalTotal = sum(resp for resp in hResponseNominal.values())
     
@@ -865,6 +871,11 @@ if "eemm" in channels:
 
 print "selectorChannels: ",selectChannels
 
+#Dictionary where signal samples are keys with cross-section*kfactors as values
+sigSampleDic=ConfigureJobs.getListOfFilesWithXSec(ConfigureJobs.getListOfEWK())
+sigSampleList=[str(i) for i in sigSampleDic.keys()]
+print "sigSamples: ",sigSampleList
+
 if not args['test']:
     background = SelectorTools.applySelector([args['analysis']+"data"]+ConfigureJobs.getListOfEWK(),selectChannels, 
             "ZZBackgroundSelector", args['selection'], fOut,args['analysis'],
@@ -876,19 +887,29 @@ if not args['test']:
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         addSumweights=True, proof=args['proof'])
 
+    #Get the Gen Histograms
+    sigSamplesPath = SelectorTools.applyGenSelector(varList,sigSampleList,selectChannels, "ZZGenSelector", args['selection'], fOut,args['analysis'],
+            extra_inputs=hist_inputs+tselection, 
+            addSumweights=False, proof=args['proof'])
+
 #Replace fOut with fUse once you have run all the data samples and the backgrounds - right now unfolded data looking really big- subtract backgrounds
 if args['test']:
-    fUse = ROOT.TFile("HistFiles/Hists04Jun2019-DiffWSF_Total.root","update")
+    sigSamplesPath={}
+    fUse = ROOT.TFile("HistFiles/Hists06Jun2019-DiffWSF_4e.root","update")
     fOut=fUse
+    for dataset in sigSampleList:
+        file_path = ConfigureJobs.getInputFilesPath(dataset,selection, analysis)
+        sigSamplesPath[dataset]=file_path
 
 #Dictionary where signal samples are keys with cross-section*kfactors as values
-sigSampleDic=ConfigureJobs.getListOfFilesWithXSec(ConfigureJobs.getListOfEWK())
-sigSampleList=[str(i) for i in sigSampleDic.keys()]
-print "sigSamples: ",sigSampleList
+#sigSampleDic=ConfigureJobs.getListOfFilesWithXSec(ConfigureJobs.getListOfEWK())
+#sigSampleList=[str(i) for i in sigSampleDic.keys()]
+#print "sigSamples: ",sigSampleList
 #Get the Gen Histograms
-sigSamplesPath = SelectorTools.applyGenSelector(varList,sigSampleList,selectChannels, "ZZGenSelector", args['selection'], fOut,args['analysis'],
-        extra_inputs=hist_inputs+tselection, 
-        addSumweights=False, proof=args['proof'])
+#sigSamplesPath = SelectorTools.applyGenSelector(varList,sigSampleList,selectChannels, "ZZGenSelector", args['selection'], fOut,args['analysis'],
+#        extra_inputs=hist_inputs+tselection, 
+#        addSumweights=False, proof=args['proof'])
+
 print "sigSamplesPath: ",sigSamplesPath
 #Sum all data and return a TList of all histograms that are booked. And an empty datSumW dictionary as there are no sumWeights
 alldata,dataSumW = HistTools.makeCompositeHists(fOut,"AllData", 
@@ -979,12 +1000,14 @@ for varName in varNames.keys():
     
 print(OutputDirs)
 print(UnfoldOutDirs)
-#for cat in channels:   
+for cat in channels:   
     #This is where we save all the plots
     #print(os.path.expanduser(OutputDirs[cat].replace("/plots", "")))
-    #print(os.path.expanduser(OutputDirs[cat].replace("/plots", "")).split("/")[-1])
-    #makeSimpleHtml.writeHTML(os.path.expanduser(OutputDirs[cat].replace("/plots", "")), "2D ResponseMatrices (from MC)")
-    #makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")), "Unfolded Distributions (from MC)")
+    print(os.path.expanduser(OutputDirs[cat].replace("/plots", "")).split("/")[-1])
+    makeSimpleHtml.writeHTML(os.path.expanduser(OutputDirs[cat].replace("/plots", "")), "2D ResponseMatrices (from MC)")
+    print(os.path.expanduser(UnfoldOutDirsDirs[cat].replace("/plots", "")).split("/")[-1])
+    makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")), "Unfolded Distributions (from MC)")
+    print("it crashes already")
 
 if args['test']:
     exit(0)
