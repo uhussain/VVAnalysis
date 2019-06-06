@@ -35,7 +35,7 @@ class ResponseMatrixMakerBase
   virtual ~ResponseMatrixMakerBase(){;}
 
   // And scale factor histograms for PU reweighting and lepton efficiency
-  void registerPUWeights(const TH1D& h, const Str& upOrDown = "") {puWeightHists[upOrDown] = h;}
+  //void registerPUWeights(const TH1D& h, const Str& upOrDown = "") {puWeightHists[upOrDown] = h;}
   // void registerLeptonSFs(const TH2F& h, const Str& lep,
   //                        const Str& upOrDown = "");
 
@@ -135,7 +135,7 @@ class ResponseMatrixMakerBase
   float genWeight;
   Vec<float> scaleWeights;
   Vec<float> pdfAndAlphaSWeights;
-  UMap<Str, TH1D> puWeightHists;
+  //UMap<Str, TH1D> puWeightHists;
   UMap<Str, UMap<Str, TH2F> > leptonSFHists;
 
   const Vec<float> binning;
@@ -664,6 +664,7 @@ class UseSFHists : public R
   void registerElectronSelectionSFHist(const TH2F& h);
   void registerElectronSelectionGapSFHist(const TH2F& h);
   void registerElectronRecoSFHist(const TH2F& h);
+  void registerElectronLowRecoSFHist(const TH2F& h);
   void registerMuonSFHist(const TH2F& h);
   void registerMuonSFErrorHist(const TH2F& h);
 
@@ -684,6 +685,7 @@ class UseSFHists : public R
   UPtr<TH2F> hEleSelSF;
   UPtr<TH2F> hEleSelGapSF;
   UPtr<TH2F> hEleRecoSF;
+  UPtr<TH2F> hEleLowRecoSF;
   UPtr<TH2F> hMuSF;
   UPtr<TH2F> hMuSFErr;
 

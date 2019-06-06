@@ -185,19 +185,19 @@ void ResponseMatrixMakerBase<T>::setup()
     recoTree->Add(fn.c_str());
 
   // set up lots of things
-  Vec<Str> systs = Vec<Str>({"",
-        "pu_up","pu_dn",
-        });
-  const bool isJetVar = (varName.find("jet") != Str::npos ||
-                         varName.find("Jet") != Str::npos ||
-                         varName.find("jj") != Str::npos);
-  if(isJetVar && !skipSyst)
-    {
-      systs.push_back("jer_up");
-      systs.push_back("jer_dn");
-      systs.push_back("jes_up");
-      systs.push_back("jes_dn");
-    }
+  //Vec<Str> systs = Vec<Str>({"",
+  //      "pu_up","pu_dn",
+  //      });
+  //const bool isJetVar = (varName.find("jet") != Str::npos ||
+  //                       varName.find("Jet") != Str::npos ||
+  //                       varName.find("jj") != Str::npos);
+  //if(isJetVar && !skipSyst)
+  //  {
+  //    systs.push_back("jer_up");
+  //    systs.push_back("jer_dn");
+  //    systs.push_back("jes_up");
+  //    systs.push_back("jes_dn");
+  //  }
   bool hasE, hasMu;
   Vec<Str> objects;
   if(channel.find("eeee") != Str::npos)
@@ -205,49 +205,49 @@ void ResponseMatrixMakerBase<T>::setup()
       objects = Vec<Str>({"e1","e2","e3","e4"});
       hasE = true;
       hasMu = false;
-      if(!skipSyst)
-        {
-          systs.push_back("eEff_up");
-          systs.push_back("eEff_dn");
-          systs.push_back("eScale_up");
-          systs.push_back("eScale_dn");
-          systs.push_back("eRhoRes_up");
-          systs.push_back("eRhoRes_dn");
-          systs.push_back("ePhiRes_up");
-        }
+  //    if(!skipSyst)
+  //      {
+  //        systs.push_back("eEff_up");
+  //        systs.push_back("eEff_dn");
+  //        systs.push_back("eScale_up");
+  //        systs.push_back("eScale_dn");
+  //        systs.push_back("eRhoRes_up");
+  //        systs.push_back("eRhoRes_dn");
+  //        systs.push_back("ePhiRes_up");
+  //      }
     }
   else if(channel.find("eemm") != Str::npos)
     {
       objects = Vec<Str>({"e1","e2","m1","m2"});
       hasE = true;
       hasMu = true;
-      if(!skipSyst)
-        {
-          systs.push_back("eEff_up");
-          systs.push_back("eEff_dn");
-          systs.push_back("mEff_up");
-          systs.push_back("mEff_dn");
-          systs.push_back("eScale_up");
-          systs.push_back("eScale_dn");
-          systs.push_back("eRhoRes_up");
-          systs.push_back("eRhoRes_dn");
-          systs.push_back("ePhiRes_up");
-          systs.push_back("mClosure_up");
-          systs.push_back("mClosure_dn");
-        }
+  //    if(!skipSyst)
+  //      {
+  //        systs.push_back("eEff_up");
+  //        systs.push_back("eEff_dn");
+  //        systs.push_back("mEff_up");
+  //        systs.push_back("mEff_dn");
+  //        systs.push_back("eScale_up");
+  //        systs.push_back("eScale_dn");
+  //        systs.push_back("eRhoRes_up");
+  //        systs.push_back("eRhoRes_dn");
+  //        systs.push_back("ePhiRes_up");
+  //        systs.push_back("mClosure_up");
+  //        systs.push_back("mClosure_dn");
+  //      }
     }
   else
     {
       objects = Vec<Str>({"m1","m2","m3","m4"});
       hasE = false;
       hasMu = true;
-      if(!skipSyst)
-        {
-          systs.push_back("mEff_up");
-          systs.push_back("mEff_dn");
-          systs.push_back("mClosure_up");
-          systs.push_back("mClosure_dn");
-        }
+  //    if(!skipSyst)
+  //      {
+  //        systs.push_back("mEff_up");
+  //        systs.push_back("mEff_dn");
+  //        systs.push_back("mClosure_up");
+  //        systs.push_back("mClosure_dn");
+  //      }
     }
 
   // Scale and PDF systematics only done for samples that have LHE info (e.g.
@@ -279,17 +279,17 @@ void ResponseMatrixMakerBase<T>::setup()
           recoTree->SetBranchAddress("scaleWeights", &scaleWtPtr);
           recoTree->SetBranchAddress("pdfWeights", &pdfWtPtr);
 
-          systs.push_back("alphaS_up");
-          systs.push_back("alphaS_dn");
+          //systs.push_back("alphaS_up");
+         // systs.push_back("alphaS_dn");
         }
     }
 
-  for(auto& s : systs)
-    {
-      responses[s] = TH2D(s.c_str(), "",
-                          binning.size()-1, &binning[0],
-                          binning.size()-1, &binning[0]);
-    }
+  //for(auto& s : systs)
+  //  {
+  //    responses[s] = TH2D(s.c_str(), "",
+  //                        binning.size()-1, &binning[0],
+  //                        binning.size()-1, &binning[0]);
+  //  }
 
   responses[""] = TH2D("nominal", "",
                        binning.size()-1, &binning[0],
@@ -311,9 +311,9 @@ void ResponseMatrixMakerBase<T>::setup()
 
   this->setRecoBranches(*recoTree.get(), objects);
 
-  bool doPUWt = (puWeightHists.find("") != puWeightHists.end());
-  bool doPUWtUp = (puWeightHists.find("up") != puWeightHists.end());
-  bool doPUWtDn = (puWeightHists.find("dn") != puWeightHists.end());
+  //bool doPUWt = (puWeightHists.find("") != puWeightHists.end());
+  //bool doPUWtUp = (puWeightHists.find("up") != puWeightHists.end());
+  //bool doPUWtDn = (puWeightHists.find("dn") != puWeightHists.end());
 
   // Loop through base reco tree, fill most things
   for(size_t row = 0; row < size_t(std::abs(recoTree->GetEntries())); ++row)
@@ -321,26 +321,26 @@ void ResponseMatrixMakerBase<T>::setup()
       recoTree->GetEntry(row);
 
       // elements needed for event weights
-      float puWt = (doPUWt ? ::getContentFromHist(puWeightHists.at(""), truePU) : 1.);
-      float puWtUp = (doPUWtUp ? ::getContentFromHist(puWeightHists.at("up"), truePU) : 1.);
-      float puWtDn = (doPUWtDn ? ::getContentFromHist(puWeightHists.at("dn"), truePU) : 1.);
+      //float puWt = (doPUWt ? ::getContentFromHist(puWeightHists.at(""), truePU) : 1.);
+      //float puWtUp = (doPUWtUp ? ::getContentFromHist(puWeightHists.at("up"), truePU) : 1.);
+      //float puWtDn = (doPUWtDn ? ::getContentFromHist(puWeightHists.at("dn"), truePU) : 1.);
 
       float lepSF = this->getLepSF(objects);
-      float lepSFEUp = 1.;
-      float lepSFEDn = 1.;
-      float lepSFMUp = 1.;
-      float lepSFMDn = 1.;
+      //float lepSFEUp = 1.;
+      //float lepSFEDn = 1.;
+      //float lepSFMUp = 1.;
+      //float lepSFMDn = 1.;
 
-      if(hasE)
-        {
-          lepSFEUp = this->getLepSF(objects, 1., 0.);
-          lepSFEDn = this->getLepSF(objects, -1., 0.);
-        }
-      if(hasMu)
-        {
-          lepSFMUp = this->getLepSF(objects, 0., 1.);
-          lepSFMDn = this->getLepSF(objects, 0., -1.);
-        }
+      //if(hasE)
+      //  {
+      //    lepSFEUp = this->getLepSF(objects, 1., 0.);
+      //    lepSFEDn = this->getLepSF(objects, -1., 0.);
+      //  }
+      //if(hasMu)
+      //  {
+      //    lepSFMUp = this->getLepSF(objects, 0., 1.);
+      //    lepSFMDn = this->getLepSF(objects, 0., -1.);
+      //  }
 
       // for(size_t i = 0; i < objects.size(); ++i)
       //   {
@@ -368,25 +368,26 @@ void ResponseMatrixMakerBase<T>::setup()
           // Nominal value
           const T val = this->getEventResponse();
 
-          const float nominalWeight = scale * puWt * lepSF * genWeight;
+          //const float nominalWeight = scale * puWt * lepSF * genWeight;
 
+          const float nominalWeight = scale * lepSF * genWeight;
           // fill histos that use nominal value but with different weights
           this->fillResponse(responses[""], val, trueVal, nominalWeight);
 
           if(!skipSyst)
             {
-              this->fillResponse(responses["pu_up"], val, trueVal, scale * puWtUp * lepSF * genWeight);
-              this->fillResponse(responses["pu_dn"], val, trueVal, scale * puWtDn * lepSF * genWeight);
+              //this->fillResponse(responses["pu_up"], val, trueVal, scale * puWtUp * lepSF * genWeight);
+              //this->fillResponse(responses["pu_dn"], val, trueVal, scale * puWtDn * lepSF * genWeight);
 
               if(hasE)
                 {
-                  this->fillResponse(responses["eEff_up"], val, trueVal, scale * puWt * lepSFEUp * genWeight);
-                  this->fillResponse(responses["eEff_dn"], val, trueVal, scale * puWt * lepSFEDn * genWeight);
+                  //this->fillResponse(responses["eEff_up"], val, trueVal, scale * puWt * lepSFEUp * genWeight);
+                  //this->fillResponse(responses["eEff_dn"], val, trueVal, scale * puWt * lepSFEDn * genWeight);
                 }
               if(hasMu)
                 {
-                  this->fillResponse(responses["mEff_up"], val, trueVal, scale * puWt * lepSFMUp * genWeight);
-                  this->fillResponse(responses["mEff_dn"], val, trueVal, scale * puWt * lepSFMDn * genWeight);
+                  //this->fillResponse(responses["mEff_up"], val, trueVal, scale * puWt * lepSFMUp * genWeight);
+                  //this->fillResponse(responses["mEff_dn"], val, trueVal, scale * puWt * lepSFMDn * genWeight);
                 }
 
               if(hasLHE && pdfAndAlphaSWeights.at(0))
@@ -411,21 +412,21 @@ void ResponseMatrixMakerBase<T>::setup()
                 }
 
               // changes to jet scale/resolution actually change numbers
-              if(isJetVar)
-                {
-                  if(this->selectEvent("jer_up"))
-                    this->fillResponse(responses["jer_up"], this->getEventResponse("jer_up"),
-                                       trueVal, nominalWeight);
-                  if(this->selectEvent("jer_dn"))
-                    this->fillResponse(responses["jer_dn"], this->getEventResponse("jer_dn"),
-                                       trueVal, nominalWeight);
-                  if(this->selectEvent("jes_up"))
-                    this->fillResponse(responses["jes_up"], this->getEventResponse("jes_up"),
-                                       trueVal, nominalWeight);
-                  if(this->selectEvent("jes_dn"))
-                    this->fillResponse(responses["jes_dn"], this->getEventResponse("jes_dn"),
-                                       trueVal, nominalWeight);
-                }
+              //if(isJetVar)
+              //  {
+              //    if(this->selectEvent("jer_up"))
+              //      this->fillResponse(responses["jer_up"], this->getEventResponse("jer_up"),
+              //                         trueVal, nominalWeight);
+              //    if(this->selectEvent("jer_dn"))
+              //      this->fillResponse(responses["jer_dn"], this->getEventResponse("jer_dn"),
+              //                         trueVal, nominalWeight);
+              //    if(this->selectEvent("jes_up"))
+              //      this->fillResponse(responses["jes_up"], this->getEventResponse("jes_up"),
+              //                         trueVal, nominalWeight);
+              //    if(this->selectEvent("jes_dn"))
+              //      this->fillResponse(responses["jes_dn"], this->getEventResponse("jes_dn"),
+              //                         trueVal, nominalWeight);
+              //  }
             }
         }
     }
@@ -472,8 +473,8 @@ void ResponseMatrixMakerBase<T>::setup()
         {
           t->GetEntry(row);
 
-          float puWt = (doPUWt ? ::getContentFromHist(puWeightHists.at(""), truePU) : 1.);
-
+          //float puWt = (doPUWt ? ::getContentFromHist(puWeightHists.at(""), truePU) : 1.);
+          float puWt = 1.0;
           float lepSF = this->getLepSF(objects);
 
            // for(size_t i = 0; i < objects.size(); ++i)
@@ -1476,6 +1477,8 @@ UseSFHists<R>::UseSFHists(const Str& channel, const Str& varName,
   hEleSelSF->SetBinContent(4, 1.);
   hEleSelGapSF.reset(new TH2F("eSelGapSFDefault", "", 1, 0., 1000., 1, 0., 1000.));
   hEleSelGapSF->SetBinContent(4, 1.);
+  hEleLowRecoSF.reset(new TH2F("eLowRecoSFDefault", "", 1, 0., 1000., 1, 0., 1000.));
+  hEleLowRecoSF->SetBinContent(4, 1.);
   hEleRecoSF.reset(new TH2F("eRecoSFDefault", "", 1, 0., 1000., 1, 0., 1000.));
   hEleRecoSF->SetBinContent(4, 1.);
   hMuSF.reset(new TH2F("mSFDefault", "", 1, 0., 1000., 1, 0., 1000.));
@@ -1504,6 +1507,11 @@ UseSFHists<R>::registerElectronRecoSFHist(const TH2F& h)
   hEleRecoSF.reset((TH2F*)h.Clone());
 }
 
+template<class R> void
+UseSFHists<R>::registerElectronLowRecoSFHist(const TH2F& h)
+{
+  hEleLowRecoSF.reset((TH2F*)h.Clone());
+}
 
 template<class R> void
 UseSFHists<R>::registerMuonSFHist(const TH2F& h)
@@ -1623,20 +1631,34 @@ UseSFHists<R>::getLepSF(const Vec<Str>& leptons,
                 err += ::getErrorFromHist(*hEleSelSF, *lEtasSF.at(i),
                                           *lPtsSF.at(i));
             }
-
-          sf *= ::getContentFromHist(*hEleRecoSF, *lEtasSF.at(i),
+          if(*lPtsSF.at(i)<20.)
+            { 
+            sf *= ::getContentFromHist(*hEleLowRecoSF, *lEtasSF.at(i),
                                      *lPtsSF.at(i));
-
-          if(eSyst)
-            {
-              float recoErr = ::getErrorFromHist(*hEleRecoSF,
-                                                 *lEtasSF.at(i),
-                                                 *lPtsSF.at(i));
-              if(*lPtsSF.at(i) < 20. || *lPtsSF.at(i) > 75.)
-                recoErr += 0.01;
-              err = eSyst * std::sqrt(err*err + recoErr*recoErr);
+            if(eSyst)
+              {
+                float recoErr = ::getErrorFromHist(*hEleLowRecoSF,
+                                                   *lEtasSF.at(i),
+                                                   *lPtsSF.at(i));
+                if(*lPtsSF.at(i) < 10.)
+                  recoErr += 0.01;
+                err = eSyst * std::sqrt(err*err + recoErr*recoErr);
+              }
             }
-
+          else 
+          {
+            sf *= ::getContentFromHist(*hEleRecoSF, *lEtasSF.at(i),
+                                     *lPtsSF.at(i));
+            if(eSyst)
+              {
+                float recoErr = ::getErrorFromHist(*hEleRecoSF,
+                                                   *lEtasSF.at(i),
+                                                   *lPtsSF.at(i));
+                if(*lPtsSF.at(i) > 75.)
+                  recoErr += 0.01;
+                err = eSyst * std::sqrt(err*err + recoErr*recoErr);
+              }
+          }
           out *= (sf + err);
         }
       else if(leptons.at(i).compare(0,1,"m") == 0)
