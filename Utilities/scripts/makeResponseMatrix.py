@@ -459,6 +459,7 @@ def generateAnalysisInputs():
 #ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx')
 #sigSamples is a dictionary containing sample names and kfactor*cross-section
 #sumW is a dictionary with sigsample:sumweights stored
+ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx','kTRUE')
 def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}):
     
     className = responseClassNames[varName][channel]
@@ -466,8 +467,8 @@ def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}
     if hSF:
         className = 'SFHist'+className
 
-    if not hasattr(ROOT,className):
-        ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx','kTRUE')
+    #if not hasattr(ROOT,className):
+    #        ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx','kTRUE')
     
     #for example C=<class 'ROOT.BranchValueResponseMatrixMaker<float>'>     
     C = getattr(ROOT, className)
@@ -567,8 +568,8 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
 
 
     ## Give hSig and hTrue in the form of histograms
-    
-    varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+    varNames={'mass': 'Mass'}
+    #varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
     
     hSig = hSigDic[chan][varNames[varName]]
     print "sigHist: ", hSig,", ",hSig.Integral()
@@ -860,9 +861,9 @@ plotDir=args['plotDir']
 UnfoldDir=args['unfoldDir']
 nIterations=args['nIter']
 
-#varNames={'mass': 'Mass'}
+varNames={'mass': 'Mass'}
 
-varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+#varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
 
 selectChannels=channels
 #I need the channels split up for my Selectors and histograms
@@ -1005,11 +1006,11 @@ for cat in channels:
     #print(os.path.expanduser(OutputDirs[cat].replace("/plots", "")))
     print(os.path.expanduser(OutputDirs[cat].replace("/plots", "")).split("/")[-1])
     makeSimpleHtml.writeHTML(os.path.expanduser(OutputDirs[cat].replace("/plots", "")), "2D ResponseMatrices (from MC)")
-    print(os.path.expanduser(UnfoldOutDirsDirs[cat].replace("/plots", "")).split("/")[-1])
+    print(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")).split("/")[-1])
     makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")), "Unfolded Distributions (from MC)")
     print("it crashes already")
 
-if args['test']:
-    exit(0)
+#if args['test']:
+#    exit(0)
 
 
