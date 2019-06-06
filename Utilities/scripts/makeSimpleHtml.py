@@ -41,11 +41,10 @@ def writeHTML(path, name):
                     '</div>\n'
                     '  <table>\n'
             )
-        if path.split("/")[-1] not in ["eeee", "eemm","mmee","mmmm"]:
+        if path.split("/")[-1] not in ["eeee", "eemm","mmmm"]:
             index.write('  <div style="text-align: center;">Plots by channel: \n'
                     '  <a href="eeee">[eeee]</a> - '
                     '  <a href="eemm">[eemm]</a> - '
-                    '  <a href="mmee">[mmee]</a> - '
                     '  <a href="mmmm">[mmmm]</a>'
                     '</div>\n'
                     '  <table>\n'
@@ -54,7 +53,6 @@ def writeHTML(path, name):
             index.write('  <div style="text-align: center;">Plots by channel: \n'
                     '  <a href="../eeee">[eeee]</a> - '
                     '  <a href="../eemm">[eemm]</a> - '
-                    '  <a href="../mmee">[mmee]</a> - '
                     '  <a href="../mmmm">[mmmm]</a>'
                     '</div>\n'
                     '  <table>\n'

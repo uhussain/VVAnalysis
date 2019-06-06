@@ -11,9 +11,11 @@ def applySelector(filelist, channels,selector_name, selection,
         extra_inputs = [],
         addSumweights=True,
         proof=False):
-    print "channels: ",channels
+    #print "channels: ",channels
+    #histSigs={}
     for i, chan in enumerate(channels):
-        print "channel length: ",len(chan)
+        #print "chan: ", chan
+        #print "channel length: ",len(chan)
         #if len(chan)==4:
             #inputs = ROOT.TList()
             #for inp in extra_inputs:
@@ -31,7 +33,7 @@ def applySelector(filelist, channels,selector_name, selection,
                 #Ultimately once extra_inputs has fake rates, we won't need to add tname for dataset. 
                 for inp in extra_inputs:
                     inputs.Add(inp)
-                    print "inputs getting added: ",inp
+                    #print "inputs getting added: ",inp
                 tchan=ROOT.TNamed("channel",chan)
                 tname=ROOT.TNamed("name",dataset) 
                 inputs.Add(tname)
@@ -51,7 +53,7 @@ def applySelector(filelist, channels,selector_name, selection,
                     #print "CountFiles: ",countfiles
                     #continue
                 output_list = select.GetOutputList()
-                print "Output_list: ", output_list
+                #print "Output_list: ", output_list
                 #dataset_list = output_list.FindObject(dataset)
                 #if not dataset_list or dataset_list.ClassName() != "TList":
                 #    print "WARNING: No output found for dataset %s" % dataset
@@ -98,35 +100,54 @@ def applySelector(filelist, channels,selector_name, selection,
                 sumweights = ROOT.TH1D("sumweights", "sumweights", 1, 0, 10)
                 meta_chain.Draw("1>>sumweights", "summedWeights")
                 dataset_list = output_list.FindObject(dataset)
-                print "dataset_list: ", dataset_list
+                #print "dataset_list: ", dataset_list
+                #sumWeightsIntegral=sumweights.Integral()
                 dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
                 ROOT.SetOwnership(sumweights,False)
                 dataset_list.SetOwner()
             for item in output_list:
+            #    histSigDic={}
+            #    #Loop over the variables for which we are making 2D matrices
+            #    for var in varList:
+            #        #print "MCVar:",var
+            #        #subItems are the histograms that the selector makes
+            #        for subItem in item:
+            #            #print "MCsubItem:",subItem.GetName()
+            #            if subItem.GetName()==var+"_"+chan:
+            #                histSig = subItem.Clone()
+            #                histSig.SetDirectory(0)
+            #        histSigDic[var]=histSig
+            #            #ROOT.SetOwnership(histSig,True)
+            #    histSigs[chan]=histSigDic
                 #if "PROOF" in item.GetName() or item.GetName() == "MissingFiles":
                 #    continue
                 OutputTools.writeOutputListItem(item, rootfile)
                 ROOT.SetOwnership(item,False)
                 item.Delete()
+                #print "SigHistReturned: ",histSig
             #if hasattr(sumweights,"Delete"):
             #    sumweights.Delete()
             #OutputTools.writeOutputListItem(dataset_list, rootfile)
             output_list.Delete()
             ROOT.gROOT.GetList().Delete()
-        #if chain.GetEntries() != 0 and proof:
-        #proof_path = "_".join([analysis, selection+("#/%s/ntuple" % chan)])
-        #ROOT.gProof.Process(proof_path, select, "")
-#This is a version that has extra_inputs in the shape of fakeRates for Bkgs. This will be the function used for everything once I have sfs setup.
-def applyGenSelector(filelist, channels,selector_name, selection, 
+    #This returns a dictionary with channel keys for TH1 Sig histograms that can go into RooUnfoldResponse
+    #print "sigHist: ", histSigs["eeee"]
+    #return histSigs,sumWeightsIntegral
+
+#Still returning a dictionary of genHistograms
+def applyGenSelector(varList,filelist, channels,selector_name, selection, 
         rootfile,
         analysis="ZZ4l2018", 
         extra_inputs = [],
         addSumweights=False,
         proof=False):
     print "Gen Selector"
+    sigSamplePaths={}
     for i, chan in enumerate(channels):
-        print "channel length: ",len(chan)
+        #print "channel length: ",len(chan)
         for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
+            #if dataset!="zz4l-powheg": continue
+            print "GenSelector on dataset: ",dataset
             select = getattr(ROOT, selector_name)()
             if len(chan)==4:
                 inputs = ROOT.TList()
@@ -139,24 +160,25 @@ def applyGenSelector(filelist, channels,selector_name, selection,
                 inputs.Add(tname)
                 inputs.Add(tchan)
                 ROOT.gROOT.cd()
-                print "Processing channel %s for dataset %s" % (chan, dataset)
+                #print "Processing channel %s for dataset %s" % (chan, dataset)
                 file_path = ConfigureJobs.getInputFilesPath(dataset, 
                         selection, analysis)
+                sigSamplePaths[dataset]=file_path
                 processGenLocalFiles(select, file_path, chan)
                 output_list = select.GetOutputList()
-                print "Output_list: ", output_list
+                #print "Output_list: ", output_list
             else:
                 inputs = ROOT.TList()
                 select.SetInputList(inputs)
                 for inp in extra_inputs:
                     inputs.Add(inp)
-                    print "inputs getting added: ",inp
+                    #print "inputs getting added: ",inp
                 tchan=ROOT.TNamed("channel",chan)
                 tname=ROOT.TNamed("name",dataset) 
                 inputs.Add(tname)
                 inputs.Add(tchan)
                 ROOT.gROOT.cd()
-                print "Processing channel %s for dataset %s" % (chan, dataset)
+                #print "Processing channel %s for dataset %s" % (chan, dataset)
                 try:
                     file_path = ConfigureJobs.getInputFilesPath(dataset, 
                         selection, analysis)
@@ -164,14 +186,33 @@ def applyGenSelector(filelist, channels,selector_name, selection,
                 except ValueError as e:
                     print e
                     continue
+                sigSamplePaths[dataset]=file_path
                 output_list = select.GetOutputList()
-                print "Output_list: ", output_list
+                #print "Output_list: ", output_list
             for item in output_list:
+                #histTrueDic={}
+                ##Loop over the variables for which we are making 2D matrices
+                #for var in varList:
+                #    #print "GenVar:",var
+                #    #subItems are the histograms that the selector makes
+                #    for subItem in item:
+                #        #print "GenSubItem: ",subItem.GetName()
+                #        if subItem.GetName()=="Gen"+var+"_"+chan:
+                #            histTrue = subItem.Clone()
+                #            histTrue.SetDirectory(0)
+                #    histTrueDic[var]=histTrue
+                #        #ROOT.SetOwnership(histSig,True)
+                ##Hence we need a dictionary of dictionaries
+                #histsTrue[chan]=histTrueDic
                 OutputTools.writeOutputListItem(item, rootfile)
                 ROOT.SetOwnership(item,False)
                 item.Delete()
             output_list.Delete()
             ROOT.gROOT.GetList().Delete()
+            #print "TrueHistReturned: ",histTrue
+    #This returns a dictionary with channel keys for TH1 True histograms that can go into RooUnfoldResponse
+    #print "trueHist: ",histsTrue["eeee"]
+    return sigSamplePaths 
 def processLocalFiles(selector, file_path, chan):
     if not os.path.isdir(file_path.rsplit("/", 1)[0]):
         raise ValueError("Invalid path! Path was %s" 

@@ -91,6 +91,11 @@ def removeZeros(hist):
             else: 
                 hist.SetBinContent(i, 0.00005)
 
+def zeroNegativeBins(hist):
+    for i in range(hist.GetNbinsX()+2):
+        if hist.GetBinContent(i) < 0:
+            hist.SetBinContent(i, 0.)
+
 def getStatHists(hist, name, chan, signal):
     stat_hists = []
     variation_names = []
@@ -246,6 +251,8 @@ def addOverflowAndUnderflow(hist, underflow=True, overflow=True):
 def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=False, overflow=True, rebin=None):
     composite = ROOT.TList()
     composite.SetName(name)
+    #Want to store the SumW for the responseclass for the signal
+    SumW={}
     for directory in [str(i) for i in members.keys()]:
         # For aQGC, the different plot groups should already be in their own files
         if "aqgc" in directory:
@@ -274,6 +281,8 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=False
                 sumhist = composite.FindObject(hist.GetName())
                 if sumweights:
                     hist.Scale(members[directory.split("__")[0]]*1000*lumi/sumweights)
+                    #Save sumweights in SumW dictionary
+                    SumW.update({directory:sumweights})
                 addOverflowAndUnderflow(hist, underflow, overflow)
             else:
                 raise RuntimeError("hist %s was not produced for "
@@ -284,7 +293,8 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=False
             else:
                 sumhist.Add(hist)
             hist.Delete()
-    return composite
+    #I also return a SumW dictionary which is empty in the case of data
+    return composite,SumW
 
 def getTransformedHists(orig_file, folders, input_hists, transformation, transform_inputs):
     output_folders = []

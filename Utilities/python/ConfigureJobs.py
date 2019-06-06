@@ -78,6 +78,13 @@ def getListOfEWKFilenames():
         "ggZZ2mu2tau",
     ]
 
+def getListOfVVV():
+    return [
+       "ZZGJetsTo4L2Nu",
+       "ZZZJetsTo4L2Nu",
+       "WZZJetsTo4L2Nu",
+       "WWZJetsTo4L2Nu", 
+    ]
 def getListOfEWK():
     return [
         "zz4l-powheg",
@@ -87,6 +94,10 @@ def getListOfEWK():
         "ggZZ2e2mu",
         "ggZZ2e2tau",
         "ggZZ2mu2tau",
+    ]
+def getListOfSignalFilenames():
+    return [
+        "zz4l-powheg",
     ]
 def getListOfDYFilenames():
     return[
@@ -155,6 +166,15 @@ def getListOfHDFSFiles(file_path):
         elif "root" in split[1]:
             files.append("/"+split[1])
     return files
+
+def getMCInfo(filelist, selection, manager_path=""):
+    if manager_path is "":
+        manager_path = getManagerPath()
+    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
+    data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
+    mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
+    
+    return mc_info
 def getListOfFiles(filelist, selection, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
@@ -163,6 +183,7 @@ def getListOfFiles(filelist, selection, manager_path=""):
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     valid_names = data_info.keys() + mc_info.keys()
     names = []
+    #print "name in getListOfFiles function: ",name
     for name in filelist:
         if "ZZ4l2018" in name:
             dataset_file = manager_path + \
@@ -188,6 +209,8 @@ def getListOfFiles(filelist, selection, manager_path=""):
                 names += [x for x in allnames if "data" in x]
             else:
                 names += allnames
+        elif "zz4l-powheg" in name:
+            names += [name]
         elif "*" in name:
             names += fnmatch.filter(valid_names, name)
         else:
