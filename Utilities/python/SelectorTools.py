@@ -23,41 +23,49 @@ def applySelector(filelist, selector_name, selection,
         inputs.Add(tchannel)
         tname = ROOT.TNamed("name", "")
         inputs.Add(tname)
-        for dataset in ConfigureJobs.getListOfFiles(filelist, selection):
-            select = getattr(ROOT, selector_name)()
-            select.SetInputList(inputs)
-            tname.SetTitle(dataset)
+        tree_name = getTreeName(nanoAOD, chan)
+        datasets = ConfigureJobs.getListOfFiles(filelist, selection)
+        for dataset in datasets:
             print "Processing channel %s for dataset %s" % (chan, dataset)
-            try:
-                file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                    selection, analysis)
-                # Only add for one channel
-                addWeights = addSumweights and i == 0 and "data" not in dataset
-                if addWeights:
-                    ROOT.gROOT.cd()
-                    sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
-                processLocalFiles(select, file_path, chan, nanoAOD, addWeights)
-            except ValueError as e:
-                print e
-                continue
-            output_list = select.GetOutputList()
-            dataset_list = output_list.FindObject(dataset)
-            if not dataset_list or dataset_list.ClassName() != "TList":
-                print "WARNING: No output found for dataset %s" % dataset
-                dataset_list = output_list.FindObject("Unknown")
-                if dataset_list and dataset_list.ClassName() == "TList":
-                    print 'WARNING: Falling back to dataset "Unknown"'
-                else:
-                    print 'WARNING: Skipping dataset %s' % dataset
-                    continue
-            if addWeights:
-                dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
+            processDataset(analysis, selection, dataset, tree_name, selector_name, inputs, addSumweights, i)
 
-            OutputTools.writeOutputListItem(dataset_list, rootfile)
-            output_list.Delete()
-            ROOT.gROOT.GetList().Delete()
+def processDataset(analysis, selection, dataset, tree_name, selector_name, inputs, addSumweights, chanNum=0):
+    select = getattr(ROOT, selector_name)()
+    select.SetInputList(inputs)
+    name = select.GetInputList().FindObject("name")
+    if name:
+        name.SetTitle(dataset)
+    try:
+        file_path = ConfigureJobs.getInputFilesPath(dataset, 
+            selection, analysis)
+        # Only add for one channel
+        addSumweights = addSumweights and chanNum == 0 and "data" not in dataset
+        if addSumweights:
+            ROOT.gROOT.cd()
+            sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
+        processLocalFiles(select, file_path, tree_name, addSumweights)
+    except ValueError as e:
+        print e
+        return
+    output_list = select.GetOutputList()
+    dataset_list = output_list.FindObject(dataset)
+    if not dataset_list or dataset_list.ClassName() != "TList":
+        print "WARNING: No output found for dataset %s" % dataset
+        dataset_list = output_list.FindObject("Unknown")
+        if dataset_list and dataset_list.ClassName() == "TList":
+            print 'WARNING: Falling back to dataset "Unknown"'
+        else:
+            print 'WARNING: Skipping dataset %s' % dataset
+            return
+    if addSumweights:
+        dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
 
-def processLocalFiles(selector, file_path, chan, nanoAOD, addSumweights):
+    outfile = ROOT.gROOT.GetListOfFiles()[0]
+    OutputTools.writeOutputListItem(dataset_list, outfile)
+    output_list.Delete()
+    ROOT.gROOT.GetList().Delete()
+
+def getFileNames(file_path):
     xrootd = "/store/user" in file_path
     if not (xrootd or os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0])):
         raise ValueError("Invalid path! Skipping dataset. Path was %s" 
@@ -66,12 +74,18 @@ def processLocalFiles(selector, file_path, chan, nanoAOD, addSumweights):
     # Assuming these are user files on HDFS, otherwise it won't work
     filenames =  glob.glob(file_path) if not xrootd else \
             ConfigureJobs.getListOfHDFSFiles(file_path)
-    tree_name = "Events" if nanoAOD else "%s/ntuple" % chan
     filenames = ['root://cmsxrootd.hep.wisc.edu/' + f if "/store/user" in f[0:12] else f for f in filenames]
-    for i, filename in enumerate(filenames):
-        processFile(selector, filename, tree_name, nanoAOD, addSumweights, i+1)
+    return filenames
 
-def processFile(selector, filename, tree_name, nanoAOD, addSumweights, filenum=1):
+def getTreeName(nanoAOD, chan):
+    return "Events" if nanoAOD else "%s/ntuple" % chan
+
+def processLocalFiles(selector, file_path, tree_name, addSumweights):
+    filenames = getFileNames(file_path)
+    for i, filename in enumerate(filenames):
+        processFile(selector, filename, tree_name, addSumweights, i+1)
+
+def processFile(selector, filename, tree_name, addSumweights, filenum=1):
         rtfile = ROOT.TFile.Open(filename)
         tree = rtfile.Get(tree_name)
         if not tree:
@@ -81,12 +95,13 @@ def processFile(selector, filename, tree_name, nanoAOD, addSumweights, filenum=1
 
         tree.Process(selector, "")
         if addSumweights:
-            fillSumweightsHist(rtfile, filenum, nanoAOD)
+            fillSumweightsHist(rtfile, filenum, tree_name)
         rtfile.Close()
 
 # You can use filenum to index the files and sum separately, but it's not necessary
-def fillSumweightsHist(rtfile, filenum, isNanoAOD):
-    if isNanoAOD:
+def fillSumweightsHist(rtfile, filenum, tree_name):
+    # NanoAOD
+    if tree_name == "Events":
         sumweights_branch = "genEventSumw"
         meta_tree_name = "Runs"
     else:
