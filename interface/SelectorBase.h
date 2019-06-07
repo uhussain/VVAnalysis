@@ -37,6 +37,10 @@ public :
         eem,
         emm,
         mmm,
+        eeee,
+        eemm,
+        mmee,
+        mmmm,
         Inclusive,
         Unknown,
     }; 

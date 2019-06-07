@@ -4,15 +4,48 @@
 
 void ZZGenSelector::Init(TTree *tree)
 {
-    ZZGenSelectorBase::Init(tree);
+    allChannels_ = {"ee", "mm", };
+    hists1D_ = {
+        "GenZ2lep2_Phi",
+        "GenZ2lep2_Pt",
+        "GenMass",
+        "Pt",
+        "nJets",
+        "nJetCSVv2T",
+        "Genyield",
+        "GenZMass",
+        "GenZ1Mass",
+        "GenZ2Mass",
+        "GenZZPt",
+        "GenZ1Pt",
+        "GenZ2Pt",
+        "GenZPt",
+        "GenZ1Phi",
+        "GenZ2Phi",
+        "GendPhiZ1Z2",
+        "GenLepPt",
+        "GenLepEta",
+        "GenLep12Pt",
+        "GenLep12Eta",
+        "GenLep34Pt",
+        "GenLep34Eta",
+        "GenZ1lep1_Eta",
+        "GenZ1lep1_Phi",
+        "GenZ1lep1_Pt",
+        "GenZ1lep2_Eta",
+        "GenZ1lep2_Phi",
+        "GenZ1lep2_Pt",
+        "GenZ2lep1_Eta",
+        "GenZ2lep1_Phi",
+        "GenZ2lep1_Pt",
+        "GenZ2lep2_Eta",
+    };
 
-    fChain->SetBranchAddress("Mass", &GenMass, &b_GenMass);
-    fChain->SetBranchAddress("Pt", &GenPt, &b_GenPt);
-    //std::cout<<"Is it able to initialize"<<std::endl; 
+    //hists2D_ = {"GenZ1Mass_GenZ2Mass"};
 }
-void ZZGenSelector::LoadBranches(Long64_t entry) { 
-    ZZGenSelectorBase::Process(entry);
 
+
+void ZZGenSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) {
     b_GenMass->GetEntry(entry);
     b_GenPt->GetEntry(entry);
     //std::cout<<"channel in LoadBranches function: "<<channel_<<std::endl;
@@ -21,7 +54,7 @@ void ZZGenSelector::LoadBranches(Long64_t entry) {
     } 
     auto deltaPhiZZ = [](float phi1, float phi2) {
       float pi = TMath::Pi();
-      float dphi = fabs(phi1-phi2);
+      float dphi = std::abs(phi1-phi2);
       if(dphi>pi)
           dphi = 2.0*pi - dphi;
       return dphi;
@@ -29,10 +62,110 @@ void ZZGenSelector::LoadBranches(Long64_t entry) {
 
     GendPhiZZ = deltaPhiZZ(GenZ1Phi,GenZ2Phi);
 }
-//Similar to Kenneth's SetShiftedMasses function which i will need later as well
+
+void ZZGenSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) {
+    throw std::domain_error("NanoAOD ntuples not supported for ZZGenSelector!");
+}
+
+void ZZGenSelector::SetBranchesNanoAOD() {
+    throw std::domain_error("NanoAOD ntuples not supported for ZZGenSelector!");
+}
+
+void ZZGenSelector::SetBranchesUWVV() {
+    if (channelName_ == "eeee") {
+        channel_ = eeee;
+        //std::cout<<"enum channel_: "<<channel_<<std::endl;
+        fChain->SetBranchAddress("e1_e2_Mass", &GenZ1mass, &b_GenZ1mass);
+        fChain->SetBranchAddress("e3_e4_Mass", &GenZ2mass, &b_GenZ2mass);
+        fChain->SetBranchAddress("e1_e2_Pt", &GenZ1pt, &b_GenZ1pt);
+        fChain->SetBranchAddress("e3_e4_Pt", &GenZ2pt, &b_GenZ2pt);
+        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
+        fChain->SetBranchAddress("e3_e4_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
+        fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
+        fChain->SetBranchAddress("e3Pt", &Genl3Pt, &b_Genl3Pt);
+        fChain->SetBranchAddress("e4Pt", &Genl4Pt, &b_Genl4Pt);
+        fChain->SetBranchAddress("e1Eta", &Genl1Eta, &b_Genl1Eta);
+        fChain->SetBranchAddress("e2Eta", &Genl2Eta, &b_Genl2Eta);
+        fChain->SetBranchAddress("e3Eta", &Genl3Eta, &b_Genl3Eta);
+        fChain->SetBranchAddress("e4Eta", &Genl4Eta, &b_Genl4Eta);
+        fChain->SetBranchAddress("e1Phi", &Genl1Phi, &b_Genl1Phi);
+        fChain->SetBranchAddress("e2Phi", &Genl2Phi, &b_Genl2Phi);
+        fChain->SetBranchAddress("e3Phi", &Genl3Phi, &b_Genl3Phi);
+        fChain->SetBranchAddress("e4Phi", &Genl4Phi, &b_Genl4Phi);
+    }
+    //Add 2e2mu channel also but it still needs to differentiate which one is Z1Mass and which one is Z2Mass leptons
+    //This is done with a flag at the time of Process for each event on the fly
+    else if (channelName_ == "eemm") {
+        channel_ = eemm;
+        fChain->SetBranchAddress("e1_e2_Mass", &GenZ1mass, &b_GenZ1mass);
+        fChain->SetBranchAddress("m1_m2_Mass", &GenZ2mass, &b_GenZ2mass);
+        fChain->SetBranchAddress("e1_e2_Pt", &GenZ1pt, &b_GenZ1pt);
+        fChain->SetBranchAddress("m1_m2_Pt", &GenZ2pt, &b_GenZ2pt);
+        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
+        fChain->SetBranchAddress("m1_m2_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
+        fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
+        fChain->SetBranchAddress("m1Pt", &Genl3Pt, &b_Genl3Pt);
+        fChain->SetBranchAddress("m2Pt", &Genl4Pt, &b_Genl4Pt);
+        fChain->SetBranchAddress("e1Eta", &Genl1Eta, &b_Genl1Eta);
+        fChain->SetBranchAddress("e2Eta", &Genl2Eta, &b_Genl2Eta);
+        fChain->SetBranchAddress("m1Eta", &Genl3Eta, &b_Genl3Eta);
+        fChain->SetBranchAddress("m2Eta", &Genl4Eta, &b_Genl4Eta);
+        fChain->SetBranchAddress("e1Phi", &Genl1Phi, &b_Genl1Phi);
+        fChain->SetBranchAddress("e2Phi", &Genl2Phi, &b_Genl2Phi);
+        fChain->SetBranchAddress("m1Phi", &Genl3Phi, &b_Genl3Phi);
+        fChain->SetBranchAddress("m2Phi", &Genl4Phi, &b_Genl4Phi);
+    }
+    else if (channelName_ == "mmee") {
+        channel_ = mmee;
+        fChain->SetBranchAddress("e1_e2_Mass", &GenZ1mass, &b_GenZ1mass);
+        fChain->SetBranchAddress("m1_m2_Mass", &GenZ2mass, &b_GenZ2mass);
+        fChain->SetBranchAddress("e1_e2_Pt", &GenZ1pt, &b_GenZ1pt);
+        fChain->SetBranchAddress("m1_m2_Pt", &GenZ2pt, &b_GenZ2pt);
+        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
+        fChain->SetBranchAddress("m1_m2_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
+        fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
+        fChain->SetBranchAddress("m1Pt", &Genl3Pt, &b_Genl3Pt);
+        fChain->SetBranchAddress("m2Pt", &Genl4Pt, &b_Genl4Pt);
+        fChain->SetBranchAddress("e1Eta", &Genl1Eta, &b_Genl1Eta);
+        fChain->SetBranchAddress("e2Eta", &Genl2Eta, &b_Genl2Eta);
+        fChain->SetBranchAddress("m1Eta", &Genl3Eta, &b_Genl3Eta);
+        fChain->SetBranchAddress("m2Eta", &Genl4Eta, &b_Genl4Eta);
+        fChain->SetBranchAddress("e1Phi", &Genl1Phi, &b_Genl1Phi);
+        fChain->SetBranchAddress("e2Phi", &Genl2Phi, &b_Genl2Phi);
+        fChain->SetBranchAddress("m1Phi", &Genl3Phi, &b_Genl3Phi);
+        fChain->SetBranchAddress("m2Phi", &Genl4Phi, &b_Genl4Phi);
+    }
+    else if (channelName_ == "mmmm") {
+        channel_ = mmmm;
+        fChain->SetBranchAddress("m1_m2_Mass", &GenZ1mass, &b_GenZ1mass);
+        fChain->SetBranchAddress("m3_m4_Mass", &GenZ2mass, &b_GenZ2mass);
+        fChain->SetBranchAddress("m1_m2_Pt", &GenZ1pt, &b_GenZ1pt);
+        fChain->SetBranchAddress("m3_m4_Pt", &GenZ2pt, &b_GenZ2pt);
+        fChain->SetBranchAddress("m1_m2_Phi", &GenZ1Phi, &b_GenZ1Phi);
+        fChain->SetBranchAddress("m3_m4_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("m1Pt", &Genl1Pt, &b_Genl1Pt);
+        fChain->SetBranchAddress("m2Pt", &Genl2Pt, &b_Genl2Pt);
+        fChain->SetBranchAddress("m3Pt", &Genl3Pt, &b_Genl3Pt);
+        fChain->SetBranchAddress("m4Pt", &Genl4Pt, &b_Genl4Pt);
+        fChain->SetBranchAddress("m1Eta", &Genl1Eta, &b_Genl1Eta);
+        fChain->SetBranchAddress("m2Eta", &Genl2Eta, &b_Genl2Eta);
+        fChain->SetBranchAddress("m3Eta", &Genl3Eta, &b_Genl3Eta);
+        fChain->SetBranchAddress("m4Eta", &Genl4Eta, &b_Genl4Eta);
+        fChain->SetBranchAddress("m1Phi", &Genl1Phi, &b_Genl1Phi);
+        fChain->SetBranchAddress("m2Phi", &Genl2Phi, &b_Genl2Phi);
+        fChain->SetBranchAddress("m3Phi", &Genl3Phi, &b_Genl3Phi);
+        fChain->SetBranchAddress("m4Phi", &Genl4Phi, &b_Genl4Phi);
+    }
+    else
+        throw std::invalid_argument("Invalid channel choice!");
+
+}
+
 void ZZGenSelector::SetVariables(Long64_t entry) {
     if(!(e1e2IsZ1(entry))){
-      //std::cout<<"e1e2IsZ1 is working"<<std::endl;
       float tempMass = GenZ1mass;
       GenZ1mass = GenZ2mass;
       GenZ2mass = tempMass;
@@ -79,134 +212,63 @@ bool ZZGenSelector::Z4lSelection() {
         return false;
 }
 
-std::string ZZGenSelector::getHistName(std::string histName) {
-  //return variationName == "" ? histName : histName + "_" + variationName;
-  return histName;
+bool ZZGenSelector::e1e2IsZ1(Long64_t entry){
+  return (std::abs(GenZ1mass-91.1876) < std::abs(GenZ2mass-91.1876));
 }
 
-void ZZGenSelector::FillHistograms(Long64_t entry, float Genweight) { 
+void ZZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     
-    SafeHistFill(hists1D_, getHistName("Genyield"), 1, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenMass"), GenMass,Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZMass"), GenZ1mass, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZMass"), GenZ2mass, Genweight);
+    SafeHistFill(histMap1D_, getHistName("Genyield", variation.second), 1, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenMass", variation.second), GenMass,Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZMass", variation.second), GenZ1mass, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZMass", variation.second), GenZ2mass, Genweight);
     //Making LeptonPt and Eta plots
-    SafeHistFill(hists1D_, getHistName("GenLepPt"), Genl1Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLepPt"), Genl2Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLepPt"), Genl3Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLepPt"), Genl4Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLepEta"), Genl1Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLepEta"), Genl2Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLepEta"), Genl3Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLepEta"), Genl4Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl1Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl2Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl3Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl4Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLepEta", variation.second), Genl1Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLepEta", variation.second), Genl2Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLepEta", variation.second), Genl3Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLepEta", variation.second), Genl4Eta, Genweight);
     // Summing 12,34 leptons
-    SafeHistFill(hists1D_, getHistName("GenLep12Pt"), Genl1Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLep12Pt"), Genl2Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLep34Pt"), Genl3Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLep34Pt"), Genl4Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLep12Eta"), Genl1Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLep12Eta"), Genl2Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLep34Eta"), Genl3Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenLep34Eta"), Genl4Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1Mass"), GenZ1mass, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2Mass"), GenZ2mass, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZPt"), GenZ1pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZPt"), GenZ2pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1Pt"), GenZ1pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2Pt"), GenZ2pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZZPt"), GenPt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1Phi"), GenZ1Phi, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2Phi"), GenZ2Phi, Genweight);
-    SafeHistFill(hists1D_, getHistName("GendPhiZ1Z2"), GendPhiZZ, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1lep1_Pt"), Genl1Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1lep1_Eta"), Genl1Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1lep1_Phi"), Genl1Phi, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1lep2_Pt"), Genl2Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1lep2_Eta"), Genl2Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1lep2_Phi"), Genl2Phi, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2lep1_Pt"), Genl3Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2lep1_Eta"), Genl3Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2lep1_Phi"), Genl3Phi, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2lep2_Pt"), Genl4Pt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2lep2_Eta"), Genl4Eta, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2lep2_Phi"), Genl4Phi, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLep12Pt", variation.second), Genl1Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLep12Pt", variation.second), Genl2Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLep34Pt", variation.second), Genl3Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLep34Pt", variation.second), Genl4Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLep12Eta", variation.second), Genl1Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLep12Eta", variation.second), Genl2Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLep34Eta", variation.second), Genl3Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenLep34Eta", variation.second), Genl4Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1Mass", variation.second), GenZ1mass, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2Mass", variation.second), GenZ2mass, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZPt", variation.second), GenZ1pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZPt", variation.second), GenZ2pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1Pt", variation.second), GenZ1pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2Pt", variation.second), GenZ2pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZZPt", variation.second), GenPt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1Phi", variation.second), GenZ1Phi, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2Phi", variation.second), GenZ2Phi, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GendPhiZ1Z2", variation.second), GendPhiZZ, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1lep1_Pt", variation.second), Genl1Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1lep1_Eta", variation.second), Genl1Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1lep1_Phi", variation.second), Genl1Phi, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1lep2_Pt", variation.second), Genl2Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1lep2_Eta", variation.second), Genl2Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ1lep2_Phi", variation.second), Genl2Phi, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2lep1_Pt", variation.second), Genl3Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2lep1_Eta", variation.second), Genl3Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2lep1_Phi", variation.second), Genl3Phi, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2lep2_Pt", variation.second), Genl4Pt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2lep2_Eta", variation.second), Genl4Eta, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZ2lep2_Phi", variation.second), Genl4Phi, Genweight);
     //2D Z1 vs Z2
-    SafeHistFill(hists2D_, getHistName("GenZ1Mass_GenZ2Mass"),GenZ1mass,GenZ2mass,Genweight);
+    //SafeHistFill(hists2D_, getHistName("GenZ1Mass_GenZ2Mass", variation.second),GenZ1mass,GenZ2mass,Genweight);
 
 }
 
-Bool_t ZZGenSelector::Process(Long64_t entry)
-{
-    LoadBranches(entry);
-    //Define Genweight of event based on channel in case of eemm or mmee
-    if (ZZSelection()) {
-      if (true) {
-        //std::cout<<run<<":"<<lumi<<":"<<evt<<std::endl;
-        //std::cout<<"Genweight in ZZGenSelector inside HZZ: "<<Genweight<<std::endl;
-        FillHistograms(entry, Genweight);
-    }
-  }
-    return true;
-}
+void ZZGenSelector::SetupNewDirectory() {
+    SelectorBase::SetupNewDirectory();
 
-std::vector<std::string> ZZGenSelector::ReadHistData(std::string histDataString) {
-    std::vector<std::string> histData;
-    boost::split(histData, histDataString, boost::is_any_of("$"));
-    std::vector<std::string> binInfo;
-    if (histData.size() != 2)
-        return {};
-    
-    boost::split(binInfo, histData[1], boost::is_any_of(","));
-   
-    histData.pop_back();
-    for (const auto& x : binInfo) {
-        histData.push_back(x);
-    }
-    
-    return histData;
-}
-
-void ZZGenSelector::InitialzeHistogram(std::string name, std::vector<std::string> histData) {
-    if (histData.size() != 4 && histData.size() != 7) {
-        std::cerr << "Malformed data string for histogram '" << name
-                    << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'"
-                    << "\n   OR form: 'Title; (optional info) $ nbins, xmin, xmax nbinsy ymin ymax'"
-                    << std::endl;
-        exit(1);
-    } 
-    std::string hist_name = name+"_"+channelName_;
-    int nbins = std::stoi(histData[1]);
-    float xmin = std::stof(histData[2]);
-    float xmax = std::stof(histData[3]);
-
-    if (histData.size() == 4) {
-          AddObject<TH1D>(hists1D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax);
-    }
-    else {
-        int nbinsy = std::stoi(histData[4]);
-        float ymin = std::stof(histData[5]);
-        float ymax = std::stof(histData[6]);
-          AddObject<TH2D>(hists2D_[name], hist_name.c_str(), histData[0].c_str(),nbins, xmin, xmax,
-                nbinsy, ymin, ymax);
-    }
-}
-
-void ZZGenSelector::SetupNewDirectory()
-{
-    ZZGenSelectorBase::SetupNewDirectory();
-   
-    TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
-    if (histInfo == nullptr ) 
-        Abort("Must pass histogram information");
-    
-    for (auto && entry : *histInfo) {  
-        TNamed* currentHistInfo = dynamic_cast<TNamed*>(entry);
-        std::string name = currentHistInfo->GetName();
-        std::vector<std::string> histData = ReadHistData(currentHistInfo->GetTitle());
-        if (hists2D_.find(name) != hists2D_.end() || hists1D_.find(name) != hists1D_.end()) { 
-            InitialzeHistogram(name, histData);
-        }
-        else
-            std::cerr << "Skipping invalid histogram " << name << std::endl;
-    }
+    InitializeHistogramsFromConfig();
 }
