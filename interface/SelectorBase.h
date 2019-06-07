@@ -46,6 +46,7 @@ public :
     }; 
     enum Selection {
         tightleptons,
+        ZZGenFiducial,
         Wselection,
         Wselection_Full,
         FakeRateSelectionLoose,
@@ -68,6 +69,7 @@ public :
 
     std::map<std::string, Selection> selectionMap_ = {
         {"tightleptons", tightleptons},
+        {"ZZGenFiducial", ZZGenFiducial},
         {"Wselection", Wselection},
         {"Wselection_Full", Wselection_Full},
         {"FakeRateSelectionLoose", FakeRateSelectionLoose},
@@ -95,6 +97,10 @@ public :
         {"eem", eem},
         {"emm", emm},
         {"mmm", mmm},
+        {"eeee", eeee},
+        {"eemm", eemm},
+        {"mmee", mmee},
+        {"mmmm", mmmm},
         {"Inclusive", Inclusive},
     };
 
