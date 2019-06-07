@@ -370,7 +370,6 @@ void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
 
     // Veto on loose leptons
     passesLeptonVeto = (nWZMediumMuon + nCBVIDHLTSafeElec) == 3;
-    weight = genWeight;
  
 }
 

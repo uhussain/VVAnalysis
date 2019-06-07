@@ -10,19 +10,23 @@ import sys
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
-    parser.add_argument("--proof", "-p", 
-        action='store_true', help="Don't use proof")
     parser.add_argument("--lumi", "-l", type=float,
         default=35.87, help="luminosity value (in fb-1)")
     parser.add_argument("--output_file", "-o", type=str,
         default="test.root", help="Output file name")
     parser.add_argument("--test", action='store_true',
         help="Run test job (no background estimate)")
+    parser.add_argument("--uwvv", action='store_true',
+        help="Use UWVV format ntuples in stead of NanoAOD")
     parser.add_argument("--noHistConfig", action='store_true',
         help="Don't rely on config file to specify hist info")
     parser.add_argument("--output_selection", type=str,
         default="", help="Selection stage of output file "
         "(Same as input if not give)")
+    parser.add_argument("-c", "--channels", 
+                        type=lambda x : [i.strip() for i in x.split(',')],
+                        default=["eee","eem","emm"], help="List of channels"
+                        "separated by commas. NOTE: set to Inclusive for NanoAOD")
     parser.add_argument("-b", "--hist_names", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["all"], help="List of histograms, "
@@ -83,11 +87,8 @@ analysis = "/".join([args['analysis'], selection])
 hists, hist_inputs = UserInput.getHistInfo(analysis, args['hist_names'], args['noHistConfig'])
 
 tselection = [ROOT.TNamed("selection", args['output_selection'])]
-nanoAOD = True
-channels = ["Inclusive"] if nanoAOD else ["eee", "eem", "emm", "mmm"]
-
-if args['proof']:
-    ROOT.TProof.Open('workers=12')
+nanoAOD = not args['uwvv']
+channels = ["Inclusive"] if nanoAOD else args['channels']
 
 if "WZxsec2016" in analysis and "FakeRate" not in args['output_selection'] and not args['test']:
     background = SelectorTools.applySelector(["WZxsec2016data"] +
@@ -98,12 +99,13 @@ if "WZxsec2016" in analysis and "FakeRate" not in args['output_selection'] and n
             channels=channels,
             addSumweights=False,
             nanoAOD=nanoAOD,
-            proof=args['proof'])
+            )
 
 selector_map = {
     "WZxsec2016" : "WZSelector",
     "Zstudy" : "ZSelector",
     "Zstudy_2016" : "ZSelector",
+    "Zstudy_2017" : "ZSelector",
 }
 
 mc = SelectorTools.applySelector(args['filenames'], selector_map[args['analysis']], 
@@ -112,7 +114,7 @@ mc = SelectorTools.applySelector(args['filenames'], selector_map[args['analysis'
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         channels=channels,
         nanoAOD=nanoAOD,
-        addSumweights=True, proof=args['proof'])
+        addSumweights=True)
 if args['test']:
     fOut.Close()
     sys.exit(0)

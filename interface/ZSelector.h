@@ -100,6 +100,22 @@ public :
     TBranch* b_SingleElectron_Trigger;
     TBranch* b_numPU;
 
+    // UWVV specific branches
+    Float_t nTruePU;
+
+    TBranch* b_nTruePU;
+    TBranch* b_nCBVIDTightElec;
+    TBranch* b_nCBVIDHLTSafeElec;
+    TBranch* b_nWZTightMuon;
+    TBranch* b_nWZMediumMuon;
+    TBranch* b_l1IsTight;
+    TBranch* b_l2IsTight;
+    TBranch* b_l1Eta;
+    TBranch* b_l2Eta;
+    TBranch* b_l1Pt;
+    TBranch* b_l2Pt;
+    TBranch* b_ZMass;
+    
     // Readers to access the data (delete the ones you do not need).
     //virtual void    SetScaleFactors() override;
     virtual void    Init(TTree *tree) override;

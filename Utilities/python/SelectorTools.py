@@ -5,14 +5,14 @@ import datetime
 import ConfigureJobs, OutputTools
 import sys
 import os
+import multiprocessing
 
 def applySelector(filelist, selector_name, selection, 
         rootfile,
         analysis, channels=["eee", "eem", "emm", "mmm"], 
         extra_inputs = [],
         nanoAOD=False,
-        addSumweights=True,
-        proof=False):
+        addSumweights=True):
     ntuple = ROOT.TNamed("ntupleType", "NanoAOD" if nanoAOD else "UWVV")
     extra_inputs.append(ntuple)
     for i, chan in enumerate(channels):
@@ -56,9 +56,6 @@ def applySelector(filelist, selector_name, selection,
             OutputTools.writeOutputListItem(dataset_list, rootfile)
             output_list.Delete()
             ROOT.gROOT.GetList().Delete()
-        #if chain.GetEntries() != 0 and proof:
-        #proof_path = "_".join([analysis, selection+("#/%s/ntuple" % chan)])
-        #ROOT.gProof.Process(proof_path, select, "")
 
 def processLocalFiles(selector, file_path, chan, nanoAOD, addSumweights):
     xrootd = "/store/user" in file_path
@@ -69,11 +66,13 @@ def processLocalFiles(selector, file_path, chan, nanoAOD, addSumweights):
     # Assuming these are user files on HDFS, otherwise it won't work
     filenames =  glob.glob(file_path) if not xrootd else \
             ConfigureJobs.getListOfHDFSFiles(file_path)
+    tree_name = "Events" if nanoAOD else "%s/ntuple" % chan
+    filenames = ['root://cmsxrootd.hep.wisc.edu/' + f if "/store/user" in f[0:12] else f for f in filenames]
     for i, filename in enumerate(filenames):
-        if "/store/user" in filename:
-            filename = 'root://cmsxrootd.hep.wisc.edu/' + filename
+        processFile(selector, filename, tree_name, nanoAOD, addSumweights, i+1)
+
+def processFile(selector, filename, tree_name, nanoAOD, addSumweights, filenum=1):
         rtfile = ROOT.TFile.Open(filename)
-        tree_name = "Events" if nanoAOD else "%s/ntuple" % chan
         tree = rtfile.Get(tree_name)
         if not tree:
             raise ValueError(("tree %s not found for file %s. " \
@@ -82,15 +81,16 @@ def processLocalFiles(selector, file_path, chan, nanoAOD, addSumweights):
 
         tree.Process(selector, "")
         if addSumweights:
-            fillSumweightsHist(rtfile, i+1, nanoAOD)
+            fillSumweightsHist(rtfile, filenum, nanoAOD)
         rtfile.Close()
 
+# You can use filenum to index the files and sum separately, but it's not necessary
 def fillSumweightsHist(rtfile, filenum, isNanoAOD):
     if isNanoAOD:
         sumweights_branch = "genEventSumw"
         meta_tree_name = "Runs"
     else:
-        sumweights_branch = "sumWeights"
+        sumweights_branch = "summedWeights"
         meta_tree_name = "metaInfo/metaInfo"
     meta_tree = rtfile.Get(meta_tree_name)
     ROOT.gROOT.cd()

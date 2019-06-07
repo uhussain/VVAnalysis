@@ -17,7 +17,35 @@ void ZSelector::Init(TTree *tree)
 }
 
 void ZSelector::SetBranchesUWVV() {
-    throw std::domain_error("UWVV ntuples not defined for Z selector!");
+    if (isMC_){
+        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+        fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
+    }
+    fChain->SetBranchAddress("Mass", &ZMass, &b_ZMass);
+
+    if (channel_ == ee) {
+        fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("e2ZZTightIDNoVtx", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("e1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("e2Eta", &l2Eta, &b_l2Eta);
+    }
+    else if (channel_ == mm) {
+        fChain->SetBranchAddress("m1IsWZTight", &l1IsTight, &b_l1IsTight);
+        fChain->SetBranchAddress("m2IsWZTight", &l2IsTight, &b_l2IsTight);
+        fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
+        fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
+        fChain->SetBranchAddress("m1Eta", &l1Eta, &b_l1Eta);
+        fChain->SetBranchAddress("m2Eta", &l2Eta, &b_l2Eta);
+    }
+
+    fChain->SetBranchAddress("type1_pfMETEt", &MET, &b_MET);
+    fChain->SetBranchAddress("type1_pfMETPhi", &type1_pfMETPhi, &b_type1_pfMETPhi);
+    //fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
+    //fChain->SetBranchAddress("nCBVIDHLTSafeElec", &nCBVIDHLTSafeElec, &b_nCBVIDHLTSafeElec);
+    //fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
+    //fChain->SetBranchAddress("nWZMediumMuon", &nWZMediumMuon, &b_nWZMediumMuon);
 }
 
 void ZSelector::SetBranchesNanoAOD() {
@@ -190,7 +218,22 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
 }
 
 void ZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation){ 
-    throw std::domain_error("UWVV ntuples not defined for Z selector!");
+    weight = 1;
+    b_l1Pt->GetEntry(entry);
+    b_l2Pt->GetEntry(entry);
+    b_l1Eta->GetEntry(entry);
+    b_l2Eta->GetEntry(entry);
+
+    if (isMC_) {
+        b_genWeight->GetEntry(entry);
+    }
+    b_ZMass->GetEntry(entry);
+    b_l1IsTight->GetEntry(entry);
+    b_l2IsTight->GetEntry(entry);
+    b_MET->GetEntry(entry);
+    //b_nCBVIDTightElec->GetEntry(entry);
+    //
+    passesTrigger = true;
 }
 
 void ZSelector::ApplyScaleFactors() {
