@@ -16,7 +16,9 @@ def applySelector(filelist, selector_name, selection,
         addSumweights=True):
     ntuple = ROOT.TNamed("ntupleType", "NanoAOD" if nanoAOD else "UWVV")
     extra_inputs.append(ntuple)
+    outfile_name = rootfile.GetName()
     for i, chan in enumerate(channels):
+        print "INFO: Processing channel %s" % chan
         inputs = ROOT.TList()
         for inp in extra_inputs:
             inputs.Add(inp)
@@ -29,9 +31,16 @@ def applySelector(filelist, selector_name, selection,
         #for dataset in datasets:
         #    print "Processing channel %s for dataset %s" % (chan, dataset)
         #    processDataset(dataset, analysis, selection, tree_name, selector_name, inputs, addSumweights, i)
-        processParallelByDataset(datasets, analysis, selection, tree_name, selector_name, inputs, addSumweights, i)
+        # TODO: Stop passing a bazillion arguments around. Make a class
+        processParallelByDataset(datasets, analysis, selection, tree_name, selector_name, inputs, addSumweights, rootfile, i)
+    # Store arrays in temp files, since it can get way too big to keep around in memory
+    rval = subprocess.call(["hadd", "-f", outfile_name] + ["%s_temp.root" % d for d in datasets])
+    if rval == 0:
+        for d in datasets:
+            os.remove("%s_temp.root" % d)
 
-def processDataset(dataset, analysis, selection, tree_name, selector_name, inputs, addSumweights, chanNum=0):
+
+def processDataset(dataset, analysis, selection, tree_name, selector_name, inputs, addSumweights, outfile, chanNum=0):
     print "Processing dataset %s" % dataset
     select = getattr(ROOT, selector_name)()
     select.SetInputList(inputs)
@@ -62,13 +71,13 @@ def processDataset(dataset, analysis, selection, tree_name, selector_name, input
             return
     if addSumweights:
         dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
-    outfile = ROOT.gROOT.GetListOfFiles()[0]
-    if len(multiprocessing.active_children()) > 0:
-        print "this should be triggered!"
+    #if len(multiprocessing.active_children()) > 0:
+    if True:
         outfile.Close()
-        outfile = ROOT.TFile.Open("%s_temp.root" % dataset, "recreate")
+        outfile = ROOT.TFile.Open("%s_temp.root" % dataset, "recreate" if chanNum == 0 else "update")
     OutputTools.writeOutputListItem(dataset_list, outfile)
-    ROOT.gROOT.GetList().Delete()
+    if True:
+        outfile.Close()
     output_list.Delete()
 
 def getFileNames(file_path):
@@ -86,17 +95,11 @@ def getFileNames(file_path):
 def getTreeName(nanoAOD, chan):
     return "Events" if nanoAOD else "%s/ntuple" % chan
 
-def processParallelByDataset(datasets, analysis, selection, tree_name, selector_name, inputs, addSumweights, i):
+def processParallelByDataset(datasets, analysis, selection, tree_name, selector_name, inputs, addSumweights, outfile, i):
     numCores = min(10, len(datasets))
     p = multiprocessing.Pool(processes=numCores)
     p.map(processDatasetHelper, [
-        [d, analysis, selection, tree_name, selector_name, inputs, addSumweights, i] for d in datasets])
-
-    #outfile = ROOT.gROOT.GetListOfFiles()[0]
-    # Store arrays in temp files, since it can get way too big to keep around in memory
-    #subprocess.call(["hadd", outfile.GetName(), ' '.join(["%s_temp.root" % d for d in datasets])])
-    #for d in datasets:
-    #    os.remove("%s_temp.root" % d)
+        [d, analysis, selection, tree_name, selector_name, inputs, addSumweights, outfile, i] for d in datasets])
 
 # Pool.map can only take in one argument, so expand the array
 def processDatasetHelper(args):
