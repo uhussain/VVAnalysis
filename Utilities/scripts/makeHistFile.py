@@ -106,6 +106,7 @@ selector_map = {
     "Zstudy" : "ZSelector",
     "Zstudy_2016" : "ZSelector",
     "Zstudy_2017" : "ZSelector",
+    "ZZGen" : "ZZGenSelector",
 }
 
 mc = SelectorTools.applySelector(args['filenames'], selector_map[args['analysis']], 
