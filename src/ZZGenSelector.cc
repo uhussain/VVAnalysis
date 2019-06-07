@@ -81,6 +81,7 @@ void ZZGenSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::
     } 
     b_GenMass->GetEntry(entry);
     b_GenPt->GetEntry(entry);
+    b_GenEta->GetEntry(entry);
     //std::cout<<"channel in LoadBranches function: "<<channel_<<std::endl;
     return;
     if(channel_ == eemm || channel_ == mmee){
@@ -198,6 +199,7 @@ void ZZGenSelector::SetBranchesUWVV() {
 
     fChain->SetBranchAddress("Mass", &GenMass, &b_GenMass);
     fChain->SetBranchAddress("Pt", &GenPt, &b_GenPt);
+    fChain->SetBranchAddress("Eta", &GenEta, &b_GenEta);
 }
 
 void ZZGenSelector::SetVariables(Long64_t entry) {
@@ -283,6 +285,7 @@ void ZZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::st
     SafeHistFill(histMap1D_, getHistName("GenZ1Pt", variation.second), GenZ1pt, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenZ2Pt", variation.second), GenZ2pt, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenZZPt", variation.second), GenPt, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GenZZEta", variation.second), GenEta, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenZ1Phi", variation.second), GenZ1Phi, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenZ2Phi", variation.second), GenZ2Phi, Genweight);
     SafeHistFill(histMap1D_, getHistName("GendPhiZ1Z2", variation.second), GendPhiZZ, Genweight);
