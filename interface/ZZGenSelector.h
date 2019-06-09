@@ -11,6 +11,7 @@ public :
     float GendPhiZZ; //DeltaPhi between Z1 and Z2
     Float_t GenMass;
     Float_t GenPt;
+    Float_t GenEta;
     Float_t Genweight;
     Float_t GenZ1mass;
     Float_t GenZ2mass;
@@ -40,6 +41,7 @@ public :
     TBranch* b_GenZ2Phi;
     TBranch* b_GenMass;
     TBranch* b_GenPt;
+    TBranch* b_GenEta;
 
     TBranch* b_Genl1Pt;
     TBranch* b_Genl2Pt;
@@ -72,7 +74,7 @@ protected:
     bool Z4lSelection();
     bool ZSelection();
     void FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) override;
-    bool e1e2IsZ1(Long64_t entry);
+    bool e1e2IsZ1();
 };
 
 #endif
