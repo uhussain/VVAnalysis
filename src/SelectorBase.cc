@@ -170,7 +170,7 @@ void SelectorBase::UpdateDirectory()
 void SelectorBase::InitializeHistogramsFromConfig() {
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
     if (histInfo == nullptr ) 
-        Abort("Can't initialize histograms without passing histogram information to TSelector");
+        throw std::domain_error("Can't initialize histograms without passing histogram information to TSelector");
 
     for (auto& label : hists1D_) {
         if (channel_ != Inclusive) {
