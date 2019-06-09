@@ -20,6 +20,8 @@ def getComLineArgs():
         help="Use UWVV format ntuples in stead of NanoAOD")
     parser.add_argument("--noHistConfig", action='store_true',
         help="Don't rely on config file to specify hist info")
+    parser.add_argument("--parallel", action='store_true',
+        help="Parallelize by dataset")
     parser.add_argument("--output_selection", type=str,
         default="", help="Selection stage of output file "
         "(Same as input if not give)")
@@ -99,6 +101,7 @@ if "WZxsec2016" in analysis and "FakeRate" not in args['output_selection'] and n
             channels=channels,
             addSumweights=False,
             nanoAOD=nanoAOD,
+            parallel=args.parallel,
             )
 
 selector_map = {
@@ -115,7 +118,9 @@ mc = SelectorTools.applySelector(args['filenames'], selector_map[args['analysis'
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         channels=channels,
         nanoAOD=nanoAOD,
-        addSumweights=True)
+        addSumweights=True,
+        parallel=args.parallel,
+        )
 if args['test']:
     fOut.Close()
     sys.exit(0)

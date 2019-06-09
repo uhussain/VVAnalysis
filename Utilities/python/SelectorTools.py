@@ -13,7 +13,8 @@ def applySelector(filelist, selector_name, selection,
         analysis, channels=["eee", "eem", "emm", "mmm"], 
         extra_inputs = [],
         nanoAOD=False,
-        addSumweights=True):
+        addSumweights=True,
+        parallel=False):
     ntuple = ROOT.TNamed("ntupleType", "NanoAOD" if nanoAOD else "UWVV")
     print "Ntuple", ntuple.GetTitle()
     extra_inputs.append(ntuple)
@@ -29,16 +30,20 @@ def applySelector(filelist, selector_name, selection,
         inputs.Add(tname)
         tree_name = getTreeName(nanoAOD, chan)
         datasets = ConfigureJobs.getListOfFiles(filelist, selection)
-        #for dataset in datasets:
-        #    print "Processing channel %s for dataset %s" % (chan, dataset)
-        #    processDataset(dataset, analysis, selection, tree_name, selector_name, inputs, addSumweights, i)
         # TODO: Stop passing a bazillion arguments around. Make a class
-        processParallelByDataset(datasets, analysis, selection, tree_name, selector_name, inputs, addSumweights, rootfile, i)
+        if parallel:
+            processParallelByDataset(datasets, analysis, selection, tree_name, selector_name, inputs, addSumweights, rootfile, i)
+        else: 
+            for dataset in datasets:
+                print "Processing dataset %s" % (chan, dataset)
+                processDataset(dataset, analysis, selection, tree_name, selector_name, inputs, addSumweights, i)
     # Store arrays in temp files, since it can get way too big to keep around in memory
     rval = subprocess.call(["hadd", "-f", outfile_name] + ["%s_temp.root" % d for d in datasets])
     if rval == 0:
         for d in datasets:
             os.remove("%s_temp.root" % d)
+    else:
+        raise RuntimeError("Valided to collect data from parallel run")
 
 
 def processDataset(dataset, analysis, selection, tree_name, selector_name, inputs, addSumweights, outfile, chanNum=0):
