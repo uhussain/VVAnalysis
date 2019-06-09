@@ -15,6 +15,7 @@ def applySelector(filelist, selector_name, selection,
         nanoAOD=False,
         addSumweights=True):
     ntuple = ROOT.TNamed("ntupleType", "NanoAOD" if nanoAOD else "UWVV")
+    print "Ntuple", ntuple.GetTitle()
     extra_inputs.append(ntuple)
     outfile_name = rootfile.GetName()
     for i, chan in enumerate(channels):
