@@ -135,7 +135,10 @@ class SelectorDriver(object):
         return filenames
 
     def getTreeName(self, chan):
-        return "Events" if self.ntupleType == "NanoAOD" else ("%s/ntuple" % chan)
+        # TODO: Fix this! This is an extremely ineffient way to separate the eemm and mmee
+        # since it involves reading the file an extra time
+        channel = chan if chan != "mmee" else "eemm"
+        return "Events" if self.ntupleType == "NanoAOD" else ("%s/ntuple" % channel)
 
     def processParallelByDataset(self, datasets, chan):
         numCores = min(self.numCores, len(datasets))
