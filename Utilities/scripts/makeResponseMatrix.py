@@ -21,7 +21,7 @@ style = Style()
 ROOT.gStyle.SetLineScalePS(1.8)
 
 #channels = ["eeee", "eemm","mmmm"]
-channels = ["eeee"]
+channels = ["eemm"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 
@@ -459,7 +459,7 @@ def generateAnalysisInputs():
 #ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx')
 #sigSamples is a dictionary containing sample names and kfactor*cross-section
 #sumW is a dictionary with sigsample:sumweights stored
-ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx','kTRUE')
+ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx')
 def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}):
     
     className = responseClassNames[varName][channel]
@@ -556,7 +556,7 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
     #hResponseNominalTotal = sum(resp for resp in hResponseNominal.values())
     
 
-    #print "type of Total hResp: " ,hResponse
+    print "type of Total hResp: " ,hResponse
     # But its better to use RooUnfoldResponse here
     #RooUnfoldResponse constructor - create from already-filled histograms
     # "response" gives the response matrix, measured X truth.
@@ -568,8 +568,8 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
 
 
     ## Give hSig and hTrue in the form of histograms
-    varNames={'mass': 'Mass'}
-    #varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+    #varNames={'mass': 'Mass'}
+    varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
     
     hSig = hSigDic[chan][varNames[varName]]
     print "sigHist: ", hSig,", ",hSig.Integral()
@@ -861,9 +861,9 @@ plotDir=args['plotDir']
 UnfoldDir=args['unfoldDir']
 nIterations=args['nIter']
 
-varNames={'mass': 'Mass'}
+#varNames={'mass': 'Mass'}
 
-#varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
 
 selectChannels=channels
 #I need the channels split up for my Selectors and histograms
@@ -896,7 +896,7 @@ if not args['test']:
 #Replace fOut with fUse once you have run all the data samples and the backgrounds - right now unfolded data looking really big- subtract backgrounds
 if args['test']:
     sigSamplesPath={}
-    fUse = ROOT.TFile("HistFiles/Hists06Jun2019-DiffWSF_4e.root","update")
+    fUse = ROOT.TFile("HistFiles/Hists06Jun2019-DiffWSF_final.root","update")
     fOut=fUse
     for dataset in sigSampleList:
         file_path = ConfigureJobs.getInputFilesPath(dataset,selection, analysis)
@@ -916,7 +916,8 @@ print "sigSamplesPath: ",sigSamplesPath
 alldata,dataSumW = HistTools.makeCompositeHists(fOut,"AllData", 
     ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"],manager_path), args['lumi'],
     underflow=False, overflow=False)
-OutputTools.writeOutputListItem(alldata, fOut)
+if not args['test']:
+    OutputTools.writeOutputListItem(alldata, fOut)
 
 #Sum all the signal which is just zz4l-powheg for now, makeCompositeHists will also scale the histogram with cross-section*kfactor*1000*lumi/sumWeights
 #allzzPowheg,zzSumW= HistTools.makeCompositeHists(fOut,"zzPowheg", ConfigureJobs.getListOfFilesWithXSec(
@@ -927,7 +928,8 @@ OutputTools.writeOutputListItem(alldata, fOut)
 ewkmc,ewkSumW = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfEWK(), manager_path), args['lumi'],
     underflow=False, overflow=False)
-OutputTools.writeOutputListItem(ewkmc, fOut)
+if not args['test']:
+    OutputTools.writeOutputListItem(ewkmc, fOut)
 
 #all mcbkg that needs to be subtracted
 allVVVmc,VVVSumW = HistTools.makeCompositeHists(fOut,"AllVVV", ConfigureJobs.getListOfFilesWithXSec(
