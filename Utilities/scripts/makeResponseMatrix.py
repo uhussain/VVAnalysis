@@ -21,7 +21,7 @@ style = Style()
 ROOT.gStyle.SetLineScalePS(1.8)
 
 #channels = ["eeee", "eemm","mmmm"]
-channels = ["eemm"]
+channels = ["eeee"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 
@@ -54,10 +54,10 @@ def getComLineArgs():
     parser.add_argument('--logy', '--logY', '--log', action='store_true',
                         help='Put vertical axis on a log scale.')
     parser.add_argument('--plotDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DataUnfolding/Era2017/RooIterMat2017',
+                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DataUnfolding/Era2017_TestUncert/RooIterMat2017',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--unfoldDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DataUnfolding/Era2017/RooIterDistributions2017',
+                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DataUnfolding/Era2017_TestUncert/RooIterDistributions2017',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--nIter', type=int, nargs='?', default=4,
                         help='Number of iterations for D\'Agostini method')
@@ -331,7 +331,7 @@ def normalizeBins(h):
         h.SetBinError(ib, h.GetBinError(ib) * binUnit / w)
         if h.GetBinError(ib) > h.GetBinContent(ib):
             h.SetBinError(ib, h.GetBinContent(ib))
-    h.sumw2()
+    h.Sumw2()
 
 def unnormalizeBins(h):
     binUnit = 1 # min(h.GetBinWidth(b) for b in range(1,len(h)+1))
@@ -341,28 +341,80 @@ def unnormalizeBins(h):
         h.SetBinError(ib, h.GetBinError(ib) * w / binUnit)
         if h.GetBinError(ib) > h.GetBinContent(ib):
             h.SetBinError(ib, h.GetBinContent(ib))
-    h.sumw2()
+    h.Sumw2()
 
+#def createRatio(numerator, denominator):
+#    '''
+#    Return the graph of numerator/denominator and a line at y=1.
+#    '''
+#    if isinstance(numerator, ROOT.THStack):
+#        for h in numerator.GetHists():
+#            h.Sumw2()
+#        hNum = numerator.GetStack().Last()
+#    else:
+#        hNum = numerator.Clone()
+#    try:
+#        hNum.Sumw2()
+#    except AttributeError:
+#        pass
+#    #num = ROOT.TGraph(hNum)
+#
+#    if isinstance(denominator, ROOT.THStack):
+#        for h in denominator.GetHists():
+#            h.Sumw2()
+#        hDenom = denominator.GetStack().Last()
+#    else:
+#        hDenom = denominator.Clone()
+#    try:
+#        hDenom.Sumw2()
+#    except AttributeError:
+#        pass
+#    #denom = ROOT.TGraph(hDenom)
+#
+#    #nRemoved = 0
+#    #for i in range(num.GetN()):
+#    #    if hDenom.GetBinContent(i+1) <= 0. or hNum.GetBinContent(i+1) <= 0:
+#    #        num.RemovePoint(i - nRemoved)
+#    #        denom.RemovePoint(i - nRemoved)
+#    #        nRemoved += 1
+#    
+#    ratioHist = hNum.Clone()
+#    ratioHist.Divide(hDenom)
+#    ratioGraph = ROOT.TGraphAsymmErrors(ratioHist)
+#
+#    unity = ROOT.TLine(hNum.GetXaxis().GetXmin(), 1, hNum.GetXaxis().GetXmax(), 1)
+#    unity.SetLineStyle(7)
+#    unity.SetLineWidth(2*unity.GetLineWidth())
+#
+#    return ratioGraph, unity
 def createRatio(h1, h2):
     Nbins = h1.GetNbinsX()
     Ratio = h1.Clone("Ratio")
     hStackLast = h2.Clone("hStackLast")
+    try:
+        Ratio.Sumw2()
+    except AttributeError:
+        pass
+    try:
+        hStackLast.Sumw2()
+    except AttributeError:
+        pass
     for i in range(Nbins+1):
         stackcontent = hStackLast.GetBinContent(i)
-        #stackerror = hStackLast.GetBinError(i)
+        stackerror = hStackLast.GetBinError(i)
         datacontent = h1.GetBinContent(i)
-        #dataerror = h1.GetBinError(i)
+        dataerror = h1.GetBinError(i)
         print "stackcontent: ",stackcontent," and data content: ",datacontent
         ratiocontent=0
         if(datacontent!=0):
             ratiocontent = datacontent/stackcontent
-        #if(datacontent!=0):
-        #    error = ratiocontent*(math.sqrt(math.pow((dataerror/datacontent),2) + math.pow((stackerror/stackcontent),2)))
-        #else:
-        #    error = 2.07
+        if(datacontent!=0):
+            error = ratiocontent*(math.sqrt(math.pow((dataerror/datacontent),2) + math.pow((stackerror/stackcontent),2)))
+        else:
+            error = 2.07
         print "ratio content: ",ratiocontent
         Ratio.SetBinContent(i,ratiocontent)
-        #Ratio.SetBinError(i,error)
+        Ratio.SetBinError(i,error)
 
     Ratio.GetYaxis().SetRangeUser(0.0,2.2)
     Ratio.SetStats(0)
@@ -568,8 +620,8 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
 
 
     ## Give hSig and hTrue in the form of histograms
-    #varNames={'mass': 'Mass'}
-    varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+    varNames={'mass': 'Mass'}
+    #varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
     
     hSig = hSigDic[chan][varNames[varName]]
     print "sigHist: ", hSig,", ",hSig.Integral()
@@ -745,34 +797,34 @@ def generatePlots(hUnfolded,hTruth,varName,unfoldDir=''):
     yaxisSize = hTrue.GetXaxis().GetTitleSize()
     if unfoldDir:
         #print ("What happens here?")
-        cUnfold = ROOT.TCanvas("c","canvas",1200,1200)
-        hUnf.GetXaxis().SetTitle('UnfData '+prettyVars[varName]+''+units[varName])
-        hUnf.GetXaxis().SetTitleSize(0.75*xaxisSize)
-        hUnf.Draw("HIST")
-        UnfHists.append(hUnf)
-        leg = makeLegend(cUnfold,*(UnfHists),**legParams[varName])
-        leg.SetFillStyle(1001)
-        leg.Draw("SAME")
-        style.setCMSStyle(cUnfold, '', dataType='  Work in Progress', intLumi=41500.)
-        #print "unfoldDir: ",unfoldDir
-        cUnfold.Print("%s/UnfDist_%s.png" % (unfoldDir,varName))
-        cUnfold.Print("%s/UnfDist_%s.pdf" % (unfoldDir,varName))
-        del cUnfold
+        #cUnfold = ROOT.TCanvas("c","canvas",1200,1200)
+        #hUnf.GetXaxis().SetTitle('UnfData '+prettyVars[varName]+''+units[varName])
+        #hUnf.GetXaxis().SetTitleSize(0.75*xaxisSize)
+        #hUnf.Draw("HIST")
+        #UnfHists.append(hUnf)
+        #leg = makeLegend(cUnfold,*(UnfHists),**legParams[varName])
+        #leg.SetFillStyle(1001)
+        #leg.Draw("SAME")
+        #style.setCMSStyle(cUnfold, '', dataType='  Work in Progress', intLumi=41500.)
+        ##print "unfoldDir: ",unfoldDir
+        #cUnfold.Print("%s/UnfDist_%s.png" % (unfoldDir,varName))
+        #cUnfold.Print("%s/UnfDist_%s.pdf" % (unfoldDir,varName))
+        #del cUnfold
 
-        cTrue = ROOT.TCanvas("c","canvas",1200,1200)
-        hTrue.GetXaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
-        hTrue.GetXaxis().SetTitleSize(0.75*yaxisSize)
-        hTrue.SetLineColor(ROOT.kRed)
-        hTrue.Draw("HIST")
-        TrueHists.append(hTrue)
-        leg = makeLegend(cTrue,*(TrueHists),**legParams[varName])
-        leg.SetFillStyle(1001)
-        leg.Draw("SAME")
-        style.setCMSStyle(cTrue, '', dataType='  Work in Progress', intLumi=41500.)
-        #print "unfoldDir: ",unfoldDir
-        cTrue.Print("%s/TrueDist_%s.png" % (unfoldDir,varName))
-        cTrue.Print("%s/TrueDist_%s.pdf" % (unfoldDir,varName))
-        del cTrue
+        #cTrue = ROOT.TCanvas("c","canvas",1200,1200)
+        #hTrue.GetXaxis().SetTitle('True '+prettyVars[varName]+''+units[varName])
+        #hTrue.GetXaxis().SetTitleSize(0.75*yaxisSize)
+        #hTrue.SetLineColor(ROOT.kRed)
+        #hTrue.Draw("HIST")
+        #TrueHists.append(hTrue)
+        #leg = makeLegend(cTrue,*(TrueHists),**legParams[varName])
+        #leg.SetFillStyle(1001)
+        #leg.Draw("SAME")
+        #style.setCMSStyle(cTrue, '', dataType='  Work in Progress', intLumi=41500.)
+        ##print "unfoldDir: ",unfoldDir
+        #cTrue.Print("%s/TrueDist_%s.png" % (unfoldDir,varName))
+        #cTrue.Print("%s/TrueDist_%s.pdf" % (unfoldDir,varName))
+        #del cTrue
         
         #Create a ratio plot
         c,pad1 = createCanvasPads()
@@ -797,6 +849,8 @@ def generatePlots(hUnfolded,hTruth,varName,unfoldDir=''):
         hTrue.GetYaxis().SetTitle("Events")
         hTrue.GetYaxis().SetTitleOffset(1.0)
         hTrue.Draw("HIST")
+        #hUnf.Sumw2(False)
+        #hUnf.SetBinErrorOption(ROOT.TH1.kPoisson)
         hUnf.SetLineColor(ROOT.kBlack)
         hUnf.SetMarkerStyle(20)
         hUnf.SetMarkerSize(0.7)
@@ -815,9 +869,14 @@ def generatePlots(hUnfolded,hTruth,varName,unfoldDir=''):
 
         #SecondPad
         pad2 = createPad2(c)
+
+        hTrueNoErrs = hTrue.Clone() # need central value only to keep ratio uncertainties consistent
+        nbins=hTrueNoErrs.GetNbinsX()
+        print(nbins)
+        hTrueNoErrs.SetError(array.array('d',[0.]*nbins))
         #Starting the ratio proceedure
-        Ratio,line = createRatio(hUnf, hTrue)
-        Ratio.Draw("pe1")
+        Ratio,line = createRatio(hUnf, hTrueNoErrs)
+        Ratio.Draw("pe")
         line.SetLineColor(ROOT.kBlack)
         line.Draw("same")
 
@@ -861,9 +920,9 @@ plotDir=args['plotDir']
 UnfoldDir=args['unfoldDir']
 nIterations=args['nIter']
 
-#varNames={'mass': 'Mass'}
+varNames={'mass': 'Mass'}
 
-varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+#varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
 
 selectChannels=channels
 #I need the channels split up for my Selectors and histograms
