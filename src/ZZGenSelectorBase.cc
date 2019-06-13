@@ -65,6 +65,16 @@ void ZZGenSelectorBase::Init(TTree *tree)
     isMC_ = false;
     if (name_.find("data") == std::string::npos){
         isMC_ = true;
+        fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
+        //if (addSumweights_) {
+        //    TFile* file = fChain->GetTree()->GetDirectory()->GetFile(); 
+        //    TTree* metaInfo = dynamic_cast<TTree*>(file->Get("metaInfo/metaInfo"));
+        //    if (metaInfo == nullptr)
+        //        std::cerr << "WARNING: Failed to add sumWeights histogram" << std::endl;
+        //    else {
+        //        metaInfo->Draw("1>>sumweights", "summedWeights");
+        //    }
+        //}
     }
     else {
         //fChain->SetBranchAddress("Flag_duplicateMuonsPass", &Flag_duplicateMuonsPass, &b_Flag_duplicateMuonsPass);
@@ -187,6 +197,7 @@ Bool_t ZZGenSelectorBase::Notify()
 Bool_t ZZGenSelectorBase::Process(Long64_t entry)
 {
     Genweight = 1;
+    b_genWeight->GetEntry(entry);
     b_Genl1Pt->GetEntry(entry);
     b_Genl2Pt->GetEntry(entry);
     b_Genl3Pt->GetEntry(entry);
@@ -208,6 +219,7 @@ Bool_t ZZGenSelectorBase::Process(Long64_t entry)
     b_GenZ1mass->GetEntry(entry);
     b_GenZ1pt->GetEntry(entry);
     b_GenZ1Phi->GetEntry(entry);
+    Genweight = genWeight;
     if(channel_ == mmee){
       if(e1e2IsZ1(entry))
         Genweight=0.0;
@@ -244,7 +256,8 @@ void ZZGenSelectorBase::UpdateDirectory()
     if ( *objPtrPtr == nullptr ) Abort("ZZGenSelectorBase: Call to UpdateObject but current directory has no instance");
   }
 }
-
 void ZZGenSelectorBase::SetupNewDirectory()
 {
+    //if (addSumweights_)
+    //    AddObject<TH1D>(sumWeightsHist_, "sumweights", "sumweights", 1, 0, 10);
 }

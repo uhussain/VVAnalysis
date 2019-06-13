@@ -36,10 +36,10 @@ public :
         "Z2Pt"
         "ZPt",
         "LepPt",
-        "Z1lep1_Pt",
-        "Z1lep2_Pt",
-        "Z2lep1_Pt",
-        "Z2lep2_Pt",
+        //"Z1lep1_Pt",
+        //"Z1lep2_Pt",
+        //"Z2lep1_Pt",
+        //"Z2lep2_Pt",
         "nTruePU",
         //"nvtx",
         //"Zlep1_Pt",
@@ -70,38 +70,39 @@ public :
         { "Z1Mass",  {} },
         { "Z2Mass",  {} },
         { "ZZPt",  {} },
+        { "ZZEta",  {} },
         { "Z1Pt",  {} },
         { "Z2Pt",  {} },
         { "ZPt",  {} },
-        { "Z1Phi",  {} },
-        { "Z2Phi",  {} },
-        {"dPhiZ1Z2",{}},
+        //{ "Z1Phi",  {} },
+        //{ "Z2Phi",  {} },
+        //{"dPhiZ1Z2",{}},
        // { "ZPt",  {} },
        // { "ZEta",  {} },
        // { "ZPhi",  {} },
        // { "dR_lW_Z",  {} },
         {"LepPt",{}},
-        {"LepEta",{}},
-        {"Lep12Pt",{}},
-        {"Lep12Eta",{}},
-        {"Lep34Pt",{}},
-        {"Lep34Eta",{}},
-        { "Z1lep1_Eta",  {} },
-        { "Z1lep1_Phi",  {} },
-        { "Z1lep1_Pt",  {} },
-        { "Z1lep1_PdgId",  {} },
-        { "Z1lep2_Eta",  {} },
-        { "Z1lep2_Phi",  {} },
-        { "Z1lep2_Pt",  {} },
-        { "Z1lep2_PdgId",  {} },
-        { "Z2lep1_Eta",  {} },
-        { "Z2lep1_Phi",  {} },
-        { "Z2lep1_Pt",  {} },
-        { "Z2lep1_PdgId",  {} },
-        { "Z2lep2_Eta",  {} },
-        { "Z2lep2_Phi",  {} },
-        { "Z2lep2_Pt",  {} },
-        { "Z2lep2_PdgId",  {} },
+        //{"LepEta",{}},
+        //{"Lep12Pt",{}},
+        //{"Lep12Eta",{}},
+        //{"Lep34Pt",{}},
+        //{"Lep34Eta",{}},
+        //{ "Z1lep1_Eta",  {} },
+        //{ "Z1lep1_Phi",  {} },
+        //{ "Z1lep1_Pt",  {} },
+        //{ "Z1lep1_PdgId",  {} },
+        //{ "Z1lep2_Eta",  {} },
+        //{ "Z1lep2_Phi",  {} },
+        //{ "Z1lep2_Pt",  {} },
+        //{ "Z1lep2_PdgId",  {} },
+        //{ "Z2lep1_Eta",  {} },
+        //{ "Z2lep1_Phi",  {} },
+        //{ "Z2lep1_Pt",  {} },
+        //{ "Z2lep1_PdgId",  {} },
+        //{ "Z2lep2_Eta",  {} },
+        //{ "Z2lep2_Phi",  {} },
+        //{ "Z2lep2_Pt",  {} },
+        //{ "Z2lep2_PdgId",  {} },
         { "Mass", {} },
        // { "Pt", {} },
        // { "nJets", {} },
@@ -172,6 +173,7 @@ public :
     UInt_t nvtx;
     Float_t Mass;
     Float_t Pt;
+    Float_t Eta;
     float dPhiZZ; //DeltaPhi between Z1 and Z2
     //Float_t Zlep1_Wlep_Mass;
     //Float_t Zlep2_Wlep_Mass;
@@ -228,6 +230,7 @@ public :
     TBranch* b_nvtx;
     TBranch* b_Mass;
     TBranch* b_Pt;
+    TBranch* b_Eta;
     //TBranch* b_Zlep1_Wlep_Mass;
     //TBranch* b_Zlep2_Wlep_Mass;
     //TBranch* b_Eta;

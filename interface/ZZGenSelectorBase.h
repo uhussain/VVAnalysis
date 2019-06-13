@@ -37,7 +37,10 @@ public :
     };
 
     TList *currentHistDir_{nullptr};
-
+    //TH1D* sumWeightsHist_;
+    //bool addSumweights_;
+    
+    Float_t genWeight;
     Float_t Genweight;
     Float_t GenZ1mass;
     Float_t GenZ2mass;
@@ -59,6 +62,7 @@ public :
     Float_t Genl3Phi;
     Float_t Genl4Phi;
     
+    TBranch* b_genWeight;
     TBranch* b_GenZ1mass;
     TBranch* b_GenZ2mass;
     TBranch* b_GenZ1pt;
