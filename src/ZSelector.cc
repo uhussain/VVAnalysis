@@ -6,8 +6,8 @@
 
 void ZSelector::Init(TTree *tree)
 {
-    allChannels_ = {"ee", "mm", };
-    hists1D_ = {"ZMass", "ptl1", "etal1", "ptl2", "etal2"};
+    allChannels_ = {"ee", "mm", "Unknown"};
+    hists1D_ = {"CutFlow", "ZMass", "ptl1", "etal1", "ptl2", "etal2"};
 
     SelectorBase::Init(tree);
     
@@ -67,8 +67,8 @@ void ZSelector::SetBranchesNanoAOD() {
     fChain->SetBranchAddress("Muon_charge", &Muon_charge, &b_Muon_charge);
     fChain->SetBranchAddress("Electron_mass", &Electron_mass, &b_Electron_mass);
     fChain->SetBranchAddress("Muon_mass", &Muon_mass, &b_Muon_mass);
-    fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", &Dimuon_Trigger, &b_Dimuon_Trigger);
-    fChain->SetBranchAddress("HLT_Mu27", &SingleMuon_Trigger, &b_SingleMuon_Trigger);
+    //fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", &Dimuon_Trigger, &b_Dimuon_Trigger);
+    fChain->SetBranchAddress("HLT_IsoMu24", &SingleMuon_Trigger, &b_SingleMuon_Trigger);
     //fChain->SetBranchAddress("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", &Dielectron_Trigger, &b_Dielectron_Trigger);
     //fChain->SetBranchAddress("HLT_Ele27_WPLoose_Gsf", &SingleElectron_Trigger, &b_SingleElectron_Trigger);
     if (isMC_) {
@@ -96,8 +96,8 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     b_Electron_mass->GetEntry(entry);
     b_Muon_mass->GetEntry(entry);
     b_MET->GetEntry(entry);
-    b_Dimuon_Trigger->GetEntry(entry);
-    //b_SingleMuon_Trigger->GetEntry(entry);
+    b_SingleMuon_Trigger->GetEntry(entry);
+    //b_Dimuon_Trigger->GetEntry(entry);
     //b_SingleElectron_Trigger->GetEntry(entry);
     //b_Dielectron_Trigger->GetEntry(entry);
 
@@ -125,20 +125,25 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     // cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)
     nCBVIDTightElec = std::count(Electron_cutBased, Electron_cutBased+nElectron, 4);
     nCBVIDVetoElec = std::count(Electron_cutBased, Electron_cutBased+nElectron, 1);
-    nTightIdMuon = std::count(Muon_tightId, Muon_tightId+nMuon, true);
-    nMediumIdMuon = std::count(Muon_mediumId, Muon_mediumId+nMuon, true);
-    //nTightIsoMuon = std::count(Muon_pfIsoId, Muon_pfIsoId+nMuon, 4);
-    //nLooseIsoMuon = std::count(Muon_pfIsoId, Muon_pfIsoId+nMuon, 1);
+    nTightIdMuon = 0;
+    nMediumIdMuon = 0;
+
+    for (size_t i = 0; i < nMuon; i++) {
+        //nMediumIdMuon += (Muon_mediumId[i] && Muon_pfRelIso04_all[i] < 0.15);
+        nMediumIdMuon += (Muon_mediumId[i] && Muon_pfRelIso04_all[i] < 0.15*Muon_pt[i]);
+        nTightIdMuon += (Muon_tightId[i] && Muon_pfRelIso04_all[i] < 0.15);
+    }
 
     channel_ = channelMap_[channelName_];
     std::vector<size_t> goodIndices = {};
 
-    if (nTightIdMuon >= 2) {
+    if (nMediumIdMuon >= 2) {
         channel_ = mm;
         channelName_ = "mm";
-        if (!(Muon_tightId[0] && Muon_tightId[1])) {
+        if (!(Muon_mediumId[0] && Muon_pfRelIso04_all[0] < 0.15
+                    && Muon_mediumId[1] && Muon_pfRelIso04_all[1] < 0.15)) {
             for (size_t i = 0; i < nMuon; i++) {
-                if (Muon_tightId[i])
+                if (Muon_mediumId[i])
                     goodIndices.push_back(i);
             }
             if (goodIndices.size() < 2) {
@@ -156,8 +161,8 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
             l2Phi = Muon_phi[goodIndices[1]];
             l1Mass = Muon_mass[goodIndices[0]];
             l2Mass = Muon_mass[goodIndices[1]];
-            l1IsTight = (Muon_tightId[goodIndices[0]] && (Muon_pfRelIso04_all[goodIndices[0]] < 0.15));
-            l2IsTight = (Muon_tightId[goodIndices[1]] && (Muon_pfRelIso04_all[goodIndices[1]] < 0.15));
+            l1IsTight = (Muon_mediumId[goodIndices[0]] && (Muon_pfRelIso04_all[goodIndices[0]] < 0.15));
+            l2IsTight = (Muon_mediumId[goodIndices[1]] && (Muon_pfRelIso04_all[goodIndices[1]] < 0.15));
         }
     }
     else if (nCBVIDTightElec >= 2) {
@@ -186,6 +191,10 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
             l2IsTight = (Electron_cutBased[goodIndices[1]] == 4);
         }
     }
+    else {
+        channel_ = Unknown;
+        channelName_ = "Unknown";
+    }
     SetMass();
 
     if (isMC_) {
@@ -195,7 +204,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
         //b_l1GenPt->GetEntry(entry);
         //b_l2GenPt->GetEntry(entry);
         //b_l3GenPt->GetEntry(entry);
-        ApplyScaleFactors();
+        //ApplyScaleFactors();
     }
     else {
         //TODO: add MET filters
@@ -204,7 +213,6 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     }
 
 
-    passesTrigger = isMC_ ? Dimuon_Trigger : true;;
     //if (!singleLepton_)
     //    //passesTrigger = (Dimuon_Trigger || SingleMuon_Trigger ||
     //    //        Dielectron_Trigger || SingleElectron_Trigger);
@@ -213,6 +221,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     //    passesTrigger = (!Dimuon_Trigger && SingleMuon_Trigger);
     //    //passesTrigger = ((!Dimuon_Trigger && SingleMuon_Trigger) ||
     //    //        (!Dielectron_Trigger && SingleElectron_Trigger));
+    passesTrigger = SingleMuon_Trigger;
 
     passesLeptonVeto = (std::min(nMediumIdMuon, nLooseIsoMuon) + nCBVIDVetoElec) == 2;
 }
@@ -282,59 +291,38 @@ bool ZSelector::tightZLeptons() {
 }
 
 void ZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { 
-    //cutflow_ee_->Fill(0.,weight);
-    //SafeHistFill(histMap1D_, getHistName("CutFlow_ee", variation.second), 0., weight);
-    //cutflow_mm_->Fill(0.,weight);
-    //if (channel_ == ee)
-    //    cutflow_ee_->Fill(1.,weight);
-    //else if (channel_ == mm)
-    //    cutflow_mm_->Fill(1.,weight);
+    int step = 0;
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
+
+    if (channel_ != mm && channel_ != ee) 
+        return;
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
     if (!passesTrigger)
         return;
-    //for (auto& hist : histMap1D_)
-    if (channel_ != mm && channel_ != ee) 
-        return;
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
     if (channel_ == ee && (std::abs(l1Eta) > 2.4 || std::abs(l2Eta) > 2.4 ))
         return;
     else if (channel_ == mm && (std::abs(l1Eta) > 2.5 || std::abs(l2Eta) > 2.5 ))
         return;
-    //if (channel_ == ee)
-    //    cutflow_ee_->Fill(2,weight);
-    //else if (channel_ == mm)
-    //    cutflow_mm_->Fill(2,weight);
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
-    if (l1Pt < 25 || l2Pt < 15)
+    if (l1Pt < 25 || l2Pt < 25)
         return;
-    //if (channel_ == ee)
-    //    cutflow_ee_->Fill(3,weight);
-    //else if (channel_ == mm)
-    //    cutflow_mm_->Fill(3,weight);
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
-    if (ZMass > 101.1876 || ZMass < 81.1876)
+    if (ZMass > 116.1876 || ZMass < 76.1876)
         return;
-
-    //if (channel_ == ee)
-    //    cutflow_ee_->Fill(4,weight);
-    //else if (channel_ == mm)
-    //    cutflow_mm_->Fill(4,weight);
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
     if (MET > 25)
         return;
-
-    //if (channel_ == ee)
-    //    cutflow_ee_->Fill(5,weight);
-    //else if (channel_ == mm)
-    //    cutflow_mm_->Fill(5,weight);
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
     if (!tightZLeptons())
         return;
-
-    //if (channel_ == ee)
-    //    cutflow_ee_->Fill(6,weight);
-    //else if (channel_ == mm)
-    //    cutflow_mm_->Fill(6,weight);
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
     SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), ZMass, weight);
     SafeHistFill(histMap1D_, getHistName("ptl1", variation.second), l1Pt, weight);
