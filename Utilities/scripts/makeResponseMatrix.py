@@ -54,10 +54,10 @@ def getComLineArgs():
     parser.add_argument('--logy', '--logY', '--log', action='store_true',
                         help='Put vertical axis on a log scale.')
     parser.add_argument('--plotDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DataUnfolding/Era2017_TestUncert/RooIterMat2017',
+                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DataUnfolding/Era2017_TestCode/RooIterMat2017',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--unfoldDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DataUnfolding/Era2017_TestUncert/RooIterDistributions2017',
+                        default='/afs/cern.ch/user/u/uhussain/www/UWVVPlots/DataUnfolding/Era2017_TestCode/RooIterDistributions2017',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--nIter', type=int, nargs='?', default=4,
                         help='Number of iterations for D\'Agostini method')
@@ -511,7 +511,7 @@ def generateAnalysisInputs():
 #ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx')
 #sigSamples is a dictionary containing sample names and kfactor*cross-section
 #sumW is a dictionary with sigsample:sumweights stored
-ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx')
+#ROOT.gSystem.Load('Utilities/scripts/ResponseMatrixMaker_cxx')
 def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}):
     
     className = responseClassNames[varName][channel]
@@ -524,7 +524,7 @@ def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}
     
     #for example C=<class 'ROOT.BranchValueResponseMatrixMaker<float>'>     
     C = getattr(ROOT, className)
-
+    print("className: ",C)
     
     #filelist=["zz4l-powheg"]
     filelist=[str(i) for i in sigSamples.keys()] 

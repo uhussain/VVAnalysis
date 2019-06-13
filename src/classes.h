@@ -9,6 +9,7 @@
 #include "Analysis/VVAnalysis/interface/ZZBackgroundSelector.h"
 #include "Analysis/VVAnalysis/interface/ScaleFactor.h"
 #include "Analysis/VVAnalysis/interface/disambiguateFinalStates.h"
+#include "Analysis/VVAnalysis/interface/ResponseMatrixMaker.hxx"
 
 namespace{
   namespace{
@@ -22,5 +23,8 @@ namespace{
     ZZBackgroundSelector pZZBackgroundSelector;
     ScaleFactor pScaleFactor;
     disambiguateFinalStates pDisambiguator;
+    typedef SimpleValueResponseMatrixMakerBase<float> FloatResponseMatrixMakerBase;
+    typedef BranchValueResponseMatrixMaker<float> FloatBranchResponseMatrixMaker;
+    typedef UseSFHists<FloatBranchResponseMatrixMaker> SFHistFloatBranchResponseMatrixMaker;
   }
 }

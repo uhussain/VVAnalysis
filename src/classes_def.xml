@@ -10,4 +10,7 @@
   <class name="ZZGenSelectorBase"/>
   <class name="ScaleFactor"/>
   <class name="disambiguateFinalStates"/>
+  <class name="FloatResponseMatrixMakerBase"/>
+  <class name="FloatBranchResponseMatrixMaker"/>
+  <class name="SFHistFloatBranchResponseMatrixMaker"/>
 </lcgdict>
