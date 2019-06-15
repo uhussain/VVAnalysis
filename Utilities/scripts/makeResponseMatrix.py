@@ -20,8 +20,8 @@ VFloat = Vec('float')
 style = Style()
 ROOT.gStyle.SetLineScalePS(1.8)
 
-#channels = ["eeee", "eemm","mmmm"]
-channels = ["eeee"]
+channels = ["eeee", "eemm","mmmm"]
+#channels = ["eeee"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 
@@ -524,7 +524,7 @@ def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}
     
     #for example C=<class 'ROOT.BranchValueResponseMatrixMaker<float>'>     
     C = getattr(ROOT, className)
-
+    print("className:",C)
     
     #filelist=["zz4l-powheg"]
     filelist=[str(i) for i in sigSamples.keys()] 
@@ -571,6 +571,8 @@ def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hSF={}
             print("scale factors are being added")
 
         responseMakers[sample] = resp
+        #print "resp: ",resp
+        ROOT.SetOwnership(resp,False)
     return responseMakers
 
 _printCounter = 0
@@ -602,6 +604,7 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
     for resp in hResponseNominal.values():
         respMat = resp.getResponse()
         hResponse.Add(respMat)
+        ROOT.SetOwnership(respMat,True)
         respMat.Delete()
 
     print ("The leaks happen in this for loop")
@@ -620,8 +623,8 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
 
 
     ## Give hSig and hTrue in the form of histograms
-    varNames={'mass': 'Mass'}
-    #varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+    #varNames={'mass': 'Mass'}
+    varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
     
     hSig = hSigDic[chan][varNames[varName]]
     print "sigHist: ", hSig,", ",hSig.Integral()
@@ -920,9 +923,9 @@ plotDir=args['plotDir']
 UnfoldDir=args['unfoldDir']
 nIterations=args['nIter']
 
-varNames={'mass': 'Mass'}
+#varNames={'mass': 'Mass'}
 
-#varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
 
 selectChannels=channels
 #I need the channels split up for my Selectors and histograms
@@ -1069,7 +1072,7 @@ for cat in channels:
     makeSimpleHtml.writeHTML(os.path.expanduser(OutputDirs[cat].replace("/plots", "")), "2D ResponseMatrices (from MC)")
     print(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")).split("/")[-1])
     makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")), "Unfolded Distributions (from MC)")
-    print("it crashes already")
+    #print("it crashes already")
 
 #if args['test']:
 #    exit(0)
