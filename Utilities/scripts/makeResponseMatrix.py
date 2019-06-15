@@ -603,6 +603,7 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
     #print "hResponseNominal after zz-pohwheg:",hResponseNominal
     for resp in hResponseNominal.values():
         respMat = resp.getResponse()
+        ROOT.SetOwnership(resp,False)
         hResponse.Add(respMat)
         ROOT.SetOwnership(respMat,False)
         #respMat.Delete()
@@ -623,8 +624,8 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
 
 
     ## Give hSig and hTrue in the form of histograms
-    #varNames={'mass': 'Mass'}
-    varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+    varNames={'mass': 'Mass'}
+    #varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
     
     hSig = hSigDic[chan][varNames[varName]]
     print "sigHist: ", hSig,", ",hSig.Integral()
@@ -923,9 +924,9 @@ plotDir=args['plotDir']
 UnfoldDir=args['unfoldDir']
 nIterations=args['nIter']
 
-#varNames={'mass': 'Mass'}
+varNames={'mass': 'Mass'}
 
-varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
+#varNames={'mass': 'Mass','pt':'ZZPt','eta':'ZZEta','z1mass':'Z1Mass','z1pt':'Z1Pt','z2mass':'Z2Mass','z2pt':'Z2Pt','zpt':'ZPt','leppt':'LepPt'}
 
 selectChannels=channels
 #I need the channels split up for my Selectors and histograms
