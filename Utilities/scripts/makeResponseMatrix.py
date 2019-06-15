@@ -20,8 +20,8 @@ VFloat = Vec('float')
 style = Style()
 ROOT.gStyle.SetLineScalePS(1.8)
 
-channels = ["eeee", "eemm","mmmm"]
-#channels = ["eeee"]
+#channels = ["eeee", "eemm","mmmm"]
+channels = ["eeee"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 
@@ -604,8 +604,8 @@ def unfold(varName,chan,responseMakers,hSigDic,hTrueDic,hDataDic,hbkgDic,hbkgMCD
     for resp in hResponseNominal.values():
         respMat = resp.getResponse()
         hResponse.Add(respMat)
-        ROOT.SetOwnership(respMat,True)
-        respMat.Delete()
+        ROOT.SetOwnership(respMat,False)
+        #respMat.Delete()
 
     print ("The leaks happen in this for loop")
     #hResponseNominalTotal = sum(resp for resp in hResponseNominal.values())
