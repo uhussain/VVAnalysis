@@ -7,7 +7,7 @@
 void ZSelector::Init(TTree *tree)
 {
     allChannels_ = {"ee", "mm", "Unknown"};
-    hists1D_ = {"CutFlow", "ZMass", "ptl1", "etal1", "ptl2", "etal2"};
+    hists1D_ = {"CutFlow", "ZMass", "ZPt", "ptl1", "etal1", "ptl2", "etal2"};
 
     SelectorBase::Init(tree);
     
@@ -70,7 +70,7 @@ void ZSelector::SetBranchesNanoAOD() {
     //fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL", &Dimuon_Trigger, &b_Dimuon_Trigger);
     fChain->SetBranchAddress("HLT_IsoMu24", &SingleMuon_Trigger, &b_SingleMuon_Trigger);
     //fChain->SetBranchAddress("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ", &Dielectron_Trigger, &b_Dielectron_Trigger);
-    //fChain->SetBranchAddress("HLT_Ele27_WPLoose_Gsf", &SingleElectron_Trigger, &b_SingleElectron_Trigger);
+    fChain->SetBranchAddress("HLT_Ele27_WPTight_Gsf", &SingleElectron_Trigger, &b_SingleElectron_Trigger);
     if (isMC_) {
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
         fChain->SetBranchAddress("Pileup_nPU", &numPU, &b_numPU);
@@ -98,7 +98,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     b_MET->GetEntry(entry);
     b_SingleMuon_Trigger->GetEntry(entry);
     //b_Dimuon_Trigger->GetEntry(entry);
-    //b_SingleElectron_Trigger->GetEntry(entry);
+    b_SingleElectron_Trigger->GetEntry(entry);
     //b_Dielectron_Trigger->GetEntry(entry);
 
     if (nElectron > N_KEEP_MU_E_ || nMuon > N_KEEP_MU_E_) {
@@ -221,7 +221,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
     //    passesTrigger = (!Dimuon_Trigger && SingleMuon_Trigger);
     //    //passesTrigger = ((!Dimuon_Trigger && SingleMuon_Trigger) ||
     //    //        (!Dielectron_Trigger && SingleElectron_Trigger));
-    passesTrigger = SingleMuon_Trigger;
+    passesTrigger = SingleMuon_Trigger || SingleElectron_Trigger;
 
     passesLeptonVeto = (std::min(nMediumIdMuon, nLooseIsoMuon) + nCBVIDVetoElec) == 2;
 }
@@ -316,9 +316,9 @@ void ZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string
         return;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
-    if (MET > 25)
-        return;
-    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
+    //if (MET > 25)
+    //    return;
+    //SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
     if (!tightZLeptons())
         return;

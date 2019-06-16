@@ -118,7 +118,7 @@ class SelectorDriver(object):
                 print 'WARNING: Falling back to dataset "Unknown"'
             else:
                 print 'WARNING: Skipping dataset %s' % dataset
-                return
+                return False
         if addSumweights:
             dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
         if self.numCores > 1:
@@ -129,10 +129,11 @@ class SelectorDriver(object):
         output_list.Delete()
         if self.current_file != self.outfile:
             self.current_file.Close()
+        return True
 
     def getFileNames(self, file_path):
-        xrootd = "/store/user" in file_path
-        if not (xrootd or os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0])):
+        xrootd = "/store/user" in file_path.split("/hdfs/")[0][:12]
+        if not (xrootd or os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0].rstrip("/*"))):
             raise ValueError("Invalid path! Skipping dataset. Path was %s" 
                 % file_path)
 
@@ -154,10 +155,10 @@ class SelectorDriver(object):
         p.map(self, [[dataset, chan] for dataset in datasets])
         # Store arrays in temp files, since it can get way too big to keep around in memory
         tempfiles = [self.tempfileName(d) for d in datasets] 
+        tempfiles = filter(os.path.isfile, tempfiles)
         rval = subprocess.call(["hadd", "-f", self.outfile_name] + tempfiles)
         if rval == 0:
-            for f in tempfiles:
-                os.remove(f)
+            map(os.remove, tempfiles)
         else:
             raise RuntimeError("Failed to collect data from parallel run")
 
