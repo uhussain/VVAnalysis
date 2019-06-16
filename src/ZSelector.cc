@@ -7,7 +7,7 @@
 void ZSelector::Init(TTree *tree)
 {
     allChannels_ = {"ee", "mm", "Unknown"};
-    hists1D_ = {"CutFlow", "ZMass", "ZPt", "ptl1", "etal1", "ptl2", "etal2"};
+    hists1D_ = {"CutFlow", "ZMass", "ZEta", "yZ", "ZPt", "ptl1", "etal1", "ptl2", "etal2"};
 
     SelectorBase::Init(tree);
     
@@ -195,7 +195,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
         channel_ = Unknown;
         channelName_ = "Unknown";
     }
-    SetMass();
+    SetComposite();
 
     if (isMC_) {
         b_genWeight->GetEntry(entry);
@@ -265,7 +265,7 @@ void ZSelector::ApplyScaleFactors() {
     weight *= pileupSF_->Evaluate1D(numPU);
 }
 
-void ZSelector::SetMass() {
+void ZSelector::SetComposite() {
     if (l1Pt == 0. || l2Pt == 0.) {
         return;
     }
@@ -273,7 +273,11 @@ void ZSelector::SetMass() {
     lepton1.SetPtEtaPhiM(l1Pt, l1Eta, l1Phi, l1Mass);
     TLorentzVector lepton2;
     lepton2.SetPtEtaPhiM(l2Pt, l2Eta, l2Phi, l2Mass);
-    ZMass = (lepton1+lepton2).M();
+    auto system = lepton1+lepton2;
+    ZMass = system.M();
+    ZPt = system.Pt();
+    ZEta = system.PseudoRapidity();
+    Zy = system.Rapidity();
 }
 
 // Meant to be a wrapper for the tight ID just in case it changes
@@ -312,7 +316,7 @@ void ZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string
         return;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
-    if (ZMass > 116.1876 || ZMass < 76.1876)
+    if (ZMass > 106.1876 || ZMass < 76.1876)
         return;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
@@ -327,6 +331,11 @@ void ZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string
     SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), ZMass, weight);
     SafeHistFill(histMap1D_, getHistName("ptl1", variation.second), l1Pt, weight);
     SafeHistFill(histMap1D_, getHistName("ptl2", variation.second), l2Pt, weight);
+    SafeHistFill(histMap1D_, getHistName("etal1", variation.second), l2Eta, weight);
+    SafeHistFill(histMap1D_, getHistName("etal2", variation.second), l2Eta, weight);
+    SafeHistFill(histMap1D_, getHistName("ZEta", variation.second), ZEta, weight);
+    SafeHistFill(histMap1D_, getHistName("yZ", variation.second), Zy, weight);
+    SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), ZPt, weight);
 }
 
 void ZSelector::SetupNewDirectory() {

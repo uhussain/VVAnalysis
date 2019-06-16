@@ -45,6 +45,9 @@ public :
     Float_t l1Mass;
     Float_t l2Mass;
     Float_t ZMass;
+    Float_t Zy;
+    Float_t ZEta;
+    Float_t ZPt;
     Bool_t l1IsTight;
     Bool_t l2IsTight;
 
@@ -134,7 +137,7 @@ protected:
     void LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void ApplyScaleFactors();
-    void SetMass();
+    void SetComposite();
     void FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) override;
 };
 
