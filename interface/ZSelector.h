@@ -17,12 +17,13 @@
 
 class ZSelector : public SelectorBase {
 public :
-    ScaleFactor* pileupSF_;
-    ScaleFactor* muonSF_;
-    ScaleFactor* eIdSF_ ;
-    ScaleFactor* eGsfSF_;
-    ScaleFactor* mIdSF_;
-    ScaleFactor* mIsoSF_;
+    ScaleFactor* pileupSF_ = nullptr;
+    ScaleFactor* muonSF_ = nullptr;
+    ScaleFactor* eIdSF_  = nullptr;
+    ScaleFactor* eGsfSF_ = nullptr;
+    ScaleFactor* mIdSF_ = nullptr;
+    ScaleFactor* mIsoSF_ = nullptr;
+    TEfficiency* prefireEff_ = nullptr;
 
     // Derived values
     bool singleLepton_;
@@ -120,7 +121,7 @@ public :
     TBranch* b_ZMass;
     
     // Readers to access the data (delete the ones you do not need).
-    //virtual void    SetScaleFactors() override;
+    virtual void    SetScaleFactors() override;
     virtual void    Init(TTree *tree) override;
     ZSelector(TTree * /*tree*/ =0) { }
     ~ZSelector() { }

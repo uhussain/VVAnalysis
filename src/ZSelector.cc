@@ -2,7 +2,6 @@
 #include "TLorentzVector.h"
 #include <TStyle.h>
 #include <regex>
-#include "TParameter.h"
 
 void ZSelector::Init(TTree *tree)
 {
@@ -14,6 +13,28 @@ void ZSelector::Init(TTree *tree)
     singleLepton_ = false;
     if (!isMC_ && name_.find("Single") != std::string::npos)
         singleLepton_ = true;
+}
+
+void ZSelector::SetScaleFactors() {
+    pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
+    if (pileupSF_ == nullptr ) 
+        std::invalid_argument("Must pass pileup weights SF");
+    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronTightIdSF");
+    if (eIdSF_ == nullptr ) 
+        std::invalid_argument("Must pass electron ID SF");
+    eGsfSF_ = (ScaleFactor *) GetInputList()->FindObject("electronGsfSF");
+    if (eGsfSF_ == nullptr ) 
+        std::invalid_argument("Must pass electron GSF SF");
+    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonTightIdSF");
+    if (mIdSF_ == nullptr ) 
+        std::invalid_argument("Must pass muon ID SF");
+    mIsoSF_ = (ScaleFactor *) GetInputList()->FindObject("muonIsoSF");
+    if (mIsoSF_ == nullptr ) 
+        std::invalid_argument("Must pass muon Iso SF");
+
+    prefireEff_ = (TEfficiency*) GetInputList()->FindObject("prefireEfficiencyMap");
+    if (prefireEff_ == nullptr ) 
+        std::invalid_argument("Must pass prefiring efficiency map");
 }
 
 void ZSelector::SetBranchesUWVV() {
@@ -199,12 +220,12 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
 
     if (isMC_) {
         b_genWeight->GetEntry(entry);
-        //TODO: add scale factors
-        //b_numPU->GetEntry(entry);
+        b_numPU->GetEntry(entry);
+        weight = genWeight;
         //b_l1GenPt->GetEntry(entry);
         //b_l2GenPt->GetEntry(entry);
         //b_l3GenPt->GetEntry(entry);
-        //ApplyScaleFactors();
+        ApplyScaleFactors();
     }
     else {
         //TODO: add MET filters
@@ -246,23 +267,29 @@ void ZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::stri
 }
 
 void ZSelector::ApplyScaleFactors() {
-    if (isMC_)
-        weight = genWeight;
-    return;
-    // This will come later
     if (channel_ == ee) {
-        weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        if (eIdSF_ != nullptr) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        if (eGsfSF_ != nullptr) {
+            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
     }
     else if (channel_ == mm) {
-        weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        if (mIdSF_ != nullptr) {
+            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        if (mIsoSF_ != nullptr) {
+            weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
     }
-    weight *= pileupSF_->Evaluate1D(numPU);
+    if (pileupSF_ != nullptr) {
+        weight *= pileupSF_->Evaluate1D(numPU);
+    }
 }
 
 void ZSelector::SetComposite() {
