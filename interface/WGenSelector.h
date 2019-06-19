@@ -25,17 +25,16 @@ public :
     LorentzVector wCand;
     LorentzVector genMet;
 
-    static const unsigned int N_KEEP_GEN_ = 30;
+    static const unsigned int N_KEEP_GEN_ = 100;
     float weight;
     // Values read from file
     Float_t genWeight;
-    Float_t MET;
     Float_t GenPart_pt[N_KEEP_GEN_];
     Float_t GenPart_eta[N_KEEP_GEN_];
     Float_t GenPart_phi[N_KEEP_GEN_];
     Float_t GenPart_mass[N_KEEP_GEN_];
-    Float_t GenPart_status[N_KEEP_GEN_];
-    Float_t GenPart_pdgId[N_KEEP_GEN_];
+    Int_t GenPart_status[N_KEEP_GEN_];
+    Int_t GenPart_pdgId[N_KEEP_GEN_];
     Float_t GenMET_pt;
     Float_t GenMET_phi;
     UInt_t nGenPart;

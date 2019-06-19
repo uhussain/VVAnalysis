@@ -16,6 +16,7 @@ class SelectorDriver(object):
             "Zstudy_2016" : "ZSelector",
             "Zstudy_2017" : "ZSelector",
             "ZZGen" : "ZZGenSelector",
+            "WGen" : "WGenSelector",
         }
 
         self.analysis = analysis
@@ -132,13 +133,19 @@ class SelectorDriver(object):
         return True
 
     def getFileNames(self, file_path):
-        xrootd = "/store/user" in file_path.split("/hdfs/")[0][:12]
+        xrootd = "/store" in file_path.split("/hdfs/")[0][:7]
+        xrootd_user = "/store/user" in file_path.split("/hdfs/")[0][:12]
+        print xrootd
         if not (xrootd or os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0].rstrip("/*"))):
             raise ValueError("Invalid path! Skipping dataset. Path was %s" 
                 % file_path)
 
         # Assuming these are user files on HDFS, otherwise it won't work
-        filenames =  glob.glob(file_path) if not xrootd else \
+        if (xrootd and not xrootd_user):
+            filenames = ['root://cms-xrd-global.cern.ch/' + file_path]
+            print filenames
+            return filenames
+        filenames =  glob.glob(file_path) if not xrootd_user else \
                 ConfigureJobs.getListOfHDFSFiles(file_path)
         filenames = ['root://cmsxrootd.hep.wisc.edu/' + f if "/store/user" in f[0:12] else f for f in filenames]
         return filenames
@@ -169,6 +176,7 @@ class SelectorDriver(object):
     def processLocalFiles(self, selector, file_path, addSumweights, chan,):
         filenames = self.getFileNames(file_path)
         for i, filename in enumerate(filenames):
+            print i, filename
             self.processFile(selector, filename, addSumweights, chan, i+1)
 
     def processFile(self, selector, filename, addSumweights, chan, filenum=1):

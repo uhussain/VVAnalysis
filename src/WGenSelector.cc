@@ -15,6 +15,8 @@ void WGenSelector::Init(TTree *tree)
 void WGenSelector::SetBranchesNanoAOD() {
     fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
     fChain->SetBranchAddress("nGenPart", &nGenPart, &b_nGenPart);
+    fChain->SetBranchAddress("GenMET_pt", &GenMET_pt, &b_GenMET_pt);
+    fChain->SetBranchAddress("GenMET_phi", &GenMET_phi, &b_GenMET_phi);
     fChain->SetBranchAddress("GenPart_pt", &GenPart_pt, &b_GenPart_pt);
     fChain->SetBranchAddress("GenPart_phi", &GenPart_phi, &b_GenPart_phi);
     fChain->SetBranchAddress("GenPart_eta", &GenPart_eta, &b_GenPart_eta);
@@ -45,8 +47,8 @@ void WGenSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std
     }
 
     channel_ = channelMap_[channelName_];
-    std::vector<size_t> goodIndices = {};
 
+    leptons.clear();
     for (size_t i = 0; i < nGenPart; i++) {
         if (GenPart_status[i] == 1 && (std::abs(GenPart_pdgId[i]) == 11 || std::abs(GenPart_pdgId[i] == 13))) {
             LorentzVector vec;
@@ -55,7 +57,7 @@ void WGenSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std
             vec.SetPhi(GenPart_phi[i]);
             vec.SetM(GenPart_mass[i]);
             int charge = (GenPart_pdgId[i] < 0) ? -1: 1;
-            leptons.push_back(reco::GenParticle(charge, vec, reco::Particle::Point(), GenPart_status[i], GenPart_pdgId[i], charge));
+            leptons.push_back(reco::GenParticle(charge, vec, reco::Particle::Point(), GenPart_pdgId[i], GenPart_status[i], charge));
         }
     }
     std::sort(leptons.begin(), leptons.end(), 
@@ -89,7 +91,7 @@ void WGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::str
     int step = 0;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
-    if (channel_ != mm && channel_ != ee) 
+    if (channel_ != m && channel_ != e) 
         return;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
