@@ -2,6 +2,7 @@
 #include "Analysis/VVAnalysis/interface/SelectorBase.h"
 #include "Analysis/VVAnalysis/interface/ZSelector.h"
 #include "Analysis/VVAnalysis/interface/ZZGenSelector.h"
+#include "Analysis/VVAnalysis/interface/WGenSelector.h"
 #include "Analysis/VVAnalysis/interface/WZSelector.h"
 #include "Analysis/VVAnalysis/interface/WZSelectorBase.h"
 #include "Analysis/VVAnalysis/interface/WZBackgroundSelector.h"
@@ -17,6 +18,7 @@ namespace{
     ZSelector pZSelector;
     WZSelector pWZSelector;
     ZZGenSelector pZZGenSelector;
+    WGenSelector pWGenSelector;
     WZBackgroundSelector pWZBackgroundSelector;
     ScaleFactor pScaleFactor;
     disambiguateFinalStates pDisambiguator;

@@ -31,6 +31,8 @@ public :
     std::vector<std::string> hists1D_ = {};
 
     enum Channel {
+        e,
+        m,
         ee,
         mm,
         eee,
@@ -91,6 +93,8 @@ public :
     };
 
     std::map<std::string, Channel> channelMap_ = {
+        {"e", e},
+        {"m", m},
         {"ee", ee},
         {"mm", mm},
         {"eee", eee},
