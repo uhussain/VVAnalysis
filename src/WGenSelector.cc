@@ -104,6 +104,10 @@ void WGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::str
         return;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
+    if (std::abs(lep.pt() < 25))
+        return;
+
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
     if (genMet.pt() < 25)
         return;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
