@@ -84,6 +84,9 @@ class SelectorDriver(object):
             else: 
                 for dataset in datasets:
                     self.processDataset(dataset, chan)
+        if len(self.channels) > 1 and self.numCores > 1:
+            tempfiles = [self.outfile_name.replace(".root", "_%s.root" % c) for c in self.channels]
+            self.combineParallelFiles(tempfiles, "Inclusive")
 
     def processDataset(self, dataset, chan):
         print "Processing dataset %s" % dataset
@@ -149,18 +152,24 @@ class SelectorDriver(object):
         channel = chan if chan != "mmee" else "eemm"
         return "Events" if self.ntupleType == "NanoAOD" else ("%s/ntuple" % channel)
 
+    def combineParallelFiles(self, tempfiles, chan):
+        tempfiles = filter(os.path.isfile, tempfiles)
+        outfile = self.outfile_name
+        if chan != "Inclusive":
+            outfile = self.outfile_name.replace(".root", "_%s.root" % chan)
+        rval = subprocess.call(["hadd", "-f", outfile] + tempfiles)
+        if rval == 0:
+            map(os.remove, tempfiles)
+        else:
+            raise RuntimeError("Failed to collect data from parallel run")
+
     def processParallelByDataset(self, datasets, chan):
         numCores = min(self.numCores, len(datasets))
         p = multiprocessing.Pool(processes=self.numCores)
         p.map(self, [[dataset, chan] for dataset in datasets])
         # Store arrays in temp files, since it can get way too big to keep around in memory
         tempfiles = [self.tempfileName(d) for d in datasets] 
-        tempfiles = filter(os.path.isfile, tempfiles)
-        rval = subprocess.call(["hadd", "-f", self.outfile_name] + tempfiles)
-        if rval == 0:
-            map(os.remove, tempfiles)
-        else:
-            raise RuntimeError("Failed to collect data from parallel run")
+        self.combineParallelFiles(tempfiles, chan)
 
     # Pool.map can only take in one argument, so expand the array
     def processDatasetHelper(self, args):
@@ -172,6 +181,7 @@ class SelectorDriver(object):
             self.processFile(selector, filename, addSumweights, chan, i+1)
 
     def processFile(self, selector, filename, addSumweights, chan, filenum=1):
+        print "Filename is", filename
         rtfile = ROOT.TFile.Open(filename)
         tree_name = self.getTreeName(chan)
         tree = rtfile.Get(tree_name)
