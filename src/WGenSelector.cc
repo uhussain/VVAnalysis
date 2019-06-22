@@ -53,7 +53,7 @@ void WGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::str
         return;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
-    if (std::abs(lep.pt() < 25))
+    if (lep.pt() < 25)
         return;
 
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
@@ -69,5 +69,5 @@ void WGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::str
     SafeHistFill(histMap1D_, getHistName("MET_phi", variation.second), genMet.phi(), weight);
     SafeHistFill(histMap1D_, getHistName("ptl", variation.second), lep.pt(), weight);
     SafeHistFill(histMap1D_, getHistName("etal", variation.second), lep.eta(), weight);
-    SafeHistFill(histMap1D_, getHistName("phil", variation.second), lep.eta(), weight);
+    SafeHistFill(histMap1D_, getHistName("phil", variation.second), lep.phi(), weight);
 }
