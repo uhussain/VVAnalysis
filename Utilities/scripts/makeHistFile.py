@@ -35,23 +35,6 @@ def getComLineArgs():
                         "by commas")
     return vars(parser.parse_args())
 
-def getFiles(list_of_files, nPerJob, jobNum):
-    if not os.path.isfile(list_of_files):
-        raise IOError("%s is not a valid file!" % list_of_files)
-    filelist = [f.strip() for f in open(list_of_files).readlines()]
-    nPerJob = int(nPerJob)
-    jobNum = int(jobNum)
-    maxNum = len(filelist)
-    print nPerJob, jobNum, maxNum
-    firstEntry = nPerJob*jobNum
-    if firstEntry > maxNum:
-        raise ValueError("The first file to process (nPerJob*jobNum) = (%i*%i)" % (nPerJob, jobNum) \
-                + "is greater than the number of entries in file %s (%s)." % (list_of_files, maxNum))
-    lastEntry = min(nPerJob*(jobNum+1), maxNum)
-    print "first, Last entry", firstEntry, lastEntry
-    print filelist[firstEntry:lastEntry]
-    return filelist[firstEntry:lastEntry]
-
 ROOT.gROOT.SetBatch(True)
 
 args = getComLineArgs()
@@ -132,9 +115,11 @@ if args['uwvv']:
     selector.setChannels(args['channels'])
 selector.setNumCores(args['numCores'])
 
-print getFiles(*args['inputs_from_file'])
-selector_input = args['filenames'] if args['filenames'] else getFiles(*args['inputs_from_file'])
-mc = selector.applySelector(selector_input)
+if args['filenames']:
+    selector.setDatasets(args['filenames'])
+else:
+    selector.setFileList(*args['inputs_from_file'])
+mc = selector.applySelector()
 
 if args['test']:
     fOut.Close()

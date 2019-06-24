@@ -33,6 +33,7 @@ class SelectorDriver(object):
         self.numCores = 1
         self.channels = ["Inclusive"]
         self.outfile_name = "temp.root"
+        self.datasets = {}
 
     # Needed to parallelize class member function, see
     # https://stackoverflow.com/questions/1816958/cant-pickle-type-instancemethod-when-using-multiprocessing-pool-map
@@ -76,46 +77,69 @@ class SelectorDriver(object):
     def setNumCores(self, numCores):
         self.numCores = numCores
 
-    def applySelector(self, datalist):
+    def setFileList(self, list_of_files, nPerJob, jobNum):
+        if not os.path.isfile(list_of_files):
+            raise ValueError("%s is not a valid file.")
+        filelist = [f.strip() for f in open(list_of_files).readlines()]
+        nPerJob = int(nPerJob)
+        jobNum = int(jobNum)
+        maxNum = len(filelist)
+        firstEntry = nPerJob*jobNum
+        if firstEntry > maxNum:
+            raise ValueError("The first file to process (nPerJob*jobNum) = (%i*%i)" % (nPerJob, jobNum) \
+                    + " is greater than the number of entries in file %s (%s)." % (list_of_files, maxNum))
+        lastEntry = min(nPerJob*(jobNum+1), maxNum)
+        
+        for line in filelist:
+            if "@" not in line:
+                dataset = "Unknown"
+                file_path = line
+            else:
+                # Intended for running specified files, use the format name:file
+                dataset, file_path = line.split("@")
+            if dataset not in self.datasets.keys():
+                self.datasets[dataset] = [file_path]
+            else:
+                self.datasets[dataset].append(file_path)
+
+    def setDatasets(self, datalist):
+        datasets = ConfigureJobs.getListOfFiles(datalist, self.input_tier)
+        for dataset in datasets:
+            try:
+                file_path = ConfigureJobs.getInputFilesPath(dataset, 
+                    self.input_tier, self.analysis)
+            except ValueError as e:
+                print e
+                continue
+            self.datasets[dataset] = file_path
+
+    def applySelector(self):
         for chan in self.channels:
             self.addTNamed("channel", chan)
             print "INFO: Processing channel %s" % chan
-            datasets = ConfigureJobs.getListOfFiles(datalist, self.input_tier)
             if self.numCores > 1:
-                self.processParallelByDataset(datasets, chan)
+                self.processParallelByDataset(self.datasets, chan)
             else: 
-                for dataset in datasets:
-                    self.processDataset(dataset, chan)
+                for dataset, file_path in self.datasets.iteritems():
+                    self.processDataset(dataset, file_path, chan)
 
-    def processDataset(self, dataset, chan):
+    def processDataset(self, dataset, file_path, chan):
         print "Processing dataset %s" % dataset
         select = getattr(ROOT, self.selector_name)()
         select.SetInputList(self.inputs)
-        # Intended for running over single file, use the format name:file
-        specified_name = dataset.split("@")
-        if len(specified_name) == 2:
-            self.addTNamed("name", specified_name[0])
-            dataset = specified_name[1]
-        else:
-            self.addTNamed("name", dataset)
-        try:
-            file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                self.input_tier, self.analysis)
-            # Only add for one channel
-            addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset
-            if addSumweights:
-                sumweights_hist = ROOT.gROOT.FindObject("sumweights")
-                if not sumweights_hist:
-                    if not self.outfile:
-                        self.outfile = ROOT.TFile.Open(self.outfile_name)
-                    sumweights_hist = self.outfile.Get("%s/sumweights" % dataset)
-                if not sumweights_hist:
-                    sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
-                sumweights_hist.SetDirectory(ROOT.gROOT)
-            self.processLocalFiles(select, file_path, addSumweights, chan)
-        except ValueError as e:
-            print e
-            return
+        self.addTNamed("name", dataset)
+        # Only add for one channel
+        addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset
+        if addSumweights:
+            sumweights_hist = ROOT.gROOT.FindObject("sumweights")
+            if not sumweights_hist:
+                if not self.outfile:
+                    self.outfile = ROOT.TFile.Open(self.outfile_name)
+                sumweights_hist = self.outfile.Get("%s/sumweights" % dataset)
+            if not sumweights_hist:
+                sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
+            sumweights_hist.SetDirectory(ROOT.gROOT)
+        self.processLocalFiles(select, file_path, addSumweights, chan)
         output_list = select.GetOutputList()
         name = self.inputs.FindObject("name").GetTitle()
         dataset_list = output_list.FindObject(name)
@@ -164,7 +188,7 @@ class SelectorDriver(object):
     def processParallelByDataset(self, datasets, chan):
         numCores = min(self.numCores, len(datasets))
         p = multiprocessing.Pool(processes=self.numCores)
-        p.map(self, [[dataset, chan] for dataset in datasets])
+        p.map(self, [[dataset, f, chan] for dataset, f in datasets.iteritems()])
         # Store arrays in temp files, since it can get way too big to keep around in memory
         tempfiles = [self.tempfileName(d) for d in datasets] 
         tempfiles = filter(os.path.isfile, tempfiles)
@@ -179,7 +203,9 @@ class SelectorDriver(object):
         self.processDataset(*args)
 
     def processLocalFiles(self, selector, file_path, addSumweights, chan,):
-        filenames = self.getFileNames(file_path)
+        filenames = []
+        for entry in file_path:
+            filenames.extend(self.getFileNames(entry))
         for i, filename in enumerate(filenames):
             self.processFile(selector, filename, addSumweights, chan, i+1)
 
