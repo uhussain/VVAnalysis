@@ -104,8 +104,14 @@ class SelectorDriver(object):
             # Only add for one channel
             addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset
             if addSumweights:
-                ROOT.gROOT.cd()
-                sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
+                sumweights_hist = ROOT.gROOT.FindObject("sumweights")
+                if not sumweights_hist:
+                    if not self.outfile:
+                        self.outfile = ROOT.TFile.Open(self.outfile_name)
+                    sumweights_hist = self.outfile.Get("%s/sumweights" % dataset)
+                if not sumweights_hist:
+                    sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
+                sumweights_hist.SetDirectory(ROOT.gROOT)
             self.processLocalFiles(select, file_path, addSumweights, chan)
         except ValueError as e:
             print e
@@ -136,7 +142,6 @@ class SelectorDriver(object):
     def getFileNames(self, file_path):
         xrootd = "/store" in file_path.split("/hdfs/")[0][:7]
         xrootd_user = "/store/user" in file_path.split("/hdfs/")[0][:12]
-        print xrootd
         if not (xrootd or os.path.isfile(file_path) or os.path.isdir(file_path.rsplit("/", 1)[0].rstrip("/*"))):
             raise ValueError("Invalid path! Skipping dataset. Path was %s" 
                 % file_path)
@@ -144,7 +149,6 @@ class SelectorDriver(object):
         # Assuming these are user files on HDFS, otherwise it won't work
         if (xrootd and not xrootd_user):
             filenames = ['root://cms-xrd-global.cern.ch/' + file_path]
-            print filenames
             return filenames
         filenames =  glob.glob(file_path) if not xrootd_user else \
                 ConfigureJobs.getListOfHDFSFiles(file_path)
@@ -177,7 +181,6 @@ class SelectorDriver(object):
     def processLocalFiles(self, selector, file_path, addSumweights, chan,):
         filenames = self.getFileNames(file_path)
         for i, filename in enumerate(filenames):
-            print i, filename
             self.processFile(selector, filename, addSumweights, chan, i+1)
 
     def processFile(self, selector, filename, addSumweights, chan, filenum=1):

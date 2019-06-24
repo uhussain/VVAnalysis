@@ -25,8 +25,8 @@ void NanoGenSelectorBase::SetBranchesNanoAOD() {
 void NanoGenSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     weight = 1;
     b_nGenPart->GetEntry(entry);
-    b_GenMET_pt->GetEntry(entry);
-    b_GenMET_phi->GetEntry(entry);
+    //b_GenMET_pt->GetEntry(entry);
+    //b_GenMET_phi->GetEntry(entry);
     b_GenPart_mass->GetEntry(entry);
     b_GenPart_pt->GetEntry(entry);
     b_GenPart_eta->GetEntry(entry);
@@ -43,6 +43,7 @@ void NanoGenSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systemat
     }
 
     channel_ = channelMap_[channelName_];
+    return;
 
     leptons.clear();
     neutrinos.clear();
@@ -68,10 +69,10 @@ void NanoGenSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systemat
     std::sort(leptons.begin(), leptons.end(), 
         [](const reco::GenParticle& a, const reco::GenParticle& b) { return a.pt() > b.pt(); });
 
-    genMet.SetPt(GenMET_pt);
-    genMet.SetPhi(GenMET_phi);
-    genMet.SetM(0.);
-    genMet.SetEta(0.);
+    //genMet.SetPt(GenMET_pt);
+    //genMet.SetPhi(GenMET_phi);
+    //genMet.SetM(0.);
+    //genMet.SetEta(0.);
 
     b_genWeight->GetEntry(entry);
     weight = genWeight;

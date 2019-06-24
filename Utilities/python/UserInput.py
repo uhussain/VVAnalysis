@@ -20,11 +20,16 @@ def getDefaultParser():
     parser.add_argument("-a", "--analysis", type=str,
                         required=False, default="WZxsec2016",
                         help="Analysis name, used in selecting the cut json")
-    parser.add_argument("-f", "--filenames", 
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument("-f", "--filenames", 
                         type=lambda x : [i.strip() for i in x.split(',')],
-                        default=["WZxsec2016"], help="List of input file names, "
+                        help="List of input file names, "
                         "as defined in AnalysisDatasetManager, separated "
                         "by commas")
+    input_group.add_argument("--inputs_from_file", nargs=3, 
+                        metavar=('filelist', 'nPerJob', 'jobNum'),
+                        help="Text file with one input file per line, "
+                        "number of files to process per job, job number")
     return parser
 
 def readAllInfo(file_path):

@@ -25,7 +25,7 @@ public :
     std::vector<reco::GenParticle> neutrinos;
     LorentzVector genMet;
 
-    static const unsigned int N_KEEP_GEN_ = 100;
+    static const unsigned int N_KEEP_GEN_ = 150;
     float weight;
     // Values read from file
     Float_t genWeight;
