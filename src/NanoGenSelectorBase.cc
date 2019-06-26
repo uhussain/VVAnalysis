@@ -43,11 +43,11 @@ void NanoGenSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systemat
     }
 
     channel_ = channelMap_[channelName_];
-    return;
 
     leptons.clear();
     neutrinos.clear();
     std::vector<unsigned int> idsToKeep = {11, 12, 13, 14};
+    std::cout << "nGenPart " << nGenPart << std::endl;
     for (size_t i = 0; i < nGenPart; i++) {
         if (GenPart_status[i] != 1)
             continue;
@@ -58,22 +58,23 @@ void NanoGenSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systemat
             vec.SetPhi(GenPart_phi[i]);
             vec.SetM(GenPart_mass[i]);
         }
-        if (std::abs(GenPart_pdgId[i]) == 11 || std::abs(GenPart_pdgId[i] == 13)) {
+        if (std::abs(GenPart_pdgId[i]) == 11 || std::abs(GenPart_pdgId[i]) == 13) {
             int charge = (GenPart_pdgId[i] < 0) ? -1: 1;
             leptons.push_back(reco::GenParticle(charge, vec, reco::Particle::Point(), GenPart_pdgId[i], GenPart_status[i], true));
         }
-        else if (std::abs(GenPart_pdgId[i]) == 12 || std::abs(GenPart_pdgId[i] == 14)) {
+        else if (std::abs(GenPart_pdgId[i]) == 12 || std::abs(GenPart_pdgId[i]) == 14) {
             neutrinos.push_back(reco::GenParticle(0, vec, reco::Particle::Point(), GenPart_pdgId[i], GenPart_status[i], true));
         }
     }
     std::sort(leptons.begin(), leptons.end(), 
         [](const reco::GenParticle& a, const reco::GenParticle& b) { return a.pt() > b.pt(); });
 
-    //genMet.SetPt(GenMET_pt);
-    //genMet.SetPhi(GenMET_phi);
-    //genMet.SetM(0.);
-    //genMet.SetEta(0.);
+    genMet.SetPt(GenMET_pt);
+    genMet.SetPhi(GenMET_phi);
+    genMet.SetM(0.);
+    genMet.SetEta(0.);
 
+    SetComposite();
     b_genWeight->GetEntry(entry);
     weight = genWeight;
 }
