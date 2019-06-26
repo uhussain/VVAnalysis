@@ -5,7 +5,7 @@
 
 void ZGenSelector::Init(TTree *tree)
 {
-    allChannels_ = {"e", "m", "Unknown"};
+    allChannels_ = {"ee", "mm", "Unknown"};
     hists1D_ = {"CutFlow", "ZMass", "yZ", "ptZ", "ptl1", "etal1", "phil1", "ptl2", "etal2", "phil2", };
 
     NanoGenSelectorBase::Init(tree);
@@ -15,6 +15,7 @@ void ZGenSelector::Init(TTree *tree)
 void ZGenSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     NanoGenSelectorBase::LoadBranchesNanoAOD(entry, variation);
 
+    std::cout << "lep size " << leptons.size() << std::endl;
     if (leptons.size() < 2) {
         channel_ = Unknown;
         channelName_ = "Unknown";
@@ -37,7 +38,8 @@ void ZGenSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std
 }
 
 void ZGenSelector::SetComposite() {
-    zCand = leptons.at(0).polarP4() + leptons.at(1).polarP4();
+    if (leptons.size() >= 2)
+        zCand = leptons.at(0).polarP4() + leptons.at(1).polarP4();
 }
 
 
@@ -59,7 +61,7 @@ void ZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::str
         return;
 
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
-    SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), zCand.pt(), weight);
+    SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), zCand.mass(), weight);
     SafeHistFill(histMap1D_, getHistName("yZ", variation.second), zCand.Rapidity(), weight);
     SafeHistFill(histMap1D_, getHistName("ptZ", variation.second), zCand.pt(), weight);
     SafeHistFill(histMap1D_, getHistName("ptl1", variation.second), lep1.pt(), weight);
