@@ -125,8 +125,11 @@ class SelectorDriver(object):
             if self.numCores > 1:
                 self.processParallelByDataset(self.datasets, chan)
             else: 
-                for dataset, file_path in self.datasets.iteritems():
+                for dataset in datasets:
                     self.processDataset(dataset, file_path, chan)
+        if len(self.channels) > 1 and self.numCores > 1:
+            tempfiles = [self.outfile_name.replace(".root", "_%s.root" % c) for c in self.channels]
+            self.combineParallelFiles(tempfiles, "Inclusive")
 
     def processDataset(self, dataset, file_path, chan):
         logging.info("Processing dataset %s" % dataset)
@@ -190,18 +193,24 @@ class SelectorDriver(object):
         channel = chan if chan != "mmee" else "eemm"
         return "Events" if self.ntupleType == "NanoAOD" else ("%s/ntuple" % channel)
 
+    def combineParallelFiles(self, tempfiles, chan):
+        tempfiles = filter(os.path.isfile, tempfiles)
+        outfile = self.outfile_name
+        if chan != "Inclusive":
+            outfile = self.outfile_name.replace(".root", "_%s.root" % chan)
+        rval = subprocess.call(["hadd", "-f", outfile] + tempfiles)
+        if rval == 0:
+            map(os.remove, tempfiles)
+        else:
+            raise RuntimeError("Failed to collect data from parallel run")
+
     def processParallelByDataset(self, datasets, chan):
         numCores = min(self.numCores, len(datasets))
         p = multiprocessing.Pool(processes=self.numCores)
         p.map(self, [[dataset, f, chan] for dataset, f in datasets.iteritems()])
         # Store arrays in temp files, since it can get way too big to keep around in memory
         tempfiles = [self.tempfileName(d) for d in datasets] 
-        tempfiles = filter(os.path.isfile, tempfiles)
-        rval = subprocess.call(["hadd", "-f", self.outfile_name] + tempfiles)
-        if rval == 0:
-            map(os.remove, tempfiles)
-        else:
-            raise RuntimeError("Failed to collect data from parallel run")
+        self.combineParallelFiles(tempfiles, chan)
 
     # Pool.map can only take in one argument, so expand the array
     def processDatasetHelper(self, args):
