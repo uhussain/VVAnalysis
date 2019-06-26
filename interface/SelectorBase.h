@@ -31,6 +31,8 @@ public :
     std::vector<std::string> hists1D_ = {};
 
     enum Channel {
+        e,
+        m,
         ee,
         mm,
         eee,
@@ -48,6 +50,7 @@ public :
         tightleptons,
         ZZGenFiducial,
         Wselection,
+        Zselection,
         Wselection_Full,
         FakeRateSelectionLoose,
         FakeRateSelectionTight,
@@ -71,6 +74,7 @@ public :
         {"tightleptons", tightleptons},
         {"ZZGenFiducial", ZZGenFiducial},
         {"Wselection", Wselection},
+        {"Zselection", Zselection},
         {"Wselection_Full", Wselection_Full},
         {"FakeRateSelectionLoose", FakeRateSelectionLoose},
         {"FakeRateSelectionTight", FakeRateSelectionTight},
@@ -91,6 +95,8 @@ public :
     };
 
     std::map<std::string, Channel> channelMap_ = {
+        {"e", e},
+        {"m", m},
         {"ee", ee},
         {"mm", mm},
         {"eee", eee},
