@@ -7,9 +7,12 @@ import sys
 import os
 import multiprocessing
 import subprocess
+import logging
 
 class SelectorDriver(object):
     def __init__(self, analysis, selection, input_tier):
+        logging.basicConfig(level=logging.DEBUG)
+
         selector_map = {
             "WZxsec2016" : "WZSelector",
             "Zstudy" : "ZSelector",
@@ -90,7 +93,9 @@ class SelectorDriver(object):
                     + " is greater than the number of entries in file %s (%s)." % (list_of_files, maxNum))
         lastEntry = min(nPerJob*(jobNum+1), maxNum)
         
-        for line in filelist:
+        for line in filelist[firstEntry:lastEntry]:
+            if '#' in line[0]:
+                continue
             if "@" not in line:
                 dataset = "Unknown"
                 file_path = line
@@ -116,7 +121,7 @@ class SelectorDriver(object):
     def applySelector(self):
         for chan in self.channels:
             self.addTNamed("channel", chan)
-            print "INFO: Processing channel %s" % chan
+            logging.info("Processing channel %s" % chan)
             if self.numCores > 1:
                 self.processParallelByDataset(self.datasets, chan)
             else: 
@@ -124,7 +129,7 @@ class SelectorDriver(object):
                     self.processDataset(dataset, file_path, chan)
 
     def processDataset(self, dataset, file_path, chan):
-        print "Processing dataset %s" % dataset
+        logging.info("Processing dataset %s" % dataset)
         select = getattr(ROOT, self.selector_name)()
         select.SetInputList(self.inputs)
         self.addTNamed("name", dataset)
@@ -210,6 +215,7 @@ class SelectorDriver(object):
             self.processFile(selector, filename, addSumweights, chan, i+1)
 
     def processFile(self, selector, filename, addSumweights, chan, filenum=1):
+        logging.debug("Processing file: %s" % filename)
         rtfile = ROOT.TFile.Open(filename)
         tree_name = self.getTreeName(chan)
         tree = rtfile.Get(tree_name)
