@@ -83,7 +83,9 @@ class SelectorDriver(object):
     def setFileList(self, list_of_files, nPerJob, jobNum):
         if not os.path.isfile(list_of_files):
             raise ValueError("%s is not a valid file.")
-        filelist = [f.strip() for f in open(list_of_files).readlines()]
+        filelist = [f.split("#")[0].strip() for f in open(list_of_files).readlines()]
+        # Remove empty/commented lines
+        filelist = filter(lambda  x: len(x) > 2, filelist)
         nPerJob = int(nPerJob)
         jobNum = int(jobNum)
         maxNum = len(filelist)
@@ -94,8 +96,6 @@ class SelectorDriver(object):
         lastEntry = min(nPerJob*(jobNum+1), maxNum)
         
         for line in filelist[firstEntry:lastEntry]:
-            if '#' in line[0]:
-                continue
             if "@" not in line:
                 dataset = "Unknown"
                 file_path = line
@@ -125,7 +125,7 @@ class SelectorDriver(object):
             if self.numCores > 1:
                 self.processParallelByDataset(self.datasets, chan)
             else: 
-                for dataset in datasets:
+                for dataset, file_path in self.datasets.iteritems():
                     self.processDataset(dataset, file_path, chan)
         if len(self.channels) > 1 and self.numCores > 1:
             tempfiles = [self.outfile_name.replace(".root", "_%s.root" % c) for c in self.channels]

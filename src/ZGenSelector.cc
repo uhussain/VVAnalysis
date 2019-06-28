@@ -15,7 +15,6 @@ void ZGenSelector::Init(TTree *tree)
 void ZGenSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     NanoGenSelectorBase::LoadBranchesNanoAOD(entry, variation);
 
-    std::cout << "lep size " << leptons.size() << std::endl;
     if (leptons.size() < 2) {
         channel_ = Unknown;
         channelName_ = "Unknown";
@@ -53,11 +52,15 @@ void ZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::str
 
     auto lep1 = leptons.at(0);
     auto lep2 = leptons.at(1);
-    if (std::abs(lep1.eta()) && std::abs(lep2.eta() < 2.5))
+    if (std::abs(lep1.eta()) > 2.5 || std::abs(lep2.eta()) > 2.5)
         return;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
 
-    if (lep1.pt() < 25 || lep2.pt() < 25)
+    if (lep1.pt() < 25. || lep2.pt() < 25.)
+        return;
+    SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
+
+    if (zCand.mass() < 60. || zCand.mass() > 120.)
         return;
 
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);

@@ -47,7 +47,6 @@ void NanoGenSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systemat
     leptons.clear();
     neutrinos.clear();
     std::vector<unsigned int> idsToKeep = {11, 12, 13, 14};
-    std::cout << "nGenPart " << nGenPart << std::endl;
     for (size_t i = 0; i < nGenPart; i++) {
         if (GenPart_status[i] != 1)
             continue;
