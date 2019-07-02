@@ -16,13 +16,13 @@ struct BranchManager {
 
   template<typename T>
   void SetBranch(std::string name, T& holder) {
-    branchHolder.push_back(new TBranch());
+    branchHolder.push_back({});
     fChain->SetBranchAddress(name.c_str(), &holder, &branchHolder.back());
   }
 
   template<typename T>
   void SetSpecificBranch(std::string name, T& holder) {
-    specificBranch[name] = new TBranch();
+    specificBranch[name] = {};
     fChain->SetBranchAddress(name.c_str(), &holder, &specificBranch[name]);
   }
 

@@ -205,15 +205,10 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
 
     if (isMC_) {
         weight = genWeight;
-        //b_l1GenPt->GetEntry(entry);
-        //b_l2GenPt->GetEntry(entry);
-        //b_l3GenPt->GetEntry(entry);
         ApplyScaleFactors();
     }
     else {
         //TODO: add MET filters
-        //b_Flag_duplicateMuonsPass->GetEntry(entry);          
-        //b_Flag_badMuonsPass->GetEntry(entry);          
     }
 
 
@@ -245,8 +240,8 @@ void ZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::stri
     b_l1IsTight->GetEntry(entry);
     b_l2IsTight->GetEntry(entry);
     b_MET->GetEntry(entry);
-    //b_nCBVIDTightElec->GetEntry(entry);
-    //
+    b_nCBVIDTightElec->GetEntry(entry);
+    
     passesTrigger = true;
 }
 
