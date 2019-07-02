@@ -14,6 +14,7 @@
 #include <vector>
 #include "Analysis/VVAnalysis/interface/ScaleFactor.h"
 #include "Analysis/VVAnalysis/interface/SelectorBase.h"
+#include "Analysis/VVAnalysis/interface/BranchManager.h"
 
 class ZSelector : public SelectorBase {
 public :
@@ -119,6 +120,8 @@ public :
     TBranch* b_l1Pt;
     TBranch* b_l2Pt;
     TBranch* b_ZMass;
+
+    BranchManager b;
     
     // Readers to access the data (delete the ones you do not need).
     virtual void    SetScaleFactors() override;
