@@ -180,7 +180,8 @@ class SelectorDriver(object):
 
         # Assuming these are user files on HDFS, otherwise it won't work
         if (xrootd and not xrootd_user):
-            filenames = ['root://cms-xrd-global.cern.ch/' + file_path]
+            xrd = 'root://%s/' % ConfigureJobs.getXrdRedirector()
+            filenames = [xrd + file_path]
             return filenames
         filenames =  glob.glob(file_path) if not xrootd_user else \
                 ConfigureJobs.getListOfHDFSFiles(file_path)

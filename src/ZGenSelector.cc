@@ -6,7 +6,10 @@
 void ZGenSelector::Init(TTree *tree)
 {
     allChannels_ = {"ee", "mm", "Unknown"};
-    hists1D_ = {"CutFlow", "ZMass", "yZ", "ptZ", "ptl1", "etal1", "phil1", "ptl2", "etal2", "phil2", };
+    hists1D_ = {"CutFlow", "ZMass", "yZ", "ptZ", "ptl1", "etal1", "phil1", "ptl2", "etal2", "phil2", 
+        "ptj1", "ptj2", "ptj3", "etaj1", "etaj2", "etaj3", "phij1", "phij2", "phij3", "nJets",
+        "MET",};
+    nLeptons_ = 2;
 
     NanoGenSelectorBase::Init(tree);
     
@@ -41,7 +44,6 @@ void ZGenSelector::SetComposite() {
         zCand = leptons.at(0).polarP4() + leptons.at(1).polarP4();
 }
 
-
 void ZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     int step = 0;
     SafeHistFill(histMap1D_, getHistName("CutFlow", variation.second), step++, weight);
@@ -73,5 +75,15 @@ void ZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::str
     SafeHistFill(histMap1D_, getHistName("ptl2", variation.second), lep2.pt(), weight);
     SafeHistFill(histMap1D_, getHistName("etal2", variation.second), lep2.eta(), weight);
     SafeHistFill(histMap1D_, getHistName("phil2", variation.second), lep2.phi(), weight);
+    SafeHistFill(histMap1D_, getHistName("nJets", variation.second), jets.size(), weight);
+    SafeHistFill(histMap1D_, getHistName("MET", variation.second), genMet.pt(), weight);
+    for (size_t i = 1; i <= 3; i++) {
+        if (jets.size() >= i ) {
+            const auto& jet = jets.at(i-1);
+            SafeHistFill(histMap1D_, getHistName("ptj"+std::to_string(i), variation.second), jet.pt(), weight);
+            SafeHistFill(histMap1D_, getHistName("etaj"+std::to_string(i), variation.second), jet.eta(), weight);
+            SafeHistFill(histMap1D_, getHistName("phij"+std::to_string(i), variation.second), jet.phi(), weight);
+        }  
+    }
 }
 
