@@ -16,6 +16,8 @@
 #include "Analysis/VVAnalysis/interface/SelectorBase.h"
 #include "Analysis/VVAnalysis/interface/BranchManager.h"
 
+#include "Analysis/VVAnalysis/interface/helpers.h"
+
 class ZSelector : public SelectorBase {
 public :
     ScaleFactor* pileupSF_ = nullptr;
@@ -27,6 +29,8 @@ public :
     TEfficiency* prefireEff_ = nullptr;
 
     // Derived values
+    std::vector<LorentzVector> leptons;
+    std::vector<LorentzVector> jets;
     bool singleLepton_;
     bool passesLeptonVeto;
     bool passesTrigger;
@@ -58,8 +62,10 @@ public :
     Float_t MET;
     Float_t type1_pfMETPhi;
     static const unsigned int N_KEEP_MU_E_ = 15;
+    static const unsigned int N_KEEP_JET_ = 30;
     UInt_t nElectron;
     UInt_t nMuon;
+    UInt_t nJet;
     Float_t Electron_pt[N_KEEP_MU_E_];
     Float_t Electron_eta[N_KEEP_MU_E_];
     Float_t Electron_phi[N_KEEP_MU_E_];
@@ -68,6 +74,10 @@ public :
     Float_t Muon_eta[N_KEEP_MU_E_];
     Float_t Muon_phi[N_KEEP_MU_E_];
     Float_t Muon_mass[N_KEEP_MU_E_];
+    Float_t Jet_pt[N_KEEP_JET_];
+    Float_t Jet_eta[N_KEEP_JET_];
+    Float_t Jet_phi[N_KEEP_JET_];
+    Float_t Jet_mass[N_KEEP_JET_];
     Int_t Electron_cutBased[N_KEEP_MU_E_];
     Int_t Electron_charge[N_KEEP_MU_E_];
     Int_t Muon_charge[N_KEEP_MU_E_];
