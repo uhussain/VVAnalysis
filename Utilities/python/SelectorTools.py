@@ -111,8 +111,8 @@ class SelectorDriver(object):
         datasets = ConfigureJobs.getListOfFiles(datalist, self.input_tier)
         for dataset in datasets:
             try:
-                file_path = ConfigureJobs.getInputFilesPath(dataset, 
-                    self.input_tier, self.analysis)
+                file_path = [ConfigureJobs.getInputFilesPath(dataset, 
+                    self.input_tier, self.analysis)]
             except ValueError as e:
                 print e
                 continue
@@ -152,12 +152,12 @@ class SelectorDriver(object):
         name = self.inputs.FindObject("name").GetTitle()
         dataset_list = output_list.FindObject(name)
         if not dataset_list or dataset_list.ClassName() != "TList":
-            print "WARNING: No output found for dataset %s" % dataset
+            logging.warning("No output found for dataset %s" % dataset)
             dataset_list = output_list.FindObject("Unknown")
             if dataset_list and dataset_list.ClassName() == "TList":
-                print 'WARNING: Falling back to dataset "Unknown"'
+                logging.warning('Falling back to dataset "Unknown"')
             else:
-                print 'WARNING: Skipping dataset %s' % dataset
+                logging.warning('Skipping dataset %s' % dataset)
                 return False
         if addSumweights:
             dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
