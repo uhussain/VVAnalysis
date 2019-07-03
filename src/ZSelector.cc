@@ -75,6 +75,7 @@ void ZSelector::SetBranchesNanoAOD() {
     b.CleanUp();
     b.SetBranch("nElectron", nElectron);
     b.SetBranch("nMuon", nMuon);
+    b.SetBranch("nJet", nJet);
     b.SetBranch("Electron_pt", Electron_pt);
     b.SetBranch("Electron_eta", Electron_eta);
     b.SetBranch("Electron_phi", Electron_phi);

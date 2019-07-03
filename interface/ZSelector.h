@@ -62,7 +62,7 @@ public :
     Float_t MET;
     Float_t type1_pfMETPhi;
     static const unsigned int N_KEEP_MU_E_ = 15;
-    static const unsigned int N_KEEP_JET_ = 30;
+    static const unsigned int N_KEEP_JET_ = 50;
     UInt_t nElectron;
     UInt_t nMuon;
     UInt_t nJet;
