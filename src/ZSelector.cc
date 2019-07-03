@@ -148,7 +148,7 @@ void ZSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::s
 
     for (size_t i = 0; i < nMuon; i++) {
         //nMediumIdMuon += (Muon_mediumId[i] && Muon_pfRelIso04_all[i] < 0.15);
-        nMediumIdMuon += (Muon_mediumId[i] && Muon_pfRelIso04_all[i] < 0.15*Muon_pt[i]);
+        nMediumIdMuon += (Muon_mediumId[i] && Muon_pfRelIso04_all[i] < 0.15);
         nTightIdMuon += (Muon_tightId[i] && Muon_pfRelIso04_all[i] < 0.15);
     }
 

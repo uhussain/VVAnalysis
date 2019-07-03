@@ -346,7 +346,7 @@ void WZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::str
                 scaleUnc = GetMuonScaleUncertainty(l3Eta);
                 l3Pt *= variation.first == muonScaleUp ? (1+scaleUnc) : (1-scaleUnc);
             }
-            SetShiftedMasses();
+            SetMasses();
         }
         else if (variation.first == electronScaleUp || variation.first == electronScaleDown) {
             if (channel_ == eee) {
@@ -369,7 +369,7 @@ void WZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::str
             }
             else if (channel_ == mmm)
                 return;
-            SetShiftedMasses();
+            SetMasses();
         }
         else if (variation.first == metUnclusteredEnergyDown) {
             b_type1_pfMETEt_unclusteredEnUp->GetEntry(entry);

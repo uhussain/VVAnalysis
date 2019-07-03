@@ -15,6 +15,7 @@
 #include <vector>
 #include "Analysis/VVAnalysis/interface/ScaleFactor.h"
 #include "Analysis/VVAnalysis/interface/SelectorBase.h"
+#include "Analysis/VVAnalysis/interface/helpers.h"
 
 class WZSelectorBase : public SelectorBase {
 public :
@@ -28,7 +29,12 @@ public :
     // Derived variables
     bool isVBS_;
     bool passesLeptonVeto;
+    UInt_t nCBVIDVetoElec;
     Float_t weight;
+    std::vector<LorentzVector> leptons;
+    std::vector<LorentzVector> jets;
+    std::vector<size_t> looseMuonIndices;
+    std::vector<size_t> looseElecIndices;
 
     // Common variables
     Float_t genWeight;
@@ -67,6 +73,7 @@ public :
     Float_t Muon_eta[N_KEEP_MU_E_];
     Float_t Muon_phi[N_KEEP_MU_E_];
     Float_t Muon_mass[N_KEEP_MU_E_];
+    Float_t Muon_pfRelIso04_all[N_KEEP_MU_E_];
     Int_t Electron_cutBased[N_KEEP_MU_E_];
     Int_t Electron_charge[N_KEEP_MU_E_];
     Int_t Muon_charge[N_KEEP_MU_E_];
@@ -85,6 +92,7 @@ public :
     TBranch* b_Muon_eta;
     TBranch* b_Muon_phi;
     TBranch* b_Muon_mass;
+    TBranch* b_Muon_pfRelIso04_all;
     TBranch* b_Electron_cutBased;
     TBranch* b_Electron_charge;
     TBranch* b_Muon_charge;
@@ -206,7 +214,10 @@ protected:
     void LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void ApplyScaleFactors();
-    void SetShiftedMasses();
+    void SetLeptonVarsNano();
+    void SetMasses();
+    void SetGoodLeptonsFromNano();
+    void SetChannelAndIndicesNano();
 };
 
 #endif
