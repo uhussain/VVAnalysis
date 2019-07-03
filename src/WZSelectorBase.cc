@@ -18,13 +18,13 @@ void WZSelectorBase::SetScaleFactors() {
     pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
     if (pileupSF_ == nullptr ) 
         std::invalid_argument("Must pass pileup weights SF");
-    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronWZTightSF");
+    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronTightIdSF");
     if (eIdSF_ == nullptr ) 
         std::invalid_argument("Must pass electron ID SF");
     eGsfSF_ = (ScaleFactor *) GetInputList()->FindObject("electronGsfSF");
     if (eGsfSF_ == nullptr ) 
         std::invalid_argument("Must pass electron GSF SF");
-    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonWZTightSF");
+    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonTightIdSF");
     if (mIdSF_ == nullptr ) 
         std::invalid_argument("Must pass muon ID SF");
     mIsoSF_ = (ScaleFactor *) GetInputList()->FindObject("muonIsoSF");
