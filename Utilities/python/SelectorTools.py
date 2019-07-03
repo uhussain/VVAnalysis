@@ -231,7 +231,8 @@ class SelectorDriver(object):
         tree = rtfile.Get(tree_name)
         if not tree:
             raise ValueError(("tree %s not found for file %s. " \
-                    "Probably the file is corrupted") % (tree_name, filename)
+                    "Either the file is corrupted or the ntupleType (%s) is wrong.") 
+                % (tree_name, filename, self.ntupleType)
             )
 
         tree.Process(selector, "")

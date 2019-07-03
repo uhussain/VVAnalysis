@@ -14,28 +14,26 @@ std::string WZSelectorBase::GetNameFromFile() {
     return std::string(matches.str(1));
 }
 
-void WZSelectorBase::SlaveBegin(TTree * /*tree*/)
-{
+void WZSelectorBase::SetScaleFactors() {
     pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
     if (pileupSF_ == nullptr ) 
-        Abort("Must pass pileup weights SF");
+        std::invalid_argument("Must pass pileup weights SF");
     eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronTightIdSF");
     if (eIdSF_ == nullptr ) 
-        Abort("Must pass electron ID SF");
+        std::invalid_argument("Must pass electron ID SF");
     eGsfSF_ = (ScaleFactor *) GetInputList()->FindObject("electronGsfSF");
     if (eGsfSF_ == nullptr ) 
-        Abort("Must pass electron GSF SF");
+        std::invalid_argument("Must pass electron GSF SF");
     mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonTightIdSF");
     if (mIdSF_ == nullptr ) 
-        Abort("Must pass muon ID SF");
+        std::invalid_argument("Must pass muon ID SF");
     mIsoSF_ = (ScaleFactor *) GetInputList()->FindObject("muonIsoSF");
     if (mIsoSF_ == nullptr ) 
-        Abort("Must pass muon Iso SF");
+        std::invalid_argument("Must pass muon Iso SF");
 
     prefireEff_ = (TEfficiency*) GetInputList()->FindObject("prefireEfficiencyMap");
     if (prefireEff_ == nullptr ) 
-        Abort("Must pass prefiring efficiency map");
-
+        std::invalid_argument("Must pass prefiring efficiency map");
 }
 
 void WZSelectorBase::Init(TTree *tree)
@@ -64,15 +62,6 @@ void WZSelectorBase::Init(TTree *tree)
         }
         else if (name_ == "zg") {
             isZgamma_ = true;
-        }
-        if (addSumweights_) {
-            TFile* file = fChain->GetTree()->GetDirectory()->GetFile(); 
-            TTree* metaInfo = dynamic_cast<TTree*>(file->Get("metaInfo/metaInfo"));
-            if (metaInfo == nullptr)
-                std::cerr << "WARNING: Failed to add sumWeights histogram" << std::endl;
-            else {
-                metaInfo->Draw("1>>sumweights", "summedWeights");
-            }
         }
     }
 }
@@ -376,38 +365,65 @@ void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
 void WZSelectorBase::ApplyScaleFactors() {
     weight = genWeight;
     if (channel_ == eee) {
-        weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        weight *= eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        if (eIdSF_ != nullptr) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        if (eGsfSF_ != nullptr) {
+            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
     }
     else if (channel_ == eem) {
-        weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        if (eIdSF_ != nullptr) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        if (eGsfSF_ != nullptr) {
+            weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= eGsfSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        if (mIdSF_ != nullptr) {
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        if (mIsoSF_ != nullptr) {
+            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
     }
     else if (channel_ == emm) {
-        weight *= eIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= eGsfSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        if (eIdSF_ != nullptr) {
+            weight *= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        if (eGsfSF_ != nullptr) {
+            weight *= eGsfSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        if (mIdSF_ != nullptr) {
+            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
+        if (mIsoSF_ != nullptr) {
+            weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+        }
     }
     else {
-        weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
-        weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
-        weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        if (mIdSF_ != nullptr) {
+            weight *= mIdSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
+        if (mIsoSF_ != nullptr) {
+            weight *= mIsoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l2Eta), l2Pt);
+            weight *= mIsoSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
+        }
     }
-    weight *= pileupSF_->Evaluate1D(nTruePU);
+    if (pileupSF_ != nullptr) {
+        //weight *= pileupSF_->Evaluate1D(numPU);
+        weight *= pileupSF_->Evaluate1D(nTruePU);
+    }
 }
 
 void WZSelectorBase::SetShiftedMasses() {

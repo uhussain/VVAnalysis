@@ -178,8 +178,7 @@ public :
     TBranch* b_Flag_globalTightHalo2016FilterPass;
 
     // Readers to access the data (delete the ones you do not need).
-    //virtual void    SetScaleFactors() override;
-    virtual void    SlaveBegin(TTree *tree) override;
+    virtual void    SetScaleFactors() override;
     virtual void    Init(TTree *tree) override;
 
     ClassDefOverride(WZSelectorBase,0);
