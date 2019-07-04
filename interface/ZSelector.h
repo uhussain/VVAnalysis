@@ -14,6 +14,7 @@
 #include <vector>
 #include "Analysis/VVAnalysis/interface/ScaleFactor.h"
 #include "Analysis/VVAnalysis/interface/SelectorBase.h"
+#include "Analysis/VVAnalysis/interface/BranchManager.h"
 
 class ZSelector : public SelectorBase {
 public :
@@ -79,34 +80,12 @@ public :
     Bool_t SingleElectron_Trigger;
     Int_t numPU;
     
-    TBranch* b_genWeight;
-    TBranch* b_MET;
-    TBranch* b_type1_pfMETPhi;
-    TBranch* b_nElectron;
-    TBranch* b_nMuon;
-    TBranch* b_Electron_pt;
-    TBranch* b_Electron_eta;
-    TBranch* b_Electron_phi;
-    TBranch* b_Electron_mass;
-    TBranch* b_Muon_pt;
-    TBranch* b_Muon_eta;
-    TBranch* b_Muon_phi;
-    TBranch* b_Muon_mass;
-    TBranch* b_Electron_cutBased;
-    TBranch* b_Electron_charge;
-    TBranch* b_Muon_charge;
-    TBranch* b_Muon_tightId;
-    TBranch* b_Muon_mediumId;
-    TBranch* b_Muon_pfRelIso04_all;
-    TBranch* b_Dimuon_Trigger;
-    TBranch* b_Dielectron_Trigger;
-    TBranch* b_SingleMuon_Trigger;
-    TBranch* b_SingleElectron_Trigger;
-    TBranch* b_numPU;
-
     // UWVV specific branches
     Float_t nTruePU;
 
+    TBranch* b_genWeight;
+    TBranch* b_MET;
+    TBranch* b_type1_pfMETPhi;
     TBranch* b_nTruePU;
     TBranch* b_nCBVIDTightElec;
     TBranch* b_nCBVIDHLTSafeElec;
@@ -119,6 +98,8 @@ public :
     TBranch* b_l1Pt;
     TBranch* b_l2Pt;
     TBranch* b_ZMass;
+
+    BranchManager b;
     
     // Readers to access the data (delete the ones you do not need).
     virtual void    SetScaleFactors() override;
