@@ -10,7 +10,7 @@ import subprocess
 import logging
 
 class SelectorDriver(object):
-    def __init__(self, analysis, selection, input_tier):
+    def __init__(self, analysis, selection, input_tier, year):
         logging.basicConfig(level=logging.DEBUG)
 
         selector_map = {
@@ -33,6 +33,7 @@ class SelectorDriver(object):
         self.selector_name = selector_map[analysis]
         self.addSumweights = True
         self.ntupleType = "NanoAOD"
+        self.year = year
         self.numCores = 1
         self.channels = ["Inclusive"]
         self.outfile_name = "temp.root"
@@ -72,6 +73,7 @@ class SelectorDriver(object):
             self.inputs.Add(inp)
         self.addTNamed("ntupleType", self.ntupleType)
         self.addTNamed("selection", self.selection)
+        self.addTNamed("year", self.year)
         
     def setNtupeType(self, ntupleType):
         self.ntupleType = ntupleType
