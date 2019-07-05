@@ -38,7 +38,6 @@ void WZSelectorBase::SetScaleFactors() {
 
 void WZSelectorBase::Init(TTree *tree)
 {
-    SelectorBase::Init(tree);
     isVBS_ = (selection_ == VBSselection_Loose || 
         selection_ == VBSselection_Loose_Full || 
         selection_ == VBSselection_NoZeppenfeld || 
@@ -64,6 +63,7 @@ void WZSelectorBase::Init(TTree *tree)
             isZgamma_ = true;
         }
     }
+    SelectorBase::Init(tree);
 }
 
 void WZSelectorBase::SetBranchesUWVV() {
@@ -153,6 +153,7 @@ void WZSelectorBase::SetBranchesUWVV() {
     fChain->SetBranchAddress("type1_pfMETPhi", &type1_pfMETPhi, &b_type1_pfMETPhi);
     fChain->SetBranchAddress("nCBVIDTightElec", &nCBVIDTightElec, &b_nCBVIDTightElec);
     fChain->SetBranchAddress("nCBVIDHLTSafeElec", &nCBVIDHLTSafeElec, &b_nCBVIDHLTSafeElec);
+    fChain->SetBranchAddress("nCBVIDVetoElec", &nCBVIDVetoElec, &b_nCBVIDVetoElec);
     fChain->SetBranchAddress("nWZTightMuon", &nWZTightMuon, &b_nWZTightMuon);
     fChain->SetBranchAddress("nWZMediumMuon", &nWZMediumMuon, &b_nWZMediumMuon);
     fChain->SetBranchAddress("Flag_BadChargedCandidateFilterPass", &Flag_BadChargedCandidateFilterPass, &b_Flag_BadChargedCandidateFilterPass);
@@ -250,8 +251,12 @@ void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, s
     l3Mass = 0;
 
     SetChannelAndIndicesNano();
-    if (channel_ != eee && channel_ != eem && channel_ != emm && channel_ != mmm)
+    if (channel_ != eee && channel_ != eem && channel_ != emm && channel_ != mmm) {
+        passesLeptonVeto = false;
         return;
+    }
+    else
+        passesLeptonVeto = true;
 
     SetGoodLeptonsFromNano();
     SetLeptonVarsNano();
@@ -260,12 +265,11 @@ void WZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, s
     if (isMC_) {
         b_genWeight->GetEntry(entry);
         b_numPU->GetEntry(entry);
-        ApplyScaleFactors();
+        //ApplyScaleFactors();
     }
-    else {
-    }
+    //else {
+    //}
 
-    passesLeptonVeto = (nMuon + nElectron) == 3;
 }
 
 void WZSelectorBase::SetLeptonVarsNano() {
@@ -285,15 +289,41 @@ void WZSelectorBase::SetLeptonVarsNano() {
     l3Eta = l3.eta();
     l3Phi = l3.phi();
     l3Mass= l3.mass();
+
+    if (channel_ == eee) {
+        l1IsTight = (Electron_cutBased[looseElecIndices.at(0)] == 4);
+        l2IsTight = (Electron_cutBased[looseElecIndices.at(1)] == 4);
+        l3IsTight = (Electron_cutBased[looseElecIndices.at(2)] == 4);
+    }
+    else if (channel_ == eem) {
+        l1IsTight = (Electron_cutBased[looseElecIndices.at(0)] == 4);
+        l2IsTight = (Electron_cutBased[looseElecIndices.at(1)] == 4);
+        size_t imu = looseMuonIndices.at(0);
+        l3IsTight = (Muon_tightId[imu] && Muon_pfRelIso04_all[imu] < 0.15);
+    }
+    else if (channel_ == eem) {
+        size_t imu = looseMuonIndices.at(0);
+        l1IsTight = (Muon_tightId[imu] && Muon_pfRelIso04_all[imu] < 0.15);
+        imu = looseMuonIndices.at(1);
+        l2IsTight = (Muon_tightId[imu] && Muon_pfRelIso04_all[imu] < 0.15);
+        l3IsTight = (Electron_cutBased[looseElecIndices.at(1)] == 4);
+     }
+     else if (channel_ == mmm) {
+        size_t imu = looseMuonIndices.at(0);
+        l1IsTight = (Muon_tightId[imu] && Muon_pfRelIso04_all[imu] < 0.15);
+        imu = looseMuonIndices.at(1);
+        l2IsTight = (Muon_tightId[imu] && Muon_pfRelIso04_all[imu] < 0.15);
+        imu = looseMuonIndices.at(2);
+        l3IsTight = (Muon_tightId[imu] && Muon_pfRelIso04_all[imu] < 0.15);
+     }
 }
 
 // Always ordered: 0 - Zlep1, 1 - Zlep2, 2 - Wlep (lep IDs are clear from channel)
 void WZSelectorBase::SetGoodLeptonsFromNano() {
+    leptons.clear();
     bool zee = (channel_ == eem || channel_ == eee);
     auto& indices = zee ? looseElecIndices : looseMuonIndices;
     if (!(indices.size() == 2 || indices.size() == 3)) {
-        std::cout << "Channel is " << channelName_ << " " << channel_ << " indices num is " << indices.size() << std::endl;
-        std::cout << "Elec indices " << looseElecIndices.size() << " muon " << looseMuonIndices.size();
         throw std::length_error("Invalid lepton indices");
     }
     for (const auto& i : indices) {
@@ -334,7 +364,7 @@ void WZSelectorBase::SetChannelAndIndicesNano() {
     }
 
     for (size_t i = 0; i < nElectron; i++) {
-        if (Electron_cutBased[i] == 1) {
+        if (Electron_cutBased[i] >= 1) {
             nCBVIDVetoElec++;
             looseElecIndices.push_back(i);
         }
@@ -388,6 +418,7 @@ void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
     b_MET->GetEntry(entry);
     b_nCBVIDTightElec->GetEntry(entry);
     b_nCBVIDHLTSafeElec->GetEntry(entry);
+    b_nCBVIDVetoElec->GetEntry(entry);
     b_nWZTightMuon->GetEntry(entry);
     b_nWZMediumMuon->GetEntry(entry);
     b_Flag_BadPFMuonFilterPass->GetEntry(entry);                    
@@ -407,7 +438,8 @@ void WZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
     // passesLeptonVeto = std::abs(nWZMediumMuon + nCBVIDHLTSafeElec - (l1IsLoose +l2IsLoose +l3IsLoose)) < 0.1;
 
     // Veto on loose leptons
-    passesLeptonVeto = (nWZMediumMuon + nCBVIDHLTSafeElec) == 3;
+    //passesLeptonVeto = (nWZMediumMuon + nCBVIDHLTSafeElec) == 3;
+    passesLeptonVeto = (nWZMediumMuon + nCBVIDVetoElec) == 3;
  
 }
 

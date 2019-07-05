@@ -29,7 +29,6 @@ public :
     // Derived variables
     bool isVBS_;
     bool passesLeptonVeto;
-    UInt_t nCBVIDVetoElec;
     Float_t weight;
     std::vector<LorentzVector> leptons;
     std::vector<LorentzVector> jets;
@@ -37,6 +36,7 @@ public :
     std::vector<size_t> looseElecIndices;
 
     // Common variables
+    UInt_t nCBVIDVetoElec;
     Float_t genWeight;
     Float_t ZMass;
     Float_t Mass;
@@ -145,6 +145,7 @@ public :
     
     TBranch* b_nTruePU;
     TBranch* b_nCBVIDTightElec;
+    TBranch* b_nCBVIDVetoElec;
     TBranch* b_nCBVIDHLTSafeElec;
     TBranch* b_nWZTightMuon;
     TBranch* b_nWZMediumMuon;
