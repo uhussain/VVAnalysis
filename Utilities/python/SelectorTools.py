@@ -82,11 +82,13 @@ class SelectorDriver(object):
 
     def setFileList(self, list_of_files, nPerJob, jobNum):
         if not os.path.isfile(list_of_files):
-            raise ValueError("%s is not a valid file.")
+            raise ValueError("%s is not a valid file." % list_of_files)
         filelist = [f.split("#")[0].strip() for f in open(list_of_files).readlines()]
         # Remove empty/commented lines
         filelist = filter(lambda  x: len(x) > 2, filelist)
         nPerJob = int(nPerJob)
+        if nPerJob < 1:
+            raise ValueError("Number of files per job must be >= 1.")
         jobNum = int(jobNum)
         maxNum = len(filelist)
         firstEntry = nPerJob*jobNum
