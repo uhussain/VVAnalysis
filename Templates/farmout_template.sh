@@ -3,8 +3,8 @@
 #     ${command}
 #
 # To resubmit failed jobs: ./farmout.sh --resubmit-failed-jobs
-#DATE=`date +%Y-%m-%d`
-DATE=2019-01-28
+DATE=`date +%Y-%m-%d`
+#DATE=2019-01-28
 pushd ${base_dir}
 if [ ! -f ${job_dir}/analysis_code.tar.gz ]; then
     tar \

@@ -86,16 +86,22 @@ Bool_t disambiguateFinalStates::Process(Long64_t entry)
     b_l4IsIso->GetEntry(entry); 
     
     float mass_discriminant,Z2ptSum;
+    //float Z2Mass;
 
     //This condition identifies the Z1 candidate
-    //Required for the 2e2mu state but redundant for the 4e,4mu state however it should be quick comparison
+    //Required for the 2e2mu state but redundant for the 4e,4mu state however it should be quick comparison and it helps with Z1Mass > 40 and Z2Mass > 12 condition
     if(fabs(l1_l2_Mass-91.1876) < fabs(l3_l4_Mass-91.1876)){
     //if(l1l2IsZ1(entry)){
       mass_discriminant = fabs(l1_l2_Mass-91.1876);
-      Z2ptSum = l3_Pt+l4_Pt;}
+      Z2ptSum = l3_Pt+l4_Pt;
+      //Z1Mass=l1_l2_Mass;
+      //Z2Mass=l3_l4_Mass;
+    }
     else{ 
       mass_discriminant = fabs(l3_l4_Mass-91.1876);
       Z2ptSum = l1_Pt+l2_Pt;
+      //Z1Mass=l3_l4_Mass;
+      //Z2Mass=l1_l2_Mass;
       //bool templ1IsTight = l1IsTight;
       //l1IsTight = l3IsTight;
       //l3IsTight = templ1IsTight;
@@ -242,3 +248,9 @@ bool disambiguateFinalStates::lep4IsTight() {
 bool disambiguateFinalStates::tightZ2Leptons() {
     return lep3IsTight() && lep4IsTight(); 
 }
+//bool disambiguateFinalStates::HZZSIPSelection(){
+//    if ((l1SIP3D < 4.0 && l2SIP3D < 4.0 && l3SIP3D < 4.0 && l4SIP3D < 4.0))
+//        return true;
+//    else
+//        return false;
+//}

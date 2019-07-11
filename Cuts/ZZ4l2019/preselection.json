@@ -5,7 +5,7 @@
             "(abs({object_name}Eta) <  2.5)",
             "(abs({object_name}PVDXY) < 0.5)",
             "(abs({object_name}PVDZ) < 1.0)",
-            "({object_name}ZZTightIDNoVtx > 0.5)",
+            "({object_name}IsFall17isoV2wpHZZ > 0.5)",
             "({object_name}ZZIsoPass > 0.5)"
         ],
         "m" : [
@@ -20,9 +20,9 @@
         ]
     },
     "State" : {
-        "eeee" : ["((e1Pt >= 20 && (e2Pt >= 12 || e3Pt >= 12 || e4Pt >= 12)) || (e3Pt >= 20 && (e1Pt >= 12 || e2Pt >= 12 || e4Pt >= 12)))"
+        "eeee" : ["((e1Pt >= 20 && (e2Pt >= 10 || e3Pt >= 10 || e4Pt >= 10)) || (e3Pt >= 20 && (e1Pt >= 10 || e2Pt >= 10 || e4Pt >= 10)))"
         ],
-        "eemm" : ["((e1Pt >= 20 && (e2Pt >= 12 || m1Pt >= 10 || m2Pt >= 10)) || (m1Pt >= 20 && (m2Pt >= 10 || e1Pt >= 12 || e2Pt >= 12)))" 
+        "eemm" : ["((e1Pt >= 20 && (e2Pt >= 10 || m1Pt >= 10 || m2Pt >= 10)) || (m1Pt >= 20 && (m2Pt >= 10 || e1Pt >= 10 || e2Pt >= 10)))" 
         ],
         "mmmm" : ["((m1Pt >= 20 && (m2Pt >= 10 || m3Pt >= 10 || m4Pt >= 10)) || (m3Pt >= 20 && (m1Pt >= 10 || m2Pt >= 10 || m4Pt >= 10)))" 
         ]

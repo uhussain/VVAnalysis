@@ -1,8 +1,9 @@
 {
     "Object" : {
-        "e" : [ 
+
+        "e" : ["({object_name}SIP3D < 4.0)" 
         ],
-        "m" : [
+        "m" : ["({object_name}SIP3D < 4.0)"  
         ]
     },
     "State" : {
