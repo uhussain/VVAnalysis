@@ -1,0 +1,7 @@
+{ 
+    "MonteCarlo" : "(singleIsoMuPass || singleEPass || singleMuSingleEPass || doubleMuDZPass || doubleEPass || tripleEPass || tripleMuPass || doubleESingleMuPass || doubleMuSingleEPass)",    
+    "EGamma" : "(singleEPass || doubleEPass || tripleEPass)",
+    "DoubleMuon" : "((doubleMuDZPass || tripleMuPass) && !(singleEPass || doubleEPass || tripleEPass))",
+    "MuonEG" : "((singleMuSingleEPass || doubleMuSingleEPass || doubleESingleMuPass) && !(doubleMuDZPass || tripleMuPass) && !(singleEPass || doubleEPass || tripleEPass))", 
+    "SingleMuon" : "((singleIsoMuPass) && !(singleMuSingleEPass || doubleMuSingleEPass || doubleESingleMuPass) && !(doubleMuDZPass || tripleMuPass) && !(singleEPass || doubleEPass || tripleEPass))"
+}
