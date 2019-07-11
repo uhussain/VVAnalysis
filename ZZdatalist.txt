@@ -1,6 +1,0 @@
-/store/user/uhussain/UWVVZZ_DATA_2016G_ZZ_19Sep2017/SingleElectron_03Feb2017-v1/ntuplize_cfg-AE6400FA-D3EA-E611-8B90-24BE05C6C7F1.root
-/store/user/uhussain/UWVVZZ_DATA_2016G_ZZ_19Sep2017/SingleElectron_03Feb2017-v1/ntuplize_cfg-AAA86FD5-DAEA-E611-8188-0CC47AA98B8C.root
-/store/user/uhussain/UWVVZZ_DATA_2016G_ZZ_19Sep2017/SingleElectron_03Feb2017-v1/ntuplize_cfg-AAD92C09-13EB-E611-85B0-001E67DDC254.root
-/store/user/uhussain/UWVVZZ_DATA_2016G_ZZ_19Sep2017/SingleElectron_03Feb2017-v1/ntuplize_cfg-AC1E22AF-21EB-E611-8FC7-002590E1E9B8.root
-/store/user/uhussain/UWVVZZ_DATA_2016G_ZZ_19Sep2017/SingleElectron_03Feb2017-v1/ntuplize_cfg-AC71B1BC-E1EA-E611-A583-A0000420FE80.root
-/store/user/uhussain/UWVVZZ_DATA_2016G_ZZ_19Sep2017/SingleElectron_03Feb2017-v1/ntuplize_cfg-ACABB1BA-21EB-E611-870D-001E67DFFF5F.root
