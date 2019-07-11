@@ -2,4 +2,9 @@ Analysis code for ZZTo4l Analyses that is compatible with UWVV ntuples generated
 ****
 Primarily focused on using selections to skim Ntuples for Run2Legacy analysis with some selections like trigger different for different years
 ****
+cmsrel CMSSW_10_3_1
+cd CMSSW_10_3_1/src
+mkdir Analysis
+cd Analysis
+git clone -b Run2Legacy git@github.com:uhussain/VVAnalysis.git
 
