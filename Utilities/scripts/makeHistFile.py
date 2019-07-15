@@ -8,8 +8,8 @@ from python import HistTools
 import os
 import sys
 import datetime
-channels = ["eeee", "eemm","mmee","mmmm"]
-#channels = ["eeee"]
+#channels = ["eeee", "eemm","mmee","mmmm"]
+channels = ["eeee"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--proof", "-p", 

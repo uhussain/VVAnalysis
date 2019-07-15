@@ -59,8 +59,12 @@ public :
     Float_t Z2mass;
     Float_t Z1pt;
     Float_t Z2pt;
-    Float_t Z1Phi;
-    Float_t Z2Phi;
+    Float_t Z1phi;
+    Float_t Z2phi; 
+    Float_t Z1eta;
+    Float_t Z1energy;
+    Float_t Z2eta;
+    Float_t Z2energy;
     Float_t type1_pfMETEt;
     Float_t type1_pfMETPhi;
     Float_t l1GenPt;
@@ -124,8 +128,13 @@ public :
     TBranch* b_Z2mass;
     TBranch* b_Z1pt;
     TBranch* b_Z2pt;
-    TBranch* b_Z1Phi;
-    TBranch* b_Z2Phi;
+    TBranch* b_Z1phi;
+    TBranch* b_Z2phi;
+
+    TBranch* b_Z1eta;
+    TBranch* b_Z2eta;
+    TBranch* b_Z1energy;
+    TBranch* b_Z2energy;
     TBranch* b_nTruePU;
     TBranch* b_type1_pfMETEt;
     TBranch* b_type1_pfMETPhi;

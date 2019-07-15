@@ -43,9 +43,13 @@ public :
     Float_t GenZ2mass;
     Float_t GenZ1pt;
     Float_t GenZ2pt;
-    Float_t GenZ1Phi;
-    Float_t GenZ2Phi;
- 
+    Float_t GenZ1phi;
+    Float_t GenZ2phi; 
+    Float_t GenZ1eta;
+    Float_t GenZ1energy;
+    Float_t GenZ2eta;
+    Float_t GenZ2energy;
+
     Float_t Genl1Pt;
     Float_t Genl2Pt;
     Float_t Genl3Pt;
@@ -58,14 +62,28 @@ public :
     Float_t Genl2Phi;
     Float_t Genl3Phi;
     Float_t Genl4Phi;
-    
+
+    Float_t Genl1Energy; 
+    Float_t Genl2Energy;
+    Float_t Genl3Energy;
+    Float_t Genl4Energy;
+
+    Float_t Genl1Mass; 
+    Float_t Genl2Mass;
+    Float_t Genl3Mass;
+    Float_t Genl4Mass;
+
     TBranch* b_GenZ1mass;
     TBranch* b_GenZ2mass;
     TBranch* b_GenZ1pt;
     TBranch* b_GenZ2pt;
-    TBranch* b_GenZ1Phi;
-    TBranch* b_GenZ2Phi;
+    TBranch* b_GenZ1phi;
+    TBranch* b_GenZ2phi;
 
+    TBranch* b_GenZ1eta;
+    TBranch* b_GenZ2eta;
+    TBranch* b_GenZ1energy;
+    TBranch* b_GenZ2energy;
 
     TBranch* b_Genl1Pt;
     TBranch* b_Genl2Pt;
@@ -79,7 +97,15 @@ public :
     TBranch* b_Genl2Phi;
     TBranch* b_Genl3Phi;
     TBranch* b_Genl4Phi; 
+    TBranch* b_Genl1Energy;
+    TBranch* b_Genl2Energy;
+    TBranch* b_Genl3Energy;
+    TBranch* b_Genl4Energy;
 
+    TBranch* b_Genl1Mass;
+    TBranch* b_Genl2Mass;
+    TBranch* b_Genl3Mass;
+    TBranch* b_Genl4Mass;
     // Readers to access the data (delete the ones you do not need).
     ZZGenSelectorBase(TTree * /*tree*/ =0) { }
     virtual ~ZZGenSelectorBase() { }

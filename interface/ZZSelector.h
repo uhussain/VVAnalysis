@@ -76,6 +76,7 @@ public :
         { "Z1Phi",  {} },
         { "Z2Phi",  {} },
         {"dPhiZ1Z2",{}},
+        {"CosTheta",{}},
        // { "ZPt",  {} },
        // { "ZEta",  {} },
        // { "ZPhi",  {} },
@@ -173,6 +174,8 @@ public :
     Float_t Mass;
     Float_t Pt;
     float dPhiZZ; //DeltaPhi between Z1 and Z2
+    float cosTheta_1; 
+    float cosTheta_2;
     //Float_t Zlep1_Wlep_Mass;
     //Float_t Zlep2_Wlep_Mass;
     //Float_t Eta;
@@ -288,6 +291,7 @@ protected:
     bool ZSelection();
     bool HZZSIPSelection();
     bool TestMuons();
+    void GetPolarizationAngle();
     void ShiftEfficiencies(Systematic variation);
     //float GetMuonScaleUncertainty(float muEta);
     //void SetShiftedMasses();

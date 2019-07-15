@@ -27,7 +27,39 @@ void ZZGenSelector::LoadBranches(Long64_t entry) {
       return dphi;
     };
 
-    GendPhiZZ = deltaPhiZZ(GenZ1Phi,GenZ2Phi);
+    GendPhiZZ = deltaPhiZZ(GenZ1phi,GenZ2phi);
+}
+void ZZGenSelector::GetPolarizationAngle(){
+
+    TLorentzVector z1P4;
+    z1P4.SetPtEtaPhiM(GenZ1pt, GenZ1eta, GenZ1phi, GenZ1mass);
+
+    TLorentzVector z2P4;
+    z2P4.SetPtEtaPhiM(GenZ2pt, GenZ2eta, GenZ2phi, GenZ2mass);
+
+    TLorentzVector l1P4;
+    l1P4.SetPtEtaPhiM(Genl1Pt,Genl1Eta,Genl1Phi,Genl1Mass);
+
+    TLorentzVector l2P4;
+    l2P4.SetPtEtaPhiM(Genl2Pt,Genl2Eta,Genl2Phi,Genl2Mass);
+    
+    TLorentzVector l3P4;
+    l3P4.SetPtEtaPhiM(Genl3Pt,Genl3Eta,Genl3Phi,Genl3Mass);
+    
+    TLorentzVector l4P4;
+    l4P4.SetPtEtaPhiM(Genl4Pt,Genl4Eta,Genl4Phi,Genl4Mass);
+
+    TLorentzVector zzP4=z1P4+z2P4;
+    l1P4.Boost(-z1P4.BoostVector());
+    l4P4.Boost(-z2P4.BoostVector());
+    z1P4.Boost(-zzP4.BoostVector());
+    z2P4.Boost(-zzP4.BoostVector());
+    //TLorentzVector lP4_z1=l2P4;
+    //TLorentzVector z1P4_zz=z1P4;
+
+    //cosTheta = (lP4_z1.Vect().Dot(z1P4_zz.Vect())) / (lP4_z1.Vect().Mag()*z1P4_zz.Vect().Mag()); 
+    cosTheta_1 = TMath::Cos(l1P4.Angle(z1P4.Vect()));
+    cosTheta_2 = TMath::Cos(l4P4.Angle(z2P4.Vect()));
 }
 //Similar to Kenneth's SetShiftedMasses function which i will need later as well
 void ZZGenSelector::SetVariables(Long64_t entry) {
@@ -36,9 +68,19 @@ void ZZGenSelector::SetVariables(Long64_t entry) {
       float tempMass = GenZ1mass;
       GenZ1mass = GenZ2mass;
       GenZ2mass = tempMass;
+      float tempEnergy = GenZ1energy;
+      GenZ1energy = GenZ2energy;
+      GenZ2energy = tempEnergy;
       float tempPt = GenZ1pt;
       GenZ1pt = GenZ2pt;
       GenZ2pt = tempPt;
+      float tempeta = GenZ1eta;
+      GenZ1eta = GenZ2eta;
+      GenZ2eta = tempeta;
+      float tempPhi = GenZ1phi;
+      GenZ1phi = GenZ2phi;
+      GenZ2phi = tempPhi;
+
       float templ1Pt = Genl1Pt;
       Genl1Pt = Genl3Pt;
       Genl3Pt = templ1Pt;
@@ -57,6 +99,18 @@ void ZZGenSelector::SetVariables(Long64_t entry) {
       float templ2Phi = Genl2Phi;
       Genl2Phi = Genl4Phi;
       Genl4Phi = templ2Phi;
+      float templ1Energy = Genl1Energy;
+      Genl1Energy = Genl3Energy;
+      Genl3Energy = templ1Energy;
+      float templ2Energy = Genl2Energy;
+      Genl2Energy = Genl4Energy;
+      Genl4Energy = templ2Energy;
+      float templ1Mass = Genl1Mass;
+      Genl1Mass = Genl3Mass;
+      Genl3Mass = templ1Mass;
+      float templ2Mass = Genl2Mass;
+      Genl2Mass = Genl4Mass;
+      Genl4Mass = templ2Mass;
     }
 }
 bool ZZGenSelector::ZZSelection() {
@@ -115,8 +169,8 @@ void ZZGenSelector::FillHistograms(Long64_t entry, float Genweight) {
     SafeHistFill(hists1D_, getHistName("GenZ1Pt"), GenZ1pt, Genweight);
     SafeHistFill(hists1D_, getHistName("GenZ2Pt"), GenZ2pt, Genweight);
     SafeHistFill(hists1D_, getHistName("GenZZPt"), GenPt, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ1Phi"), GenZ1Phi, Genweight);
-    SafeHistFill(hists1D_, getHistName("GenZ2Phi"), GenZ2Phi, Genweight);
+    SafeHistFill(hists1D_, getHistName("GenZ1Phi"), GenZ1phi, Genweight);
+    SafeHistFill(hists1D_, getHistName("GenZ2Phi"), GenZ2phi, Genweight);
     SafeHistFill(hists1D_, getHistName("GendPhiZ1Z2"), GendPhiZZ, Genweight);
     SafeHistFill(hists1D_, getHistName("GenZ1lep1_Pt"), Genl1Pt, Genweight);
     SafeHistFill(hists1D_, getHistName("GenZ1lep1_Eta"), Genl1Eta, Genweight);
@@ -130,6 +184,8 @@ void ZZGenSelector::FillHistograms(Long64_t entry, float Genweight) {
     SafeHistFill(hists1D_, getHistName("GenZ2lep2_Pt"), Genl4Pt, Genweight);
     SafeHistFill(hists1D_, getHistName("GenZ2lep2_Eta"), Genl4Eta, Genweight);
     SafeHistFill(hists1D_, getHistName("GenZ2lep2_Phi"), Genl4Phi, Genweight);
+    SafeHistFill(hists1D_, getHistName("GenCosTheta"),  cosTheta_1, Genweight);
+    SafeHistFill(hists1D_, getHistName("GenCosTheta"),  cosTheta_2, Genweight);
     //2D Z1 vs Z2
     SafeHistFill(hists2D_, getHistName("GenZ1Mass_GenZ2Mass"),GenZ1mass,GenZ2mass,Genweight);
 
@@ -139,6 +195,7 @@ Bool_t ZZGenSelector::Process(Long64_t entry)
 {
     LoadBranches(entry);
     //Define Genweight of event based on channel in case of eemm or mmee
+    GetPolarizationAngle();
     if (ZZSelection()) {
       if (true) {
         //std::cout<<run<<":"<<lumi<<":"<<evt<<std::endl;

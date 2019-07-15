@@ -20,6 +20,7 @@ public :
         { "GenZ1Phi",  {} },
         { "GenZ2Phi",  {} },
         {"GendPhiZ1Z2",{}},
+        {"GenCosTheta",{}},
        // { "ZPt",  {} },
        // { "ZEta",  {} },
        // { "ZPhi",  {} },
@@ -56,6 +57,8 @@ public :
     Float_t GenMass;
     Float_t GenPt;
     float GendPhiZZ; //DeltaPhi between Z1 and Z2
+    float cosTheta_1; 
+    float cosTheta_2;
     TBranch* b_GenMass;
     TBranch* b_GenPt;
 
@@ -74,7 +77,8 @@ protected:
     void InitialzeHistogram(std::string name, std::vector<std::string> histData);
     std::vector<std::string> ReadHistData(std::string histDataString);
     std::string getHistName(std::string histName);
-    void SetVariables(Long64_t entry); 
+    void SetVariables(Long64_t entry);
+    void GetPolarizationAngle();
     bool ZZSelection();
     bool Z4lSelection();
     bool ZSelection();

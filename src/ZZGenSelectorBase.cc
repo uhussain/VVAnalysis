@@ -93,8 +93,12 @@ void ZZGenSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e3_e4_Mass", &GenZ2mass, &b_GenZ2mass);
         fChain->SetBranchAddress("e1_e2_Pt", &GenZ1pt, &b_GenZ1pt);
         fChain->SetBranchAddress("e3_e4_Pt", &GenZ2pt, &b_GenZ2pt);
-        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
-        fChain->SetBranchAddress("e3_e4_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &GenZ1eta, &b_GenZ1eta);
+        fChain->SetBranchAddress("e3_e4_Eta", &GenZ2eta, &b_GenZ2eta);
+        fChain->SetBranchAddress("e1_e2_Energy", &GenZ1energy, &b_GenZ1energy);
+        fChain->SetBranchAddress("e3_e4_Energy", &GenZ2energy, &b_GenZ2energy);
+        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1phi, &b_GenZ1phi);
+        fChain->SetBranchAddress("e3_e4_Phi", &GenZ2phi, &b_GenZ2phi);
         fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
         fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
         fChain->SetBranchAddress("e3Pt", &Genl3Pt, &b_Genl3Pt);
@@ -107,6 +111,15 @@ void ZZGenSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2Phi", &Genl2Phi, &b_Genl2Phi);
         fChain->SetBranchAddress("e3Phi", &Genl3Phi, &b_Genl3Phi);
         fChain->SetBranchAddress("e4Phi", &Genl4Phi, &b_Genl4Phi);
+        fChain->SetBranchAddress("e1Energy", &Genl1Energy, &b_Genl1Energy);
+        fChain->SetBranchAddress("e2Energy", &Genl2Energy, &b_Genl2Energy);
+        fChain->SetBranchAddress("e3Energy", &Genl3Energy, &b_Genl3Energy);
+        fChain->SetBranchAddress("e4Energy", &Genl4Energy, &b_Genl4Energy);
+
+        fChain->SetBranchAddress("e1Mass", &Genl1Mass, &b_Genl1Mass);
+        fChain->SetBranchAddress("e2Mass", &Genl2Mass, &b_Genl2Mass);
+        fChain->SetBranchAddress("e3Mass", &Genl3Mass, &b_Genl3Mass);
+        fChain->SetBranchAddress("e4Mass", &Genl4Mass, &b_Genl4Mass);
     }
     //Add 2e2mu channel also but it still needs to differentiate which one is Z1Mass and which one is Z2Mass leptons
     //This is done with a flag at the time of Process for each event on the fly
@@ -116,8 +129,12 @@ void ZZGenSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m1_m2_Mass", &GenZ2mass, &b_GenZ2mass);
         fChain->SetBranchAddress("e1_e2_Pt", &GenZ1pt, &b_GenZ1pt);
         fChain->SetBranchAddress("m1_m2_Pt", &GenZ2pt, &b_GenZ2pt);
-        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
-        fChain->SetBranchAddress("m1_m2_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1phi, &b_GenZ1phi);
+        fChain->SetBranchAddress("m1_m2_Phi", &GenZ2phi, &b_GenZ2phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &GenZ1eta, &b_GenZ1eta);
+        fChain->SetBranchAddress("m1_m2_Eta", &GenZ2eta, &b_GenZ2eta);
+        fChain->SetBranchAddress("e1_e2_Energy", &GenZ1energy, &b_GenZ1energy);
+        fChain->SetBranchAddress("m1_m2_Energy", &GenZ2energy, &b_GenZ2energy);
         fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
         fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
         fChain->SetBranchAddress("m1Pt", &Genl3Pt, &b_Genl3Pt);
@@ -130,6 +147,16 @@ void ZZGenSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2Phi", &Genl2Phi, &b_Genl2Phi);
         fChain->SetBranchAddress("m1Phi", &Genl3Phi, &b_Genl3Phi);
         fChain->SetBranchAddress("m2Phi", &Genl4Phi, &b_Genl4Phi);
+
+        fChain->SetBranchAddress("e1Energy", &Genl1Energy, &b_Genl1Energy);
+        fChain->SetBranchAddress("e2Energy", &Genl2Energy, &b_Genl2Energy);
+        fChain->SetBranchAddress("m1Energy", &Genl3Energy, &b_Genl3Energy);
+        fChain->SetBranchAddress("m2Energy", &Genl4Energy, &b_Genl4Energy);
+
+        fChain->SetBranchAddress("e1Mass", &Genl1Mass, &b_Genl1Mass);
+        fChain->SetBranchAddress("e2Mass", &Genl2Mass, &b_Genl2Mass);
+        fChain->SetBranchAddress("m1Mass", &Genl3Mass, &b_Genl3Mass);
+        fChain->SetBranchAddress("m2Mass", &Genl4Mass, &b_Genl4Mass);
     }
     else if (channelName_ == "mmee") {
         channel_ = mmee;
@@ -137,8 +164,12 @@ void ZZGenSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m1_m2_Mass", &GenZ2mass, &b_GenZ2mass);
         fChain->SetBranchAddress("e1_e2_Pt", &GenZ1pt, &b_GenZ1pt);
         fChain->SetBranchAddress("m1_m2_Pt", &GenZ2pt, &b_GenZ2pt);
-        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
-        fChain->SetBranchAddress("m1_m2_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1_e2_Phi", &GenZ1phi, &b_GenZ1phi);
+        fChain->SetBranchAddress("m1_m2_Phi", &GenZ2phi, &b_GenZ2phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &GenZ1eta, &b_GenZ1eta);
+        fChain->SetBranchAddress("m1_m2_Eta", &GenZ2eta, &b_GenZ2eta);
+        fChain->SetBranchAddress("e1_e2_Energy", &GenZ1energy, &b_GenZ1energy);
+        fChain->SetBranchAddress("m1_m2_Energy", &GenZ2energy, &b_GenZ2energy);
         fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
         fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
         fChain->SetBranchAddress("m1Pt", &Genl3Pt, &b_Genl3Pt);
@@ -151,6 +182,16 @@ void ZZGenSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("e2Phi", &Genl2Phi, &b_Genl2Phi);
         fChain->SetBranchAddress("m1Phi", &Genl3Phi, &b_Genl3Phi);
         fChain->SetBranchAddress("m2Phi", &Genl4Phi, &b_Genl4Phi);
+
+        fChain->SetBranchAddress("e1Energy", &Genl1Energy, &b_Genl1Energy);
+        fChain->SetBranchAddress("e2Energy", &Genl2Energy, &b_Genl2Energy);
+        fChain->SetBranchAddress("m1Energy", &Genl3Energy, &b_Genl3Energy);
+        fChain->SetBranchAddress("m2Energy", &Genl4Energy, &b_Genl4Energy);
+
+        fChain->SetBranchAddress("e1Mass", &Genl1Mass, &b_Genl1Mass);
+        fChain->SetBranchAddress("e2Mass", &Genl2Mass, &b_Genl2Mass);
+        fChain->SetBranchAddress("m1Mass", &Genl3Mass, &b_Genl3Mass);
+        fChain->SetBranchAddress("m2Mass", &Genl4Mass, &b_Genl4Mass);
     }
     else if (channelName_ == "mmmm") {
         channel_ = mmmm;
@@ -158,8 +199,12 @@ void ZZGenSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m3_m4_Mass", &GenZ2mass, &b_GenZ2mass);
         fChain->SetBranchAddress("m1_m2_Pt", &GenZ1pt, &b_GenZ1pt);
         fChain->SetBranchAddress("m3_m4_Pt", &GenZ2pt, &b_GenZ2pt);
-        fChain->SetBranchAddress("m1_m2_Phi", &GenZ1Phi, &b_GenZ1Phi);
-        fChain->SetBranchAddress("m3_m4_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("m1_m2_Phi", &GenZ1phi, &b_GenZ1phi);
+        fChain->SetBranchAddress("m3_m4_Phi", &GenZ2phi, &b_GenZ2phi);
+        fChain->SetBranchAddress("m1_m2_Eta", &GenZ1eta, &b_GenZ1eta);
+        fChain->SetBranchAddress("m3_m4_Eta", &GenZ2eta, &b_GenZ2eta);
+        fChain->SetBranchAddress("m1_m2_Energy", &GenZ1energy, &b_GenZ1energy);
+        fChain->SetBranchAddress("m3_m4_Energy", &GenZ2energy, &b_GenZ2energy);
         fChain->SetBranchAddress("m1Pt", &Genl1Pt, &b_Genl1Pt);
         fChain->SetBranchAddress("m2Pt", &Genl2Pt, &b_Genl2Pt);
         fChain->SetBranchAddress("m3Pt", &Genl3Pt, &b_Genl3Pt);
@@ -172,6 +217,16 @@ void ZZGenSelectorBase::Init(TTree *tree)
         fChain->SetBranchAddress("m2Phi", &Genl2Phi, &b_Genl2Phi);
         fChain->SetBranchAddress("m3Phi", &Genl3Phi, &b_Genl3Phi);
         fChain->SetBranchAddress("m4Phi", &Genl4Phi, &b_Genl4Phi);
+
+        fChain->SetBranchAddress("m1Energy", &Genl1Energy, &b_Genl1Energy);
+        fChain->SetBranchAddress("m2Energy", &Genl2Energy, &b_Genl2Energy);
+        fChain->SetBranchAddress("m3Energy", &Genl3Energy, &b_Genl3Energy);
+        fChain->SetBranchAddress("m4Energy", &Genl4Energy, &b_Genl4Energy);
+
+        fChain->SetBranchAddress("m1Mass", &Genl1Mass, &b_Genl1Mass);
+        fChain->SetBranchAddress("m2Mass", &Genl2Mass, &b_Genl2Mass);
+        fChain->SetBranchAddress("m3Mass", &Genl3Mass, &b_Genl3Mass);
+        fChain->SetBranchAddress("m4Mass", &Genl4Mass, &b_Genl4Mass);
     }
     else
         throw std::invalid_argument("Invalid channel choice!");
@@ -196,18 +251,30 @@ Bool_t ZZGenSelectorBase::Process(Long64_t entry)
     b_Genl1Phi->GetEntry(entry);
     b_Genl2Phi->GetEntry(entry);
     b_Genl3Phi->GetEntry(entry);
+    b_Genl1Energy->GetEntry(entry);
+    b_Genl2Energy->GetEntry(entry);
+    b_Genl3Energy->GetEntry(entry);
+    b_Genl1Mass->GetEntry(entry);
+    b_Genl2Mass->GetEntry(entry);
+    b_Genl3Mass->GetEntry(entry);
     //std::cout<<"Is the ZZGenSelectorBase fine until here"<<std::endl;
     if (channel_ == eeee || channel_ == eemm || channel_ == mmee || channel_ == mmmm) {
       b_Genl4Pt->GetEntry(entry);
       b_Genl4Eta->GetEntry(entry);
       b_Genl4Phi->GetEntry(entry);
+      b_Genl4Energy->GetEntry(entry);
+      b_Genl4Mass->GetEntry(entry);
       b_GenZ2mass->GetEntry(entry);
       b_GenZ2pt->GetEntry(entry);
-      b_GenZ2Phi->GetEntry(entry);
+      b_GenZ2phi->GetEntry(entry);
+      b_GenZ2eta->GetEntry(entry);
+      b_GenZ2energy->GetEntry(entry);
     }
     b_GenZ1mass->GetEntry(entry);
     b_GenZ1pt->GetEntry(entry);
-    b_GenZ1Phi->GetEntry(entry);
+    b_GenZ1phi->GetEntry(entry);
+    b_GenZ1eta->GetEntry(entry);
+    b_GenZ1energy->GetEntry(entry);
     if(channel_ == mmee){
       if(e1e2IsZ1(entry))
         Genweight=0.0;

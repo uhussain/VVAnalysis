@@ -194,7 +194,39 @@ void ZZSelector::LoadBranches(Long64_t entry, std::pair<Systematic, std::string>
       return dphi;
     };
 
-    dPhiZZ = deltaPhiZZ(Z1Phi,Z2Phi);
+    dPhiZZ = deltaPhiZZ(Z1phi,Z2phi);
+}
+void ZZSelector::GetPolarizationAngle(){
+
+    TLorentzVector z1P4;
+    z1P4.SetPtEtaPhiM(Z1pt, Z1eta, Z1phi, Z1mass);
+
+    TLorentzVector z2P4;
+    z2P4.SetPtEtaPhiM(Z2pt, Z2eta, Z2phi, Z2mass);
+
+    TLorentzVector l1P4;
+    l1P4.SetPtEtaPhiM(l1Pt,l1Eta,l1Phi,l1Mass);
+
+    TLorentzVector l2P4;
+    l2P4.SetPtEtaPhiM(l2Pt,l2Eta,l2Phi,l2Mass);
+
+    TLorentzVector l3P4;
+    l3P4.SetPtEtaPhiM(l3Pt,l3Eta,l3Phi,l3Mass);
+
+    TLorentzVector l4P4;
+    l4P4.SetPtEtaPhiM(l4Pt,l4Eta,l4Phi,l4Mass);
+    
+    TLorentzVector zzP4=z1P4+z2P4;
+    l1P4.Boost(-z1P4.BoostVector());
+    l4P4.Boost(-z2P4.BoostVector());
+    z1P4.Boost(-zzP4.BoostVector());
+    z2P4.Boost(-zzP4.BoostVector());
+    //TLorentzVector lP4_z1=l1P4;
+    //TLorentzVector z1P4_zz=z1P4;
+
+    //cosTheta = (lP4_z1.Vect().Dot(z1P4_zz.Vect())) / (lP4_z1.Vect().Mag()*z1P4_zz.Vect().Mag()); 
+    cosTheta_1 = TMath::Cos(l1P4.Angle(z1P4.Vect()));
+    cosTheta_2 = TMath::Cos(l4P4.Angle(z2P4.Vect()));
 }
 //Similar to Kenneth's SetShiftedMasses function which i will need later as well
 void ZZSelector::SetVariables(Long64_t entry) {
@@ -206,6 +238,15 @@ void ZZSelector::SetVariables(Long64_t entry) {
       float tempPt = Z1pt;
       Z1pt = Z2pt;
       Z2pt = tempPt;
+      float tempEnergy = Z1energy;
+      Z1energy = Z2energy;
+      Z2energy = tempEnergy;
+      float tempeta = Z1eta;
+      Z1eta = Z2eta;
+      Z2eta = tempeta;
+      float tempPhi = Z1phi;
+      Z1phi = Z2phi;
+      Z2phi = tempPhi;
       bool templ1IsTight = l1IsTight;
       l1IsTight = l3IsTight;
       l3IsTight = templ1IsTight;
@@ -512,8 +553,8 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists1D_, getHistName("Z1Pt", variation.second), Z1pt, weight);
     SafeHistFill(hists1D_, getHistName("Z2Pt", variation.second), Z2pt, weight);
     SafeHistFill(hists1D_, getHistName("ZZPt", variation.second), Pt, weight);
-    SafeHistFill(hists1D_, getHistName("Z1Phi", variation.second), Z1Phi, weight);
-    SafeHistFill(hists1D_, getHistName("Z2Phi", variation.second), Z2Phi, weight);
+    SafeHistFill(hists1D_, getHistName("Z1Phi", variation.second), Z1phi, weight);
+    SafeHistFill(hists1D_, getHistName("Z2Phi", variation.second), Z2phi, weight);
     SafeHistFill(hists1D_, getHistName("dPhiZ1Z2", variation.second), dPhiZZ, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Pt", variation.second), l1Pt, weight);
     SafeHistFill(hists1D_, getHistName("Z1lep1_Eta", variation.second), l1Eta, weight);
@@ -537,6 +578,8 @@ void ZZSelector::FillHistograms(Long64_t entry, float weight, bool noBlind,
     SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Pt",variation.second),l3Pt,l4Pt,weight);
     SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Eta",variation.second),l3Eta,l4Eta,weight);
     SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Phi",variation.second),l3Phi,l4Phi,weight);
+    SafeHistFill(hists1D_, getHistName("CosTheta", variation.second),  cosTheta_1, weight);
+    SafeHistFill(hists1D_, getHistName("CosTheta", variation.second),  cosTheta_2, weight);
     //2D Z1 vs Z2
     SafeHistFill(hists2D_, getHistName("Z1Mass_Z2Mass",variation.second),Z1mass,Z2mass,weight);
 
@@ -552,6 +595,7 @@ Bool_t ZZSelector::Process(Long64_t entry)
 
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
+    GetPolarizationAngle();
     //Define weight of event based on channel in case of eemm or mmee
     if (HZZSIPSelection() && ZZSelection() && TightZZLeptons()) {
       if (true) {
