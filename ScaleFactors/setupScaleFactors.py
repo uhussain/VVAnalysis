@@ -54,24 +54,41 @@ pileupFileDown = ROOT.TFile.Open('PileupWeights18/PU_minBiasDOWN.root')
 pileupSF.Set1DHist(pileupFile.Get('pileup'), pileupFileUp.Get('pileup'), pileupFileDown.Get('pileup'))
 fScales.cd()
 pileupSF.Write()
+
+
+#Electron (Pt<20 Reco SF from POG https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2018DataRecommendations
+electronLowReco19SF = ROOT.ScaleFactor("electronLowReco19SF", "Moriond '19 Electron Low Reco SF, x=Eta, y=Pt")
+eLowRecoFile = ROOT.TFile.Open('data/Ele_Reco_LowEt_2018.root')
+electronLowReco19SF.Set2DHist(float2double(eLowRecoFile.Get('EGamma_SF2D')))
+fScales.cd()
+electronLowReco19SF.Write()
+
+#Electron (Pt>20 Reco SF from POG https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2018DataRecommendations
+electronReco19SF = ROOT.ScaleFactor("electronReco19SF", "Moriond '19 Electron Reco SF, x=Eta, y=Pt")
+eRecoFile = ROOT.TFile.Open('data/Ele_Reco_2018.root')
+electronReco19SF.Set2DHist(float2double(eRecoFile.Get('EGamma_SF2D')))
+fScales.cd()
+electronReco19SF.Write()
 #
-electronMoriond18SF = ROOT.ScaleFactor("electronMoriond18SF", "Moriond '18 Electron Reco & HZZ ID SF, x=Eta, y=Pt")
-eidFile = ROOT.TFile.Open('data/egammaEffi.txt_EGM2D_Moriond2018v1.root')
-electronMoriond18SF.Set2DHist(float2double(eidFile.Get('EGamma_SF2D')))
+#
+electronMoriond19SF = ROOT.ScaleFactor("electronMoriond19SF", "Moriond '19 Electron HZZ ID SF, x=Eta, y=Pt")
+eidFile = ROOT.TFile.Open('data/egammaEffi.txt_EGM2D_Moriond2019_v1.root')
+electronMoriond19SF.Set2DHist(float2double(eidFile.Get('EGamma_SF2D')))
 fScales.cd()
-electronMoriond18SF.Write()
+electronMoriond19SF.Write()
 
-electronMoriond18GapSF = ROOT.ScaleFactor("electronMoriond18GapSF", "Moriond '18 GapElectron Reco & HZZ ID SF, x=Eta, y=Pt")
-eleGsfFile = ROOT.TFile.Open('data/egammaEffi.txt_EGM2D_Moriond2018v1_gap.root')
-electronMoriond18GapSF.Set2DHist(float2double(eleGsfFile.Get('EGamma_SF2D')))
+electronMoriond19GapSF = ROOT.ScaleFactor("electronMoriond19GapSF", "Moriond '19 GapElectron HZZ ID SF, x=Eta, y=Pt")
+eleGsfFile = ROOT.TFile.Open('data/egammaEffi.txt_EGM2D_Moriond2019_v1_gap.root')
+electronMoriond19GapSF.Set2DHist(float2double(eleGsfFile.Get('EGamma_SF2D')))
 fScales.cd()
-electronMoriond18GapSF.Write()
+electronMoriond19GapSF.Write()
 
-muonMoriond18SF = ROOT.ScaleFactor("muonMoriond18SF", "Moriond '18 Trk+ID+ISO SF, x=abs(Eta), y=Pt")
-midFile = ROOT.TFile.Open('data/ScaleFactors_mu_Moriond2018_final.root')
-muonMoriond18SF.Set2DHist(float2double(midFile.Get('FINAL')))
+muonMoriond19SF = ROOT.ScaleFactor("muonMoriond19SF", "Muon Moriond '19 Trk+ID+ISO SF, x=abs(Eta), y=Pt")
+midFile = ROOT.TFile.Open('data/final_HZZ_muon_SF_2018RunA2D_ER_2702.root')
+mid17File = ROOT.TFile.Open('data/ScaleFactors_mu_Moriond2018_final.root')
+muonMoriond19SF.Set2DHist(float2double(midFile.Get('FINAL')),float2double(mid17File.Get('ERROR')),float2double(mid17File.Get('ERROR')))
 fScales.cd()
-muonMoriond18SF.Write()
+muonMoriond19SF.Write()
 
 
 if os.path.isfile(args.tightfr_file):

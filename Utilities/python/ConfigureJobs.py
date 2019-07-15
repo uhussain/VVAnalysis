@@ -45,7 +45,8 @@ def getCombinePath():
     return config['Setup']['combine_path'] + "/"
 def getListOfEWKFilenames():
     return [
-        "wz3lnu-amcnlo",
+        #"wz3lnu-amcnlo",#old 2018 ntuples
+        "wz3lnu-powheg",#New 2018 ntuples
     # Use jet binned WZ samples for subtraction by default
         #"wz3lnu-mgmlm-0j",
         #"wz3lnu-mgmlm-1j",

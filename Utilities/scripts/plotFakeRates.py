@@ -65,7 +65,7 @@ def getLumiTextBox():
     texS.SetTextFont(42)
     texS.SetTextSize(0.040)
     texS.Draw()
-    texS1 = ROOT.TLatex(0.15,0.95,"#bf{UW} #it{Internal} 2018 Data")
+    texS1 = ROOT.TLatex(0.15,0.95,"#bf{CMS} #it{Preliminary}")
     texS1.SetNDC()
     texS1.SetTextFont(42)
     texS1.SetTextSize(0.040)
@@ -225,7 +225,7 @@ def makeMCPlots(param, obj, outdir):
     canvas.Print("%s/ratio%s_all%s.png" % (outdir, param, obj))
     canvas.Print("%s/ratio%s_all%s.pdf" % (outdir, param, obj))
 
-frfile = ROOT.TFile("/data/uhussain/ZZTo4l/ZZ2018/VVAnalysisTools/CMSSW_9_4_2/src/Analysis/VVAnalysis/data/fakeRate18Dec2018-ZplusLSkimZZ2018Data.root")
+frfile = ROOT.TFile("/data/uhussain/ZZTo4l/ZZ2019/VVAnalysisTools/CMSSW_9_4_2/src/Analysis/VVAnalysis/data/fakeRate18Dec2018-ZplusLSkimZZ2018Data.root")
 
 
 data_folder_name = datetime.date.today().strftime("%Y%b%d"+"_ZZ4l") 

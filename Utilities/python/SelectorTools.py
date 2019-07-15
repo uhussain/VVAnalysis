@@ -11,9 +11,9 @@ def applySelector(filelist, channels,selector_name, selection,
         extra_inputs = [],
         addSumweights=True,
         proof=False):
-    print "channels: ",channels
+    #print "channels: ",channels
     for i, chan in enumerate(channels):
-        print "channel length: ",len(chan)
+        #print "channel length: ",len(chan)
         #if len(chan)==4:
             #inputs = ROOT.TList()
             #for inp in extra_inputs:
@@ -31,7 +31,7 @@ def applySelector(filelist, channels,selector_name, selection,
                 #Ultimately once extra_inputs has fake rates, we won't need to add tname for dataset. 
                 for inp in extra_inputs:
                     inputs.Add(inp)
-                    print "inputs getting added: ",inp
+                    #print "inputs getting added: ",inp
                 tchan=ROOT.TNamed("channel",chan)
                 tname=ROOT.TNamed("name",dataset) 
                 inputs.Add(tname)
@@ -52,7 +52,7 @@ def applySelector(filelist, channels,selector_name, selection,
                     #print "CountFiles: ",countfiles
                     #continue
                 output_list = select.GetOutputList()
-                print "Output_list: ", output_list
+                #print "Output_list: ", output_list
                 #dataset_list = output_list.FindObject(dataset)
                 #if not dataset_list or dataset_list.ClassName() != "TList":
                 #    print "WARNING: No output found for dataset %s" % dataset
@@ -61,6 +61,8 @@ def applySelector(filelist, channels,selector_name, selection,
             else:
                 inputs = ROOT.TList()
                 select.SetInputList(inputs)
+                for inp in extra_inputs:
+                    inputs.Add(inp)
                 #This part is introduced to work out the fact that I dont have "extra_inputs" such as SFs yet.
                 tchan=ROOT.TNamed("channel",chan)
                 tname=ROOT.TNamed("name",dataset) 
@@ -69,7 +71,7 @@ def applySelector(filelist, channels,selector_name, selection,
                 #print "inputs: ",inputs.Print()
                 ROOT.gROOT.cd()
                 #So line 56 doesn't give a false because of null list?
-                print "Processing channel %s for dataset %s" % (chan, dataset)
+                #print "Processing channel %s for dataset %s" % (chan, dataset)
                 try:
                     #print dataset
                     file_path = ConfigureJobs.getInputFilesPath(dataset, 
@@ -83,7 +85,7 @@ def applySelector(filelist, channels,selector_name, selection,
                     #print "CountFiles: ",countfiles
                     continue
                 output_list = select.GetOutputList()
-                print "Output_list: ", output_list
+                #print "Output_list: ", output_list
                 #dataset_list = output_list.FindObject(dataset)
                 #if not dataset_list or dataset_list.ClassName() != "TList":
                 #    print "WARNING: No output found for dataset %s" % dataset
@@ -95,7 +97,7 @@ def applySelector(filelist, channels,selector_name, selection,
                 sumweights = ROOT.TH1D("sumweights", "sumweights", 1, 0, 10)
                 meta_chain.Draw("1>>sumweights", "summedWeights")
                 dataset_list = output_list.FindObject(dataset)
-                print "dataset_list: ", dataset_list
+                #print "dataset_list: ", dataset_list
                 dataset_list.Add(ROOT.gROOT.FindObject("sumweights"))
                 ROOT.SetOwnership(sumweights,False)
                 dataset_list.SetOwner()
@@ -120,7 +122,7 @@ def applyBkgSelector(filelist, channels,selector_name, selection,
         extra_inputs = [],
         addSumweights=True,
         proof=False):
-    print "Background Selector"
+    #print "Background Selector"
     for i, chan in enumerate(channels):
         inputs = ROOT.TList()
         for inp in extra_inputs:

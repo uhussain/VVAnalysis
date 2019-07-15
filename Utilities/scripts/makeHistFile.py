@@ -76,20 +76,24 @@ eZZTightFakeRate = fScales.Get("eZZTightFakeRate")
 ## For medium muons
 ##mZZMedFakeRate.SetName("fakeRate_allMu")
 if mZZTightFakeRate:
-    print "Yes muon fake rates"
+    #print "Yes muon fake rates"
     mZZTightFakeRate.SetName("fakeRate_allMu")
 if eZZTightFakeRate:
-    print "Yes electron fake rates"
+    #print "Yes electron fake rates"
     eZZTightFakeRate.SetName("fakeRate_allE")
 #
 #muonIsoSF = fScales.Get('muonIsoSF')
-muonMoriond18SF= fScales.Get('muonMoriond18SF')
-electronMoriond18SF = fScales.Get('electronMoriond18SF')
-electronMoriond18GapSF = fScales.Get('electronMoriond18GapSF')
+muonMoriond19SF= fScales.Get('muonMoriond19SF')
+#Electron Reco SF (POG) https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2018DataRecommendations
+electronLowReco19SF = fScales.Get('electronLowReco19SF')
+electronReco19SF = fScales.Get('electronReco19SF')
+#Electron ID + SIP HZZ Scale factors
+electronMoriond19SF = fScales.Get('electronMoriond19SF')
+electronMoriond19GapSF = fScales.Get('electronMoriond19GapSF')
 pileupSF = fScales.Get('pileupSF')
 
 fr_inputs = [eZZTightFakeRate, mZZTightFakeRate,]
-sf_inputs = [electronMoriond18SF, electronMoriond18GapSF,muonMoriond18SF,pileupSF]
+sf_inputs = [electronLowReco19SF,electronReco19SF,electronMoriond19SF, electronMoriond19GapSF,muonMoriond19SF,pileupSF]
 #sf_inputs=[pileupSF]
 selection = args['selection'].replace("LooseLeptons", "") \
     if args['output_selection'] == "" else args['output_selection'].split("_")[0]
@@ -101,11 +105,11 @@ hists = ConfigHistTools.getAllHistNames(manager_path, analysis) \
     if "all" in args['hist_names'] else args['hist_names']
 
 hists = [h for h in hists if "unrolled" not in h and "wCR" not in h and h not in  ["YieldByChannel", "CutFlow"]]
-print "hists: ", hists
+#print "hists: ", hists
 hist_inputs = [getHistExpr(hists, analysis)]
-print "hist_inputs: ",hist_inputs
+#print "hist_inputs: ",hist_inputs
 tselection = [ROOT.TNamed("selection", args['output_selection'])]
-print "tselection: ",tselection
+#print "tselection: ",tselection
 if args['proof']:
     ROOT.TProof.Open('workers=12')
 
