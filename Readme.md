@@ -8,13 +8,17 @@ cmsrel CMSSW_10_3_1
 cd CMSSW_10_3_1/src
 mkdir Analysis
 cd Analysis
-git clone -b Run2Legacy git@github.com:uhussain/VVAnalysis.git
+git clone -b Run2LegacySkims git@github.com:uhussain/VVAnalysis.git
+scram b -j 12
 ```
 ##Use
+
 Run Skims locally for sync and testing
+
 ```bash
 ./runSignalSkim.sh
 ```
+
 Submit Skim jobs using farmout
 ```bash
 ./SubmitSkimJobs.sh
