@@ -74,25 +74,39 @@ def getListOfHDFSFiles(file_path):
             files.append("/"+split[1])
     return files
 def getListOfFiles(filelist, manager_path):
-    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
-        zz4l="ZZ4l2019"
-        Zl="ZplusL2019"
+        print "name in filelist: ",name
+        zz4l="ZZ4l"
+        Zl="ZplusL"
         if (zz4l in name) or (Zl in name):
             if (zz4l in name):
-                dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                    "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2019/%s.json" % "ntuples"
+                if "ZZ4l2016" in name:
+                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                        "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2016/%s.json" % "ntuples"
+                elif "ZZ4l2017" in name:
+                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                        "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2017/%s.json" % "ntuples"
+                elif "ZZ4l2018" in name:
+                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                        "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2018/%s.json" % "ntuples"
             elif(Zl in name):
-                if "Skim" in name:
+                #if "Skim" in name:
+                #    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                #        "ZZ4lRun2DatasetManager/FileInfo/ZplusL2018/%s.json" % "skim"
+                if "ZplusL2016" in name:
                     dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                        "ZZ4lAnalysisDatasetManager/FileInfo/ZplusL2019/%s.json" % "skim"
-                else:
+                        "ZZ4lRun2DatasetManager/FileInfo/ZplusL2016/%s.json" % "ntuples"
+                elif "ZplusL2017" in name:
                     dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                        "ZZ4lAnalysisDatasetManager/FileInfo/ZplusL2019/%s.json" % "ntuples"
+                        "ZZ4lRun2DatasetManager/FileInfo/ZplusL2017/%s.json" % "ntuples"
+                elif "ZplusL2018" in name:
+                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                        "ZZ4lRun2DatasetManager/FileInfo/ZplusL2018/%s.json" % "ntuples"
             print dataset_file
             allnames = json.load(open(dataset_file)).keys()
             print allnames
@@ -118,7 +132,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
     with open(out_file_name, "w") as outFile:
         outFile.write(result)
 def getListOfFilesWithXSec(filelist, manager_path):
-    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     files = getListOfFiles(filelist, manager_path)
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     info = {}
@@ -132,23 +146,35 @@ def getListOfFilesWithXSec(filelist, manager_path):
     return info
 def getPreviousStep(selection, analysis):
     selection_map = {}
-    if analysis == "ZZ4l2019":
+    if analysis == "ZZ4l2016":
         selection_map = { "ntuples": "ntuples",
                 "loosePreselection" : "ntuples",
                 "preselection" : "ntuples",
                 "4lCRBase" : "ntuples"
         }
-    elif analysis == "ZplusL2019":
+    elif analysis == "ZZ4l2017":
+        selection_map = { "ntuples": "ntuples",
+                "loosePreselection" : "ntuples",
+                "preselection" : "ntuples",
+                "4lCRBase" : "ntuples"
+        }
+    elif analysis == "ZZ4l2018":
+        selection_map = { "ntuples": "ntuples",
+                "loosePreselection" : "ntuples",
+                "preselection" : "ntuples",
+                "4lCRBase" : "ntuples"
+        }    
+    elif analysis == "ZplusL2016":
         selection_map = { "ntuples": "ntuples",
                 "ZplusLBase" : "ntuples"
         }
-    elif analysis == "WZDecemberAnalysis":
-        selection_map = { "ntuples" : "ntuples",
-                "loosepreselection" : "ntuples",
-                "preselection" : "ntuples",
-                "Mass3l" : "preselection",
-                "Zselection" : "preselection",
-                "Wselection" : "Zselection"
+    elif analysis == "ZplusL2017":
+        selection_map = { "ntuples": "ntuples",
+                "ZplusLBase" : "ntuples"
+        }
+    elif analysis == "ZplusL2018":
+        selection_map = { "ntuples": "ntuples",
+                "ZplusLBase" : "ntuples"
         }
     first_selection = selection.split(",")[0].strip()
     if first_selection not in selection_map.keys():
@@ -159,7 +185,7 @@ def getPreviousStep(selection, analysis):
                 "%s" % (first_selection, selection_map.keys()))
     return selection_map[first_selection]
 def getInputFilesPath(sample_name, manager_path,selection, analysis):
-    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
         selection])
     input_files = UserInput.readJson(input_file_name)
@@ -171,7 +197,7 @@ def getInputFilesPath(sample_name, manager_path,selection, analysis):
 def getCutsJsonName(selection, analysis):
     return "/".join(["Cuts", analysis, selection + ".json"]) 
 def getTriggerName(sample_name,analysis, selection):
-    trigger_names = ["MuonEG", "DoubleMuon", "EGamma", "SingleMuon", "SingleElectron"]
+    trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG","EGamma", "SingleMuon", "SingleElectron"]
     if "Run" in sample_name and getPreviousStep(selection, analysis) == "ntuples":
         for name in trigger_names:
             if name in sample_name:

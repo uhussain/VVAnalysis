@@ -15,7 +15,7 @@ def getComLineArgs():
                         "separated by commas. They must be"
                         " mapped to a cuts json via Cuts/definitions.json")
     parser.add_argument("-t", "--trigger", type=str, default="",
-                        choices=["EGamma", "DoubleMuon", "MuonEG", 
+                        choices=["EGamma", "DoubleEG","DoubleMuon", "MuonEG", 
                             "SingleMuon", "SingleElectron", "MonteCarlo", ""],
                         help="Name of trigger to select in data")
     parser.add_argument("-f", "--filelist", type=str,
@@ -57,10 +57,10 @@ def getDeduplicatedListForTree(tree, analysis, state, cut_string):
             l3_l4_cand_mass = "e3_e4_Mass"
             l3_cand_pt = "e3Pt"
             l4_cand_pt = "e4Pt"
-            l1_cand_Tight = "e1ZZTightIDNoVtxHZZWP"
-            l2_cand_Tight = "e2ZZTightIDNoVtxHZZWP"
-            l3_cand_Tight = "e3ZZTightIDNoVtxHZZWP"
-            l4_cand_Tight = "e4ZZTightIDNoVtxHZZWP"
+            l1_cand_Tight = "e1ZZTightIDNoVtx"
+            l2_cand_Tight = "e2ZZTightIDNoVtx"
+            l3_cand_Tight = "e3ZZTightIDNoVtx"
+            l4_cand_Tight = "e4ZZTightIDNoVtx"
             l1_cand_Iso = "e1ZZIsoPass"
             l2_cand_Iso = "e2ZZIsoPass"
             l3_cand_Iso = "e3ZZIsoPass"
@@ -84,8 +84,8 @@ def getDeduplicatedListForTree(tree, analysis, state, cut_string):
             l1_l2_cand_mass = "e1_e2_Mass"
             l1_cand_pt = "e1Pt"
             l2_cand_pt = "e2Pt"
-            l1_cand_Tight = "e1ZZTightIDNoVtxHZZWP"
-            l2_cand_Tight = "e2ZZTightIDNoVtxHZZWP"
+            l1_cand_Tight = "e1ZZTightIDNoVtx"
+            l2_cand_Tight = "e2ZZTightIDNoVtx"
             l1_cand_Iso = "e1ZZIsoPass"
             l2_cand_Iso = "e2ZZIsoPass"
             l3_l4_cand_mass = "m1_m2_Mass"
