@@ -17,6 +17,8 @@
 class ZZSelectorBase : public TSelector {
 public :
     ScaleFactor* pileupSF_;
+    ScaleFactor* eLowRecoSF_;
+    ScaleFactor* eRecoSF_;
     ScaleFactor* eIdSF_;
     ScaleFactor* eGapIdSF_;
     ScaleFactor* mIdSF_;
@@ -45,15 +47,22 @@ public :
 
     bool addSumweights_;
     //bool isVBS_;
-    //MC variable to check for duplication(this is a flag to differentiate between channels)
+    //MC variable to check for duplication(this is a flag to differentiate between channels) 
+    UInt_t run;
+    UInt_t lumi;
+    ULong64_t evt;
     //Int_t duplicated;
     Float_t weight;
     Float_t genWeight;
     Float_t nTruePU;
     Float_t Z1mass;
-    Float_t Z2mass;
+    Float_t Z2mass; 
+    //Float_t Zamass;
+    //Float_t Zbmass;
     Float_t Z1pt;
     Float_t Z2pt;
+    Float_t Z1Phi;
+    Float_t Z2Phi;
     Float_t type1_pfMETEt;
     Float_t type1_pfMETPhi;
     Float_t l1GenPt;
@@ -115,8 +124,13 @@ public :
     TBranch* b_genWeight;
     TBranch* b_Z1mass;
     TBranch* b_Z2mass;
+    //Smart cut on 4e/4mu 
+    //TBranch* b_Zamass;
+    //TBranch* b_Zbmass;
     TBranch* b_Z1pt;
     TBranch* b_Z2pt;
+    TBranch* b_Z1Phi;
+    TBranch* b_Z2Phi;
     TBranch* b_nTruePU;
     TBranch* b_type1_pfMETEt;
     TBranch* b_type1_pfMETPhi;
@@ -125,6 +139,10 @@ public :
     TBranch* b_l3GenPt;
     TBranch* b_l4GenPt;
     
+    TBranch* b_run;
+    TBranch* b_lumi;
+    TBranch* b_evt;
+
     TBranch* b_l1IsTight;
     TBranch* b_l2IsTight;
     TBranch* b_l3IsTight;
@@ -221,8 +239,10 @@ protected:
     bool isNonpromptEstimate_;
     bool isNonpromptMC_;
     bool isZgamma_;
-    const float FR_MAX_PT_ = 200;
+    const float FR_MAX_PT_ = 80;
     const float FR_MAX_ETA_ = 2.5;
+    const float MuSF_MAX_PT_ = 200;
+    const float EleSF_MAX_PT_ = 500;
     bool e1e2IsZ1(Long64_t entry);
     bool lep1IsTight();
     bool lep2IsTight();
@@ -234,6 +254,7 @@ protected:
     bool Z2PF();
     bool Z2FP();
     bool Z2FF();
+    bool tightSIP();
     bool tightZ1Leptons();
     bool tightZ2Leptons();
     //bool IsGenMatched3l();

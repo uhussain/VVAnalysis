@@ -16,6 +16,8 @@ public :
         Central,
         muonEfficiencyUp,
         muonEfficiencyDown,
+        electronRecoEffUp,
+        electronRecoEffDown,
         electronEfficiencyUp,
         electronEfficiencyDown,
         pileupUp,
@@ -26,14 +28,19 @@ public :
         "yield",
         "backgroundControlYield",
         "Mass",
-        "Z1Mass",
-        "Z2Mass",
+        //"Z1Mass",
+        //"Z2Mass",
         "ZMass",
         "ZZPt",
         "Z1Pt",
         "Z2Pt"
         "ZPt",
-        //"nTruePU",
+        "LepPt",
+        "Z1lep1_Pt",
+        "Z1lep2_Pt",
+        "Z2lep1_Pt",
+        "Z2lep2_Pt",
+        "nTruePU",
         //"nvtx",
         //"Zlep1_Pt",
         //"Zlep2_Pt",
@@ -44,6 +51,8 @@ public :
     };
 
     std::map<Systematic, std::string> systematics_ = {
+        {electronRecoEffUp,"CMS_RecoEff_eUp"},
+        {electronRecoEffDown,"CMS_RecoEff_eDown"},
         {electronEfficiencyUp, "CMS_eff_eUp"},
         {electronEfficiencyDown, "CMS_eff_eDown"},
         {muonEfficiencyUp, "CMS_eff_mUp"},
@@ -54,8 +63,9 @@ public :
 
     std::map<std::string, TH1D*> hists1D_ = {
         { "yield",  {} },
+        //{"duplicated",{}},
         { "backgroundControlYield",  {} },
-        //{ "nTruePU",  {} },
+        { "nTruePU",  {} },
         { "nvtx",  {} },
         { "ZMass",  {} },
         { "Z1Mass",  {} },
@@ -63,11 +73,20 @@ public :
         { "ZZPt",  {} },
         { "Z1Pt",  {} },
         { "Z2Pt",  {} },
+        { "Z1Phi",  {} },
+        { "Z2Phi",  {} },
+        {"dPhiZ1Z2",{}},
         { "ZPt",  {} },
        // { "ZPt",  {} },
        // { "ZEta",  {} },
        // { "ZPhi",  {} },
        // { "dR_lW_Z",  {} },
+        {"LepPt",{}},
+        {"LepEta",{}},
+        {"Lep12Pt",{}},
+        {"Lep12Eta",{}},
+        {"Lep34Pt",{}},
+        {"Lep34Eta",{}},
         { "Z1lep1_Eta",  {} },
         { "Z1lep1_Phi",  {} },
         { "Z1lep1_Pt",  {} },
@@ -154,6 +173,7 @@ public :
     UInt_t nvtx;
     Float_t Mass;
     Float_t Pt;
+    float dPhiZZ; //DeltaPhi between Z1 and Z2
     //Float_t Zlep1_Wlep_Mass;
     //Float_t Zlep2_Wlep_Mass;
     //Float_t Eta;
@@ -262,12 +282,16 @@ protected:
     //unsigned int GetLheWeightInfo();
     std::vector<std::string> ReadHistData(std::string histDataString);
     std::string getHistName(std::string histName, std::string variationName);
-    void SetVariables(Long64_t entry); 
+    void SetVariables(Long64_t entry);
+    //bool DuplicatedEvent();
     bool TightZZLeptons();
     bool ZZSelection();
     bool Z4lSelection();
     bool ZSelection();
     bool HZZSIPSelection();
+    //bool SmartCut();
+    bool HZZLowMass();
+    bool HZZMediumMass();
     bool TestMuons();
     void ShiftEfficiencies(Systematic variation);
     //float GetMuonScaleUncertainty(float muEta);

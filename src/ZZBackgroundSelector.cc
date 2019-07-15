@@ -102,7 +102,7 @@ Bool_t ZZBackgroundSelector::Process(Long64_t entry)
     //if (!PassesBaseSelection(entry, false, selection_))
     //    return true;
     //float event_weight=getEventWeight(entry);
-    if (ZZSelection()){
+    if (ZZSelection() && HZZSIPSelection()){
       if (true) {
       //if(getEventWeight(entry)>0){
       //std::cout<<"weight before filling: "<<getEventWeight(entry)<<std::endl;}
