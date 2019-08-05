@@ -196,7 +196,7 @@ Bool_t ZZGenSelector::Process(Long64_t entry)
     LoadBranches(entry);
     //Define Genweight of event based on channel in case of eemm or mmee
     GetPolarizationAngle();
-    if (ZZSelection()) {
+    if (true) {
       if (true) {
         //std::cout<<run<<":"<<lumi<<":"<<evt<<std::endl;
         //std::cout<<"Genweight in ZZGenSelector inside HZZ: "<<Genweight<<std::endl;

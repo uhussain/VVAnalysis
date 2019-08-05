@@ -1,3 +1,0 @@
-[submodule "PileupWeights"]
-	path = PileupWeights
-	url = ssh://git@gitlab.cern.ch:7999/ncsmith/PileupWeights.git
