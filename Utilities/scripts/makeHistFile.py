@@ -132,7 +132,7 @@ mc = SelectorTools.applySelector(args['filenames'],channels, "ZZSelector", args[
         extra_inputs=sf_inputs+hist_inputs+tselection, 
         addSumweights=True, proof=args['proof'])
 #Get the Gen Histograms
-gen = SelectorTools.applyGenSelector(args['filenames'],channels, "ZZGenSelector", args['selection'], fOut,args['analysis'],
+gen = SelectorTools.applyGenSelector(ConfigureJobs.getListOfEWK(),channels, "ZZGenSelector", args['selection'], fOut,args['analysis'],
         extra_inputs=hist_inputs+tselection, 
         addSumweights=False, proof=args['proof'])
 if args['test']:

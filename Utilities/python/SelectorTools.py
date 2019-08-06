@@ -210,7 +210,7 @@ def processGenLocalFiles(selector, file_path, chan):
             tree = rtfile.Get("%sGen/ntuple" % chan)
         #try:
         if not tree:
-            raise ValueError(("tree %s/ntuple not found for file %s. " \
+            raise ValueError(("tree %sGen/ntuple not found for file %s. " \
                 "Probably it is corrupted") % (chan, filename)
             )
         #except ValueError as e:
