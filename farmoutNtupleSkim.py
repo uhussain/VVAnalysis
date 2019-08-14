@@ -85,13 +85,13 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     first_selection = selection.split(",")[0].strip()
     if first_selection=="4lCRBase":
         submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
-            % '{:%Y-%m-%d}_ZZ4lCR2019AnalysisJobs'.format(datetime.date.today())
+            % '{:%Y-%m-%d}_%sAnalysisJobs'.format(datetime.date.today()) %analysis
     elif first_selection=="ZplusLBase":
         submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
-            % '{:%Y-%m-%d}_ZplusL2019AnalysisJobs'.format(datetime.date.today())
+            % '{:%Y-%m-%d}_%sAnalysisJobs'.format(datetime.date.today()) %analysis
     else:
         submission_dir = ('/data/uhussain/%s' if "uhussain" in path else "/nfs_scratch/uhussain/%s") \
-            % '{:%Y-%m-%d}_ZZ2019AnalysisJobs'.format(datetime.date.today())
+            % '{:%Y-%m-%d}_%sAnalysisJobs'.format(datetime.date.today()) %analysis
     try:
         os.mkdir(submission_dir)
     except:
@@ -103,6 +103,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     else:
         farmout_dict['files_per_job'] = getFilesPerJob(farmout_dict['input_files_path'])
     farmout_dict['job_name'] = job_name
+    #farmout_dict['analysis'] = analysis
     farmout_dict['time'] = datetime.datetime.now()
     farmout_dict['command'] = ' '.join(sys.argv)
     script_name = '/'.join([farmout_dict['job_dir'], 'farmout.sh'])
