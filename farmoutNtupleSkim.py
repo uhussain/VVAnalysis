@@ -103,7 +103,7 @@ def farmoutNtupleSkim(sample_name, path, selection, analysis, version, scaleFacs
     else:
         farmout_dict['files_per_job'] = getFilesPerJob(farmout_dict['input_files_path'])
     farmout_dict['job_name'] = job_name
-    #farmout_dict['analysis'] = analysis
+    farmout_dict['Analysis'] = analysis
     farmout_dict['time'] = datetime.datetime.now()
     farmout_dict['command'] = ' '.join(sys.argv)
     script_name = '/'.join([farmout_dict['job_dir'], 'farmout.sh'])

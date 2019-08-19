@@ -24,7 +24,7 @@ popd
 chmod +x ${job_dir}/skim.sh
 farmoutAnalysisJobs \
     --fwklite \
-    --output-dir=/store/user/$$USER/ZZ4l2016AnalysisJobs_$$DATE/${job_name} \
+    --output-dir=/store/user/$$USER/${Analysis}AnalysisJobs_$$DATE/${job_name} \
     --input-file-list=${job_dir}/input_file_list.txt \
     --submit-dir=${job_dir}/submit \
     --input-files-per-job=1 \
