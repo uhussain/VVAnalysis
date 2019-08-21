@@ -51,7 +51,7 @@ def getManagerPath():
             raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
                             % os.environ["USER"])
     except ValueError as e:
-        if os.path.isdir('AnalysisDatasetManager'):
+        if os.path.isdir('ZZ4lRun2DatasetManager'):
             return '.'
         raise e
 
@@ -63,8 +63,19 @@ def getCombinePath():
         raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
                             % os.environ["USER"])
     return config['Setup']['combine_path'] + "/"
-def getListOfEWKFilenames():
-    return [
+def getListOfEWKFilenames(analysis):
+    if "ZZ4l" in analysis:
+        return [
+        "zz4l-powheg",
+        "ggZZ4e",
+        "ggZZ4m",
+        "ggZZ4t",
+        "ggZZ2e2mu",
+        "ggZZ2e2tau",
+        "ggZZ2mu2tau",
+        ]
+    else:
+        return [
     #    "wz3lnu-powheg",
     # Use jet binned WZ samples for subtraction by default
         "wz3lnu-mgmlm-0j",
@@ -86,7 +97,7 @@ def getListOfEWKFilenames():
         "ggZZ4e",
         "ggZZ4m",
         "ggZZ2e2mu",
-    ]
+        ]
 def getListOfNonpromptFilenames():
     return ["tt-lep",
         "st-schan",
@@ -141,7 +152,7 @@ def getListOfHDFSFiles(file_path):
 def getListOfFiles(filelist, selection, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllInfo("/".join([data_path, "data/*"]))
     mc_info = UserInput.readAllInfo("/".join([data_path, "montecarlo/*"]))
     valid_names = data_info.keys() + mc_info.keys()
@@ -151,7 +162,7 @@ def getListOfFiles(filelist, selection, manager_path=""):
             names.append(name)
         elif "WZxsec2016" in name:
             dataset_file = manager_path + \
-                "AnalysisDatasetManager/FileInfo/WZxsec2016/%s.json" % selection
+                "ZZ4lRun2DatasetManager/FileInfo/WZxsec2016/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
@@ -185,7 +196,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
 def getListOfFilesWithXSec(filelist, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     files = getListOfFiles(filelist, "ntuples", manager_path)
     mc_info = UserInput.readAllInfo("/".join([data_path, "montecarlo/*"]))
     info = {}
@@ -248,7 +259,7 @@ def getInputFilesPath(sample_name, selection, analysis, manager_path=""):
     if ".root" in sample_name:
         print "INFO: using simple file %s" % sample_name
         return sample_name
-    data_path = "%s/AnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     input_file_base_name = "/".join([data_path, analysis, selection])
     input_file_name = getConfigFileName(input_file_base_name)
     input_files = UserInput.readInfo(input_file_name)
