@@ -4,8 +4,6 @@
 
 void ZZSelector::Init(TTree *tree)
 {
-    ZZSelectorBase::Init(tree);
-
     weight_info_ = 0;
     if (isMC_) {
         weight_info_ = GetLheWeightInfo();
@@ -599,8 +597,11 @@ bool ZZSelector::TestMuons(){
 void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     //bool noBlind = true;
     //Applying the ZZ Selection here
-    if (!PassesZZSelection())
-        return;
+    //std::cout<<"Is fillHistograms working?"<<std::endl;
+    //std::cout<<"weight:"<<weight<<std::endl;
+    if (!PassesHZZSelection()){
+        //std::cout<<"It should not be doing this?"<<std::endl;
+        return;}
     if ((variation.first == Central || (doaTGC_ && isaTGC_)) && isMC_){
         for (size_t i = 0; i < lheWeights.size(); i++) {
             SafeHistFill(weighthists_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
@@ -678,6 +679,9 @@ void ZZSelector::SetupNewDirectory()
 {
     SelectorBase::SetupNewDirectory();
     isaTGC_ = name_.find("atgc") != std::string::npos;
-   
+    //std::cout<<"selection in ZZSelector: "<<selection_<<std::endl;
+    applyFullSelection_ = (selection_ == ZZselection);
+    //std::cout<<applyFullSelection_<<std::endl;
     InitializeHistogramsFromConfig();   
+    //std::cout<<"Do Histos get initialized"<<std::endl;
 }

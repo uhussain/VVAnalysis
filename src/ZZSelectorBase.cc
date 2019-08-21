@@ -41,7 +41,7 @@ void ZZSelectorBase::SetScaleFactors()
 void ZZSelectorBase::Init(TTree *tree)
 {
 
-    allChannels_ = {"eeee","eemm","mmee","mmmm","eee", "eem", "emm", "mmm"};
+    //allChannels_ = {"eeee","eemm","mmee","mmmm","eee", "eem", "emm", "mmm"};
 
     SelectorBase::Init(tree);
 } 
@@ -55,11 +55,12 @@ void ZZSelectorBase::SetBranchesUWVV() {
         //fChain->SetBranchAddress("Flag_duplicateMuonsPass", Flag_duplicateMuonsPass);
         //fChain->SetBranchAddress("Flag_badMuonsPass", Flag_badMuonsPass);
     }
+    //std::cout<<"In ZZSelectorBase"<<std::endl;
     //std::cout<<"channelName: "<<channelName_<<std::endl;
     //std::cout<<"enum channel_: "<<channel_<<std::endl;
     //std::cout<<"isMC: "<<isMC_<<std::endl;
-    if (channelName_ == "eeee") {
-        channel_ = eeee;
+    //if (channelName_ == "eeee") {
+    if (channel_ == eeee){
         //std::cout<<"enum channel_: "<<channel_<<std::endl;
         fChain->SetBranchAddress("run", &run, &b_run);
         fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
@@ -116,8 +117,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
     }
     //Add 2e2mu channel also but it still needs to differentiate which one is Z1Mass and which one is Z2Mass leptons
     //This is done with a flag at the time of Process for each event on the fly
-    else if (channelName_ == "eemm") {
-        channel_ = eemm;
+    else if (channel_ == eemm) {
+        //channel_ = eemm;
         //fChain->SetBranchAddress("e1ZZTightIDNoVtx", &l1IsTight, &b_l1IsTight); 
         fChain->SetBranchAddress("run", &run, &b_run);
         fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
@@ -170,8 +171,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("m1IsLoose", &l3IsGap, &b_l3IsGap);
         fChain->SetBranchAddress("m2IsLoose", &l4IsGap, &b_l4IsGap);
     }
-    else if (channelName_ == "mmee") {
-        channel_ = mmee;
+    else if (channel_ == mmee) {
+        //channel_ = mmee;
         fChain->SetBranchAddress("run", &run, &b_run);
         fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
         fChain->SetBranchAddress("evt", &evt, &b_evt);
@@ -221,8 +222,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("m1IsLoose", &l3IsGap, &b_l3IsGap);
         fChain->SetBranchAddress("m2IsLoose", &l4IsGap, &b_l4IsGap);
     }
-    else if (channelName_ == "mmmm") {
-        channel_ = mmmm;
+    else if (channel_ == mmmm) {
+        //channel_ = mmmm;
         fChain->SetBranchAddress("run", &run, &b_run);
         fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
         fChain->SetBranchAddress("evt", &evt, &b_evt);
@@ -268,8 +269,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("m3Mass", &l3Mass, &b_l3Mass);
         fChain->SetBranchAddress("m4Mass", &l4Mass, &b_l4Mass);
     }
-    else if (channelName_ == "eee") {
-        channel_ = eee;
+    else if (channel_ == eee) {
+        //channel_ = eee;
         fChain->SetBranchAddress("run", &run, &b_run);
         fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
         fChain->SetBranchAddress("evt", &evt, &b_evt);
@@ -300,8 +301,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("e3PdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("e3MtToMET", &l3MtToMET, &b_l3MtToMET);
     }
-    else if (channelName_ == "eem") { 
-        channel_ = eem;
+    else if (channel_ == eem) { 
+        //channel_ = eem;
         fChain->SetBranchAddress("run", &run, &b_run);
         fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
         fChain->SetBranchAddress("evt", &evt, &b_evt);
@@ -333,8 +334,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("mPdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("mMtToMET", &l3MtToMET, &b_l3MtToMET);
     }
-    else if (channelName_ == "emm") { 
-        channel_ = emm;
+    else if (channel_ == emm) { 
+        //channel_ = emm;
         fChain->SetBranchAddress("run", &run, &b_run);
         fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
         fChain->SetBranchAddress("evt", &evt, &b_evt);
@@ -365,8 +366,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("ePdgId", &l3PdgId, &b_l3PdgId);
         fChain->SetBranchAddress("eMtToMET", &l3MtToMET, &b_l3MtToMET);
     }
-    else if (channelName_ == "mmm") { 
-        channel_ = mmm;
+    else if (channel_ == mmm) { 
+        //channel_ = mmm;
         fChain->SetBranchAddress("run", &run, &b_run);
         fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
         fChain->SetBranchAddress("evt", &evt, &b_evt);
@@ -398,7 +399,7 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("m3MtToMET", &l3MtToMET, &b_l3MtToMET);
     }
     else
-        throw std::invalid_argument("Invalid channel choice!");
+        throw std::invalid_argument("Invalid channel choice in ZZSelectorBase!");
 
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
 }

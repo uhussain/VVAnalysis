@@ -180,12 +180,6 @@ protected:
         "DYm50-2j","DYm50-3j","DYm50-4j", "DYm50__LO",
     };
 
-    std::string name_ = "Unnamed";
-    std::string channelName_ = "Unnamed";
-    Channel channel_ = Unknown;
-    std::string selectionName_ = "tightleptons";
-    Selection selection_ = tightleptons;
-    bool isMC_;
     bool isNonpromptEstimate_;
     bool isNonpromptMC_;
     bool isZgamma_;

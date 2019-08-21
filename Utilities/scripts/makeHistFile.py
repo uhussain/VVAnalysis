@@ -131,7 +131,7 @@ def makeHistFile(args):
         sys.exit(0)
 
     alldata = HistTools.makeCompositeHists(fOut,"AllData", 
-        ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"],, manager_path), args['lumi'],
+        ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"], manager_path), args['lumi'],
         underflow=False, overflow=False)
     OutputTools.writeOutputListItem(alldata, fOut)
     alldata.Delete()

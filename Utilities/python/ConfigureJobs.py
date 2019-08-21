@@ -171,6 +171,42 @@ def getListOfFiles(filelist, selection, manager_path=""):
                 names += [x for x in allnames if "data" in x]
             else:
                 names += allnames
+        elif "ZZ4l2016" in name:
+            dataset_file = manager_path + \
+                "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2016/%s.json" % selection
+            allnames = json.load(open(dataset_file)).keys()
+            print allnames
+            if "nodata" in name:
+                nodata = [x for x in allnames if "data" not in x]
+                names += nodata
+            elif "data" in name:
+                names += [x for x in allnames if "data" in x]
+            else:
+                names += allnames
+        elif "ZZ4l2017" in name:
+            dataset_file = manager_path + \
+                "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2017/%s.json" % selection
+            allnames = json.load(open(dataset_file)).keys()
+            print allnames
+            if "nodata" in name:
+                nodata = [x for x in allnames if "data" not in x]
+                names += nodata
+            elif "data" in name:
+                names += [x for x in allnames if "data" in x]
+            else:
+                names += allnames
+        elif "ZZ4l2018" in name:
+            dataset_file = manager_path + \
+                "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2018/%s.json" % selection
+            allnames = json.load(open(dataset_file)).keys()
+            print allnames
+            if "nodata" in name:
+                nodata = [x for x in allnames if "data" not in x]
+                names += nodata
+            elif "data" in name:
+                names += [x for x in allnames if "data" in x]
+            else:
+                names += allnames
         elif "*" in name:
             names += fnmatch.filter(valid_names, name)
         else:
