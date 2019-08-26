@@ -95,6 +95,7 @@ class SelectorBase : public TSelector {
         {"Zselection", Zselection},
         {"ZZselection", ZZselection},
         {"SignalSync", ZZselection},
+        {"LooseLeptons", ZZselection},
         {"Wselection_Full", Wselection_Full},
         {"FakeRateSelectionLoose", FakeRateSelectionLoose},
         {"FakeRateSelectionTight", FakeRateSelectionTight},

@@ -599,7 +599,7 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     //Applying the ZZ Selection here
     //std::cout<<"Is fillHistograms working?"<<std::endl;
     //std::cout<<"weight:"<<weight<<std::endl;
-    if (!PassesHZZSelection()){
+    if (!PassesZZSelection()){
         //std::cout<<"It should not be doing this?"<<std::endl;
         return;}
     if ((variation.first == Central || (doaTGC_ && isaTGC_)) && isMC_){
