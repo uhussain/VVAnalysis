@@ -133,6 +133,8 @@ def makeHistFile(args):
         fOut.Close()
         sys.exit(0)
 
+    if not ROOT.gROOT.GetListOfFiles().FindObject(tmpFileName):
+        fOut = ROOT.TFile.Open(tmpFileName, "update")
     alldata = HistTools.makeCompositeHists(fOut,"AllData", 
         ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"], manager_path), args['lumi'],
         underflow=False, overflow=False)
