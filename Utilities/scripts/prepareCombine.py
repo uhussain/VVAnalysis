@@ -67,12 +67,12 @@ stat_variations = { chan : [] for chan in (chans + ["all"])}
 args = getComLineArgs()
 
 manager_path = ConfigureJobs.getManagerPath() 
-sys.path.append("/".join([manager_path, "ZZ4lAnalysisDatasetManager",
+sys.path.append("/".join([manager_path, "ZZ4lRun2DatasetManager",
     "Utilities/python"]))
 
 from ConfigHistFactory import ConfigHistFactory
 config_factory = ConfigHistFactory(
-    "%s/ZZ4lAnalysisDatasetManager" % manager_path,
+    "%s/ZZ4lRun2DatasetManager" % manager_path,
     args['selection'],
 )
 

@@ -229,8 +229,8 @@ frfile = ROOT.TFile("/data/uhussain/ZZTo4l/ZZ2019/VVAnalysisTools/CMSSW_9_4_2/sr
 
 
 data_folder_name = datetime.date.today().strftime("%Y%b%d"+"_ZZ4l") 
-data_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2019/FakeRatesFromData/" + data_folder_name + "/plots"
-mc_outdir = "~/www/ZZAnalysisData/PlottingResults/ZZ4l2019/FakeRates/" + data_folder_name + "-MC/plots"
+data_outdir = "~/www/ZZFullRunII/PlottingResults/ZZ4l2018/FakeRatesFromData/" + data_folder_name + "/plots"
+mc_outdir = "~/www/ZZFullRunII/PlottingResults/ZZ4l2018/FakeRates/" + data_folder_name + "-MC/plots"
 
 for outdir in [data_outdir, mc_outdir]:
     try:
