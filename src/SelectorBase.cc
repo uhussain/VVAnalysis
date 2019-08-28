@@ -71,17 +71,13 @@ void SelectorBase::Init(TTree *tree)
         }
     }
 
-    //std::cout<<"In SelectorBase"<<std::endl;
-    //std::cout<<"selectionName: "<<selectionName_<<std::endl;
-    //std::cout<<"enum selection_: "<<selection_<<std::endl;
     if (selectionMap_.find(selectionName_) != selectionMap_.end()) {
         selection_ = selectionMap_[selectionName_];
     }
     else
-        throw std::invalid_argument("Invalid selection SelectorBase!");
+        throw std::invalid_argument("Invalid selection!");
     
     isMC_ = false;
-    //std::cout<<"What is a name: "<<name_<<std::endl;
     if (name_.find("data") == std::string::npos){
         isMC_ = true;
     }
@@ -90,12 +86,8 @@ void SelectorBase::Init(TTree *tree)
 
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
 
-    if (channelMap_.find(channelName_) != channelMap_.end()){
+    if (channelMap_.find(channelName_) != channelMap_.end())
         channel_ = channelMap_[channelName_];
-        //std::cout<<"In SelectorBase"<<std::endl;
-        //std::cout<<"channelName: "<<channelName_<<std::endl;
-        //std::cout<<"enum channel_: "<<channel_<<std::endl;
-    }
     else {
         std::string message = "Invalid channel choice! ";
         message += "Choice was " + channelName_ + "\n";
@@ -143,7 +135,6 @@ void SelectorBase::LoadBranches(Long64_t entry, std::pair<Systematic, std::strin
 Bool_t SelectorBase::Process(Long64_t entry)
 {
     for (const auto& variation : variations_) {
-        //std::cout<<"Selector Base Process"<<std::endl;
         LoadBranches(entry, variation);
         FillHistograms(entry, variation);
     }
@@ -182,26 +173,29 @@ void SelectorBase::UpdateDirectory()
   }
 }
 
+template<typename T>
+void SelectorBase::InitializeHistMap(std::vector<std::string>& labels, std::map<std::string, T*>& histMap) {
+    for (auto& label : labels) {
+        if (channel_ != Inclusive) {
+            auto histName = getHistName(label, "", channelName_);
+            histMap[histName] = {};
+        }
+        else {
+            for (auto& chan : allChannels_) {
+                auto histName = getHistName(label, "", chan);
+                histMap[histName] = {};
+            }
+        }
+    }
+}
+
 void SelectorBase::InitializeHistogramsFromConfig() {
     TList* histInfo = (TList *) GetInputList()->FindObject("histinfo");
     if (histInfo == nullptr ) 
         throw std::domain_error("Can't initialize histograms without passing histogram information to TSelector");
 
-    //std::cout<<"SelectorBase: Does it enter this function"<<std::endl;
-    //std::cout<<"hist1D length"<<hists1D_.size()<<std::endl;
-    for (auto& label : hists1D_) {
-        if (channel_ != Inclusive) {
-            auto histName = getHistName(label, "", channelName_);
-            histMap1D_[histName] = {};
-            //std::cout<<"SelectorBase: Do Histos get initialized"<<std::endl;
-        }
-        else {
-            for (auto& chan : allChannels_) {
-                auto histName = getHistName(label, "", chan);
-                histMap1D_[histName] = {};
-            }
-        }
-    }
+    InitializeHistMap(hists1D_, histMap1D_);
+    InitializeHistMap(weighthists1D_, weighthistMap1D_);
 
     for (auto && entry : *histInfo) {  
         TNamed* currentHistInfo = dynamic_cast<TNamed*>(entry);
@@ -248,17 +242,17 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
                 AddObject<TH1D>(histMap1D_[syst_histName], syst_histName.c_str(), 
                     histData[0].c_str(),nbins, xmin, xmax);
                 // TODO: Cleaner way to determine if you want to store systematics for weighted entries
-                //if (isaQGC_ && doaQGC_ && (weighthists_.find(name) != weighthists_.end())) { 
+                //if (isaQGC_ && doaQGC_ && (weighthistMap1D_.find(name) != weighthistMap1D_.end())) { 
                 //    std::string weightsyst_histName = name+"_lheWeights_"+syst.second;
-                //    AddObject<TH2D>(weighthists_[syst_histName], 
+                //    AddObject<TH2D>(weighthistMap1D_[syst_histName], 
                 //        (weightsyst_histName+"_"+channel).c_str(), histData[0].c_str(),
                 //        nbins, xmin, xmax, 1000, 0, 1000);
                 //}
             }
         }
         // Weight hists must be subset of 1D hists!
-        if (isMC_ && (weighthists_.find(histName) != weighthists_.end())) { 
-            AddObject<TH2D>(weighthists_[histName], 
+        if (isMC_ && (weighthistMap1D_.find(histName) != weighthistMap1D_.end())) { 
+            AddObject<TH2D>(weighthistMap1D_[histName], 
                 (name+"_lheWeights_"+channel).c_str(), histData[0].c_str(),
                 nbins, xmin, xmax, 1000, 0, 1000);
         }
@@ -278,8 +272,8 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
             }
         }
         // 3D weight hists must be subset of 2D hists!
-        if (isMC_ && (weighthists2D_.find(histName) != weighthists2D_.end())) { 
-            AddObject<TH3D>(weighthists2D_[histName], 
+        if (isMC_ && (weighthistMap2D_.find(histName) != weighthistMap2D_.end())) { 
+            AddObject<TH3D>(weighthistMap2D_[histName], 
                 (name+"_lheWeights_"+channel).c_str(), histData[0].c_str(),
                 nbins, xmin, xmax, nbinsy, ymin, ymax, 1000, 0, 1000);
         }
