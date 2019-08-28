@@ -28,6 +28,8 @@ def getComLineArgs():
         default="", help="Selection stage of input files")
     parser.add_argument("--year", type=str,
         default="default", help="Year of Analysis")
+    parser.add_argument("--scalefactors_file", "-sf", type=str,
+        default="", help="ScaleFactors file name")
     parser.add_argument("-c", "--channels", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["eee","eem","emm","mmm"], help="List of channels"
@@ -59,40 +61,81 @@ def makeHistFile(args):
     addScaleFacs = False
     if args['analysis'] == "WZxsec2016" or args['analysis'] == 'Zstudy_2016':
         addScaleFacs = True
-    addScaleFacs=False
+    
+    if "ZZ4l" in args['scalefactors_file']:
+        addScaleFacs=True
+    else:
+        addScaleFacs = False
+
     sf_inputs = [ROOT.TParameter(bool)("applyScaleFacs", False)]
 
     if addScaleFacs:
-        fScales = ROOT.TFile('data/scaleFactors.root')
-        mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
-        eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
-        useSvenjasFRs = False
-        useJakobsFRs = False
-        if useSvenjasFRs:
-            mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
-            eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
-        elif useJakobsFRs:
-            mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Jakob")
-            eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Jakob")
-        # For medium muons
-        #mCBMedFakeRate.SetName("fakeRate_allMu")
-        if mCBTightFakeRate:
-            mCBTightFakeRate.SetName("fakeRate_allMu")
-        if eCBTightFakeRate:
-            eCBTightFakeRate.SetName("fakeRate_allE")
+        fScales = ROOT.TFile(args['scalefactors_file'])
+        if "ZZ4l" in args['analysis']:
+            mZZTightFakeRate = fScales.Get("mZZTightFakeRate")
+            eZZTightFakeRate = fScales.Get("eZZTightFakeRate")
+            if mZZTightFakeRate:
+                mZZTightFakeRate.SetName("fakeRate_allMu")
+            if eZZTightFakeRate:
+                eZZTightFakeRate.SetName("fakeRate_allE")
+            if "2018" in args['scalefactors_file']:
+                muonMoriondSF= fScales.Get('muonMoriond19SF')
+                muonMoriondSF.SetName("muonMoriondSF")
+                electronLowRecoSF = fScales.Get('electronLowReco19SF')
+                electronLowRecoSF.SetName("electronLowRecoSF")
+                electronRecoSF = fScales.Get('electronReco19SF')
+                electronRecoSF.SetName("electronRecoSF")
+                electronMoriondSF = fScales.Get('electronMoriond19SF')
+                electronMoriondSF.SetName("electronMoriondSF")
+                electronMoriondGapSF = fScales.Get('electronMoriond19GapSF')
+                electronMoriondGapSF.SetName("electronMoriondGapSF")
+            else:
+                muonMoriondSF= fScales.Get('muonMoriond18SF')
+                muonMoriondSF.SetName("muonMoriondSF")
+                electronLowRecoSF = fScales.Get('electronLowReco18SF')
+                electronLowRecoSF.SetName("electronLowRecoSF")
+                electronRecoSF = fScales.Get('electronReco18SF')
+                electronRecoSF.SetName("electronRecoSF")
+                electronMoriondSF = fScales.Get('electronMoriond18SF')
+                electronMoriondSF.SetName("electronMoriondSF")
+                electronMoriondGapSF = fScales.Get('electronMoriond18GapSF')
+                electronMoriondGapSF.SetName("electronMoriondGapSF")
+            pileupSF = fScales.Get('pileupSF')
 
-        muonIsoSF = fScales.Get('muonIsoSF')
-        muonIdSF = fScales.Get('muonTightIdSF')
-        electronTightIdSF = fScales.Get('electronTightIdSF')
-        electronGsfSF = fScales.Get('electronGsfSF')
-        pileupSF = fScales.Get('pileupSF')
+            fr_inputs = [eZZTightFakeRate, mZZTightFakeRate,]
+            sf_inputs = [electronLowRecoSF,electronRecoSF,electronMoriondSF, electronMoriondGapSF,muonMoriondSF,pileupSF]
+        else:
+            fScales = ROOT.TFile('data/scaleFactors.root')
+            mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
+            eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
+            useSvenjasFRs = False
+            useJakobsFRs = False
+            if useSvenjasFRs:
+                mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
+                eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
+            elif useJakobsFRs:
+                mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Jakob")
+                eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Jakob")
+            # For medium muons
+            #mCBMedFakeRate.SetName("fakeRate_allMu")
+            if mCBTightFakeRate:
+                mCBTightFakeRate.SetName("fakeRate_allMu")
+            if eCBTightFakeRate:
+                eCBTightFakeRate.SetName("fakeRate_allE")
 
-        #fPrefireEfficiency = ROOT.TFile('data/Map_Jet_L1FinOReff_bxm1_looseJet_JetHT_Run2016B-H.root')
-        fPrefireEfficiency = ROOT.TFile('data/Map_Jet_L1FinOReff_bxm1_looseJet_SingleMuon_Run2016B-H.root')
-        prefireEff = fPrefireEfficiency.Get('prefireEfficiencyMap')
+            muonIsoSF = fScales.Get('muonIsoSF')
+            muonIdSF = fScales.Get('muonTightIdSF')
+            electronTightIdSF = fScales.Get('electronTightIdSF')
+            electronGsfSF = fScales.Get('electronGsfSF')
+            pileupSF = fScales.Get('pileupSF')
 
-        fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
-        sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF, prefireEff]
+            #fPrefireEfficiency = ROOT.TFile('data/Map_Jet_L1FinOReff_bxm1_looseJet_JetHT_Run2016B-H.root')
+            fPrefireEfficiency = ROOT.TFile('data/Map_Jet_L1FinOReff_bxm1_looseJet_SingleMuon_Run2016B-H.root')
+            prefireEff = fPrefireEfficiency.Get('prefireEfficiencyMap')
+
+            fr_inputs = [eCBTightFakeRate, mCBTightFakeRate,]
+            sf_inputs = [electronTightIdSF, electronGsfSF, muonIsoSF, muonIdSF, pileupSF, prefireEff]
+
         sf_inputs.append(ROOT.TParameter(bool)("applyScaleFacs", True))
 
     if args['input_tier'] == '':

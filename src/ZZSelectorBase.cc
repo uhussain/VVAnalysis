@@ -16,21 +16,21 @@ void ZZSelectorBase::SetScaleFactors()
     pileupSF_ = (ScaleFactor *) GetInputList()->FindObject("pileupSF");
     if (pileupSF_ == nullptr ) 
         std::invalid_argument("Must pass pileup weights SF");
-    eLowRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronLowReco19SF");
+    eLowRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronLowRecoSF");
     if (eLowRecoSF_ == nullptr ) 
-        std::invalid_argument("Must pass electron LowReco18 SF");
-    eRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronReco19SF");
+        std::invalid_argument("Must pass electron LowReco SF");
+    eRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronRecoSF");
     if (eRecoSF_ == nullptr ) 
-        std::invalid_argument("Must pass electron Reco18 SF");
-    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriond19SF");
+        std::invalid_argument("Must pass electron Reco SF");
+    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriondSF");
     if (eIdSF_ == nullptr ) 
-        std::invalid_argument("Must pass electron Moriond19 SF");
-    eGapIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriond19GapSF");
+        std::invalid_argument("Must pass electron Moriond SF");
+    eGapIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriondGapSF");
     if (eGapIdSF_ == nullptr ) 
-        std::invalid_argument("Must pass electronGap Moriond19 SF");
-    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonMoriond19SF");
+        std::invalid_argument("Must pass electronGap Moriond SF");
+    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonMoriondSF");
     if (mIdSF_ == nullptr ) 
-        std::invalid_argument("Must pass muon Moriond19 SF");
+        std::invalid_argument("Must pass muon Moriond SF");
 
     //There are L1Prefiring weight and uncertainity in the ZZ UWVV ntuples 
     //prefireEff_ = (TEfficiency*) GetInputList()->FindObject("prefireEfficiencyMap");
