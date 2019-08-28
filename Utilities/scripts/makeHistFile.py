@@ -48,8 +48,12 @@ def makeHistFile(args):
             "ZZ4lRun2DatasetManager", "Utilities/python"]))
 
     today = datetime.date.today().strftime("%d%b%Y")
-    tmpFileName = "Hists%s-%s.root" % (today, args['output_file']) if args['selection'] == "SignalSync" \
-        else "Hists%s-%s.root" % (today, args['analysis'])
+    
+    if args['test']:
+        tmpFileName = "Hists%s-%s.root" % (today, args['output_file']) 
+    else:
+        tmpFileName = "Hists%s-%s.root" % (today, args['output_file']) if args['selection'] == "SignalSync" \
+            else "Hists%s-%s.root" % (today, args['analysis'])
     fOut = ROOT.TFile(tmpFileName, "recreate")
 
     addScaleFacs = False
@@ -132,11 +136,13 @@ def makeHistFile(args):
     if args['test']:
         fOut.Close()
         sys.exit(0)
-
+    
+    fOut.Close()    
+    fOut = ROOT.TFile.Open(tmpFileName, "update")
+    
     alldata = HistTools.makeCompositeHists(fOut,"AllData", 
         ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"], manager_path), args['lumi'],
         underflow=False, overflow=False)
-    print "alldata:", alldata
     OutputTools.writeOutputListItem(alldata, fOut)
     alldata.Delete()
 
@@ -148,7 +154,6 @@ def makeHistFile(args):
 
         OutputTools.writeOutputListItem(nonpromptmc, fOut)
     
-    print "fOut: ",fOut
     ewkmc = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
         ConfigureJobs.getListOfEWKFilenames(args['analysis']), manager_path), args['lumi'],
         underflow=False, overflow=False)
