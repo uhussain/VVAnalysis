@@ -146,6 +146,7 @@ class SelectorDriver(object):
 
     def processDataset(self, dataset, file_path, chan):
         logging.info("Processing dataset %s" % dataset)
+        print "Processing dataset: ", dataset
         select = getattr(ROOT, self.selector_name)()
         select.SetInputList(self.inputs)
         self.addTNamed("name", dataset)
@@ -160,7 +161,7 @@ class SelectorDriver(object):
                 self.outfile = ROOT.TFile.Open(self.outfile_name)
             sumweights_hist = self.outfile.Get("%s/sumweights" % dataset)
             if not sumweights_hist:
-                sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 100, 0, 100)
+                sumweights_hist = ROOT.TH1D("sumweights", "sumweights", 1000, 0, 1000)
             sumweights_hist.SetDirectory(ROOT.gROOT)
         self.processLocalFiles(select, file_path, addSumweights, chan)
         output_list = select.GetOutputList()

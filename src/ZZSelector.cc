@@ -11,28 +11,29 @@ void ZZSelector::Init(TTree *tree)
     systematics_ = {
         {electronRecoEffUp,"CMS_RecoEff_eUp"},
         {electronRecoEffDown,"CMS_RecoEff_eDown"},
-        {electronEfficiencyUp, "CMS_eff_eUp"},
-        {electronEfficiencyDown, "CMS_eff_eDown"},
-        {muonEfficiencyUp, "CMS_eff_mUp"},
-        {muonEfficiencyDown, "CMS_eff_mDown"},
-        {pileupUp, "CMS_pileupUp"},
-        {pileupDown, "CMS_pileupDown"},
-    };
+        //{electronEfficiencyUp, "CMS_eff_eUp"},
+        //{electronEfficiencyDown, "CMS_eff_eDown"},
+        //{muonEfficiencyUp, "CMS_eff_mUp"},
+        //{muonEfficiencyDown, "CMS_eff_mDown"},
+        //{pileupUp, "CMS_pileupUp"},
+        //{pileupDown, "CMS_pileupDown"},
+    }; 
+    doSystematics_ = true;
 
     systHists_ = {
         "yield",
         "Mass",
-        "ZMass",
+        //"ZMass",
         "ZZPt",
-        "Z1Pt",
-        "Z2Pt"
+        //"Z1Pt",
+        //"Z2Pt"
         "ZPt",
-        "LepPt",
-        "Z1lep1_Pt",
-        "Z1lep2_Pt",
-        "Z2lep1_Pt",
-        "Z2lep2_Pt",
-        "nTruePU",
+        //"LepPt",
+        //"Z1lep1_Pt",
+        //"Z1lep2_Pt",
+        //"Z2lep1_Pt",
+        //"Z2lep2_Pt",
+        //"nTruePU",
     };
     hists1D_ = {
          "yield", "backgroundControlYield","nTruePU","nvtx","ZMass","Z1Mass","Z2Mass","ZZPt",  
@@ -59,7 +60,7 @@ void ZZSelector::SetBranchesUWVV() {
 
 unsigned int ZZSelector::GetLheWeightInfo() {
     std::vector<std::string> noLheWeights = {
-        "ggZZ2e2mu", "ggZZ4e", "ggZZ4m", "ggZZ4t", "ggZZ2e2tau","ggZZ2mu2tau"
+        "ggZZ2e2mu", "ggZZ4e", "ggZZ4m", "ggZZ4t", "ggZZ2e2tau","ggZZ2mu2tau","zz4l-sherpa","ZZJJTo2e2mu-EWK-phantom","ZZJJTo4e-EWK-phantom","ZZJJTo4mu-EWK-phantom"
     };
     std::vector<std::string> scaleAndPdfWeights = {
         "wz3lnu-powheg", "wz3lnu-mg5amcnlo",
@@ -73,7 +74,7 @@ unsigned int ZZSelector::GetLheWeightInfo() {
         //"wz-atgc_pt300"
     };
 
-    if (std::find(noLheWeights.begin(), noLheWeights.end(), name_) != noLheWeights.end())
+    if ((std::find(noLheWeights.begin(), noLheWeights.end(), name_) != noLheWeights.end()) || (isaTGC_))
         return 0;
     if (std::find(scaleAndPdfWeights.begin(), scaleAndPdfWeights.end(), name_) != scaleAndPdfWeights.end())
         return 2;
@@ -379,7 +380,10 @@ void ZZSelector::ShiftEfficiencies(Systematic variation) {
       float pt_e2 = l2Pt < EleSF_MAX_PT_ ? l2Pt : EleSF_MAX_PT_ - 0.01;
       float pt_e3 = l3Pt < EleSF_MAX_PT_ ? l3Pt : EleSF_MAX_PT_ - 0.01;
       float pt_e4 = l4Pt < EleSF_MAX_PT_ ? l4Pt : EleSF_MAX_PT_ - 0.01;
+      //std::cout<<eRecoSF_<<std::endl;
       if (variation == electronRecoEffUp || variation == electronRecoEffDown) {
+        if (eRecoSF_ != nullptr and eLowRecoSF_ != nullptr ) {
+          //std::cout<<"Is it a null ptr"<<std::endl;
         //Applying Electron Reco SFs Up/Down for ElectronRecoSyst
         if(l1Pt < 20){ 
           weight *= eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt,shift)/eLowRecoSF_->Evaluate2D(std::abs(l1Eta), l1Pt);
@@ -406,8 +410,10 @@ void ZZSelector::ShiftEfficiencies(Systematic variation) {
           weight *= eRecoSF_->Evaluate2D(std::abs(l4Eta), pt_e4,shift)/eRecoSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
         }
       }
+    }
       //Applying Electron ID SFs Up/Down for ElectronIDEffSyst
       else if (variation == electronEfficiencyUp || variation == electronEfficiencyDown) {
+        if (eIdSF_ != nullptr and eGapIdSF_ != nullptr ) {
         if(l1IsGap){
           weight *= eGapIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1, shift)/eGapIdSF_->Evaluate2D(std::abs(l1Eta), pt_e1);
         }
@@ -433,6 +439,7 @@ void ZZSelector::ShiftEfficiencies(Systematic variation) {
           weight *= eIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4, shift)/eIdSF_->Evaluate2D(std::abs(l4Eta), pt_e4);
         }
     }
+  }
   }//channel eeee
     else if (channel_ == eemm) {
       //In order to get around the Overflow issue, set the Pt, not ideal.
@@ -609,6 +616,7 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
             SafeHistFill(weighthistMap1D_, getHistName("Pt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
         }
       }
+    //std::cout << "variation.second: "<<variation.second;
     SafeHistFill(histMap1D_, getHistName("yield", variation.second), 1, weight);
     SafeHistFill(histMap1D_, getHistName("Mass", variation.second), Mass,weight);
     SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), Z1mass, weight);
