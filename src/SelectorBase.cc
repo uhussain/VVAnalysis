@@ -194,7 +194,9 @@ void SelectorBase::InitializeHistogramsFromConfig() {
     if (histInfo == nullptr ) 
         throw std::domain_error("Can't initialize histograms without passing histogram information to TSelector");
 
-    InitializeHistMap(hists1D_, histMap1D_);
+    std::vector<std::string> allhists1D = hists1D_;
+    allhists1D.insert(allhists1D.end(), systHists_.begin(), systHists_.end());
+    InitializeHistMap(allhists1D, histMap1D_);
     InitializeHistMap(weighthists1D_, weighthistMap1D_);
 
     for (auto && entry : *histInfo) {  
