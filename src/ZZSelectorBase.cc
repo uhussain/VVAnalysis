@@ -402,6 +402,7 @@ void ZZSelectorBase::SetBranchesUWVV() {
         throw std::invalid_argument("Invalid channel choice in ZZSelectorBase!");
 
     fChain->SetBranchAddress("type1_pfMETEt", &type1_pfMETEt, &b_type1_pfMETEt);
+
 }
 
 void ZZSelectorBase::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) {

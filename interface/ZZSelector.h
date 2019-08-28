@@ -32,6 +32,7 @@ public :
     float zep3l_jesDown;
     float zep3l_jerUp;
     float zep3l_jerDown;
+    Float_t mjj;
     std::vector<float>* jetEta = NULL;
     std::vector<float>* jetEta_jesUp = NULL;
     std::vector<float>* jetEta_jesDown = NULL;
@@ -55,6 +56,9 @@ public :
     TBranch* b_nvtx;
     TBranch* b_Mass;
     TBranch* b_Pt;
+    TBranch* b_jetPt;
+    TBranch* b_jetEta;
+    TBranch* b_mjj;
     int cen_count = 0;
     float count = 0;
 
@@ -70,6 +74,7 @@ protected:
     void FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void ApplyScaleFactors();
     bool PassesZZSelection();
+    bool PassesZZjjSelection();
     bool PassesHZZSelection();
     unsigned int GetLheWeightInfo();
     void SetVariables(Long64_t entry);

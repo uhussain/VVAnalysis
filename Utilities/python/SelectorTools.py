@@ -24,6 +24,9 @@ class SelectorDriver(object):
             "ZZ4l2016" : "ZZSelector",
             "ZZ4l2017" : "ZZSelector",
             "ZZ4l2018" : "ZZSelector",
+            "ZZ4l2016Bkg" : "ZZBackgroundSelector",
+            "ZZ4l2017Bkg" : "ZZBackgroundSelector",
+            "ZZ4l2018Bkg" : "ZZBackgroundSelector",
             "WGen" : "WGenSelector",
             "ZGen" : "ZGenSelector",
             "ThreeLep" : "ThreeLepSelector",
@@ -88,6 +91,9 @@ class SelectorDriver(object):
     def setNumCores(self, numCores):
         self.numCores = numCores
 
+    def setSumWeights(self, addSumweights):
+        self.addSumweights = addSumweights
+
     def setFileList(self, list_of_files, nPerJob, jobNum):
         if not os.path.isfile(list_of_files):
             raise ValueError("%s is not a valid file." % list_of_files)
@@ -123,6 +129,8 @@ class SelectorDriver(object):
             if "@" in dataset:
                 dataset, file_path = [f.strip() for f in dataset.split("@")]
             else:
+                if "Bkg" in self.analysis:
+                    self.analysis=self.analysis[:-3]
                 try:
                     file_path = ConfigureJobs.getInputFilesPath(dataset, 
                         self.input_tier, self.analysis)
