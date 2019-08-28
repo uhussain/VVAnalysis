@@ -604,9 +604,9 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
         return;}
     if ((variation.first == Central || (doaTGC_ && isaTGC_)) && isMC_){
         for (size_t i = 0; i < lheWeights.size(); i++) {
-            SafeHistFill(weighthists_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
-            SafeHistFill(weighthists_, getHistName("Mass", variation.second), Mass, i, lheWeights[i]/lheWeights[0]*weight);
-            SafeHistFill(weighthists_, getHistName("Pt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("Mass", variation.second), Mass, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("Pt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
         }
       }
     SafeHistFill(histMap1D_, getHistName("yield", variation.second), 1, weight);
