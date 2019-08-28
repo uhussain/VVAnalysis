@@ -179,10 +179,10 @@ def makeHistFile(args):
     if args['test']:
         fOut.Close()
         sys.exit(0)
-    
-    fOut.Close()    
+
+    fOut.Close()
     fOut = ROOT.TFile.Open(tmpFileName, "update")
-    
+
     alldata = HistTools.makeCompositeHists(fOut,"AllData", 
         ConfigureJobs.getListOfFilesWithXSec([args['analysis']+"data"], manager_path), args['lumi'],
         underflow=False, overflow=False)
