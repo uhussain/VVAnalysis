@@ -7,7 +7,7 @@
 
 class ZZSelector : public ZZSelectorBase {
 public :
-    bool doSystematics_ = true;
+    bool doSystematics_ = false;
     bool applyFullSelection_ = true;
     bool isaQGC_ = false;
     bool doaQGC_ = false;

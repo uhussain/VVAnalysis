@@ -118,7 +118,7 @@ def applySelector(filelist, channels,selector_name, selection,
 #This is a version that has extra_inputs in the shape of fakeRates for Bkgs. This will be the function used for everything once I have sfs setup.
 def applyBkgSelector(filelist, channels,selector_name, selection, 
         rootfile,
-        analysis="ZZ4l2018", 
+        analysis, 
         extra_inputs = [],
         addSumweights=True,
         proof=False):

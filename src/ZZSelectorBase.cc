@@ -15,10 +15,10 @@ void ZZSelectorBase::SlaveBegin(TTree * /*tree*/)
         Abort("Must pass pileup weights SF");
     eLowRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronLowReco19SF");
     if (eLowRecoSF_ == nullptr ) 
-        Abort("Must pass electron LowReco18 SF");
+        Abort("Must pass electron LowReco19 SF");
     eRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronReco19SF");
     if (eRecoSF_ == nullptr ) 
-        Abort("Must pass electron Reco18 SF");
+        Abort("Must pass electron Reco19 SF");
     eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriond19SF");
     if (eIdSF_ == nullptr ) 
         Abort("Must pass electron Moriond19 SF");

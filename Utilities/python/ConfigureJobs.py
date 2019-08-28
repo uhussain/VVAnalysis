@@ -69,7 +69,7 @@ def getListOfEWKFilenames():
         "ggZZ4t",
         "ggZZ2e2mu",
         "ggZZ2e2tau",
-        "ggZZ2mu2tau",
+        #"ggZZ2mu2tau",
     ]
 
 def getListOfEWK():
@@ -80,7 +80,7 @@ def getListOfEWK():
         "ggZZ4t",
         "ggZZ2e2mu",
         "ggZZ2e2tau",
-        "ggZZ2mu2tau",
+       # "ggZZ2mu2tau",
     ]
 def getListOfDYFilenames():
     return[
@@ -88,7 +88,7 @@ def getListOfDYFilenames():
         "DYJetsToLLM-50",
         ]
 def getListOfNonpromptFilenames():
-    return ["tt-lep",
+    return [#"tt-lep",
             "tt-jets",
         #"st-schan",
         #"st-tchan-t",
@@ -115,7 +115,7 @@ def getListOfggZZFilenames():
         "ggZZ4t",
         "ggZZ2e2mu",
         "ggZZ2e2tau",
-        "ggZZ2mu2tau"
+        #"ggZZ2mu2tau"
         ]
 def getJobName(sample_name, analysis, selection, version):
     date = '{:%Y-%m-%d}'.format(datetime.date.today())
@@ -153,15 +153,15 @@ def getListOfHDFSFiles(file_path):
 def getListOfFiles(filelist, selection, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
-    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     data_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "data/*"]))
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
     valid_names = data_info.keys() + mc_info.keys()
     names = []
     for name in filelist:
-        if "ZZ4l2018" in name:
+        if "ZZ4l2016" in name:
             dataset_file = manager_path + \
-                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2018/%s.json" % selection
+                "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2016/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
             print allnames
             if "nodata" in name:
@@ -171,9 +171,21 @@ def getListOfFiles(filelist, selection, manager_path=""):
                 names += [x for x in allnames if "data" in x]
             else:
                 names += allnames
-        elif "ZZ4l2019" in name:
+        elif "ZZ4l2017" in name:
             dataset_file = manager_path + \
-                "ZZ4lAnalysisDatasetManager/FileInfo/ZZ4l2019/%s.json" % selection
+                "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2017/%s.json" % selection
+            allnames = json.load(open(dataset_file)).keys()
+            print allnames
+            if "nodata" in name:
+                nodata = [x for x in allnames if "data" not in x]
+                names += nodata
+            elif "data" in name:
+                names += [x for x in allnames if "data" in x]
+            else:
+                names += allnames
+        elif "ZZ4l2018" in name:
+            dataset_file = manager_path + \
+                "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2018/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
             print allnames
             if "nodata" in name:
@@ -200,7 +212,7 @@ def fillTemplatedFile(template_file_name, out_file_name, template_dict):
 def getListOfFilesWithXSec(filelist, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
-    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     files = getListOfFiles(filelist, "ntuples", manager_path)
     #files = getListOfFiles(filelist, "2018Data", manager_path)
     mc_info = UserInput.readAllJson("/".join([data_path, "%s.json" % "montecarlo/*"]))
@@ -215,7 +227,25 @@ def getListOfFilesWithXSec(filelist, manager_path=""):
     return info
 def getPreviousStep(selection, analysis):
     selection_map = {}
-    if analysis == "ZZ4l2018":
+    if analysis == "ZZ4l2016":
+        selection_map = { "ntuples" : "ntuples",
+                "preselection" : "ntuples",
+                "4lCRBase" : "ntuples"
+        }
+    elif analysis == "ZplusL2016":
+        selection_map = { "ntuples": "ntuples",
+                "ZplusLBase" : "ntuples"
+        }
+    elif analysis == "ZZ4l2017":
+        selection_map = { "ntuples" : "ntuples",
+                "preselection" : "ntuples",
+                "4lCRBase" : "ntuples"
+        }
+    elif analysis == "ZplusL2017":
+        selection_map = { "ntuples": "ntuples",
+                "ZplusLBase" : "ntuples"
+        }
+    elif analysis == "ZZ4l2018":
         selection_map = { "ntuples" : "ntuples",
                 "preselection" : "ntuples",
                 "4lCRBase" : "ntuples"
@@ -223,23 +253,6 @@ def getPreviousStep(selection, analysis):
     elif analysis == "ZplusL2018":
         selection_map = { "ntuples": "ntuples",
                 "ZplusLBase" : "ntuples"
-        }
-    elif analysis == "ZZ4l2019":
-        selection_map = { "ntuples" : "ntuples",
-                "preselection" : "ntuples",
-                "4lCRBase" : "ntuples"
-        }
-    elif analysis == "ZplusL2019":
-        selection_map = { "ntuples": "ntuples",
-                "ZplusLBase" : "ntuples"
-        }
-    elif analysis == "WZDecemberAnalysis":
-        selection_map = { "ntuples" : "ntuples",
-                "loosepreselection" : "ntuples",
-                "preselection" : "ntuples",
-                "Mass3l" : "preselection",
-                "Zselection" : "preselection",
-                "Wselection" : "Zselection"
         }
     selection = selection.replace(";",",")
     first_selection = selection.split(",")[0].strip()
@@ -253,7 +266,7 @@ def getPreviousStep(selection, analysis):
 def getInputFilesPath(sample_name, selection, analysis, manager_path=""):
     if manager_path is "":
         manager_path = getManagerPath()
-    data_path = "%s/ZZ4lAnalysisDatasetManager/FileInfo" % manager_path
+    data_path = "%s/ZZ4lRun2DatasetManager/FileInfo" % manager_path
     input_file_name = "/".join([data_path, analysis, "%s.json" %
         selection])
     input_files = UserInput.readJson(input_file_name)

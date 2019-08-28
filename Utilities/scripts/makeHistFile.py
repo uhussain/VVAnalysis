@@ -30,7 +30,7 @@ def getComLineArgs():
     parser.add_argument("-b", "--hist_names", 
                         type=lambda x : [i.strip() for i in x.split(',')],
                         default=["all"], help="List of histograms, "
-                        "as defined in ZZ4lAnalysisDatasetManager, separated "
+                        "as defined in ZZ4lRun2DatasetManager, separated "
                         "by commas")
     return vars(parser.parse_args())
 
@@ -51,7 +51,7 @@ ROOT.gROOT.SetBatch(True)
 args = getComLineArgs()
 manager_path = ConfigureJobs.getManagerPath()
 sys.path.append("/".join([manager_path, 
-    "ZZ4lAnalysisDatasetManager", "Utilities/python"]))
+    "ZZ4lRun2DatasetManager", "Utilities/python"]))
 import ConfigHistTools 
 
 today = datetime.date.today().strftime("%d%b%Y")

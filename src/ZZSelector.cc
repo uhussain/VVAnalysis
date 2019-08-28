@@ -586,7 +586,7 @@ Bool_t ZZSelector::Process(Long64_t entry)
     std::pair<Systematic, std::string> central_var = std::make_pair(Central, "");
     LoadBranches(entry, central_var);
     //Define weight of event based on channel in case of eemm or mmee
-    if (HZZSIPSelection() && ZZSelection() && TightZZLeptons()) {
+    if (ZZSelection() && TightZZLeptons()) {
       if (true) {
         //std::cout<<run<<":"<<lumi<<":"<<evt<<std::endl;
         //std::cout<<"Z1Mass: "<<Z1mass<<std::endl;
@@ -598,7 +598,7 @@ Bool_t ZZSelector::Process(Long64_t entry)
         for (const auto& systematic : systematics_) {
             if(systematic.first==muonEfficiencyUp || systematic.first==muonEfficiencyDown){ 
             LoadBranches(entry, systematic);
-            if (ZZSelection() && HZZSIPSelection() && TightZZLeptons()) {
+            if (ZZSelection() && TightZZLeptons()) {
                 FillHistograms(entry, weight, !blindVBS, systematic);
             }
         }
