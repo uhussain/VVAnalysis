@@ -24,9 +24,6 @@ class SelectorDriver(object):
             "ZZ4l2016" : "ZZSelector",
             "ZZ4l2017" : "ZZSelector",
             "ZZ4l2018" : "ZZSelector",
-            "ZZ4l2016Bkg" : "ZZBackgroundSelector",
-            "ZZ4l2017Bkg" : "ZZBackgroundSelector",
-            "ZZ4l2018Bkg" : "ZZBackgroundSelector",
             "WGen" : "WGenSelector",
             "ZGen" : "ZGenSelector",
             "ThreeLep" : "ThreeLepSelector",
@@ -59,11 +56,14 @@ class SelectorDriver(object):
     def setChannels(self, channels):
         self.channels = channels
 
+    def isBackground(self):
+        self.selector_name = self.selector_name.replace("Selector", "BackgroundSelector")
+
     def setOutputfile(self, outfile_name):
         self.outfile_name = outfile_name
         self.outfile = ROOT.gROOT.FindObject(outfile_name)
         if not self.outfile:
-            self.outfile = ROOT.TFile.Open(outfile_name)
+            self.outfile = ROOT.TFile.Open(outfile_name, "recreate")
         self.current_file = self.outfile
 
     def addTNamed(self, name, title):
@@ -222,7 +222,7 @@ class SelectorDriver(object):
     def combineParallelFiles(self, tempfiles, chan):
         tempfiles = filter(os.path.isfile, tempfiles)
         outfile = self.outfile_name
-        if chan != "Inclusive":
+        if chan != "Inclusive" and len(self.channels) != 1:
             outfile = self.outfile_name.replace(".root", "_%s.root" % chan)
         rval = subprocess.call(["hadd", "-f", outfile] + tempfiles)
         if rval == 0:
