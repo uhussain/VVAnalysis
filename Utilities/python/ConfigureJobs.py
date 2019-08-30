@@ -83,7 +83,18 @@ def getCombinePath():
         raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
                             % os.environ["USER"])
     return config['Setup']['combine_path'] + "/"
-def getListOfEWKFilenames():
+def getListOfEWKFilenames(analysis=""):
+    if "ZZ4l" in analysis:
+        return [
+            "zz4l-powheg",
+            "ggZZ4e",
+            "ggZZ4m",
+            "ggZZ4t",
+            "ggZZ2e2mu",
+            "ggZZ2e2tau",
+            #"ggZZ2mu2tau",
+        ]
+    # TODO: This is obviously WZ specific and should be updated
     return [
     #    "wz3lnu-powheg",
     # Use jet binned WZ samples for subtraction by default
