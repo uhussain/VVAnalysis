@@ -148,24 +148,24 @@ def makeHistFile(args):
     analysis = "/".join([args['analysis'], selection])
     hists, hist_inputs = UserInput.getHistInfo(analysis, args['hist_names'], args['noHistConfig'])
 
-    if not args['test']:
+    #if not args['test']:
 
-        bkgselector = SelectorTools.SelectorDriver(args['analysis']+"Bkg", args['selection'], args['input_tier'], args['year'])
-        bkgselector.setOutputfile(fOut.GetName())
-        bkgselector.setInputs(sf_inputs+fr_inputs+hist_inputs)
-        bkgselector.setSumWeights(False)
-        bkgselector.setNtupeType("UWVV" if args['uwvv'] else "NanoAOD")
-        if args['uwvv']:
-            logging.debug("Processing channels " % args['channels'])
-            bkgselector.setChannels(args['channels'])
-        bkgselector.setNumCores(args['numCores'])
+    #    bkgselector = SelectorTools.SelectorDriver(args['analysis']+"Bkg", args['selection'], args['input_tier'], args['year'])
+    #    bkgselector.setOutputfile(fOut.GetName())
+    #    bkgselector.setInputs(sf_inputs+fr_inputs+hist_inputs)
+    #    bkgselector.setSumWeights(False)
+    #    bkgselector.setNtupeType("UWVV" if args['uwvv'] else "NanoAOD")
+    #    if args['uwvv']:
+    #        logging.debug("Processing channels " % args['channels'])
+    #        bkgselector.setChannels(args['channels'])
+    #    bkgselector.setNumCores(args['numCores'])
 
-        if args['filenames']:
-            bkgselector.setDatasets(args['filenames'])
-        else:
-            bkgselector.setFileList(*args['inputs_from_file'])
+    #    if args['filenames']:
+    #        bkgselector.setDatasets(args['filenames'])
+    #    else:
+    #        bkgselector.setFileList(*args['inputs_from_file'])
 
-        background = bkgselector.applySelector()
+    #    background = bkgselector.applySelector()
 
     selector = SelectorTools.SelectorDriver(args['analysis'], args['selection'], args['input_tier'], args['year'])
     selector.setOutputfile(fOut.GetName())

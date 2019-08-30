@@ -129,8 +129,8 @@ class SelectorDriver(object):
             if "@" in dataset:
                 dataset, file_path = [f.strip() for f in dataset.split("@")]
             else:
-                if "Bkg" in self.analysis:
-                    self.analysis=self.analysis[:-3]
+                #if "Bkg" in self.analysis:
+                #    self.analysis=self.analysis[:-3]
                 try:
                     file_path = ConfigureJobs.getInputFilesPath(dataset, 
                         self.input_tier, self.analysis)
