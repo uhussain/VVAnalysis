@@ -8,6 +8,7 @@ shapes qqZZ_powheg * ${output_file} qqZZ_powheg/${fit_variable}_$$CHANNEL     qq
 shapes ggZZ * ${output_file} ggZZ/${fit_variable}_$$CHANNEL                   ggZZ/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
 shapes VVV  * ${output_file} VVV/${fit_variable}_$$CHANNEL                    VVV/${fit_variable}_$$SYSTEMATIC_$$CHANNEL 
 
+#shapes nonprompt * ${output_file} nonprompt/${fit_variable}_$$CHANNEL nonprompt/${fit_variable}_$$SYSTEMATIC_$$CHANNEL
 shapes nonprompt * ${output_file} nonprompt/${fit_variable}_Fakes_$$CHANNEL nonprompt/${fit_variable}_Fakes_$$SYSTEMATIC_$$CHANNEL
 shapes data_obs  * ${output_file} data/${fit_variable}_$$CHANNEL
 
@@ -32,6 +33,6 @@ trigger_mm_17             lnN       1.01             1.01                1.01   
 CMS_eff_e               shape       1                 1                 1            1          0
 CMS_RecoEff_e           shape       1                 1                 1            1          0
 CMS_eff_m               shape       1                 1                 1            1          0
-CMS_pileup              shape       1                 1                 1            1          0
+#CMS_pileup              shape       1                 1                 1            1          0
 CMS_lumi                  lnN       1.01             1.01               1.01         1.01       1.01
 lumi_17                   lnN       1.021            1.021              1.021        1.021      1.021

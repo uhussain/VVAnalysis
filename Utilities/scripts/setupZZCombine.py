@@ -29,7 +29,8 @@ fileMap = { "2017" : "/eos/user/k/kelong/HistFiles/ZZ/Hists13Aug2019-ZZ4l2017Ful
     "2016" : "/eos/user/k/kelong/HistFiles/ZZ/Hists29Aug2019-ZZ4l2016.root",
 }
 channels = ["eeee", "eemm", "mmee", "mmmm"]
-nuissance_map = {"eeee" : 9, "eemm" : 10, "mmee" : 10, "mmmm" : 8, "all" : 6}
+#nuissance_map = {"eeee" : 9, "eemm" : 10, "mmee" : 10, "mmmm" : 8, "all" : 6}
+nuissance_map = {"eeee" : 8, "eemm" : 9, "mmee" : 9, "mmmm" : 7, "all" : 5}
 #fitvar = "ZZPt"
 #rebin = array.array('d', [0.0,50.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0])
 fitvar = "Mass"
@@ -53,7 +54,8 @@ for year in ["2016"]:#fileMap.keys():
     #cardtool.setOutputFolder("/eos/user/k/kelong/CombineStudies/ZZ/%s%sFit" % (fitvar, year))
     for process in plot_groups:
         #Turn this back on when the theory uncertainties are added
-        addTheory = process not in ["nonprompt"] and False
+        #addTheory = process not in ["nonprompt"] and False
+        addTheory = process not in ["nonprompt", "data"]
         cardtool.loadHistsForProcess(process, addTheory)
         cardtool.writeProcessHistsToOutput(process)
 

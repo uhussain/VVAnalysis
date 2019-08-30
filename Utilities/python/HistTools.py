@@ -163,6 +163,7 @@ def getVariationHists(hists, process_name, histUp_name, up_action, down_action, 
         # For now, skip this check on aQGC for now, since they're screwed up
         if "aqgc" in process_name: continue
     isValidVariation(process_name, histCentral, histUp, histDown)
+    #print "For process %s: Central, down, up: %s, %s, %s" % (process_name, histCentral.Integral(), histUp.Integral(), histDown.Integral())
     return [histUp, histDown]
 
 def isValidVariation(process_name, histCentral, histUp, histDown):
@@ -266,7 +267,7 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=False
             sumweights_hist = hist_file.Get("/".join([directory.split("__")[0], "sumweights"]))
             if not sumweights_hist:
                 raise RuntimeError("Failed to find sumWeights for dataset %s" % directory)
-            sumweights = sumweights_hist.Integral()
+            sumweights = sumweights_hist.Integral(1, sumweights_hist.GetNbinsX()+2)
             sumweights_hist.Delete()
         for histname in hists:
             if histname == "sumweights": continue
@@ -280,6 +281,7 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=False
                 sumhist = composite.FindObject(hist.GetName())
                 if sumweights:
                     hist.Scale(members[dirname.split("__")[0]]*1000*lumi/sumweights)
+                    #print "Scaling by lumi*xsec / sumweights",  lumi, members[dirname.split("__")[0]], sumweights
                 addOverflowAndUnderflow(hist, underflow, overflow)
             else:
                 raise RuntimeError("hist %s was not produced for "
