@@ -9,6 +9,7 @@ import os
 import logging
 import sys
 import datetime
+import subprocess
 
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
@@ -20,6 +21,8 @@ def getComLineArgs():
         help="Run test job (no background estimate)")
     parser.add_argument("--uwvv", action='store_true',
         help="Use UWVV format ntuples in stead of NanoAOD")
+    parser.add_argument("--with_background", action='store_true',
+        help="Don't run background selector")
     parser.add_argument("--noHistConfig", action='store_true',
         help="Don't rely on config file to specify hist info")
     parser.add_argument("-j", "--numCores", type=int, default=1,
@@ -56,19 +59,14 @@ def makeHistFile(args):
     else:
         tmpFileName = "Hists%s-%s.root" % (today, args['output_file']) if args['selection'] == "SignalSync" \
             else "Hists%s-%s.root" % (today, args['analysis'])
-    fOut = ROOT.TFile(tmpFileName, "recreate")
+    fOut = ROOT.TFile(tmpFileName if not args['with_background'] else tmpFileName.replace(".root", "sel.root"), "recreate")
 
     addScaleFacs = False
-    if args['analysis'] == "WZxsec2016" or args['analysis'] == 'Zstudy_2016':
+    if args['analysis'] == "WZxsec2016" or args['analysis'] == 'Zstudy_2016' or args['scalefactors_file']:
         addScaleFacs = True
     
-    if "ZZ4l" in args['scalefactors_file']:
-        addScaleFacs=True
-    else:
-        addScaleFacs = False
-
     sf_inputs = [ROOT.TParameter(bool)("applyScaleFacs", False)]
-
+    fr_inputs = []
     if addScaleFacs:
         fScales = ROOT.TFile(args['scalefactors_file'])
         if "ZZ4l" in args['analysis']:
@@ -148,18 +146,6 @@ def makeHistFile(args):
     analysis = "/".join([args['analysis'], selection])
     hists, hist_inputs = UserInput.getHistInfo(analysis, args['hist_names'], args['noHistConfig'])
 
-    #if "WZxsec2016" in analysis and "FakeRate" not in args['output_selection'] and not args['test']:
-    #    background = SelectorTools.applySelector(["WZxsec2016data"] +
-    #        ConfigureJobs.getListOfEWKFilenames() + ["wz3lnu-powheg"] +
-    #        ConfigureJobs.getListOfNonpromptFilenames(), 
-    #            "WZBackgroundSelector", args['selection'], fOut, 
-    #            extra_inputs=sf_inputs+fr_inputs+hist_inputs+tselection, 
-    #            channels=channels,
-    #            addSumweights=False,
-    #            nanoAOD=nanoAOD,
-    #            parallel=args['parallel'],
-    #            )
-
     selector = SelectorTools.SelectorDriver(args['analysis'], args['selection'], args['input_tier'], args['year'])
     selector.setOutputfile(fOut.GetName())
     selector.setInputs(sf_inputs+hist_inputs)
@@ -180,6 +166,16 @@ def makeHistFile(args):
         fOut.Close()
         sys.exit(0)
 
+    if args['with_background']:
+        selector.isBackground()
+        selector.setInputs(sf_inputs+hist_inputs+fr_inputs)
+        selector.setOutputfile(tmpFileName.replace(".root", "bkgd.root"))
+        nonprompt = selector.applySelector()
+        tempfiles = [tmpFileName.replace(".root", "%s.root" % app) for app in ["sel", "bkgd"]]
+        rval = subprocess.call(["hadd", "-f", tmpFileName] + tempfiles)
+        if rval == 0:
+            map(os.remove, tempfiles)
+
     fOut.Close()
     fOut = ROOT.TFile.Open(tmpFileName, "update")
 
@@ -196,7 +192,7 @@ def makeHistFile(args):
         nonpromptmc.Delete()
 
         OutputTools.writeOutputListItem(nonpromptmc, fOut)
-    
+
     ewkmc = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
         ConfigureJobs.getListOfEWKFilenames(args['analysis']), manager_path), args['lumi'],
         underflow=False, overflow=False)

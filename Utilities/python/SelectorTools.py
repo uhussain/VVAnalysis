@@ -56,11 +56,14 @@ class SelectorDriver(object):
     def setChannels(self, channels):
         self.channels = channels
 
+    def isBackground(self):
+        self.selector_name = self.selector_name.replace("Selector", "BackgroundSelector")
+
     def setOutputfile(self, outfile_name):
         self.outfile_name = outfile_name
         self.outfile = ROOT.gROOT.FindObject(outfile_name)
         if not self.outfile:
-            self.outfile = ROOT.TFile.Open(outfile_name)
+            self.outfile = ROOT.TFile.Open(outfile_name, "recreate")
         self.current_file = self.outfile
 
     def addTNamed(self, name, title):
@@ -87,6 +90,9 @@ class SelectorDriver(object):
 
     def setNumCores(self, numCores):
         self.numCores = numCores
+
+    def setSumWeights(self, addSumweights):
+        self.addSumweights = addSumweights
 
     def setFileList(self, list_of_files, nPerJob, jobNum):
         if not os.path.isfile(list_of_files):
@@ -151,7 +157,7 @@ class SelectorDriver(object):
         select.SetInputList(self.inputs)
         self.addTNamed("name", dataset)
         # Only add for one channel
-        addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset
+        addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset and "Background" not in self.selector_name
         if addSumweights:
             sumweights_hist = ROOT.gROOT.FindObject("sumweights")
             # Avoid accidentally combining sumweights across datasets
@@ -214,7 +220,7 @@ class SelectorDriver(object):
     def combineParallelFiles(self, tempfiles, chan):
         tempfiles = filter(os.path.isfile, tempfiles)
         outfile = self.outfile_name
-        if chan != "Inclusive":
+        if chan != "Inclusive" and len(self.channels) != 1:
             outfile = self.outfile_name.replace(".root", "_%s.root" % chan)
         rval = subprocess.call(["hadd", "-f", outfile] + tempfiles)
         if rval == 0:

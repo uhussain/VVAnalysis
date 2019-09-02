@@ -237,13 +237,13 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
 
     if (histData.size() == 4) {
         AddObject<TH1D>(histMap1D_[histName], histName.c_str(), histData[0].c_str(),nbins, xmin, xmax);
-        std::cout<<"doSystematics: "<<doSystematics_<<std::endl;
-        std::cout<<systHists_.size()<<std::endl;
-        std::cout<<"histName: "<<histName<<std::endl;
-        if (doSystematics_ && std::find(systHists_.begin(), systHists_.end(), histName) != systHists_.end()) {
-            std::cout<<"are there systHists_"<<std::endl;
+        //std::cout<<"doSystematics: "<<doSystematics_<<std::endl;
+        //std::cout<<systHists_.size()<<std::endl;
+        //std::cout<<"histName: "<<histName<<std::endl;
+        if (doSystematics_ && std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
+            //std::cout<<"are there systHists_"<<std::endl;
             for (auto& syst : systematics_) {
-                std::cout<<"systHists getting filled?"<<std::endl;
+                //std::cout<<"systHists getting filled?"<<std::endl;
                 std::string syst_histName = getHistName(name, syst.second, channel);
                 histMap1D_[syst_histName] = {};
                 AddObject<TH1D>(histMap1D_[syst_histName], syst_histName.c_str(), 
@@ -258,7 +258,9 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
             }
         }
         // Weight hists must be subset of 1D hists!
+        //std::cout<<"size of weighthistMap1D_: "<<weighthistMap1D_.size()<<std::endl;
         if (isMC_ && (weighthistMap1D_.find(histName) != weighthistMap1D_.end())) { 
+           //std::cout<<"Is weightHists getting filled?"<<std::endl;
             AddObject<TH2D>(weighthistMap1D_[histName], 
                 (name+"_lheWeights_"+channel).c_str(), histData[0].c_str(),
                 nbins, xmin, xmax, 1000, 0, 1000);
