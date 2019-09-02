@@ -176,7 +176,7 @@ class CombineCardTools(object):
         self.combineChannels(group)
         #TODO: Make optional
         map(HistTools.addOverflow, filter(lambda x: (x.GetName() not in processedHists), group))
-        if "data" not in group.GetName():
+        if "data" not in group.GetName().lower():
             map(HistTools.removeZeros, filter(lambda x: (x.GetName() not in processedHists), group))
         self.histData[processName] = group
 
