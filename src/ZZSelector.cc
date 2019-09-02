@@ -11,38 +11,52 @@ void ZZSelector::Init(TTree *tree)
     systematics_ = {
         {electronRecoEffUp,"CMS_RecoEff_eUp"},
         {electronRecoEffDown,"CMS_RecoEff_eDown"},
-        //{electronEfficiencyUp, "CMS_eff_eUp"},
-        //{electronEfficiencyDown, "CMS_eff_eDown"},
-        //{muonEfficiencyUp, "CMS_eff_mUp"},
-        //{muonEfficiencyDown, "CMS_eff_mDown"},
+        {electronEfficiencyUp, "CMS_eff_eUp"},
+        {electronEfficiencyDown, "CMS_eff_eDown"},
+        {muonEfficiencyUp, "CMS_eff_mUp"},
+        {muonEfficiencyDown, "CMS_eff_mDown"},
         //{pileupUp, "CMS_pileupUp"},
         //{pileupDown, "CMS_pileupDown"},
     }; 
     doSystematics_ = true;
+    
+    //This would be set true inside ZZBackground Selector
+    isNonPrompt_ = false;
 
     systHists_ = {
         "yield",
         "Mass",
-        //"ZMass",
+        "ZMass",
         "ZZPt",
         //"Z1Pt",
         //"Z2Pt"
         "ZPt",
-        //"LepPt",
+        "LepPt",
+        "LepEta"
         //"Z1lep1_Pt",
         //"Z1lep2_Pt",
         //"Z2lep1_Pt",
         //"Z2lep2_Pt",
         //"nTruePU",
     };
+    //hists1D_ = {
+    //     "yield", "backgroundControlYield","nTruePU","nvtx","ZMass","Z1Mass","Z2Mass","ZZPt",  
+    //     "Z1Pt","Z2Pt","Z1Phi","Z2Phi","dPhiZ1Z2","ZPt","LepPt","LepEta","Lep12Pt","Lep12Eta",
+    //     "Lep34Pt","Lep34Eta","Z1lep1_Eta","Z1lep1_Phi","Z1lep1_Pt","Z1lep1_PdgId","Z1lep2_Eta", 
+    //     "Z1lep2_Phi","Z1lep2_Pt","Z1lep2_PdgId","Z2lep1_Eta","Z2lep1_Phi","Z2lep1_Pt","Z2lep1_PdgId",
+    //     "Z2lep2_Eta","Z2lep2_Phi","Z2lep2_Pt","Z2lep2_PdgId","Mass","nJets",
+    //};
+
     hists1D_ = {
-         "yield", "backgroundControlYield","nTruePU","nvtx","ZMass","Z1Mass","Z2Mass","ZZPt",  
-         "Z1Pt","Z2Pt","Z1Phi","Z2Phi","dPhiZ1Z2","ZPt","LepPt","LepEta","Lep12Pt","Lep12Eta",
-         "Lep34Pt","Lep34Eta","Z1lep1_Eta","Z1lep1_Phi","Z1lep1_Pt","Z1lep1_PdgId","Z1lep2_Eta", 
-         "Z1lep2_Phi","Z1lep2_Pt","Z1lep2_PdgId","Z2lep1_Eta","Z2lep1_Phi","Z2lep1_Pt","Z2lep1_PdgId",
-         "Z2lep2_Eta","Z2lep2_Phi","Z2lep2_Pt","Z2lep2_PdgId","Mass","nJets",
+         "yield", "ZMass","ZZPt","dPhiZ1Z2","ZPt","LepPt","LepEta",
+         "Mass","nJets","jetPt[0]","jetPt[1]","jetEta[0]","jetEta[1]","mjj","dEtajj"
     };
 
+    weighthists1D_ = {
+        "yield",
+        "Mass",
+        "ZZPt",
+    };
     ZZSelectorBase::Init(tree);
 }
 
@@ -56,6 +70,9 @@ void ZZSelector::SetBranchesUWVV() {
     }
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
+    fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
+    fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
+    fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
 }
 
 unsigned int ZZSelector::GetLheWeightInfo() {
@@ -92,6 +109,9 @@ void ZZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::str
     //b_l3Pt->GetEntry(entry);
     b_Mass->GetEntry(entry);
     b_Pt->GetEntry(entry);
+    b_jetPt->GetEntry(entry);
+    b_jetEta->GetEntry(entry);
+    b_mjj->GetEntry(entry);
     //std::cout<<"channel in LoadBranches function: "<<channel_<<std::endl;
     if(channel_ == eemm || channel_ == mmee){
       //if(TightZZLeptons()){//i don't think this condition is needed even though it might save time but it messes up sf application for CRs in eemm,mmee states
@@ -141,7 +161,14 @@ void ZZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::str
           dphi = 2.0*pi - dphi;
       return dphi;
     };
+    auto deltaEtajj = [](std::vector<float>* jEta) {
+        if (jEta->size() < 2)
+            return -1.;
+        double etaDiff = jEta->at(0) - jEta->at(1);
+        return std::abs(etaDiff);
+    };
 
+    dEtajj = deltaEtajj(jetEta);
     dPhiZZ = deltaPhiZZ(Z1Phi,Z2Phi);
 }
 
@@ -537,17 +564,36 @@ void ZZSelector::ShiftEfficiencies(Systematic variation) {
       weight *= mIdSF_->Evaluate2D(std::abs(l4Eta), pt_m4, shift)/mIdSF_->Evaluate2D(std::abs(l4Eta), pt_m4);
     }
 }
-bool ZZSelector::PassesZZSelection(){
-  if (ZZSelection() && TightZZLeptons())
-    return true;
-  else
-    return false;
+
+bool ZZSelector::PassesZZjjSelection() {
+    if ((jetPt->size() != jetEta->size() || jetPt->size() < 2) || (mjj < 100))
+        return false;
+    else
+        return true;
 }
+bool ZZSelector::PassesZZSelection(bool nonPrompt){
+  //This nonPrompt boolean is for ZZBackgroundSelector
+  //When running ZZBackgroundSelector, FillHistograms should run just with ZZSelection, we cannot require TightZZLeptons by definition
+  if (nonPrompt){
+    if (ZZSelection())
+      return true;
+    else
+      return false;
+  }
+  else{
+    //std::cout<<"nonPrompt inside function: "<<nonPrompt<<std::endl;
+    if (ZZSelection() && TightZZLeptons())
+        return true;
+    else
+        return false;
+  }
+}
+
 bool ZZSelector::PassesHZZSelection(){
-  if (ZSelection() && TightZZLeptons())
-    return true;
-  else
-    return false;
+    if (ZSelection() && TightZZLeptons())
+      return true;
+    else
+      return false;
 }
 bool ZZSelector::TightZZLeptons() {
     if (tightZ1Leptons() && tightZ2Leptons())
@@ -605,22 +651,31 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     //bool noBlind = true;
     //Applying the ZZ Selection here
     //std::cout<<"Is fillHistograms working?"<<std::endl;
-    //std::cout<<"weight:"<<weight<<std::endl;
-    if (!PassesZZSelection()){
-        //std::cout<<"It should not be doing this?"<<std::endl;
-        return;}
+    //std::cout<<"isNonPrompt_ in FillHistograms:"<<isNonPrompt_<<std::endl;
+    if (!PassesZZSelection(isNonPrompt_)){
+        return;
+    }
+    //std::cout<<"eventWeight in ZZSelector: "<<weight<<std::endl;
     if ((variation.first == Central || (doaTGC_ && isaTGC_)) && isMC_){
+        //std::cout<<"does it go into lheWeights"<<std::endl;
         for (size_t i = 0; i < lheWeights.size(); i++) {
             SafeHistFill(weighthistMap1D_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthistMap1D_, getHistName("Mass", variation.second), Mass, i, lheWeights[i]/lheWeights[0]*weight);
-            SafeHistFill(weighthistMap1D_, getHistName("Pt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("ZZPt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
         }
       }
+    //std::cout<<"isNonPrompt_ in FillHistograms after ZZSelection:"<<isNonPrompt_<<std::endl;
+    //std::cout<<run<<":"<<lumi<<":"<<evt<<std::endl;
     //std::cout << "variation.second: "<<variation.second;
     SafeHistFill(histMap1D_, getHistName("yield", variation.second), 1, weight);
     SafeHistFill(histMap1D_, getHistName("Mass", variation.second), Mass,weight);
     SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), Z1mass, weight);
     SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), Z2mass, weight);
+    SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z1pt, weight);
+    SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z2pt, weight);
+    SafeHistFill(histMap1D_, getHistName("dPhiZ1Z2", variation.second), dPhiZZ, weight);
+    SafeHistFill(histMap1D_, getHistName("ZZPt", variation.second), Pt, weight);
+    
     //Making LeptonPt and Eta plots
     SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l1Pt, weight);
     SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l2Pt, weight);
@@ -630,56 +685,66 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l2Eta, weight);
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l3Eta, weight);
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l4Eta, weight);
-    // Summing 12,34 leptons
-    SafeHistFill(histMap1D_, getHistName("Lep12Pt", variation.second), l1Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Lep12Pt", variation.second), l2Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Lep34Pt", variation.second), l3Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Lep34Pt", variation.second), l4Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Lep12Eta", variation.second), l1Eta, weight);
-    SafeHistFill(histMap1D_, getHistName("Lep12Eta", variation.second), l2Eta, weight);
-    SafeHistFill(histMap1D_, getHistName("Le34Eta", variation.second), l3Eta, weight);
-    SafeHistFill(histMap1D_, getHistName("Lep34Eta", variation.second), l4Eta, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1Mass", variation.second), Z1mass, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2Mass", variation.second), Z2mass, weight);
-    SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z1pt, weight);
-    SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z2pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1Pt", variation.second), Z1pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2Pt", variation.second), Z2pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1Phi", variation.second), Z1Phi, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2Phi", variation.second), Z2Phi, weight);
-    SafeHistFill(histMap1D_, getHistName("dPhiZ1Z2", variation.second), dPhiZZ, weight);
-    SafeHistFill(histMap1D_, getHistName("ZZPt", variation.second), Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1lep1_Pt", variation.second), l1Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1lep1_Eta", variation.second), l1Eta, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1lep1_Phi", variation.second), l1Phi, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1lep1_PdgId", variation.second), l1PdgId, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1lep2_Pt", variation.second), l2Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1lep2_Eta", variation.second), l2Eta, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1lep2_Phi", variation.second), l2Phi, weight);
-    SafeHistFill(histMap1D_, getHistName("Z1lep2_PdgId", variation.second), l2PdgId, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2lep1_Pt", variation.second), l3Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2lep1_Eta", variation.second), l3Eta, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2lep1_Phi", variation.second), l3Phi, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2lep1_PdgId", variation.second), l3PdgId, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2lep2_Pt", variation.second), l4Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2lep2_Eta", variation.second), l4Eta, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2lep2_Phi", variation.second), l4Phi, weight);
-    SafeHistFill(histMap1D_, getHistName("Z2lep2_PdgId", variation.second), l4PdgId, weight);
-    SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Pt",variation.second),l1Pt,l2Pt,weight);
-    SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Eta",variation.second),l1Eta,l2Eta,weight);
-    SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Phi",variation.second),l1Phi,l2Phi,weight);
-    SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Pt",variation.second),l3Pt,l4Pt,weight);
-    SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Eta",variation.second),l3Eta,l4Eta,weight);
-    SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Phi",variation.second),l3Phi,l4Phi,weight);
-    //2D Z1 vs Z2
-    SafeHistFill(hists2D_, getHistName("Z1Mass_Z2Mass",variation.second),Z1mass,Z2mass,weight);
-
-    if (histMap1D_[getHistName("nvtx", variation.second)] != nullptr) {
-        b_nvtx->GetEntry(entry);
-        histMap1D_[getHistName("nvtx", variation.second)]->Fill(nvtx, weight);
+    SafeHistFill(histMap1D_, getHistName("nJets", variation.second), jetPt->size(), weight);
+    if (jetPt->size() > 0 && jetPt->size() == jetEta->size()) {
+        SafeHistFill(histMap1D_, getHistName("jetPt[0]", variation.second), jetPt->at(0), weight);
+        SafeHistFill(histMap1D_, getHistName("jetEta[0]", variation.second), jetEta->at(0), weight);
     }
-    if (isMC_)
-      SafeHistFill(histMap1D_, getHistName("nTruePU", variation.second), nTruePU, weight);
+    if (jetPt->size() > 1 && jetPt->size() == jetEta->size()) {
+        SafeHistFill(histMap1D_, getHistName("jetPt[1]", variation.second), jetPt->at(1), weight);
+        SafeHistFill(histMap1D_, getHistName("jetEta[1]", variation.second), jetEta->at(1), weight);
+    }
+    if (!PassesZZjjSelection()){
+      return;
+    }
+    SafeHistFill(histMap1D_, getHistName("mjj", variation.second), mjj, weight);
+    SafeHistFill(histMap1D_, getHistName("dEtajj", variation.second), dEtajj, weight);
+    // Summing 12,34 leptons
+    //SafeHistFill(histMap1D_, getHistName("Lep12Pt", variation.second), l1Pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Lep12Pt", variation.second), l2Pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Lep34Pt", variation.second), l3Pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Lep34Pt", variation.second), l4Pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Lep12Eta", variation.second), l1Eta, weight);
+    //SafeHistFill(histMap1D_, getHistName("Lep12Eta", variation.second), l2Eta, weight);
+    //SafeHistFill(histMap1D_, getHistName("Le34Eta", variation.second), l3Eta, weight);
+    //SafeHistFill(histMap1D_, getHistName("Lep34Eta", variation.second), l4Eta, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1Mass", variation.second), Z1mass, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2Mass", variation.second), Z2mass, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1Pt", variation.second), Z1pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2Pt", variation.second), Z2pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1Phi", variation.second), Z1Phi, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2Phi", variation.second), Z2Phi, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1lep1_Pt", variation.second), l1Pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1lep1_Eta", variation.second), l1Eta, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1lep1_Phi", variation.second), l1Phi, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1lep1_PdgId", variation.second), l1PdgId, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1lep2_Pt", variation.second), l2Pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1lep2_Eta", variation.second), l2Eta, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1lep2_Phi", variation.second), l2Phi, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z1lep2_PdgId", variation.second), l2PdgId, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2lep1_Pt", variation.second), l3Pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2lep1_Eta", variation.second), l3Eta, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2lep1_Phi", variation.second), l3Phi, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2lep1_PdgId", variation.second), l3PdgId, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2lep2_Pt", variation.second), l4Pt, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2lep2_Eta", variation.second), l4Eta, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2lep2_Phi", variation.second), l4Phi, weight);
+    //SafeHistFill(histMap1D_, getHistName("Z2lep2_PdgId", variation.second), l4PdgId, weight);
+    //SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Pt",variation.second),l1Pt,l2Pt,weight);
+    //SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Eta",variation.second),l1Eta,l2Eta,weight);
+    //SafeHistFill(hists2D_, getHistName("Z1lep1_Z1lep2_Phi",variation.second),l1Phi,l2Phi,weight);
+    //SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Pt",variation.second),l3Pt,l4Pt,weight);
+    //SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Eta",variation.second),l3Eta,l4Eta,weight);
+    //SafeHistFill(hists2D_, getHistName("Z2lep1_Z2lep2_Phi",variation.second),l3Phi,l4Phi,weight);
+    ////2D Z1 vs Z2
+    //SafeHistFill(hists2D_, getHistName("Z1Mass_Z2Mass",variation.second),Z1mass,Z2mass,weight);
+
+    //if (histMap1D_[getHistName("nvtx", variation.second)] != nullptr) {
+    //    b_nvtx->GetEntry(entry);
+    //    histMap1D_[getHistName("nvtx", variation.second)]->Fill(nvtx, weight);
+    //}
+    //if (isMC_)
+    //  SafeHistFill(histMap1D_, getHistName("nTruePU", variation.second), nTruePU, weight);
 }
 
 

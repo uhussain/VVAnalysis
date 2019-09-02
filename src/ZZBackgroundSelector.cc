@@ -26,10 +26,8 @@ void ZZBackgroundSelector::SetupNewDirectory()
     // Insure that hist ranges are exactly the same as ZZSelector, just change name
     for (const auto && obj : *currentHistDir_) {
         std::string name = obj->GetName();
-        //std::cout<<"histname: " <<name<<std::endl;
         TNamed* named = dynamic_cast<TNamed*>(obj);
         named->SetName(name.insert(name.length()-4, "Fakes_").c_str());
-        //std::cout<<"histname in BkgSelector: " <<named<<std::endl;
     } 
       AddObject<TH1D>(Z1MassHistPPPF_, ("Z1Mass_PPPF_"+channelName_).c_str(), "Z1Mass; m_{Z_{1}} [GeV]; Events;", 60, 0, 120);
       AddObject<TH1D>(Z1MassHistPPFF_, ("Z1Mass_PPFF_"+channelName_).c_str(), "Z1Mass; m_{Z_{1}} [GeV]; Events;", 60, 0, 120);
@@ -93,9 +91,15 @@ float ZZBackgroundSelector::getEventWeight(Long64_t entry) {
 }
 
 void ZZBackgroundSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) {
-    ZZSelector::LoadBranches(entry, variation);
-    SetZ1Z2Masses();
+    ZZSelector::LoadBranchesUWVV(entry, variation);
+    SetZ1Z2Masses(); 
+    if (!ZZSelection()){
+      return;}
+    //std::cout<<"isNonPrompt_ from ZZSelector: "<<isNonPrompt_<<std::endl;
+    isNonPrompt_ = true;
+    //std::cout<<"isNonPrompt_ from ZZBackgroundSelector: "<<isNonPrompt_<<std::endl;
     weight = getEventWeight(entry);
+    //std::cout<<"eventWeight in loadBranchesUWVV: "<<weight<<std::endl;
 }
 float ZZBackgroundSelector::getl3FakeRate(Long64_t entry) {
     float pt_fillval = l3Pt < FR_MAX_PT_ ? l3Pt : FR_MAX_PT_ - 0.01;

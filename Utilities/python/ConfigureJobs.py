@@ -92,7 +92,7 @@ def getListOfEWKFilenames(analysis=""):
             "ggZZ4t",
             "ggZZ2e2mu",
             "ggZZ2e2tau",
-            #"ggZZ2mu2tau",
+            "ggZZ2mu2tau",
         ]
     # TODO: This is obviously WZ specific and should be updated
     return [
