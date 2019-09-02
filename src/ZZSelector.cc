@@ -65,7 +65,7 @@ void ZZSelector::SetBranchesUWVV() {
     if (isMC_) {
         if (weight_info_ > 0)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
-        if ((weight_info_ == 2 || weight_info_ == 3) && doSystematics_)
+        if ((weight_info_ == 2 || weight_info_ == 3) && doSystematics_ && !isNonPrompt_)
             fChain->SetBranchAddress("pdfWeights", &pdfWeights, &b_pdfWeights);
     }
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
@@ -122,7 +122,7 @@ void ZZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::str
         ApplyScaleFactors();
       }
     if (variation.first == Central) {
-        if (isMC_ && doSystematics_) {
+        if (isMC_ && doSystematics_ && !isNonPrompt_) {
             if (isMC_ && weight_info_ > 0) {
                 b_scaleWeights->GetEntry(entry);
                 lheWeights = *scaleWeights;
