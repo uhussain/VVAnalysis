@@ -11,6 +11,8 @@ import sys
 import datetime
 import subprocess
 
+#logging.basicConfig(level=logging.DEBUG)
+
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--lumi", "-l", type=float,
