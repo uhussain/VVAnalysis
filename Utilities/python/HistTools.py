@@ -282,7 +282,6 @@ def makeCompositeHists(hist_file, name, members, lumi, hists=[], underflow=False
                 sumhist = composite.FindObject(hist.GetName())
                 if sumweights:
                     hist.Scale(members[dirname.split("__")[0]]*1000*lumi/sumweights)
-                    #print "Scaling by lumi*xsec / sumweights",  lumi, members[dirname.split("__")[0]], sumweights
                 addOverflowAndUnderflow(hist, underflow, overflow)
             else:
                 raise RuntimeError("hist %s was not produced for "

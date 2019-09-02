@@ -145,7 +145,7 @@ class CombineCardTools(object):
 
         group = HistTools.makeCompositeHists(self.inputFile, processName, 
                     {proc : self.crossSectionMap[proc] for proc in self.processes[processName]}, 
-                    self.lumi, plotsToRead, rebin=self.rebin)
+                    self.lumi, plotsToRead, rebin=self.rebin, overflow=False)
 
         fitVariable = self.getFitVariable(processName)
         #TODO:Make optional

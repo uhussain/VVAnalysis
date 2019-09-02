@@ -5,7 +5,7 @@ import ROOT
 import logging
 import array
 
-#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 cardtool = CombineCardTools.CombineCardTools()
 
@@ -37,6 +37,7 @@ nuissance_map = {"eeee" : 12, "eemm" : 13, "mmee" : 13, "mmmm" : 11, "all" : 9}
 #rebin = array.array('d', [0.0,50.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0])
 fitvar = "Mass"
 rebin = array.array('d', [100.0,200.0,250.0,300.0,350.0,400.0,500.0,600.0,800.0,1000.0,1200.0])
+#fitvar = "yield"
 cardtool.setFitVariable(fitvar)
 cardtool.setRebin(rebin)
 cardtool.setFitVariableAppend("nonprompt", "Fakes")
