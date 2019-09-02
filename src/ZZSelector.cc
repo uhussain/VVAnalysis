@@ -4,10 +4,6 @@
 
 void ZZSelector::Init(TTree *tree)
 {
-    weight_info_ = 0;
-    if (isMC_) {
-        weight_info_ = GetLheWeightInfo();
-    }
     systematics_ = {
         {electronRecoEffUp,"CMS_RecoEff_eUp"},
         {electronRecoEffDown,"CMS_RecoEff_eDown"},
@@ -63,6 +59,7 @@ void ZZSelector::Init(TTree *tree)
 void ZZSelector::SetBranchesUWVV() {
     ZZSelectorBase::SetBranchesUWVV();
     if (isMC_) {
+        weight_info_ = GetLheWeightInfo();
         if (weight_info_ > 0)
             fChain->SetBranchAddress("scaleWeights", &scaleWeights, &b_scaleWeights);
         if ((weight_info_ == 2 || weight_info_ == 3) && doSystematics_)
@@ -658,7 +655,10 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     //std::cout<<"eventWeight in ZZSelector: "<<weight<<std::endl;
     if ((variation.first == Central || (doaTGC_ && isaTGC_)) && isMC_){
         //std::cout<<"does it go into lheWeights"<<std::endl;
+        std::cout << "lheWeights.size() " << lheWeights.size() << std::endl;
         for (size_t i = 0; i < lheWeights.size(); i++) {
+            if (i < 5)
+                std::cout << "    lheWeights[i]/lheWeights[0] = " <<  lheWeights[i]/lheWeights[0] << std::endl;
             SafeHistFill(weighthistMap1D_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthistMap1D_, getHistName("Mass", variation.second), Mass, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthistMap1D_, getHistName("ZZPt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
