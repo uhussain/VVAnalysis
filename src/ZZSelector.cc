@@ -18,7 +18,10 @@ void ZZSelector::Init(TTree *tree)
         //{pileupUp, "CMS_pileupUp"},
         //{pileupDown, "CMS_pileupDown"},
     }; 
-    doSystematics_ = false;
+    doSystematics_ = true;
+    
+    //This would be set true inside ZZBackground Selector
+    isNonPrompt_ = false;
 
     systHists_ = {
         "yield",
@@ -49,6 +52,11 @@ void ZZSelector::Init(TTree *tree)
          "Mass","nJets","jetPt[0]","jetPt[1]","jetEta[0]","jetEta[1]","mjj","dEtajj"
     };
 
+    weighthists1D_ = {
+        "yield",
+        "Mass",
+        "ZZPt",
+    };
     ZZSelectorBase::Init(tree);
 }
 
@@ -563,17 +571,29 @@ bool ZZSelector::PassesZZjjSelection() {
     else
         return true;
 }
-bool ZZSelector::PassesZZSelection(){
-  if (ZZSelection() && TightZZLeptons())
-    return true;
-  else
-    return false;
+bool ZZSelector::PassesZZSelection(bool nonPrompt){
+  //This nonPrompt boolean is for ZZBackgroundSelector
+  //When running ZZBackgroundSelector, FillHistograms should run just with ZZSelection, we cannot require TightZZLeptons by definition
+  if (nonPrompt){
+    if (ZZSelection())
+      return true;
+    else
+      return false;
+  }
+  else{
+    //std::cout<<"nonPrompt inside function: "<<nonPrompt<<std::endl;
+    if (ZZSelection() && TightZZLeptons())
+        return true;
+    else
+        return false;
+  }
 }
+
 bool ZZSelector::PassesHZZSelection(){
-  if (ZSelection() && TightZZLeptons())
-    return true;
-  else
-    return false;
+    if (ZSelection() && TightZZLeptons())
+      return true;
+    else
+      return false;
 }
 bool ZZSelector::TightZZLeptons() {
     if (tightZ1Leptons() && tightZ2Leptons())
@@ -631,17 +651,21 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     //bool noBlind = true;
     //Applying the ZZ Selection here
     //std::cout<<"Is fillHistograms working?"<<std::endl;
-    //std::cout<<"weight:"<<weight<<std::endl;
-    if (!PassesZZSelection()){
-        //std::cout<<"It should not be doing this?"<<std::endl;
-        return;}
+    //std::cout<<"isNonPrompt_ in FillHistograms:"<<isNonPrompt_<<std::endl;
+    if (!PassesZZSelection(isNonPrompt_)){
+        return;
+    }
+    //std::cout<<"eventWeight in ZZSelector: "<<weight<<std::endl;
     if ((variation.first == Central || (doaTGC_ && isaTGC_)) && isMC_){
+        //std::cout<<"does it go into lheWeights"<<std::endl;
         for (size_t i = 0; i < lheWeights.size(); i++) {
             SafeHistFill(weighthistMap1D_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthistMap1D_, getHistName("Mass", variation.second), Mass, i, lheWeights[i]/lheWeights[0]*weight);
-            SafeHistFill(weighthistMap1D_, getHistName("Pt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("ZZPt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
         }
       }
+    //std::cout<<"isNonPrompt_ in FillHistograms after ZZSelection:"<<isNonPrompt_<<std::endl;
+    //std::cout<<run<<":"<<lumi<<":"<<evt<<std::endl;
     //std::cout << "variation.second: "<<variation.second;
     SafeHistFill(histMap1D_, getHistName("yield", variation.second), 1, weight);
     SafeHistFill(histMap1D_, getHistName("Mass", variation.second), Mass,weight);

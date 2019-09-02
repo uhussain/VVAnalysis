@@ -256,7 +256,9 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
             }
         }
         // Weight hists must be subset of 1D hists!
+        //std::cout<<"size of weighthistMap1D_: "<<weighthistMap1D_.size()<<std::endl;
         if (isMC_ && (weighthistMap1D_.find(histName) != weighthistMap1D_.end())) { 
+           //std::cout<<"Is weightHists getting filled?"<<std::endl;
             AddObject<TH2D>(weighthistMap1D_[histName], 
                 (name+"_lheWeights_"+channel).c_str(), histData[0].c_str(),
                 nbins, xmin, xmax, 1000, 0, 1000);

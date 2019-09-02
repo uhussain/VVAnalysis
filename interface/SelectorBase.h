@@ -95,6 +95,7 @@ class SelectorBase : public TSelector {
         {"Zselection", Zselection},
         {"ZZselection", ZZselection},
         {"SignalSync", ZZselection},
+        {"AllData", ZZselection},
         {"LooseLeptons", ZZselection},
         {"Wselection_Full", Wselection_Full},
         {"FakeRateSelectionLoose", FakeRateSelectionLoose},
@@ -142,6 +143,7 @@ class SelectorBase : public TSelector {
     TH1D* sumWeightsHist_;
 
     bool doSystematics_;
+    bool isNonPrompt_;
     bool addSumweights_;
     bool applyScaleFactors_;
     bool applyPrefiringCorr_;

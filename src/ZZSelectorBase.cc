@@ -460,7 +460,7 @@ void ZZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
     b_l2IsTight->GetEntry(entry);
     b_l2IsIso->GetEntry(entry);
     b_l3IsTight->GetEntry(entry);
-    b_l3IsIso->GetEntry(entry); 
+    b_l3IsIso->GetEntry(entry);
     if (channel_ == eeee || channel_ == eemm || channel_ == mmee){
       b_l1IsGap->GetEntry(entry); 
       b_l2IsGap->GetEntry(entry); 

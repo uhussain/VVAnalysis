@@ -129,8 +129,6 @@ class SelectorDriver(object):
             if "@" in dataset:
                 dataset, file_path = [f.strip() for f in dataset.split("@")]
             else:
-                #if "Bkg" in self.analysis:
-                #    self.analysis=self.analysis[:-3]
                 try:
                     file_path = ConfigureJobs.getInputFilesPath(dataset, 
                         self.input_tier, self.analysis)
@@ -159,7 +157,7 @@ class SelectorDriver(object):
         select.SetInputList(self.inputs)
         self.addTNamed("name", dataset)
         # Only add for one channel
-        addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset
+        addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset and "Background" not in self.selector_name
         if addSumweights:
             sumweights_hist = ROOT.gROOT.FindObject("sumweights")
             # Avoid accidentally combining sumweights across datasets

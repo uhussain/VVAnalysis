@@ -73,7 +73,7 @@ protected:
     void LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     void ApplyScaleFactors();
-    bool PassesZZSelection();
+    bool PassesZZSelection(bool nonPrompt);
     bool PassesZZjjSelection();
     bool PassesHZZSelection();
     unsigned int GetLheWeightInfo();

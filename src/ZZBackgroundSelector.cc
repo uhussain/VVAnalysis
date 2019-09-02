@@ -92,8 +92,14 @@ float ZZBackgroundSelector::getEventWeight(Long64_t entry) {
 
 void ZZBackgroundSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) {
     ZZSelector::LoadBranchesUWVV(entry, variation);
-    SetZ1Z2Masses();
+    SetZ1Z2Masses(); 
+    if (!ZZSelection()){
+      return;}
+    //std::cout<<"isNonPrompt_ from ZZSelector: "<<isNonPrompt_<<std::endl;
+    isNonPrompt_ = true;
+    //std::cout<<"isNonPrompt_ from ZZBackgroundSelector: "<<isNonPrompt_<<std::endl;
     weight = getEventWeight(entry);
+    //std::cout<<"eventWeight in loadBranchesUWVV: "<<weight<<std::endl;
 }
 float ZZBackgroundSelector::getl3FakeRate(Long64_t entry) {
     float pt_fillval = l3Pt < FR_MAX_PT_ ? l3Pt : FR_MAX_PT_ - 0.01;
