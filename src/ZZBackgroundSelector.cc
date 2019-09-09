@@ -98,6 +98,7 @@ void ZZBackgroundSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic
     //std::cout<<"isNonPrompt_ from ZZSelector: "<<isNonPrompt_<<std::endl;
     isNonPrompt_ = true;
     //std::cout<<"isNonPrompt_ from ZZBackgroundSelector: "<<isNonPrompt_<<std::endl;
+    //We don't want systematics to run for data-driven nonPrompt Estimate so save time and space 
     weight = getEventWeight(entry);
     //std::cout<<"eventWeight in loadBranchesUWVV: "<<weight<<std::endl;
 }

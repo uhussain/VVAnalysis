@@ -10,28 +10,35 @@ import array
 cardtool = CombineCardTools.CombineCardTools()
 
 manager_path = ConfigureJobs.getManagerPath() 
-manager_name = ConfigureJobs.getManagerName() 
-sys.path.append("/".join([manager_path, "AnalysisDatasetManager",
+manager_name = ConfigureJobs.getManagerName()
+#print "manager_path: ", manager_path
+#print "manager_name: ", manager_name
+sys.path.append("/".join([manager_path, manager_name,
     "Utilities/python"]))
-
+#print sys.path
 from ConfigHistFactory import ConfigHistFactory
 config_factory = ConfigHistFactory(
     "%s/%s" % (manager_path, manager_name),
     "ZZ4l2016/LooseLeptons",
 )
 
-plot_groups = ["HZZ_signal","qqZZ_powheg","ggZZ", "VVV", "data", "nonprompt",] 
+plot_groups = ["HZZ-signal","qqZZ-powheg","ggZZ", "VVV", "data", "nonprompt",] 
 plotGroupsMap = {name : config_factory.getPlotGroupMembers(name) for name in plot_groups}
 
 xsecs  = ConfigureJobs.getListOfFilesWithXSec([f for files in plotGroupsMap.values() for f in files])
+
 
 lumiMap = {"2016" : 35.9, "2017" : 41.5, "2018" : 59.74}
 fileMap = { "2016" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2016.root",
     "2017" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2017.root",
     "2018" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2018.root",
+=======
+lumiMap = {"2016" : 35.9, "2017" : 41.5, "2018" : 59.67}
+fileMap = { "2017" : "/eos/user/k/kelong/HistFiles/ZZ/Hists29Aug2019-ZZ4l2017.root",
+    "2018" : "/eos/user/k/kelong/HistFiles/ZZ/Hists13Aug2019-ZZ4l2018Full.root",
+    "2016" : "/afs/cern.ch/user/u/uhussain/public/ForKenneth/Hists30Aug2019-ZZ4l2016.root",
 }
 channels = ["eeee", "eemm", "mmee", "mmmm"]
-#nuissance_map = {"eeee" : 9, "eemm" : 10, "mmee" : 10, "mmmm" : 8, "all" : 6}
 nuissance_map = {"eeee" : 12, "eemm" : 13, "mmee" : 13, "mmmm" : 11, "all" : 9}
 #fitvar = "ZZPt"
 #rebin = array.array('d', [0.0,50.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0])
@@ -47,7 +54,9 @@ cardtool.setCrosSectionMap(xsecs)
 cardtool.setVariations(["CMS_eff_e", "CMS_RecoEff_e", "CMS_eff_m", ],#"CMS_pileup"],
                         exclude=["nonprompt", "data"])
 #cardtool.setOutputFolder("/eos/user/k/kelong/CombineStudies/ZZ/%s2016Fit" % fitvar)
+
 cardtool.setOutputFolder("/eos/user/k/kelong/CombineStudies/ZZ/%sFitFullRunII" % fitvar)
+cardtool.setOutputFolder("/eos/user/u/uhussain/CombineStudies/ZZ/%s2016Fit" % fitvar)
 
 for year in fileMap.keys():
     cardtool.setLumi(lumiMap[year])

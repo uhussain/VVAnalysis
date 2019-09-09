@@ -81,7 +81,7 @@ void SelectorBase::Init(TTree *tree)
     if (name_.find("data") == std::string::npos){
         isMC_ = true;
     }
-    if (doSystematics_ && isMC_) // isNonpromptEstimate?
+    if (doSystematics_ && isMC_ && !isNonPrompt_) // isNonpromptEstimate?
         variations_.insert(systematics_.begin(), systematics_.end());
 
     currentHistDir_ = dynamic_cast<TList*>(fOutput->FindObject(name_.c_str()));
@@ -238,7 +238,7 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
         //std::cout<<"doSystematics: "<<doSystematics_<<std::endl;
         //std::cout<<systHists_.size()<<std::endl;
         //std::cout<<"histName: "<<histName<<std::endl;
-        if (doSystematics_ && std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
+        if (doSystematics_ && !isNonPrompt_ && std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
             //std::cout<<"are there systHists_"<<std::endl;
             for (auto& syst : systematics_) {
                 //std::cout<<"systHists getting filled?"<<std::endl;
@@ -270,7 +270,7 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
         float ymax = std::stof(histData[6]);
         AddObject<TH2D>(hists2D_[histName], histName.c_str(), histData[0].c_str(),nbins, xmin, xmax,
                 nbinsy, ymin, ymax);
-        if (doSystematics_ && std::find(systHists2D_.begin(), systHists2D_.end(), histName) != systHists2D_.end()) {
+        if (doSystematics_ && !isNonPrompt_ && std::find(systHists2D_.begin(), systHists2D_.end(), histName) != systHists2D_.end()) {
             for (auto& syst : systematics_) {
                 std::string syst_hist_name = name+"_"+syst.second + "_" + channel;
                 hists2D_[syst_hist_name] = {};
