@@ -25,41 +25,47 @@ dummyTree.Scan('randVal : globalFunc(randVal)', '', '', 10)
 
 # Generate with setupScaleFactors.py
 # Will need appropriate files in ../data/
-fScales = ROOT.TFile('../data/scaleFactors.root')
+fScales = ROOT.TFile('../data/scaleFactorsZZ4l2017.root')
 pu = fScales.Get('pileupSF')
-muonIso = fScales.Get('muonIsoSF')
-muonId = fScales.Get('muonTightIdSF')
-electronTightId = fScales.Get('electronTightIdSF')
-electronMediumId = fScales.Get('electronMediumIdSF')
+#muonIso = fScales.Get('muonIsoSF')
+#muonId = fScales.Get('electronLowRecoSF')
+#electronTightId = fScales.Get('electronTightIdSF')
+#electronMediumId = fScales.Get('electronMediumIdSF')
 
-#mCBTightFakeRate = fScales.Get("mCBTightFakeRate_Svenja")
-#mCBMedFakeRate = fScales.Get("mCBMedFakeRate_Svenja")
-#eCBTightFakeRate = fScales.Get("eCBTightFakeRate_Svenja")
-#eCBMedFakeRate = fScales.Get("eCBMedFakeRate_Svenja")
-mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
-eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
+mZZTightFakeRate = fScales.Get("mZZTightFakeRate")
+eZZTightFakeRate = fScales.Get("eZZTightFakeRate")
+
+muonMoriondSF= fScales.Get('muonMoriond18SF')
+electronLowRecoSF = fScales.Get('electronLowReco18SF')
+electronRecoSF = fScales.Get('electronReco18SF')
+electronMoriondSF = fScales.Get('electronMoriond18SF')
+electronMoriondGapSF = fScales.Get('electronMoriond18GapSF')
+
+
+#mCBTightFakeRate = fScales.Get("mCBTightFakeRate")
+#eCBTightFakeRate = fScales.Get("eCBTightFakeRate")
 del fScales # Make sure we don't rely on file being open
 
 pu.RegisterGlobalFunction()
 print "pileupSF(3) = ", ROOT.pileupSF(3)
 dummyTree.Scan('10+10*randVal : pileupSF(10+10*randVal)', '', '', 10)
 
-muonIso.RegisterGlobalFunction(2) # 2D function
-muonId.RegisterGlobalFunction(2) # 2D function
-print "muonIsoSF(1.1, 30) = ", ROOT.muonIsoSF(1.1, 30)
-print "muonTightIdSF(1.1, 30) = ", ROOT.muonTightIdSF(1.1, 30)
-dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonIsoSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
-dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonTightIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+muonMoriondSF.RegisterGlobalFunction(2) # 2D function
+electronLowRecoSF.RegisterGlobalFunction(2) # 2D function
+print "muonMoriondSF(1.1, 30) = ", ROOT.muonMoriond18SF(1.1, 30)
+print "electronLowRecoSF(1.1, 30) = ", ROOT.electronLowReco18SF(1.1, 30)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : muonMoriond18SF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : electronLowReco18SF(abs(randVal*2), randVal2*5+30)', '', '', 10)
 
-electronMediumId.RegisterGlobalFunction(2) # 2D function
-electronTightId.RegisterGlobalFunction(2) # 2D function
-dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : electronMediumIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
-dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : electronTightIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
-
-mCBTightFakeRate.RegisterGlobalFunction(2) # 2D function
-print "mCBTightFakeRate(1.1, 30) = ", ROOT.mCBTightFakeRate(30, 1.1)
-dummyTree.Scan('abs(randVal*2) : randVal2*10+30 : mCBTightFakeRate(randVal2*10+30, abs(randVal*2))', '', '', 10)
-
-eCBTightFakeRate.RegisterGlobalFunction(2) # 2D function
-print "eCBTightFakeRate(1.1, 30) = ", ROOT.eCBTightFakeRate(30, 1.1)
-dummyTree.Scan('abs(randVal*2) : randVal2*10+30 : eCBTightFakeRate(randVal2*10+30, abs(randVal*2))', '', '', 10)
+#electronMediumId.RegisterGlobalFunction(2) # 2D function
+#electronTightId.RegisterGlobalFunction(2) # 2D function
+#dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : electronMediumIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+#dummyTree.Scan('abs(randVal*2) : randVal2*5+30 : electronTightIdSF(abs(randVal*2), randVal2*5+30)', '', '', 10)
+#
+#mCBTightFakeRate.RegisterGlobalFunction(2) # 2D function
+#print "mCBTightFakeRate(1.1, 30) = ", ROOT.mCBTightFakeRate(30, 1.1)
+#dummyTree.Scan('abs(randVal*2) : randVal2*10+30 : mCBTightFakeRate(randVal2*10+30, abs(randVal*2))', '', '', 10)
+#
+#eCBTightFakeRate.RegisterGlobalFunction(2) # 2D function
+#print "eCBTightFakeRate(1.1, 30) = ", ROOT.eCBTightFakeRate(30, 1.1)
+#dummyTree.Scan('abs(randVal*2) : randVal2*10+30 : eCBTightFakeRate(randVal2*10+30, abs(randVal*2))', '', '', 10)

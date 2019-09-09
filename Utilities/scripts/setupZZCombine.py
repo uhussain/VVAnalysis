@@ -10,26 +10,28 @@ import array
 cardtool = CombineCardTools.CombineCardTools()
 
 manager_path = ConfigureJobs.getManagerPath() 
-manager_name = ConfigureJobs.getManagerName() 
-sys.path.append("/".join([manager_path, "AnalysisDatasetManager",
+manager_name = ConfigureJobs.getManagerName()
+#print "manager_path: ", manager_path
+#print "manager_name: ", manager_name
+sys.path.append("/".join([manager_path, manager_name,
     "Utilities/python"]))
-
+#print sys.path
 from ConfigHistFactory import ConfigHistFactory
 config_factory = ConfigHistFactory(
     "%s/%s" % (manager_path, manager_name),
     "ZZ4l2016/LooseLeptons",
 )
 
-plot_groups = ["HZZ_signal","qqZZ_powheg","ggZZ", "VVV", "data", "nonprompt",] 
+plot_groups = ["HZZ-signal","qqZZ-powheg","ggZZ", "VVV", "data", "nonprompt",] 
 plotGroupsMap = {name : config_factory.getPlotGroupMembers(name) for name in plot_groups}
 
 xsecs  = ConfigureJobs.getListOfFilesWithXSec([f for files in plotGroupsMap.values() for f in files])
+
 
 lumiMap = {"2016" : 35.9, "2017" : 41.5, "2018" : 59.74}
 fileMap = { "2016" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2016.root",
     "2017" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2017.root",
     "2018" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2018.root",
-}
 channels = ["eeee", "eemm", "mmee", "mmmm"]
 nuissance_map = {"eeee" : 16, "eemm" : 17, "mmee" : 17, "mmmm" : 15, "all" : 13}
 #fitvar = "ZZPt"
@@ -46,7 +48,9 @@ cardtool.setCrosSectionMap(xsecs)
 cardtool.setVariations(["CMS_eff_e", "CMS_RecoEff_e", "CMS_eff_m", ],#"CMS_pileup"],
                         exclude=["nonprompt", "data"])
 #cardtool.setOutputFolder("/eos/user/k/kelong/CombineStudies/ZZ/%s2016Fit" % fitvar)
+
 cardtool.setOutputFolder("/eos/user/k/kelong/CombineStudies/ZZ/%sFitFullRunII" % fitvar)
+cardtool.setOutputFolder("/eos/user/u/uhussain/CombineStudies/ZZ/%s2016Fit" % fitvar)
 
 for year in fileMap.keys():
     cardtool.setLumi(lumiMap[year])
