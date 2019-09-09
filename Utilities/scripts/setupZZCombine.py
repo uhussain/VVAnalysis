@@ -22,22 +22,17 @@ config_factory = ConfigHistFactory(
     "ZZ4l2016/LooseLeptons",
 )
 
-plot_groups = ["HZZ-signal","qqZZ-powheg","ggZZ", "VVV", "data", "nonprompt",] 
+plot_groups = ["HZZ_signal","qqZZ_powheg","zzjj4l_ewk","ggZZ", "VVV", "data", "nonprompt",] 
 plotGroupsMap = {name : config_factory.getPlotGroupMembers(name) for name in plot_groups}
 
 xsecs  = ConfigureJobs.getListOfFilesWithXSec([f for files in plotGroupsMap.values() for f in files])
 
 
-lumiMap = {"2016" : 35.9, "2017" : 41.5, "2018" : 59.74}
-fileMap = { "2016" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2016.root",
-    "2017" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2017.root",
-    "2018" : "/eos/user/k/kelong/HistFiles/ZZ/Hists02Sep2019-ZZ4l2018.root",
-=======
 lumiMap = {"2016" : 35.9, "2017" : 41.5, "2018" : 59.67}
-fileMap = { "2017" : "/eos/user/k/kelong/HistFiles/ZZ/Hists29Aug2019-ZZ4l2017.root",
-    "2018" : "/eos/user/k/kelong/HistFiles/ZZ/Hists13Aug2019-ZZ4l2018Full.root",
-    "2016" : "/afs/cern.ch/user/u/uhussain/public/ForKenneth/Hists30Aug2019-ZZ4l2016.root",
-}
+fileMap = { "2016" : "/afs/cern.ch/user/u/uhussain/ZZ4lRun2HistFiles/Hists02Sep2019-ZZ4l2016.root",
+    "2017" : "/afs/cern.ch/user/u/uhussain/ZZ4lRun2HistFiles/Hists02Sep2019-ZZ4l2017.root",
+    "2018" : "/afs/cern.ch/user/u/uhussain/ZZ4lRun2HistFiles/Hists02Sep2019-ZZ4l2018.root",
+
 channels = ["eeee", "eemm", "mmee", "mmmm"]
 nuissance_map = {"eeee" : 12, "eemm" : 13, "mmee" : 13, "mmmm" : 11, "all" : 9}
 #fitvar = "ZZPt"
@@ -55,8 +50,7 @@ cardtool.setVariations(["CMS_eff_e", "CMS_RecoEff_e", "CMS_eff_m", ],#"CMS_pileu
                         exclude=["nonprompt", "data"])
 #cardtool.setOutputFolder("/eos/user/k/kelong/CombineStudies/ZZ/%s2016Fit" % fitvar)
 
-cardtool.setOutputFolder("/eos/user/k/kelong/CombineStudies/ZZ/%sFitFullRunII" % fitvar)
-cardtool.setOutputFolder("/eos/user/u/uhussain/CombineStudies/ZZ/%s2016Fit" % fitvar)
+cardtool.setOutputFolder("/eos/user/u/uhussain/CombineStudies/ZZ/%sFitFullRunII" % fitvar)
 
 for year in fileMap.keys():
     cardtool.setLumi(lumiMap[year])
