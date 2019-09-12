@@ -59,6 +59,9 @@ class SelectorDriver(object):
     def isBackground(self):
         self.selector_name = self.selector_name.replace("Selector", "BackgroundSelector")
 
+    def isFake(self):
+        self.selector_name = self.selector_name.replace("ZZ", "FakeRate")
+    
     def setOutputfile(self, outfile_name):
         self.outfile_name = outfile_name
         self.outfile = ROOT.gROOT.FindObject(outfile_name)

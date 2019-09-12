@@ -97,6 +97,8 @@ class SelectorBase : public TSelector {
         {"SignalSync", ZZselection},
         {"AllData", ZZselection},
         {"LooseLeptons", ZZselection},
+        {"TightLeptonsWGen", ZZselection},
+        {"ZplusLSkim", ZZselection},
         {"Wselection_Full", Wselection_Full},
         {"FakeRateSelectionLoose", FakeRateSelectionLoose},
         {"FakeRateSelectionTight", FakeRateSelectionTight},
