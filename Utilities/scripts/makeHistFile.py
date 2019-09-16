@@ -164,14 +164,14 @@ def makeHistFile(args):
         selector.setDatasets(args['filenames'])
     else:
         selector.setFileList(*args['inputs_from_file'])
-    mc = selector.applySelector()
+    #mc = selector.applySelector()
 
 
     if args['with_background']:
         selector.isBackground()
         selector.setInputs(sf_inputs+hist_inputs+fr_inputs)
         selector.setOutputfile(tmpFileName.replace(".root", "bkgd.root"))
-        nonprompt = selector.applySelector()
+        #nonprompt = selector.applySelector()
         #tempfiles = [tmpFileName.replace(".root", "%s.root" % app) for app in ["sel", "bkgd"]]
         #rval = subprocess.call(["hadd", "-f", tmpFileName] + tempfiles)
         #if rval == 0:
@@ -181,12 +181,11 @@ def makeHistFile(args):
         selector.isGen()
         selector.setChannels([c+"Gen" for c in args['channels']])
         # Make sure to remove data from the dataset lists
-        selector.clearDatasets()
         selector.setInputs(hist_inputs)
         selector.setOutputfile(tmpFileName.replace(".root", "gen.root"))
         if args['filenames']:
             #selector.setDatasets(args['filenames'])
-            selector.setDatasets(ConfigureJobs.getListOfGenFilenames())
+            selector.setDatasets(ConfigureJobs.getListOfGenFilenames(args['analysis']))
         else:
             selector.setFileList(*args['inputs_from_file'])
         gen = selector.applySelector()
@@ -218,7 +217,7 @@ def makeHistFile(args):
         OutputTools.writeOutputListItem(nonpromptmc, fOut)
 
     ewkmc = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
-        ConfigureJobs.getListOfEWK(args['analysis']), manager_path), args['lumi'],
+        ConfigureJobs.getListOfEWKFilenames(args['analysis']), manager_path), args['lumi'],
         underflow=False, overflow=False)
     OutputTools.writeOutputListItem(ewkmc, fOut)
     ewkmc.Delete()

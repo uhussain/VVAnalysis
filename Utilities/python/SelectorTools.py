@@ -129,6 +129,7 @@ class SelectorDriver(object):
                 self.datasets[dataset].append(file_path)
 
     def setDatasets(self, datalist):
+        self.clearDatasets()
         datasets = ConfigureJobs.getListOfFiles(datalist, self.input_tier)
         for dataset in datasets:
             if "@" in dataset:
@@ -141,13 +142,9 @@ class SelectorDriver(object):
                     logging.warning(e)
                     continue
             self.datasets[dataset] = [file_path]
-    def clearDatasets(self):
-        for dataset in self.datasets:
-            self.datasets[dataset] = []
 
     def clearDatasets(self):
-        for dataset in self.datasets:
-            self.datasets[dataset] = []
+        self.datasets.clear()
 
     def applySelector(self):
         for chan in self.channels:
@@ -164,7 +161,6 @@ class SelectorDriver(object):
 
     def processDataset(self, dataset, file_path, chan):
         logging.info("Processing dataset %s" % dataset)
-        print "Processing dataset: ", dataset
         select = getattr(ROOT, self.selector_name)()
         select.SetInputList(self.inputs)
         self.addTNamed("name", dataset)

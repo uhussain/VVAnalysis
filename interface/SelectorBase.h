@@ -133,6 +133,7 @@ class SelectorBase : public TSelector {
         {"ee", ee},                 {"em", em},       {"mm", mm},
         {"eee", eee},               {"eem", eem},     {"emm", emm},     {"mmm", mmm},
         {"eeee", eeee},             {"eemm", eemm},   {"mmee", mmee},   {"mmmm", mmmm},
+        {"eeeeGen", eeee},          {"eemmGen", eemm},{"mmeeGen", mmee},{"mmmmGen", mmmm},
         {"Inclusive", Inclusive},   {"lll", lll},
     };
 
