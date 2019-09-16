@@ -13,6 +13,7 @@ public :
     Float_t GenPt;
     Float_t GenEta;
     Float_t Genweight;
+    Float_t genWeight;
     Float_t GenZ1mass;
     Float_t GenZ2mass;
     Float_t GenZ1pt;
@@ -33,6 +34,7 @@ public :
     Float_t Genl3Phi;
     Float_t Genl4Phi;
     
+    TBranch* b_genWeight;
     TBranch* b_GenZ1mass;
     TBranch* b_GenZ2mass;
     TBranch* b_GenZ1pt;

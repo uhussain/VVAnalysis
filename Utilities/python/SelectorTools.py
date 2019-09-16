@@ -20,7 +20,6 @@ class SelectorDriver(object):
             "Zstudy" : "ZSelector",
             "Zstudy_2016" : "ZSelector",
             "Zstudy_2017" : "ZSelector",
-            "ZZGen" : "ZZGenSelector",
             "ZZ4l2016" : "ZZSelector",
             "ZZ4l2017" : "ZZSelector",
             "ZZ4l2018" : "ZZSelector",
@@ -59,6 +58,9 @@ class SelectorDriver(object):
     def isBackground(self):
         self.selector_name = self.selector_name.replace("Selector", "BackgroundSelector")
 
+    def isGen(self):
+        self.selector_name = self.selector_name.replace("BackgroundSelector", "GenSelector")
+    
     def isFake(self):
         self.selector_name = self.selector_name.replace("ZZ", "FakeRate")
     
@@ -160,8 +162,9 @@ class SelectorDriver(object):
         select.SetInputList(self.inputs)
         self.addTNamed("name", dataset)
         # Only add for one channel
-        addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset and "Background" not in self.selector_name
+        addSumweights = self.addSumweights and self.channels.index(chan) == 0 and "data" not in dataset and "Background" not in self.selector_name and "Gen" not in self.selector_name
         if addSumweights:
+            #print "Should only go here once!"
             sumweights_hist = ROOT.gROOT.FindObject("sumweights")
             # Avoid accidentally combining sumweights across datasets
             if sumweights_hist:
@@ -255,7 +258,10 @@ class SelectorDriver(object):
         rtfile = ROOT.TFile.Open(filename)
         if not rtfile or not rtfile.IsOpen() or rtfile.IsZombie():
             raise IOError("Failed to open file %s!" % filename)
-        tree_name = self.getTreeName(chan)
+        if "Gen" in self.selector_name:
+            tree_name = self.getTreeName(chan+"Gen")
+        else:
+            tree_name = self.getTreeName(chan)
         tree = rtfile.Get(tree_name)
         if not tree:
             raise ValueError(("tree %s not found for file %s. " \

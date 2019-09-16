@@ -25,6 +25,8 @@ def getComLineArgs():
         help="Use UWVV format ntuples in stead of NanoAOD")
     parser.add_argument("--with_background", action='store_true',
         help="Don't run background selector")
+    parser.add_argument("--with_Gen", action='store_true',
+        help="Don't run ZZGen selector")
     parser.add_argument("--noHistConfig", action='store_true',
         help="Don't rely on config file to specify hist info")
     parser.add_argument("-j", "--numCores", type=int, default=1,
@@ -164,19 +166,35 @@ def makeHistFile(args):
         selector.setFileList(*args['inputs_from_file'])
     mc = selector.applySelector()
 
-    if args['test']:
-        fOut.Close()
-        sys.exit(0)
 
     if args['with_background']:
         selector.isBackground()
         selector.setInputs(sf_inputs+hist_inputs+fr_inputs)
         selector.setOutputfile(tmpFileName.replace(".root", "bkgd.root"))
         nonprompt = selector.applySelector()
-        tempfiles = [tmpFileName.replace(".root", "%s.root" % app) for app in ["sel", "bkgd"]]
+        #tempfiles = [tmpFileName.replace(".root", "%s.root" % app) for app in ["sel", "bkgd"]]
+        #rval = subprocess.call(["hadd", "-f", tmpFileName] + tempfiles)
+        #if rval == 0:
+        #    map(os.remove, tempfiles)
+
+    if args['with_Gen']:
+        selector.isGen()
+        selector.setInputs(hist_inputs)
+        selector.setOutputfile(tmpFileName.replace(".root", "gen.root"))
+        if args['filenames']:
+            #selector.setDatasets(args['filenames'])
+            selector.setDatasets(ConfigureJobs.getListOfGenFilenames())
+        else:
+            selector.setFileList(*args['inputs_from_file'])
+        gen = selector.applySelector()
+        tempfiles = [tmpFileName.replace(".root", "%s.root" % app) for app in ["sel", "bkgd","gen"]]
         rval = subprocess.call(["hadd", "-f", tmpFileName] + tempfiles)
         if rval == 0:
             map(os.remove, tempfiles)
+
+    if args['test']:
+        fOut.Close()
+        sys.exit(0)
 
     fOut.Close()
     fOut = ROOT.TFile.Open(tmpFileName, "update")
@@ -196,7 +214,7 @@ def makeHistFile(args):
         OutputTools.writeOutputListItem(nonpromptmc, fOut)
 
     ewkmc = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
-        ConfigureJobs.getListOfEWKFilenames(args['analysis']), manager_path), args['lumi'],
+        ConfigureJobs.getListOfEWK(args['analysis']), manager_path), args['lumi'],
         underflow=False, overflow=False)
     OutputTools.writeOutputListItem(ewkmc, fOut)
     ewkmc.Delete()
