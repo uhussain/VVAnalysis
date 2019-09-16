@@ -143,8 +143,8 @@ class SelectorDriver(object):
             self.datasets[dataset] = [file_path]
 
     def clearDatasets(self):
-        for dataset in datasets:
-            dataset[dataset] = []
+        for dataset in self.datasets:
+            self.datasets[dataset] = []
 
     def applySelector(self):
         for chan in self.channels:
