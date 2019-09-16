@@ -142,6 +142,10 @@ class SelectorDriver(object):
                     continue
             self.datasets[dataset] = [file_path]
 
+    def clearDatasets(self):
+        for dataset in datasets:
+            dataset[dataset] = []
+
     def applySelector(self):
         for chan in self.channels:
             self.addTNamed("channel", chan)
@@ -258,10 +262,7 @@ class SelectorDriver(object):
         rtfile = ROOT.TFile.Open(filename)
         if not rtfile or not rtfile.IsOpen() or rtfile.IsZombie():
             raise IOError("Failed to open file %s!" % filename)
-        if "Gen" in self.selector_name:
-            tree_name = self.getTreeName(chan+"Gen")
-        else:
-            tree_name = self.getTreeName(chan)
+        tree_name = self.getTreeName(chan)
         tree = rtfile.Get(tree_name)
         if not tree:
             raise ValueError(("tree %s not found for file %s. " \
