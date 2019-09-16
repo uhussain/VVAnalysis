@@ -94,12 +94,12 @@ def getListOfGenFilenames(analysis='ZZ'):
             "ggZZ2e2mu",
             "ggZZ2e2tau",
             "ggZZ2mu2tau",
-            #"ggHZZ",
-            #"ttH_HToZZ_4L",
-            #"WminusHToZZ",
-            #"WplusHToZZ",
-            #"ZHToZZ_4L",
-            #"vbfHZZ",
+            "ggHZZ",
+            "ttH_HToZZ_4L",
+            "WminusHToZZ",
+            "WplusHToZZ",
+            "ZHToZZ_4L",
+            "vbfHZZ",
         ]
     return []
 def getListOfEWKFilenames(analysis=""):

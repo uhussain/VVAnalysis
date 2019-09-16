@@ -42,6 +42,7 @@ class SelectorDriver(object):
         self.numCores = 1
         self.channels = ["Inclusive"]
         self.outfile_name = "temp.root"
+        self.outfile = 0
         self.datasets = {}
 
     # Needed to parallelize class member function, see
@@ -63,8 +64,13 @@ class SelectorDriver(object):
     
     def isFake(self):
         self.selector_name = self.selector_name.replace("ZZ", "FakeRate")
+
+    def outputFile(self):
+        return self.outfile
     
     def setOutputfile(self, outfile_name):
+        if self.outfile:
+            self.outfile.Close()
         self.outfile_name = outfile_name
         self.outfile = ROOT.gROOT.FindObject(outfile_name)
         if not self.outfile:
