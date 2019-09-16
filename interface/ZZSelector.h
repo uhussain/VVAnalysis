@@ -52,10 +52,12 @@ public :
     UInt_t nvtx;
     Float_t Mass;
     Float_t Pt;
+    Float_t Eta;
     float dPhiZZ; //DeltaPhi between Z1 and Z2
     TBranch* b_nvtx;
     TBranch* b_Mass;
     TBranch* b_Pt;
+    TBranch* b_Eta;
     TBranch* b_jetPt;
     TBranch* b_jetEta;
     TBranch* b_mjj;
@@ -75,7 +77,7 @@ protected:
     void ApplyScaleFactors();
     bool PassesZZSelection(bool nonPrompt);
     bool PassesZZjjSelection();
-    bool PassesHZZSelection();
+    bool PassesHZZSelection(bool nonPrompt);
     unsigned int GetLheWeightInfo();
     void SetVariables(Long64_t entry);
     //bool DuplicatedEvent();

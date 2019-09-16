@@ -141,6 +141,9 @@ class SelectorDriver(object):
                     logging.warning(e)
                     continue
             self.datasets[dataset] = [file_path]
+    def clearDatasets(self):
+        for dataset in self.datasets:
+            self.datasets[dataset] = []
 
     def clearDatasets(self):
         for dataset in self.datasets:
