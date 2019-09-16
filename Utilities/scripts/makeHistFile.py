@@ -179,6 +179,8 @@ def makeHistFile(args):
 
     if args['with_Gen']:
         selector.isGen()
+        selector.setChannels([c+"Gen" for c in args['channels']])
+        selector.clearDatasets()
         selector.setInputs(hist_inputs)
         selector.setOutputfile(tmpFileName.replace(".root", "gen.root"))
         if args['filenames']:
@@ -187,6 +189,7 @@ def makeHistFile(args):
         else:
             selector.setFileList(*args['inputs_from_file'])
         gen = selector.applySelector()
+        selector.setChannels(args['channels'])
         tempfiles = [tmpFileName.replace(".root", "%s.root" % app) for app in ["sel", "bkgd","gen"]]
         rval = subprocess.call(["hadd", "-f", tmpFileName] + tempfiles)
         if rval == 0:

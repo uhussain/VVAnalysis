@@ -134,7 +134,9 @@ void SelectorBase::LoadBranches(Long64_t entry, std::pair<Systematic, std::strin
 
 Bool_t SelectorBase::Process(Long64_t entry)
 {
+    //std::cout<<"Does it enter Process"<<std::endl;
     for (const auto& variation : variations_) {
+        //std::cout<<"Does it enter variations"<<std::endl;
         LoadBranches(entry, variation);
         FillHistograms(entry, variation);
     }

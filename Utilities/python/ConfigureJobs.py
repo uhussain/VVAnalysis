@@ -83,7 +83,35 @@ def getCombinePath():
         raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
                             % os.environ["USER"])
     return config['Setup']['combine_path'] + "/"
-def getListOfEWKFilenames(analysis=""):
+def getListOfGenFilenames():
+    return [
+        "zz4l-amcatnlo",
+        "zz4l-powheg",
+        "ggZZ4e",
+        "ggZZ4m",
+        "ggZZ4t",
+        "ggZZ2e2mu",
+        "ggZZ2e2tau",
+        "ggZZ2mu2tau",
+        "ggHZZ",
+        "ttH_HToZZ_4L",
+        "WminusHToZZ",
+        "WplusHToZZ",
+        "ZHToZZ_4L",
+        "vbfHZZ",
+    ]
+def getListOfEWKFilenames():
+    return [
+        "wz3lnu-mg5amcnlo",
+        "zz4l-powheg",
+        "ggZZ4e",
+        "ggZZ4m",
+        "ggZZ4t",
+        "ggZZ2e2mu",
+        "ggZZ2e2tau",
+        "ggZZ2mu2tau",
+    ]
+def getListOfEWK(analysis=""):
     if "ZZ4l" in analysis:
         return [
             "zz4l-powheg",
@@ -118,6 +146,11 @@ def getListOfEWKFilenames(analysis=""):
         "ggZZ4m",
         "ggZZ2e2mu",
     ]
+def getListOfDYFilenames():
+    return[
+        "DYJetsToLL_M10to50",
+        "DYJetsToLLM-50",
+        ]
 def getListOfNonpromptFilenames():
     return ["tt-lep",
         "st-schan",

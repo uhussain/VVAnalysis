@@ -11,10 +11,10 @@ void ZZSelector::Init(TTree *tree)
         {electronEfficiencyDown, "CMS_eff_eDown"},
         {muonEfficiencyUp, "CMS_eff_mUp"},
         {muonEfficiencyDown, "CMS_eff_mDown"},
-        //{pileupUp, "CMS_pileupUp"},
-        //{pileupDown, "CMS_pileupDown"},
+        {pileupUp, "CMS_pileupUp"},
+        {pileupDown, "CMS_pileupDown"},
     }; 
-    doSystematics_ = true;
+    doSystematics_ = false;
     
     //This would be set true inside ZZBackground Selector
     isNonPrompt_ = false;
@@ -24,6 +24,8 @@ void ZZSelector::Init(TTree *tree)
         "Mass",
         "ZMass",
         "ZZPt",
+        "ZZEta",
+        "dPhiZ1Z2",
         //"Z1Pt",
         //"Z2Pt"
         "ZPt",
@@ -44,14 +46,20 @@ void ZZSelector::Init(TTree *tree)
     //};
 
     hists1D_ = {
-         "yield", "ZMass","ZZPt","dPhiZ1Z2","ZPt","LepPt","LepEta",
-         "Mass","nJets","jetPt[0]","jetPt[1]","jetEta[0]","jetEta[1]","mjj","dEtajj"
+         "yield", "ZMass","ZZPt","ZZEta","dPhiZ1Z2","ZPt","LepPt","LepEta",
+         "Mass","nJets","jetPt[0]","jetPt[1]","jetEta[0]","jetEta[1]","mjj","dEtajj","SIP3D"
     };
 
     weighthists1D_ = {
         "yield",
         "Mass",
+        "ZMass",
         "ZZPt",
+        "ZZEta",
+        "dPhiZ1Z2",
+        "ZPt",
+        "LepPt",
+        "LepEta"
     };
     ZZSelectorBase::Init(tree);
 }
@@ -67,6 +75,7 @@ void ZZSelector::SetBranchesUWVV() {
     }
     fChain->SetBranchAddress("Mass", &Mass, &b_Mass);
     fChain->SetBranchAddress("Pt", &Pt, &b_Pt);
+    fChain->SetBranchAddress("Eta", &Eta, &b_Eta);
     fChain->SetBranchAddress("jetPt", &jetPt, &b_jetPt);
     fChain->SetBranchAddress("jetEta", &jetEta, &b_jetEta);
     fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
@@ -106,6 +115,7 @@ void ZZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::str
     //b_l3Pt->GetEntry(entry);
     b_Mass->GetEntry(entry);
     b_Pt->GetEntry(entry);
+    b_Eta->GetEntry(entry);
     b_jetPt->GetEntry(entry);
     b_jetEta->GetEntry(entry);
     b_mjj->GetEntry(entry);
@@ -586,11 +596,19 @@ bool ZZSelector::PassesZZSelection(bool nonPrompt){
   }
 }
 
-bool ZZSelector::PassesHZZSelection(){
+bool ZZSelector::PassesHZZSelection(bool nonPrompt){
+  if (nonPrompt){
+    if (ZSelection())
+      return true;
+    else
+      return false;
+  }
+  else{
     if (ZSelection() && TightZZLeptons())
       return true;
     else
       return false;
+  }
 }
 bool ZZSelector::TightZZLeptons() {
     if (tightZ1Leptons() && tightZ2Leptons())
@@ -626,7 +644,7 @@ bool ZZSelector::HZZSIPSelection(){
         return false;
 }
 bool ZZSelector::HZZLowMass() {
-    if (Mass > 70.0 && Mass < 110.0)
+    if (Mass > 130.0 && Mass < 170.0)
         return true;
     else
         return false;
@@ -674,8 +692,13 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z1pt, weight);
     SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z2pt, weight);
     SafeHistFill(histMap1D_, getHistName("dPhiZ1Z2", variation.second), dPhiZZ, weight);
-    SafeHistFill(histMap1D_, getHistName("ZZPt", variation.second), Pt, weight);
-    
+    SafeHistFill(histMap1D_, getHistName("ZZPt", variation.second), Pt, weight); 
+    SafeHistFill(histMap1D_, getHistName("ZZEta", variation.second), Eta, weight);
+
+    SafeHistFill(histMap1D_, getHistName("SIP3D", variation.second), l1SIP3D, weight);
+    SafeHistFill(histMap1D_, getHistName("SIP3D", variation.second), l2SIP3D, weight);
+    SafeHistFill(histMap1D_, getHistName("SIP3D", variation.second), l3SIP3D, weight);
+    SafeHistFill(histMap1D_, getHistName("SIP3D", variation.second), l4SIP3D, weight);
     //Making LeptonPt and Eta plots
     SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l1Pt, weight);
     SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l2Pt, weight);
