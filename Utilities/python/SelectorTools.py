@@ -42,6 +42,7 @@ class SelectorDriver(object):
         self.numCores = 1
         self.channels = ["Inclusive"]
         self.outfile_name = "temp.root"
+        self.outfile = 0
         self.datasets = {}
 
     # Needed to parallelize class member function, see
@@ -63,8 +64,13 @@ class SelectorDriver(object):
     
     def isFake(self):
         self.selector_name = self.selector_name.replace("ZZ", "FakeRate")
+
+    def outputFile(self):
+        return self.outfile
     
     def setOutputfile(self, outfile_name):
+        if self.outfile:
+            self.outfile.Close()
         self.outfile_name = outfile_name
         self.outfile = ROOT.gROOT.FindObject(outfile_name)
         if not self.outfile:
@@ -129,6 +135,7 @@ class SelectorDriver(object):
                 self.datasets[dataset].append(file_path)
 
     def setDatasets(self, datalist):
+        self.clearDatasets()
         datasets = ConfigureJobs.getListOfFiles(datalist, self.input_tier)
         for dataset in datasets:
             if "@" in dataset:
@@ -141,9 +148,9 @@ class SelectorDriver(object):
                     logging.warning(e)
                     continue
             self.datasets[dataset] = [file_path]
+
     def clearDatasets(self):
-        for dataset in self.datasets:
-            self.datasets[dataset] = []
+        self.datasets.clear()
 
     def applySelector(self):
         for chan in self.channels:
@@ -160,7 +167,6 @@ class SelectorDriver(object):
 
     def processDataset(self, dataset, file_path, chan):
         logging.info("Processing dataset %s" % dataset)
-        print "Processing dataset: ", dataset
         select = getattr(ROOT, self.selector_name)()
         select.SetInputList(self.inputs)
         self.addTNamed("name", dataset)
@@ -261,12 +267,7 @@ class SelectorDriver(object):
         rtfile = ROOT.TFile.Open(filename)
         if not rtfile or not rtfile.IsOpen() or rtfile.IsZombie():
             raise IOError("Failed to open file %s!" % filename)
-        #if "Gen" in self.selector_name:
-        #    tree_name = self.getTreeName(chan+"Gen")
-        #else:
         tree_name = self.getTreeName(chan)
-        print "selector: ",self.selector_name
-        print "tree_name: ",tree_name
         tree = rtfile.Get(tree_name)
         if not tree:
             raise ValueError(("tree %s not found for file %s. " \

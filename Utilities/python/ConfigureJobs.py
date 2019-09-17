@@ -83,38 +83,31 @@ def getCombinePath():
         raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
                             % os.environ["USER"])
     return config['Setup']['combine_path'] + "/"
-def getListOfGenFilenames():
-    return [
-        "zz4l-amcatnlo",
-        "zz4l-powheg",
-        "ggZZ4e",
-        "ggZZ4m",
-        "ggZZ4t",
-        "ggZZ2e2mu",
-        "ggZZ2e2tau",
-        "ggZZ2mu2tau",
-        "ggHZZ",
-        "ttH_HToZZ_4L",
-        "WminusHToZZ",
-        "WplusHToZZ",
-        "ZHToZZ_4L",
-        "vbfHZZ",
-    ]
-def getListOfEWKFilenames():
-    return [
-        "wz3lnu-mg5amcnlo",
-        "zz4l-powheg",
-        "ggZZ4e",
-        "ggZZ4m",
-        "ggZZ4t",
-        "ggZZ2e2mu",
-        "ggZZ2e2tau",
-        "ggZZ2mu2tau",
-    ]
-def getListOfEWK(analysis=""):
+def getListOfGenFilenames(analysis='ZZ'):
+    if 'ZZ' in analysis:
+        return [
+            "zz4l-amcatnlo",
+            "zz4l-powheg",
+            "zzjj4l-ewk",
+            "ggZZ4e",
+            "ggZZ4m",
+            "ggZZ4t",
+            "ggZZ2e2mu",
+            "ggZZ2e2tau",
+            "ggZZ2mu2tau",
+            "ggHZZ",
+            "ttH_HToZZ_4L",
+            "WminusHToZZ",
+            "WplusHToZZ",
+            "ZHToZZ_4L",
+            "vbfHZZ",
+        ]
+    return []
+def getListOfEWKFilenames(analysis=""):
     if "ZZ4l" in analysis:
         return [
             "zz4l-powheg",
+            "zzjj4l-ewk",
             "ggZZ4e",
             "ggZZ4m",
             "ggZZ4t",
@@ -233,7 +226,6 @@ def getListOfFiles(filelist, selection, manager_path="", analysis=""):
             dataset_file = manager_path + \
                 "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2016/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
-            print allnames
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
                 names += nodata
@@ -245,7 +237,6 @@ def getListOfFiles(filelist, selection, manager_path="", analysis=""):
             dataset_file = manager_path + \
                 "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2017/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
-            print allnames
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
                 names += nodata
@@ -257,7 +248,6 @@ def getListOfFiles(filelist, selection, manager_path="", analysis=""):
             dataset_file = manager_path + \
                 "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2018/%s.json" % selection
             allnames = json.load(open(dataset_file)).keys()
-            print allnames
             if "nodata" in name:
                 nodata = [x for x in allnames if "data" not in x]
                 names += nodata

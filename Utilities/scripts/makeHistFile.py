@@ -63,7 +63,9 @@ def makeHistFile(args):
     else:
         tmpFileName = "Hists%s-%s.root" % (today, args['output_file']) if args['selection'] == "SignalSync" \
             else "Hists%s-%s.root" % (today, args['analysis'])
-    fOut = ROOT.TFile(tmpFileName if not args['with_background'] else tmpFileName.replace(".root", "sel.root"), "recreate")
+    toCombine = args['with_background'] or args['with_Gen']
+    fOut = ROOT.TFile(tmpFileName if not toCombine else tmpFileName.replace(".root", "sel.root"), "recreate")
+    combinedNames = [fOut.GetName()]
 
     addScaleFacs = False
     if args['analysis'] == "WZxsec2016" or args['analysis'] == 'Zstudy_2016' or args['scalefactors_file']:
@@ -170,30 +172,32 @@ def makeHistFile(args):
     if args['with_background']:
         selector.isBackground()
         selector.setInputs(sf_inputs+hist_inputs+fr_inputs)
-        selector.setOutputfile(tmpFileName.replace(".root", "bkgd.root"))
-        nonprompt = selector.applySelector()
-        #tempfiles = [tmpFileName.replace(".root", "%s.root" % app) for app in ["sel", "bkgd"]]
-        #rval = subprocess.call(["hadd", "-f", tmpFileName] + tempfiles)
-        #if rval == 0:
-        #    map(os.remove, tempfiles)
+        output_name = tmpFileName.replace(".root", "bkgd.root")
+        selector.setOutputfile(output_name)
+        bkgd = selector.applySelector()
+        combinedNames.append(output_name)
 
     if args['with_Gen']:
         selector.isGen()
         selector.setChannels([c+"Gen" for c in args['channels']])
-        selector.clearDatasets()
+        # Make sure to remove data from the dataset lists
         selector.setInputs(hist_inputs)
-        selector.setOutputfile(tmpFileName.replace(".root", "gen.root"))
+        output_name = tmpFileName.replace(".root", "gen.root")
+        selector.setOutputfile(output_name)
+        combinedNames.append(output_name)
         if args['filenames']:
             #selector.setDatasets(args['filenames'])
-            selector.setDatasets(ConfigureJobs.getListOfGenFilenames())
+            selector.setDatasets(ConfigureJobs.getListOfGenFilenames(args['analysis']))
         else:
             selector.setFileList(*args['inputs_from_file'])
         gen = selector.applySelector()
         selector.setChannels(args['channels'])
-        tempfiles = [tmpFileName.replace(".root", "%s.root" % app) for app in ["sel", "bkgd","gen"]]
-        rval = subprocess.call(["hadd", "-f", tmpFileName] + tempfiles)
+        selector.outputFile().Close()
+
+    if len(combinedNames) > 1:
+        rval = subprocess.call(["hadd", "-f", tmpFileName] + combinedNames)
         if rval == 0:
-            map(os.remove, tempfiles)
+            map(os.remove, combinedNames)
 
     if args['test']:
         fOut.Close()
@@ -217,7 +221,7 @@ def makeHistFile(args):
         OutputTools.writeOutputListItem(nonpromptmc, fOut)
 
     ewkmc = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getListOfFilesWithXSec(
-        ConfigureJobs.getListOfEWK(args['analysis']), manager_path), args['lumi'],
+        ConfigureJobs.getListOfEWKFilenames(args['analysis']), manager_path), args['lumi'],
         underflow=False, overflow=False)
     OutputTools.writeOutputListItem(ewkmc, fOut)
     ewkmc.Delete()
