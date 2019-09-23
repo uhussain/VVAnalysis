@@ -54,6 +54,7 @@ public :
     Float_t Pt;
     Float_t Eta;
     float dPhiZZ; //DeltaPhi between Z1 and Z2
+    float dRZZ; //DeltaR between Z1 and Z2
     TBranch* b_nvtx;
     TBranch* b_Mass;
     TBranch* b_Pt;

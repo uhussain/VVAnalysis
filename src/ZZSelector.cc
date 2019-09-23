@@ -14,7 +14,7 @@ void ZZSelector::Init(TTree *tree)
         {pileupUp, "CMS_pileupUp"},
         {pileupDown, "CMS_pileupDown"},
     }; 
-    doSystematics_ = false;
+    doSystematics_ = true;
     
     //This would be set true inside ZZBackground Selector
     isNonPrompt_ = false;
@@ -26,16 +26,10 @@ void ZZSelector::Init(TTree *tree)
         "ZZPt",
         "ZZEta",
         "dPhiZ1Z2",
-        //"Z1Pt",
-        //"Z2Pt"
+        "dRZ1Z2",
         "ZPt",
         "LepPt",
         "LepEta"
-        //"Z1lep1_Pt",
-        //"Z1lep2_Pt",
-        //"Z2lep1_Pt",
-        //"Z2lep2_Pt",
-        //"nTruePU",
     };
     //hists1D_ = {
     //     "yield", "backgroundControlYield","nTruePU","nvtx","ZMass","Z1Mass","Z2Mass","ZZPt",  
@@ -46,7 +40,7 @@ void ZZSelector::Init(TTree *tree)
     //};
 
     hists1D_ = {
-         "yield", "ZMass","ZZPt","ZZEta","dPhiZ1Z2","ZPt","LepPt","LepEta",
+         "yield", "ZMass","ZZPt","ZZEta","dPhiZ1Z2","dRZ1Z2","ZPt","LepPt","LepEta",
          "Mass","nJets","jetPt[0]","jetPt[1]","jetEta[0]","jetEta[1]","mjj","dEtajj","SIP3D"
     };
 
@@ -57,6 +51,7 @@ void ZZSelector::Init(TTree *tree)
         "ZZPt",
         "ZZEta",
         "dPhiZ1Z2",
+        "dRZ1Z2",
         "ZPt",
         "LepPt",
         "LepEta"
@@ -175,8 +170,14 @@ void ZZSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::str
         return std::abs(etaDiff);
     };
 
+    auto deltaRZZ = [](float eta1, float eta2, float dPhi) {
+      float dEta = eta1 - eta2;
+      return std::sqrt(dPhi * dPhi + dEta * dEta);
+    };
+
     dEtajj = deltaEtajj(jetEta);
     dPhiZZ = deltaPhiZZ(Z1Phi,Z2Phi);
+    dRZZ = deltaRZZ(Z1Eta,Z2Eta,dPhiZZ);
 }
 
 void ZZSelector::ApplyScaleFactors() {
@@ -680,6 +681,14 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
             SafeHistFill(weighthistMap1D_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthistMap1D_, getHistName("Mass", variation.second), Mass, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthistMap1D_, getHistName("ZZPt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("ZPt", variation.second), Z1pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("ZPt", variation.second), Z2pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("LepPt", variation.second), l1Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("LepPt", variation.second), l2Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("LepPt", variation.second), l3Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("LepPt", variation.second), l4Pt, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("dPhiZ1Z2", variation.second), dPhiZZ, i, lheWeights[i]/lheWeights[0]*weight);
+            SafeHistFill(weighthistMap1D_, getHistName("dRZ1Z2", variation.second), dRZZ, i, lheWeights[i]/lheWeights[0]*weight);
         }
       }
     //std::cout<<"isNonPrompt_ in FillHistograms after ZZSelection:"<<isNonPrompt_<<std::endl;
@@ -692,6 +701,7 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z1pt, weight);
     SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z2pt, weight);
     SafeHistFill(histMap1D_, getHistName("dPhiZ1Z2", variation.second), dPhiZZ, weight);
+    SafeHistFill(histMap1D_, getHistName("dRZ1Z2", variation.second), dRZZ, weight);
     SafeHistFill(histMap1D_, getHistName("ZZPt", variation.second), Pt, weight); 
     SafeHistFill(histMap1D_, getHistName("ZZEta", variation.second), Eta, weight);
 

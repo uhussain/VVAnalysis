@@ -6,40 +6,16 @@ void ZZGenSelector::Init(TTree *tree)
 {
     allChannels_ = {"ee", "mm", };
     hists1D_ = {
-        "GenZ2lep2_Phi",
-        "GenZ2lep2_Pt",
         "GenMass",
-        "Pt",
-        "nJets",
-        "nJetCSVv2T",
         "Genyield",
         "GenZMass",
-        "GenZ1Mass",
-        "GenZ2Mass",
         "GenZZPt",
         "GenZZEta",
-        "GenZ1Pt",
-        "GenZ2Pt",
         "GenZPt",
-        "GenZ1Phi",
-        "GenZ2Phi",
         "GendPhiZ1Z2",
+        "GendRZ1Z2",
         "GenLepPt",
         "GenLepEta",
-        "GenLep12Pt",
-        "GenLep12Eta",
-        "GenLep34Pt",
-        "GenLep34Eta",
-        "GenZ1lep1_Eta",
-        "GenZ1lep1_Phi",
-        "GenZ1lep1_Pt",
-        "GenZ1lep2_Eta",
-        "GenZ1lep2_Phi",
-        "GenZ1lep2_Pt",
-        "GenZ2lep1_Eta",
-        "GenZ2lep1_Phi",
-        "GenZ2lep1_Pt",
-        "GenZ2lep2_Eta",
     };
 
     //hists2D_ = {"GenZ1Mass_GenZ2Mass"};
@@ -67,6 +43,8 @@ void ZZGenSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::
       b_GenZ2mass->GetEntry(entry);
       b_GenZ2pt->GetEntry(entry);
       b_GenZ2Phi->GetEntry(entry);
+      b_GenZ1Eta->GetEntry(entry);
+      b_GenZ2Eta->GetEntry(entry);
     }
     b_GenZ1mass->GetEntry(entry);
     b_GenZ1pt->GetEntry(entry);
@@ -98,7 +76,13 @@ void ZZGenSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::
       return dphi;
     };
 
+    auto deltaRZZ = [](float eta1, float eta2, float dPhi) {
+      float dEta = eta1 - eta2;
+      return std::sqrt(dPhi * dPhi + dEta * dEta);
+    };
+
     GendPhiZZ = deltaPhiZZ(GenZ1Phi,GenZ2Phi);
+    GendRZZ = deltaRZZ(GenZ1Eta,GenZ2Eta,GendPhiZZ);
 }
 
 void ZZGenSelector::LoadBranchesNanoAOD(Long64_t entry, std::pair<Systematic, std::string> variation) {
@@ -121,6 +105,8 @@ void ZZGenSelector::SetBranchesUWVV() {
         fChain->SetBranchAddress("e3_e4_Pt", &GenZ2pt, &b_GenZ2pt);
         fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
         fChain->SetBranchAddress("e3_e4_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &GenZ1Eta, &b_GenZ1Eta);
+        fChain->SetBranchAddress("e3_e4_Eta", &GenZ2Eta, &b_GenZ2Eta);
         fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
         fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
         fChain->SetBranchAddress("e3Pt", &Genl3Pt, &b_Genl3Pt);
@@ -143,6 +129,8 @@ void ZZGenSelector::SetBranchesUWVV() {
         fChain->SetBranchAddress("m1_m2_Pt", &GenZ2pt, &b_GenZ2pt);
         fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
         fChain->SetBranchAddress("m1_m2_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &GenZ1Eta, &b_GenZ1Eta);
+        fChain->SetBranchAddress("m1_m2_Eta", &GenZ2Eta, &b_GenZ2Eta);
         fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
         fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
         fChain->SetBranchAddress("m1Pt", &Genl3Pt, &b_Genl3Pt);
@@ -163,6 +151,8 @@ void ZZGenSelector::SetBranchesUWVV() {
         fChain->SetBranchAddress("m1_m2_Pt", &GenZ2pt, &b_GenZ2pt);
         fChain->SetBranchAddress("e1_e2_Phi", &GenZ1Phi, &b_GenZ1Phi);
         fChain->SetBranchAddress("m1_m2_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &GenZ1Eta, &b_GenZ1Eta);
+        fChain->SetBranchAddress("m1_m2_Eta", &GenZ2Eta, &b_GenZ2Eta);
         fChain->SetBranchAddress("e1Pt", &Genl1Pt, &b_Genl1Pt);
         fChain->SetBranchAddress("e2Pt", &Genl2Pt, &b_Genl2Pt);
         fChain->SetBranchAddress("m1Pt", &Genl3Pt, &b_Genl3Pt);
@@ -183,6 +173,8 @@ void ZZGenSelector::SetBranchesUWVV() {
         fChain->SetBranchAddress("m3_m4_Pt", &GenZ2pt, &b_GenZ2pt);
         fChain->SetBranchAddress("m1_m2_Phi", &GenZ1Phi, &b_GenZ1Phi);
         fChain->SetBranchAddress("m3_m4_Phi", &GenZ2Phi, &b_GenZ2Phi);
+        fChain->SetBranchAddress("m1_m2_Eta", &GenZ1Eta, &b_GenZ1Eta);
+        fChain->SetBranchAddress("m3_m4_Eta", &GenZ2Eta, &b_GenZ2Eta);
         fChain->SetBranchAddress("m1Pt", &Genl1Pt, &b_Genl1Pt);
         fChain->SetBranchAddress("m2Pt", &Genl2Pt, &b_Genl2Pt);
         fChain->SetBranchAddress("m3Pt", &Genl3Pt, &b_Genl3Pt);
@@ -268,6 +260,7 @@ void ZZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::st
     SafeHistFill(histMap1D_, getHistName("GenZZPt", variation.second), GenPt, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenZZEta", variation.second), GenEta, Genweight);
     SafeHistFill(histMap1D_, getHistName("GendPhiZ1Z2", variation.second), GendPhiZZ, Genweight);
+    SafeHistFill(histMap1D_, getHistName("GendRZ1Z2", variation.second), GendRZZ, Genweight);
     //Making LeptonPt and Eta plots
     SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl1Pt, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl2Pt, Genweight);

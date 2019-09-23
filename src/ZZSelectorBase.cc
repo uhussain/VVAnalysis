@@ -86,6 +86,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("e3_e4_Pt", &Z2pt, &b_Z2pt);
         fChain->SetBranchAddress("e1_e2_Phi", &Z1Phi, &b_Z1Phi);
         fChain->SetBranchAddress("e3_e4_Phi", &Z2Phi, &b_Z2Phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &Z1Eta, &b_Z1Eta);
+        fChain->SetBranchAddress("e3_e4_Eta", &Z2Eta, &b_Z2Eta);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("e3Pt", &l3Pt, &b_l3Pt);
@@ -140,6 +142,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("m1_m2_Pt", &Z2pt, &b_Z2pt);
         fChain->SetBranchAddress("e1_e2_Phi", &Z1Phi, &b_Z1Phi);
         fChain->SetBranchAddress("m1_m2_Phi", &Z2Phi, &b_Z2Phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &Z1Eta, &b_Z1Eta);
+        fChain->SetBranchAddress("m1_m2_Eta", &Z2Eta, &b_Z2Eta);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m1Pt", &l3Pt, &b_l3Pt);
@@ -193,6 +197,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("m1_m2_Pt", &Z2pt, &b_Z2pt);
         fChain->SetBranchAddress("e1_e2_Phi", &Z1Phi, &b_Z1Phi);
         fChain->SetBranchAddress("m1_m2_Phi", &Z2Phi, &b_Z2Phi);
+        fChain->SetBranchAddress("e1_e2_Eta", &Z1Eta, &b_Z1Eta);
+        fChain->SetBranchAddress("m1_m2_Eta", &Z2Eta, &b_Z2Eta);
         fChain->SetBranchAddress("e1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("e2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m1Pt", &l3Pt, &b_l3Pt);
@@ -244,6 +250,8 @@ void ZZSelectorBase::SetBranchesUWVV() {
         fChain->SetBranchAddress("m3_m4_Pt", &Z2pt, &b_Z2pt);
         fChain->SetBranchAddress("m1_m2_Phi", &Z1Phi, &b_Z1Phi);
         fChain->SetBranchAddress("m3_m4_Phi", &Z2Phi, &b_Z2Phi);
+        fChain->SetBranchAddress("m1_m2_Eta", &Z1Eta, &b_Z1Eta);
+        fChain->SetBranchAddress("m3_m4_Eta", &Z2Eta, &b_Z2Eta);
         fChain->SetBranchAddress("m1Pt", &l1Pt, &b_l1Pt);
         fChain->SetBranchAddress("m2Pt", &l2Pt, &b_l2Pt);
         fChain->SetBranchAddress("m3Pt", &l3Pt, &b_l3Pt);
@@ -450,6 +458,8 @@ void ZZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
       b_Z2mass->GetEntry(entry);
       b_Z2pt->GetEntry(entry);
       b_Z2Phi->GetEntry(entry);
+      b_Z1Eta->GetEntry(entry);
+      b_Z2Eta->GetEntry(entry);
     }
     b_Z1mass->GetEntry(entry);
     b_Z1pt->GetEntry(entry);

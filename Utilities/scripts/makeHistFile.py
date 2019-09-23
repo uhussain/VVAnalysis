@@ -83,31 +83,45 @@ def makeHistFile(args):
             if eZZTightFakeRate:
                 eZZTightFakeRate.SetName("fakeRate_allE")
             if "2018" in args['scalefactors_file']:
-                muonMoriondSF= fScales.Get('muonMoriond19SF')
-                muonMoriondSF.SetName("muonMoriondSF")
-                electronLowRecoSF = fScales.Get('electronLowReco19SF')
-                electronLowRecoSF.SetName("electronLowRecoSF")
-                electronRecoSF = fScales.Get('electronReco19SF')
-                electronRecoSF.SetName("electronRecoSF")
-                electronMoriondSF = fScales.Get('electronMoriond19SF')
-                electronMoriondSF.SetName("electronMoriondSF")
-                electronMoriondGapSF = fScales.Get('electronMoriond19GapSF')
-                electronMoriondGapSF.SetName("electronMoriondGapSF")
-            else:
-                muonMoriondSF= fScales.Get('muonMoriond18SF')
-                muonMoriondSF.SetName("muonMoriondSF")
+                muonRunSF= fScales.Get('muonRun18SF')
+                muonRunSF.SetName("muonRunSF")
                 electronLowRecoSF = fScales.Get('electronLowReco18SF')
                 electronLowRecoSF.SetName("electronLowRecoSF")
                 electronRecoSF = fScales.Get('electronReco18SF')
                 electronRecoSF.SetName("electronRecoSF")
-                electronMoriondSF = fScales.Get('electronMoriond18SF')
-                electronMoriondSF.SetName("electronMoriondSF")
-                electronMoriondGapSF = fScales.Get('electronMoriond18GapSF')
-                electronMoriondGapSF.SetName("electronMoriondGapSF")
+                electronRunSF = fScales.Get('electronRun18SF')
+                electronRunSF.SetName("electronRunSF")
+                electronRunGapSF = fScales.Get('electronRun18GapSF')
+                electronRunGapSF.SetName("electronRunGapSF")
+            elif "2016" in args['scalefactors_file']:
+                muonRunSF= fScales.Get('muonRun16SF')
+                muonRunSF.SetName("muonRunSF")
+                electronLowRecoSF = fScales.Get('electronLowReco16SF')
+                electronLowRecoSF.SetName("electronLowRecoSF")
+                electronRecoSF = fScales.Get('electronReco16SF')
+                electronRecoSF.SetName("electronRecoSF")
+                electronRunSF = fScales.Get('electronRun16SF')
+                electronRunSF.SetName("electronRunSF")
+                electronRunGapSF = fScales.Get('electronRun16GapSF')
+                electronRunGapSF.SetName("electronRunGapSF")
+            elif "2017" in args['scalefactors_file']:
+                muonRunSF= fScales.Get('muonRun17SF')
+                muonRunSF.SetName("muonRunSF")
+                electronLowRecoSF = fScales.Get('electronLowReco17SF')
+                electronLowRecoSF.SetName("electronLowRecoSF")
+                electronRecoSF = fScales.Get('electronReco17SF')
+                electronRecoSF.SetName("electronRecoSF")
+                electronRunSF = fScales.Get('electronRun17SF')
+                electronRunSF.SetName("electronRunSF")
+                electronRunGapSF = fScales.Get('electronRun17GapSF')
+                electronRunGapSF.SetName("electronRunGapSF")
+            else: 
+                print "what scale factors you want?"
+                sys.exit()
             pileupSF = fScales.Get('pileupSF')
 
             fr_inputs = [eZZTightFakeRate, mZZTightFakeRate,]
-            sf_inputs = [electronLowRecoSF,electronRecoSF,electronMoriondSF, electronMoriondGapSF,muonMoriondSF,pileupSF]
+            sf_inputs = [electronLowRecoSF,electronRecoSF,electronRunSF, electronRunGapSF,muonRunSF,pileupSF]
         else:
             fScales = ROOT.TFile('data/scaleFactors.root')
             mCBTightFakeRate = fScales.Get("mCBTightFakeRate")

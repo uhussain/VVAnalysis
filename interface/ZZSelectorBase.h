@@ -44,6 +44,8 @@ public :
     Float_t Z2pt;
     Float_t Z1Phi;
     Float_t Z2Phi;
+    Float_t Z1Eta;
+    Float_t Z2Eta;
     Float_t type1_pfMETEt;
     Float_t type1_pfMETPhi;
     Float_t l1GenPt;
@@ -114,6 +116,8 @@ public :
     TBranch* b_Z2pt;
     TBranch* b_Z1Phi;
     TBranch* b_Z2Phi;
+    TBranch* b_Z1Eta;
+    TBranch* b_Z2Eta;
     TBranch* b_nTruePU;
     TBranch* b_type1_pfMETEt;
     TBranch* b_type1_pfMETPhi;

@@ -8,7 +8,8 @@
 class ZZGenSelector : public SelectorBase {
 public :
     
-    float GendPhiZZ; //DeltaPhi between Z1 and Z2
+    float GendPhiZZ; //DeltaPhi between Z1 and Z2 
+    float GendRZZ; //DeltaR between Z1 and Z2
     Float_t GenMass;
     Float_t GenPt;
     Float_t GenEta;
@@ -19,8 +20,10 @@ public :
     Float_t GenZ1pt;
     Float_t GenZ2pt;
     Float_t GenZ1Phi;
-    Float_t GenZ2Phi;
- 
+    Float_t GenZ2Phi; 
+    Float_t GenZ1Eta;
+    Float_t GenZ2Eta;
+
     Float_t Genl1Pt;
     Float_t Genl2Pt;
     Float_t Genl3Pt;
@@ -39,6 +42,8 @@ public :
     TBranch* b_GenZ2mass;
     TBranch* b_GenZ1pt;
     TBranch* b_GenZ2pt;
+    TBranch* b_GenZ1Eta;
+    TBranch* b_GenZ2Eta;
     TBranch* b_GenZ1Phi;
     TBranch* b_GenZ2Phi;
     TBranch* b_GenMass;
