@@ -20,9 +20,9 @@ void ZZBackgroundSelector::SlaveBegin(TTree * /*tree*/)
     if (fakeRate_allMu_ == nullptr ) Abort("Must pass muon fake rate to input list!");
 }
 void ZZBackgroundSelector::Init(TTree *tree) {
+      isNonPrompt_ = true;
       ZZSelector::Init(tree);
       systematics_ = {};
-      doSystematics_ = false;
 }
 
 void ZZBackgroundSelector::SetupNewDirectory()
@@ -102,7 +102,7 @@ void ZZBackgroundSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic
     if (!ZZSelection()){
       return;}
     //std::cout<<"isNonPrompt_ from ZZSelector: "<<isNonPrompt_<<std::endl;
-    isNonPrompt_ = true;
+    //isNonPrompt_ = true;
     //std::cout<<"isNonPrompt_ from ZZBackgroundSelector: "<<isNonPrompt_<<std::endl;
     //We don't want systematics to run for data-driven nonPrompt Estimate so save time and space
     //systematics_ = {};

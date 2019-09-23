@@ -6,18 +6,18 @@ void ZZSelector::Init(TTree *tree)
 {
     systematics_ = {
         {electronRecoEffUp,"CMS_RecoEff_eUp"},
-        {electronRecoEffDown,"CMS_RecoEff_eDown"},
-        {electronEfficiencyUp, "CMS_eff_eUp"},
-        {electronEfficiencyDown, "CMS_eff_eDown"},
-        {muonEfficiencyUp, "CMS_eff_mUp"},
-        {muonEfficiencyDown, "CMS_eff_mDown"},
-        {pileupUp, "CMS_pileupUp"},
-        {pileupDown, "CMS_pileupDown"},
+        //{electronRecoEffDown,"CMS_RecoEff_eDown"},
+        //{electronEfficiencyUp, "CMS_eff_eUp"},
+        //{electronEfficiencyDown, "CMS_eff_eDown"},
+        //{muonEfficiencyUp, "CMS_eff_mUp"},
+        //{muonEfficiencyDown, "CMS_eff_mDown"},
+        //{pileupUp, "CMS_pileupUp"},
+        //{pileupDown, "CMS_pileupDown"},
     }; 
     doSystematics_ = true;
     
     //This would be set true inside ZZBackground Selector
-    isNonPrompt_ = false;
+    //isNonPrompt_ = false;
 
     systHists_ = {
         "yield",
