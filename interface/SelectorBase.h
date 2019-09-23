@@ -146,7 +146,7 @@ class SelectorBase : public TSelector {
     TH1D* sumWeightsHist_;
 
     bool doSystematics_;
-    bool isNonPrompt_;
+    bool isNonPrompt_ = false;
     bool addSumweights_;
     bool applyScaleFactors_;
     bool applyPrefiringCorr_;

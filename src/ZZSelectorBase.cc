@@ -22,15 +22,15 @@ void ZZSelectorBase::SetScaleFactors()
     eRecoSF_ = (ScaleFactor *) GetInputList()->FindObject("electronRecoSF");
     if (eRecoSF_ == nullptr ) 
         std::invalid_argument("Must pass electron Reco SF");
-    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriondSF");
+    eIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronRunSF");
     if (eIdSF_ == nullptr ) 
-        std::invalid_argument("Must pass electron Moriond SF");
-    eGapIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronMoriondGapSF");
+        std::invalid_argument("Must pass electron Run SF");
+    eGapIdSF_ = (ScaleFactor *) GetInputList()->FindObject("electronRunGapSF");
     if (eGapIdSF_ == nullptr ) 
-        std::invalid_argument("Must pass electronGap Moriond SF");
-    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonMoriondSF");
+        std::invalid_argument("Must pass electronGap Run SF");
+    mIdSF_ = (ScaleFactor *) GetInputList()->FindObject("muonRunSF");
     if (mIdSF_ == nullptr ) 
-        std::invalid_argument("Must pass muon Moriond SF");
+        std::invalid_argument("Must pass muon Run SF");
 
     //There are L1Prefiring weight and uncertainity in the ZZ UWVV ntuples 
     //prefireEff_ = (TEfficiency*) GetInputList()->FindObject("prefireEfficiencyMap");

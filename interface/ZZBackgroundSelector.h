@@ -22,6 +22,7 @@ public :
     TH1D* WeightsHistmmee_;
     TH1D* WeightsHisteemm_;
     
+    virtual void    Init(TTree *tree) override;
     virtual void    SetupNewDirectory() override;
     virtual void    SlaveBegin(TTree *tree) override;
 
