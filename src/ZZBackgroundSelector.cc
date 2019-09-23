@@ -12,6 +12,7 @@ void ZZBackgroundSelector::SlaveBegin(TTree * /*tree*/)
     //};
     //isNonpromptEstimate_ = true;
     //doaQGC_ = false;
+
     ZZSelector::SlaveBegin(0);
     fakeRate_allE_ = (ScaleFactor *) GetInputList()->FindObject("fakeRate_allE");
     if (fakeRate_allE_ == nullptr ) Abort("Must pass electron fake rate to input list!");
@@ -98,7 +99,9 @@ void ZZBackgroundSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic
     //std::cout<<"isNonPrompt_ from ZZSelector: "<<isNonPrompt_<<std::endl;
     isNonPrompt_ = true;
     //std::cout<<"isNonPrompt_ from ZZBackgroundSelector: "<<isNonPrompt_<<std::endl;
-    //We don't want systematics to run for data-driven nonPrompt Estimate so save time and space 
+    //We don't want systematics to run for data-driven nonPrompt Estimate so save time and space
+    systematics_ = {};
+    doSystematics_ = false;
     weight = getEventWeight(entry);
     //std::cout<<"eventWeight in loadBranchesUWVV: "<<weight<<std::endl;
 }
