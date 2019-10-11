@@ -88,7 +88,7 @@ def getListOfGenFilenames(analysis='ZZ'):
         return [
             "zz4l-amcatnlo",
             "zz4l-powheg",
-            "zzjj4l-ewk",
+            #"zzjj4l-ewk",
             "ggZZ4e",
             "ggZZ4m",
             "ggZZ4t",
@@ -107,7 +107,7 @@ def getListOfEWKFilenames(analysis=""):
     if "ZZ4l" in analysis:
         return [
             "zz4l-powheg",
-            "zzjj4l-ewk",
+            #"zzjj4l-ewk",
             "ggZZ4e",
             "ggZZ4m",
             "ggZZ4t",

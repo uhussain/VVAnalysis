@@ -107,7 +107,8 @@ class CombineCardTools(object):
         self.templateName = templateName
 
     def setOutputFile(self, outputFile):
-        self.outputFile = self.getRootFile("/".join([self.outputFolder, outputFile]), "RECREATE")
+        #self.outputFile = self.getRootFile("/".join([self.outputFolder, outputFile]), "RECREATE")
+        self.outputFile = self.getRootFile(outputFile, "RECREATE")
 
     def setInputFile(self, inputFile):
         self.inputFile = self.getRootFile(inputFile)

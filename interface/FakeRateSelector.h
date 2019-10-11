@@ -54,16 +54,15 @@ public :
     TH1D* ratio1DPt_endcap_;
     TH1D* ratio1DEta_;
 
-    // Readers to access the data (delete the ones you do not need).
-    FakeRateSelector(TTree * /*tree*/ =0) { }
-    virtual ~FakeRateSelector() { }
     virtual void    Init(TTree *tree) override;
     virtual void    SetupNewDirectory() override;
-
+    //virtual void    FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) override;
     ClassDefOverride(FakeRateSelector,0);
 
-protected:
-    void LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
+private:
+    void    LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) override;
+
+
 };
 
 #endif

@@ -14,7 +14,7 @@ void ZZSelector::Init(TTree *tree)
         {pileupUp, "CMS_pileupUp"},
         {pileupDown, "CMS_pileupDown"},
     }; 
-    doSystematics_ = true;
+    doSystematics_ = false;
     
     //This would be set true inside ZZBackground Selector
     //isNonPrompt_ = false;
@@ -676,8 +676,6 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
         //std::cout<<"does it go into lheWeights"<<std::endl;
         //std::cout << "lheWeights.size() " << lheWeights.size() << std::endl;
         for (size_t i = 0; i < lheWeights.size(); i++) {
-            if (i < 5)
-                //std::cout << "    lheWeights[i]/lheWeights[0] = " <<  lheWeights[i]/lheWeights[0] << std::endl;
             SafeHistFill(weighthistMap1D_, getHistName("yield", variation.second), 1, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthistMap1D_, getHistName("Mass", variation.second), Mass, i, lheWeights[i]/lheWeights[0]*weight);
             SafeHistFill(weighthistMap1D_, getHistName("ZZPt", variation.second), Pt, i, lheWeights[i]/lheWeights[0]*weight);

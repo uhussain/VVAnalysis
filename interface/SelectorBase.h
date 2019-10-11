@@ -77,6 +77,7 @@ class SelectorBase : public TSelector {
         electronEfficiencyUp,      electronEfficiencyDown,
         electronScaleUp,           electronScaleDown,
         pileupUp,                  pileupDown,
+        //L1prefiringWeightUp,       L1prefiringWeightDown,
     }; 
 
     /****************************/

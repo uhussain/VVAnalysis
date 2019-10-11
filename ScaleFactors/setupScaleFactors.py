@@ -9,6 +9,7 @@
 import ROOT
 import argparse
 import os
+import sys
 ROOT.gROOT.SetBatch(True)
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
@@ -37,118 +38,153 @@ def invert2DHist(hist):
     return new_hist
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-t", "--tightfr_file", type=str,
-        default='data/fakeRate18Apr2017-3LooseLeptons-TightMuons.root')
-parser.add_argument("-m", "--medfr_file", type=str,
-        default='data/fakeRate18Apr2017-3LooseLeptons-MediumMuons.root')
-args = parser.parse_args()
-output_file = 'data/scaleFactors.root'
-fScales = ROOT.TFile(output_file, 'recreate')
+
+def getComLineArgs():
+    parser.add_argument("--year", type=str,default="default", help="Year of Analysis")
+    parser.add_argument("-t", "--tightfr_file", type=str,
+            default="")
+    parser.add_argument("--output_file", "-o", type=str,
+            default="test.root", help="Output file name")
+
+    return vars(parser.parse_args())
+
+args = getComLineArgs()
+
+year = args["year"]
+frfile = args["tightfr_file"]
+fScales = ROOT.TFile(args['output_file'], 'recreate')
+
+
 
 # For nTruePU reweighting
-pileupSF = ROOT.ScaleFactor("pileupSF", "Run2016B-H 36.8/fb Pileup profile over RunIISpring16 MC Scale Factor, x=NTruePU")
-pileupFile = ROOT.TFile.Open('PileupWeights/PU_Central.root')
-pileupFileUp = ROOT.TFile.Open('PileupWeights/PU_minBiasUP.root')
-pileupFileDown = ROOT.TFile.Open('PileupWeights/PU_minBiasDOWN.root')
+if year=="2016":
+    print "2016 PU reweighting"
+    pileupSF = ROOT.ScaleFactor("pileupSF", "Run2016B-H 35.9/fb Pileup profile over RunIISummer16 MC Scale Factor, x=NTruePU")
+    pileupFile = ROOT.TFile.Open('PileupWeights16/PU_Central.root')
+    pileupFileUp = ROOT.TFile.Open('PileupWeights16/PU_minBiasUP.root')
+    pileupFileDown = ROOT.TFile.Open('PileupWeights16/PU_minBiasDOWN.root')
+elif year=="2017":
+    pileupSF = ROOT.ScaleFactor("pileupSF", "Run2017B-F 41.5/fb Pileup profile over RunIIFall17 MC Scale Factor, x=NTruePU")
+    pileupFile = ROOT.TFile.Open('PileupWeights17/PU_Central.root')
+    pileupFileUp = ROOT.TFile.Open('PileupWeights17/PU_minBiasUP.root')
+    pileupFileDown = ROOT.TFile.Open('PileupWeights17/PU_minBiasDOWN.root')
+elif year=="2018":
+    pileupSF = ROOT.ScaleFactor("pileupSF", "Run2018A-D 59.95/fb Pileup profile over RunIIFall18 MC Scale Factor, x=NTruePU")
+    pileupFile = ROOT.TFile.Open('PileupWeights18/PU_Central.root')
+    pileupFileUp = ROOT.TFile.Open('PileupWeights18/PU_minBiasUP.root')
+    pileupFileDown = ROOT.TFile.Open('PileupWeights18/PU_minBiasDOWN.root')
+else:
+    print "You forgot to specify the year for which you want scale factors"
+    sys.exit()
 pileupSF.Set1DHist(pileupFile.Get('pileup'), pileupFileUp.Get('pileup'), pileupFileDown.Get('pileup'))
 fScales.cd()
 pileupSF.Write()
 
-electronTightIdSF = ROOT.ScaleFactor("electronTightIdSF", "Moriond '17 Electron Tight WP ID SF, x=Eta, y=Pt")
-eidFile = ROOT.TFile.Open('data/moriond17ElectronTightSF.root')
-electronTightIdSF.Set2DHist(float2double(eidFile.Get('EGamma_SF2D')))
-fScales.cd()
-electronTightIdSF.Write()
-electronGsfSF = ROOT.ScaleFactor("electronGsfSF", "Moriond '17 Electron GSF track reco SF, x=Eta, y=Pt")
-eleGsfFile = ROOT.TFile.Open('data/moriond17ElectronRecoSF.root')
-electronGsfSF.Set2DHist(float2double(eleGsfFile.Get('EGamma_SF2D')))
-fScales.cd()
-electronGsfSF.Write()
 
-muonIdSF = ROOT.ScaleFactor("muonTightIdSF", "Moriond '17 Muon Tight WP ID SF, x=abs(Eta), y=Pt, z=run number")
-midFile1 = ROOT.TFile.Open('data/moriond17MuonID_BCDEF.root')
-midFile2 = ROOT.TFile.Open('data/moriond17MuonID_GH.root')
-muon_ptetaratio1 = midFile1.Get('MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio')
-muon_ptetaratio2 = midFile2.Get('MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/abseta_pt_ratio')
-muon_allratio = float2double(muon_ptetaratio1.Clone("muon_allratio"))
-for xbin in range(muon_ptetaratio1.GetNbinsX()+2):
-    for ybin in range(muon_ptetaratio1.GetNbinsY()+2):
-        runBFmean, runBFerr = muon_ptetaratio1.GetBinContent(xbin, ybin), muon_ptetaratio1.GetBinError(xbin, ybin)
-        runGHmean, runGHerr = muon_ptetaratio2.GetBinContent(xbin, ybin), muon_ptetaratio2.GetBinError(xbin, ybin)
-        allmean = (20.5*runBFmean + 16.3*runGHmean) / 36.8
-        allerr = (20.5*runBFerr + 16.3*runGHerr) / 36.8
-        muon_allratio.SetBinContent(xbin, ybin, allmean)
-        muon_allratio.SetBinError(xbin, ybin, allerr)
-muonIdSF.Set2DHist(muon_allratio)
-fScales.cd()
-muonIdSF.Write()
-muonIsoSF = ROOT.ScaleFactor("muonIsoSF", "Moriond '17 Muon Tight Iso (0.15) WP ID SF, x=abs(Eta), y=Pt, z=run number")
-misoFile1 = ROOT.TFile.Open('data/moriond17MuonIso_BCDEF.root')
-misoFile2 = ROOT.TFile.Open('data/moriond17MuonIso_GH.root')
-muIso_ptetaratio1 = misoFile1.Get('TightISO_TightID_pt_eta/abseta_pt_ratio')
-muIso_ptetaratio2 = misoFile2.Get('TightISO_TightID_pt_eta/abseta_pt_ratio')
-muIso_allratio = float2double(muon_ptetaratio1.Clone("muIso_allratio"))
-for xbin in range(muIso_ptetaratio1.GetNbinsX()+2):
-    for ybin in range(muIso_ptetaratio1.GetNbinsY()+2):
-        runBFmean, runBFerr = muIso_ptetaratio1.GetBinContent(xbin, ybin), muIso_ptetaratio1.GetBinError(xbin, ybin)
-        runGHmean, runGHerr = muIso_ptetaratio2.GetBinContent(xbin, ybin), muIso_ptetaratio2.GetBinError(xbin, ybin)
-        allmean = (20.5*runBFmean + 16.3*runGHmean) / 36.8
-        allerr = (20.5*runBFerr + 16.3*runGHerr) / 36.8
-        muIso_allratio.SetBinContent(xbin, ybin, allmean)
-        muIso_allratio.SetBinError(xbin, ybin, allerr)
-muonIsoSF.Set2DHist(muIso_allratio)
-fScales.cd()
-muonIsoSF.Write()
-
-# Used for tests on fake rate files from Jakob and Svenja
-#efakeRateFile = ROOT.TFile.Open('/eos/user/k/kelong/WZAnalysisData/FakeRates/fromJakob/eFakeRates.root')
-#jakob_etight = efakeRateFile.Get('eFakeRates')
-#jakob_etight = invert2DHist(jakob_etight)
-#mfakeRateFile = ROOT.TFile.Open('/eos/user/k/kelong/WZAnalysisData/FakeRates/fromJakob/muFakeRates.root')
-#jakob_mtight = mfakeRateFile.Get('muFakeRates')
-#jakob_mtight = invert2DHist(jakob_mtight)
-#
-#eCBTightFakeRate = ROOT.ScaleFactor("eCBTightFakeRate_Jakob", "Fake rate from dijet control, via Jakob")
-#eCBTightFakeRate.Set2DHist(jakob_etight, 0, 0, ROOT.ScaleFactor.AsInHist)
-#mCBTightFakeRate = ROOT.ScaleFactor("mCBTightFakeRate_Jakob", "Fake rate from dijet control, via Jakob")
-#mCBTightFakeRate.Set2DHist(jakob_mtight, 0, 0, ROOT.ScaleFactor.AsInHist)
-#fScales.cd()
-#mCBTightFakeRate.Write()
-#eCBTightFakeRate.Write()
-
-#fakeRateFile = ROOT.TFile.Open('/eos/user/k/kelong/WZAnalysisData/FakeRates/CutBasedFakeRate_fromSvenja_final.root')
-#eCBMedFakeRate = ROOT.ScaleFactor("eCBMedFakeRate_Svenja", "Fake rate from dijet control, by Svenja")
-#eCBMedFakeRate.Set2DHist(float2double(fakeRateFile.Get('e/medium/fakeratePtEta')), 0, 0, ROOT.ScaleFactor.AsInHist)
-#eCBTightFakeRate = ROOT.ScaleFactor("eCBTightFakeRate_Svenja", "Fake rate from dijet control, by Svenja")
-#eCBTightFakeRate.Set2DHist(float2double(fakeRateFile.Get('e/tight/fakeratePtEta')), 0, 0, ROOT.ScaleFactor.AsInHist)
-#mCBMedFakeRate = ROOT.ScaleFactor("mCBMedFakeRate_Svenja", "Fake rate from dijet control, by Svenja")
-#mCBMedFakeRate.Set2DHist(float2double(fakeRateFile.Get('m/medium/fakeratePtEta')), 0, 0, ROOT.ScaleFactor.AsInHist)
-#mCBTightFakeRate = ROOT.ScaleFactor("mCBTightFakeRate_Svenja", "Fake rate from dijet control, by Svenja")
-#mCBTightFakeRate.Set2DHist(float2double(fakeRateFile.Get('m/tight/fakeratePtEta')), 0, 0, ROOT.ScaleFactor.AsInHist)
-#fScales.cd()
-#mCBMedFakeRate.Write()
-#mCBTightFakeRate.Write()
-#eCBMedFakeRate.Write()
-#eCBTightFakeRate.Write()
-
-if os.path.isfile(args.medfr_file):
-    print "INFO: Adding medium fake rates to %s" % output_file
-    fakeRateFile = ROOT.TFile.Open(args.medfr_file)
-    eCBMedFakeRateZjets = ROOT.ScaleFactor("eCBMedFakeRate", "Fake rate from Z+jet")
-    eCBMedFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allE'), 0, 0, ROOT.ScaleFactor.AsInHist)
-    mCBMedFakeRateZjets = ROOT.ScaleFactor("mCBMedFakeRate", "Fake rate from Z+jet")
-    mCBMedFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu'), 0, 0, ROOT.ScaleFactor.AsInHist)
+if year=="2016":
+    print "Doing 2016 Lepton SF"
+    electronLowReco16SF = ROOT.ScaleFactor("electronLowReco16SF", "Run '16 Electron Low Reco SF, x=Eta, y=Pt")
+    eLowRecoFile = ROOT.TFile.Open('data/Ele_Reco_LowEt_2016.root')
+    electronLowReco16SF.Set2DHist(float2double(eLowRecoFile.Get('EGamma_SF2D')))
     fScales.cd()
-    mCBMedFakeRateZjets.Write()
-    eCBMedFakeRateZjets.Write()
-
-if os.path.isfile(args.tightfr_file):
-    print "INFO: Adding tight fake rates to %s" % output_file
-    fakeRateFile = ROOT.TFile.Open(args.tightfr_file)
-    eCBTightFakeRateZjets = ROOT.ScaleFactor("eCBTightFakeRate", "Fake rate from Z+jet")
-    eCBTightFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allE'), 0, 0, ROOT.ScaleFactor.AsInHist)
-    mCBTightFakeRateZjets = ROOT.ScaleFactor("mCBTightFakeRate", "Fake rate from Z+jet")
-    mCBTightFakeRateZjets.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratio2D_allMu'), 0, 0, ROOT.ScaleFactor.AsInHist)
+    electronLowReco16SF.Write()
+    
+    #Electron (Pt>20 Reco SF from POG https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2016DataRecommendations
+    electronReco16SF = ROOT.ScaleFactor("electronReco16SF", "Run '16 Electron Reco SF, x=Eta, y=Pt")
+    eRecoFile = ROOT.TFile.Open('data/Ele_Reco_2016.root')
+    electronReco16SF.Set2DHist(float2double(eRecoFile.Get('EGamma_SF2D')))
     fScales.cd()
-    mCBTightFakeRateZjets.Write()
-    eCBTightFakeRateZjets.Write()
+    electronReco16SF.Write()
+    
+    electronRun16SF = ROOT.ScaleFactor("electronRun16SF", "Run '16 Electron HZZ ID SF, x=Eta, y=Pt")
+    eidFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2016_NoGap.root')
+    electronRun16SF.Set2DHist(float2double(eidFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronRun16SF.Write()
+    
+    electronRun16GapSF = ROOT.ScaleFactor("electronRun16GapSF", "Run '16 GapElectron HZZ ID SF, x=Eta, y=Pt")
+    eleGsfFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2016_Gap.root')
+    electronRun16GapSF.Set2DHist(float2double(eleGsfFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronRun16GapSF.Write()
+    
+    muonRun16SF = ROOT.ScaleFactor("muonRun16SF", "Muon Run '16 Trk+ID+ISO SF, x=abs(Eta), y=Pt")
+    mid16File = ROOT.TFile.Open('data/final_HZZ_muon_SF_2016_IsBDT_0610.root')
+    muonRun16SF.Set2DHist(float2double(mid16File.Get('FINAL')),float2double(mid16File.Get('ERROR')),float2double(mid16File.Get('ERROR')))
+    fScales.cd()
+    muonRun16SF.Write()
+elif year=="2017":
+    electronLowReco17SF = ROOT.ScaleFactor("electronLowReco17SF", "Run '17 Electron Low Reco SF, x=Eta, y=Pt")
+    eLowRecoFile = ROOT.TFile.Open('data/Ele_Reco_LowEt_2017.root')
+    electronLowReco17SF.Set2DHist(float2double(eLowRecoFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronLowReco17SF.Write()
+    
+    #Electron (Pt>20 Reco SF from POG https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2017DataRecommendations
+    electronReco17SF = ROOT.ScaleFactor("electronReco17SF", "Run '17 Electron Reco SF, x=Eta, y=Pt")
+    eRecoFile = ROOT.TFile.Open('data/Ele_Reco_2017.root')
+    electronReco17SF.Set2DHist(float2double(eRecoFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronReco17SF.Write()
+    
+    electronRun17SF = ROOT.ScaleFactor("electronRun17SF", "Run '17 Electron HZZ ID SF, x=Eta, y=Pt")
+    eidFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2017_NoGap.root')
+    electronRun17SF.Set2DHist(float2double(eidFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronRun17SF.Write()
+    
+    electronRun17GapSF = ROOT.ScaleFactor("electronRun17GapSF", "Run '17 GapElectron HZZ ID SF, x=Eta, y=Pt")
+    eleGsfFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2017_Gap.root')
+    electronRun17GapSF.Set2DHist(float2double(eleGsfFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronRun17GapSF.Write()
+    
+    muonRun17SF = ROOT.ScaleFactor("muonRun17SF", "Muon Run '17 Trk+ID+ISO SF, x=abs(Eta), y=Pt")
+    midFile = ROOT.TFile.Open('data/final_HZZ_muon_SF_2017_IsBDT_0610.root')
+    muonRun17SF.Set2DHist(float2double(midFile.Get('FINAL')),float2double(midFile.Get('ERROR')),float2double(midFile.Get('ERROR')))
+    fScales.cd()
+    muonRun17SF.Write()
+elif year=="2018":
+    #Electron (Pt<20 Reco SF from POG https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2018DataRecommendations
+    electronLowReco18SF = ROOT.ScaleFactor("electronLowReco18SF", "Run '18 Electron Low Reco SF, x=Eta, y=Pt")
+    eLowRecoFile = ROOT.TFile.Open('data/Ele_Reco_LowEt_2018.root')
+    electronLowReco18SF.Set2DHist(float2double(eLowRecoFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronLowReco18SF.Write()
+    
+    #Electron (Pt>20 Reco SF from POG https://twiki.cern.ch/twiki/bin/viewauth/CMS/Egamma2018DataRecommendations
+    electronReco18SF = ROOT.ScaleFactor("electronReco18SF", "Run '18 Electron Reco SF, x=Eta, y=Pt")
+    eRecoFile = ROOT.TFile.Open('data/Ele_Reco_2018.root')
+    electronReco18SF.Set2DHist(float2double(eRecoFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronReco18SF.Write()
+    
+    electronRun18SF = ROOT.ScaleFactor("electronRun18SF", "Run '18 Electron HZZ ID SF, x=Eta, y=Pt")
+    eidFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2018_NoGap.root')
+    electronRun18SF.Set2DHist(float2double(eidFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronRun18SF.Write()
+    
+    electronRun18GapSF = ROOT.ScaleFactor("electronRun18GapSF", "Run '18 GapElectron HZZ ID SF, x=Eta, y=Pt")
+    eleGsfFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2018_Gap.root')
+    electronRun18GapSF.Set2DHist(float2double(eleGsfFile.Get('EGamma_SF2D')))
+    fScales.cd()
+    electronRun18GapSF.Write()
+    
+    muonRun18SF = ROOT.ScaleFactor("muonRun18SF", "Muon Run '18 Trk+ID+ISO SF, x=abs(Eta), y=Pt")
+    mid18File = ROOT.TFile.Open('data/final_HZZ_muon_SF_2018_IsBDT_0610.root')
+    muonRun18SF.Set2DHist(float2double(mid18File.Get('FINAL')),float2double(mid18File.Get('ERROR')),float2double(mid18File.Get('ERROR')))
+    fScales.cd()
+    muonRun18SF.Write()
+
+#For every year there is a separate fakeRate file
+if os.path.isfile(frfile):
+    print "INFO: Adding tight fake rates to %s" % args["output_file"]
+    fakeRateFile = ROOT.TFile.Open(frfile)
+    eZZTightFakeRate = ROOT.ScaleFactor("eZZTightFakeRate", "Fake rate from Z+jet")
+    eZZTightFakeRate.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratioE2D_allE'), 0, 0, ROOT.ScaleFactor.AsInHist)
+    mZZTightFakeRate = ROOT.ScaleFactor("mZZTightFakeRate", "Fake rate from Z+jet")
+    mZZTightFakeRate.Set2DHist(fakeRateFile.Get('DataEWKCorrected/ratioMu2D_allMu'), 0, 0, ROOT.ScaleFactor.AsInHist)
+    fScales.cd()
+    mZZTightFakeRate.Write()
+    eZZTightFakeRate.Write()

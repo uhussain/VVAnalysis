@@ -1,8 +1,7 @@
 #include "Analysis/VVAnalysis/interface/FakeRateSelector.h"
 #include <TStyle.h>
 
-void FakeRateSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) {
-
+void FakeRateSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std::string> variation) { 
     ZZSelectorBase::LoadBranchesUWVV(entry, variation);
     //In HZZ AN it says: |M_inv(l1,l2)- MZ| < 7 GeV, to reduce the contribution from photon (asymmetric) conversions populating low masses.
     if (Z1mass > 98.1876 || Z1mass < 84.1876){
@@ -16,7 +15,8 @@ void FakeRateSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, st
     
     float pt_fillval = l3Pt;
     float eta_fillval = std::abs(l3Eta);
-
+    //std::cout<<"Is it filling?"<<std::endl;
+    //std::cout<<pt_fillval<<std::endl;
     float loose_weight = weight;
     //if (channel_ == eee || channel_ == emm) {
     //    loose_weight /= eIdSF_->Evaluate2D(std::abs(l3Eta), l3Pt);
@@ -69,13 +69,14 @@ void FakeRateSelector::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, st
 
 void FakeRateSelector::Init(TTree *tree)
 {
+    //systematics_ = {{Central,""}};
     ZZSelectorBase::Init(tree);
 
 }
 
 void FakeRateSelector::SetupNewDirectory()
 {
-    SelectorBase::SetupNewDirectory();
+    ZZSelectorBase::SetupNewDirectory();
 
     const int MuPtbins = 6;
     double Mu_Pt_bins[MuPtbins+1] = {5,10,20,30,40,50,80};

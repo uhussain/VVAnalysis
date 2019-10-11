@@ -50,6 +50,9 @@ void ZZSelectorBase::SetBranchesUWVV() {
     if (isMC_){
         fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
         fChain->SetBranchAddress("nTruePU", &nTruePU, &b_nTruePU);
+        if (year_ == yr2016 || year_ == yr2017){
+          fChain->SetBranchAddress("L1prefiringWeight", &L1prefiringWeight, &b_L1prefiringWeight);
+        }
     }
     else {
         //fChain->SetBranchAddress("Flag_duplicateMuonsPass", Flag_duplicateMuonsPass);
@@ -485,6 +488,13 @@ void ZZSelectorBase::LoadBranchesUWVV(Long64_t entry, std::pair<Systematic, std:
         b_genWeight->GetEntry(entry);
         b_nTruePU->GetEntry(entry);
         weight = genWeight;
+        //Prefiring weights for 2016 and 2017
+        //std::cout<<"genWeight: "<<weight<<std::endl;
+        if (year_ == yr2016 || year_ == yr2017){
+          b_L1prefiringWeight->GetEntry(entry);
+          weight *= L1prefiringWeight;
+          //std::cout<<"PrefiredWeight: "<<weight<<std::endl;
+        }
     }
     if(channel_ == mmee){
       if(e1e2IsZ1(entry))
