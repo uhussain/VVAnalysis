@@ -2,12 +2,13 @@ import sys
 import ROOT
 import os
 import logging
-
-plot_groups = ["HZZ_signal","qqZZ_powheg","qqZZ_sherpa","zzjj4l_ewk","ggZZ", "VVV", "data", "nonprompt",]
+#Putting qqZZ_sherpa in the atgc files
+#plot_groups = ["HZZ_signal","qqZZ_powheg","qqZZ_sherpa","zzjj4l_ewk","ggZZ", "VVV", "data", "nonprompt",]
+plot_groups = ["HZZ_signal","qqZZ_powheg","zzjj4l_ewk","ggZZ", "VVV", "data", "nonprompt",]
 #plot_groups = ["HZZ_signal"]
-fileMap = { "2016" : "CombineStudies/ZZ/MassFitFullRunII/ZZCombineInput_2016.root",
-    "2017" : "/eos/user/u/uhussain/CombineStudies/ZZ/MassFitFullRunII/ZZCombineInput_2017.root",
-    "2018" : "/eos/user/u/uhussain/CombineStudies/ZZ/MassFitFullRunII/ZZCombineInput_2018.root",
+fileMap = { "2016" : "/data/uhussain/ZZTo4l/FullRun2/VVAnalyzer/CMSSW_10_3_1/src/Analysis/VVAnalysis/ZZCombineInput_2016.root",
+    "2017" : "/data/uhussain/ZZTo4l/FullRun2/VVAnalyzer/CMSSW_10_3_1/src/Analysis/VVAnalysis/ZZCombineInput_2017.root",
+    "2018" : "/data/uhussain/ZZTo4l/FullRun2/VVAnalyzer/CMSSW_10_3_1/src/Analysis/VVAnalysis/ZZCombineInput_2018.root",
     }
 channels = ["eeee", "eemm", "mmmm"]
 #channels = ["eemm"]
@@ -23,8 +24,8 @@ outputFolder = "ForSenka/%sFullRunII" % fitvar
 if not os.path.isdir(outputFolder):
     os.makedirs(outputFolder)
 
-#for year in fileMap.keys():
-for year in ["2016"]:
+for year in fileMap.keys():
+#for year in ["2016"]:
     fileName=fileMap[year]
     if type(fileName) == str: hist_file = ROOT.TFile.Open(fileName)
     for chan in channels:

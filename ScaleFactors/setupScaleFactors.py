@@ -109,7 +109,7 @@ if year=="2016":
     electronRun16GapSF.Write()
     
     muonRun16SF = ROOT.ScaleFactor("muonRun16SF", "Muon Run '16 Trk+ID+ISO SF, x=abs(Eta), y=Pt")
-    mid16File = ROOT.TFile.Open('data/final_HZZ_muon_SF_2016_IsBDT_0610.root')
+    mid16File = ROOT.TFile.Open('data/MoriondSFs/final_HZZ_SF_2016_legacy_mupogsysts_newLoose_noTracking_1610.root')
     muonRun16SF.Set2DHist(float2double(mid16File.Get('FINAL')),float2double(mid16File.Get('ERROR')),float2double(mid16File.Get('ERROR')))
     fScales.cd()
     muonRun16SF.Write()
@@ -140,7 +140,7 @@ elif year=="2017":
     electronRun17GapSF.Write()
     
     muonRun17SF = ROOT.ScaleFactor("muonRun17SF", "Muon Run '17 Trk+ID+ISO SF, x=abs(Eta), y=Pt")
-    midFile = ROOT.TFile.Open('data/final_HZZ_muon_SF_2017_IsBDT_0610.root')
+    midFile = ROOT.TFile.Open('data/MoriondSFs/ScaleFactors_mu_Moriond2018_final.root')
     muonRun17SF.Set2DHist(float2double(midFile.Get('FINAL')),float2double(midFile.Get('ERROR')),float2double(midFile.Get('ERROR')))
     fScales.cd()
     muonRun17SF.Write()

@@ -27,16 +27,9 @@ manager_name = ConfigureJobs.getManagerName()
 if manager_path not in sys.path:
         sys.path.insert(0, "/".join([manager_path,"ZZ4lRun2DatasetManager", "Utilities/python"]))
 
-dataset_file = "%s/ZZ4lRun2DatasetManager/FileInfo/ZZ4l2016/%s.json" % (manager_path, "LooseLeptons")
-allnames = json.load(open(dataset_file))
-atgcSamples={}
-for name in allnames.keys():
-    if "atgc" in name or "sherpa" in name:
-        atgcSamples[str(name)]= str(allnames[name]['plot_group'])
-print atgcSamples
-fileMap = { "2016" : "/afs/cern.ch/user/u/uhussain/ZZ4lRun2HistFiles/Hists02Sep2019-ZZ4l2016.root",
+fileMap = { "2016" : "/afs/cern.ch/user/u/uhussain/ZZ4lRun2HistFiles/Hists17Oct2019-ZZ4l2016_Moriond.root",
     "2017" : "",
-    "2018" : "",
+    "2018" : "/afs/cern.ch/user/u/uhussain/ZZ4lRun2HistFiles/Hists29Oct2019-ZZ4l2018_MVA.root",
     }
 channels = ["eeee", "eemm", "mmmm"]
 #channels = ["eemm"]
@@ -50,8 +43,16 @@ if not os.path.isdir(outputFolder):
     os.makedirs(outputFolder)
 
 #for year in fileMap.keys():
-for year in ["2016"]:
+for year in ["2018"]:
+    dataset_file = "%s/ZZ4lRun2DatasetManager/FileInfo/ZZ4l%s/%s.json" % (manager_path,year, "LooseLeptons")
+    allnames = json.load(open(dataset_file))
+    atgcSamples={}
+    for name in allnames.keys():
+        if "atgc" in name or "sherpa" in name:
+            atgcSamples[str(name)]= str(allnames[name]['plot_group'])
+    print atgcSamples
     fileName=fileMap[year]
+    print "fileName: ",fileName
     if type(fileName) == str: hist_file = ROOT.TFile.Open(fileName)
     for chan in channels:
         savehists=[]
@@ -75,8 +76,8 @@ for year in ["2016"]:
                 elif chan=="eemm":
                     for var in eVariations+mVariations:
                         histNames.append("Mass_%s_%s" % (var,chan))
-            print "plot_group: ",process
-            print "histNames: ",histNames
+            #print "plot_group: ",process
+            #print "histNames: ",histNames
             for name in histNames:
                 tmphist = hist_file.Get("/".join([process, name]))
                 if not tmphist: 
@@ -93,8 +94,12 @@ for year in ["2016"]:
                 histnew = hist.Rebin(len(rebin)-1,"histnew",rebin)
                 addOverflow(histnew)
                 tmphist.Delete()
-                if process=="qqZZ_sherpa":
+                if process=="zz4l-sherpa":
+                    print "this process happens in 2016"
                     histnew.Scale(0.455985*1000*35.9*1.239/histnew.Integral())
+                if process=="zz4l-atgc_1" and year=="2018":
+                    print "this process happens in 2018"
+                    histnew.Scale(0.455985*1000*41.5*1.239/histnew.Integral())
                 newName = name.replace("Mass",str(atgcSamples[process]))
                 newName = newName.replace("_"+chan,"")
                 hist.Delete()
