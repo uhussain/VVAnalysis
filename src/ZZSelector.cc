@@ -14,7 +14,7 @@ void ZZSelector::Init(TTree *tree)
         {pileupUp, "CMS_pileupUp"},
         {pileupDown, "CMS_pileupDown"},
     }; 
-    doSystematics_ = false;
+    doSystematics_ = true;
     
     //This would be set true inside ZZBackground Selector
     //isNonPrompt_ = false;
@@ -355,10 +355,10 @@ void ZZSelector::SetVariables(Long64_t entry) {
       bool templ2IsTight = l2IsTight;
       l2IsTight = l4IsTight;
       l4IsTight = templ2IsTight;
-      bool templ1IsIso = l1IsIso;
+      float templ1IsIso = l1IsIso;
       l1IsIso = l3IsIso;
       l3IsIso = templ1IsIso;
-      bool templ2IsIso = l2IsIso;
+      float templ2IsIso = l2IsIso;
       l2IsIso = l4IsIso;
       l4IsIso = templ2IsIso;
       bool templ1IsGap = l1IsGap;
@@ -583,17 +583,34 @@ bool ZZSelector::PassesZZSelection(bool nonPrompt){
   //This nonPrompt boolean is for ZZBackgroundSelector
   //When running ZZBackgroundSelector, FillHistograms should run just with ZZSelection, we cannot require TightZZLeptons by definition
   if (nonPrompt){
-    if (ZZSelection())
-      return true;
-    else
-      return false;
+    //Because we are using Cut Based Moriond ID for Muons, we need SIP cut for 2016,2017
+    if (year_ == yr2016 || year_ == yr2017){
+      if (ZZSelection() && HZZSIPSelection())
+        return true;
+      else
+        return false;
+    }
+    else{ 
+      if (ZZSelection())
+        return true;
+      else
+        return false; 
+    }
   }
   else{
-    //std::cout<<"nonPrompt inside function: "<<nonPrompt<<std::endl;
-    if (ZZSelection() && TightZZLeptons())
-        return true;
-    else
-        return false;
+    //std::cout<<"nonPrompt inside function: "<<nonPrompt<<std::endl; 
+    if (year_ == yr2016 || year_ == yr2017){
+      if (ZZSelection() && TightZZLeptons() && HZZSIPSelection())
+          return true;
+      else
+          return false;
+    }
+    else{
+      if (ZZSelection() && TightZZLeptons())
+          return true;
+      else
+          return false;
+    }
   }
 }
 

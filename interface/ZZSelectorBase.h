@@ -58,10 +58,10 @@ public :
     Bool_t l2IsTight;
     Bool_t l3IsTight;
     Bool_t l4IsTight;
-    Bool_t l1IsIso;
-    Bool_t l2IsIso;
-    Bool_t l3IsIso;
-    Bool_t l4IsIso;
+    Float_t l1IsIso;
+    Float_t l2IsIso;
+    Float_t l3IsIso;
+    Float_t l4IsIso;
 
     Bool_t l1IsGap;
     Bool_t l2IsGap;
@@ -203,6 +203,10 @@ protected:
     bool lep2IsTight();
     bool lep3IsTight();
     bool lep4IsTight();
+    bool lep1IsIso();
+    bool lep2IsIso();
+    bool lep3IsIso();
+    bool lep4IsIso();
     bool Z1PF();
     bool Z1FP();
     bool Z1FF();
