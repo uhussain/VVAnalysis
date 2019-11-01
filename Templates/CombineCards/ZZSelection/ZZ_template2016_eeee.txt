@@ -23,27 +23,23 @@ observation  ${data}
 # on each process and bin
 
 bin                                  eeee               eeee              eeee               eeee       eeee           eeee         
-process                           zzjj4l_ewk         HZZ_signal        qqZZ_powheg           ggZZ       VVV         nonprompt  
-process                               -3                 -2                -1                  0         1              2
-rate                              ${zzjj4l_ewk}      ${HZZ_signal}       ${qqZZ_powheg}       ${ggZZ}    ${VVV}       ${nonprompt}
------------------------------------------------------------------------------------------------------------------------------------                                                                                                                                                                                                                    
-bkg_eeee_16               lnN            -                 -                  -                 -           -          1.2
-bkg_ee_16                 lnN            -                 -                  -                 -           -           1.2
-trigger_eeee_16           lnN           1.01              1.01             1.01                1.01         1.01        -       
-trigger_ee_16             lnN           1.01              1.01             1.01                1.01         1.01        -       
-CMS_eff_e                shape           1                 1                 1                 1            1          0
-CMS_RecoEff_e            shape           1                 1                 1                 1            1          0
-#CMS_pileup               shape           1                 1                 1                 1            1          0
-CMS_lumi                  lnN           1.01              1.01             1.01               1.01         1.01       1.01
-lumi_16                   lnN           1.023             1.023            1.023              1.023        1.023      1.023
-QCDscale_HZZ_signal     shape            0                 1                   0               0               0           0
-QCDscale_qqZZ_powheg    shape            0                 0                   1               0               0           0
-QCDscale_ggZZ           lnN              0                 0                   0               1.2             0           0
-QCDscale_VVV            shape            0                 0                   0               0               1           0
-pdf_HZZ_signal          shape         0                  1                 0                 0               0           0
-pdf_qqZZ_powheg         shape         0                  0                  1                0               0           0
-pdf_ggZZ                lnN           0                  0                  0               1.05            0           0
-pdf_VVV                 shape         0                  0                  0                0               1           0
-
+process                          zzjj4l_ewk         HZZ_signal        qqZZ_powheg           ggZZ       VVV         nonprompt  
+process                              4                3                -1                  0         1              2
+rate                             ${zzjj4l_ewk}      ${HZZ_signal}       ${qqZZ_powheg}       ${ggZZ}    ${VVV}       ${nonprompt}
+----------------------------------------------------------------------------------------------------------------------------------                                                                                                                                                                                                                    
+bkg_eeee_16               lnN           -                 -                  -                 -           -          1.2
+bkg_ee_16                 lnN             -                 -                  -                 -           -           1.2
+trigger_eeee_16           lnN             1.01              1.01             1.01                1.01         1.01        -       
+trigger_ee_16             lnN             1.01              1.01             1.01                1.01         1.01        -       
+CMS_eff_e                shape             1                 1                 1                 1            1          0
+CMS_RecoEff_e            shape             1                 1                 1                 1            1          0
+CMS_pileup               shape             1                 1                 1                 1            1          0
+CMS_lumi                  lnN             1.01              1.01             1.01               1.01         1.01       1.01
+lumi_16                   lnN             1.023             1.023            1.023              1.023        1.023      1.023
+QCDscale_HZZ_signal     shape              0                 1                   0               0               0           0
+QCDscale_VVV            shape              0                 0                   0               0               1           0
+pdf_HZZ_signal          shape              0                  1                  0                 0               0           0
+pdf_VVV                 shape              0                  0                 0                  0               1           0
+theoAcc                 lnN           -                 -                 1.02              1.02          -           -
 
 * autoMCStats 1
