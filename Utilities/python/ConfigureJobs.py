@@ -83,6 +83,21 @@ def getCombinePath():
         raise ValueError("dataset_manager_path not specified in config file Template/config.%s" 
                             % os.environ["USER"])
     return config['Setup']['combine_path'] + "/"
+def getListOfEWK():
+    return [
+        "zz4l-powheg",
+        "ggZZ4e",
+        "ggZZ4m",
+        "ggZZ4t",
+        "ggZZ2e2mu",
+        "ggZZ2e2tau",
+        #"ggZZ2mu2tau",
+    ]
+
+def getListOfaltSig():
+    return [
+        "zz4l-amcatnlo",
+    ]
 def getListOfEWKFilenames(analysis=""):
     if "ZZ4l" in analysis:
         return [
@@ -92,7 +107,7 @@ def getListOfEWKFilenames(analysis=""):
             "ggZZ4t",
             "ggZZ2e2mu",
             "ggZZ2e2tau",
-            "ggZZ2mu2tau",
+            #"ggZZ2mu2tau",
         ]
     # TODO: This is obviously WZ specific and should be updated
     return [
@@ -117,6 +132,13 @@ def getListOfEWKFilenames(analysis=""):
         "ggZZ4e",
         "ggZZ4m",
         "ggZZ2e2mu",
+    ]
+def getListOfVVV():
+    return [
+       "WZZ",
+       "ZZZ",
+       "WWZ",
+       "ttZ-jets", 
     ]
 def getListOfNonpromptFilenames():
     return ["tt-lep",
@@ -341,7 +363,10 @@ def getInputFilesPath(sample_name, selection, analysis, manager_path=""):
         return sample_name
     data_path = "%s/%s/FileInfo" % (manager_path, getManagerName())
     input_file_base_name = "/".join([data_path, analysis, selection])
+    #print "analysis:", analysis
+    #print "path:", input_file_base_name
     input_file_name = getConfigFileName(input_file_base_name)
+    #print "file_name: ",input_file_name
     input_files = UserInput.readInfo(input_file_name)
     if sample_name not in input_files.keys():
         raise ValueError("Invalid input file %s. Input file must correspond"
