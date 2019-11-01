@@ -24,7 +24,7 @@ observation  ${data}
 
 bin                               all              all                all                 all        all        all         
 process                          zzjj4l_ewk        HZZ_signal        qqZZ_powheg           ggZZ       VVV       nonprompt  
-process                          4                   3                -1                  0         1          2
+process                          -3                   -2                -1                  0         1          2
 rate                             ${zzjj4l_ewk}     ${HZZ_signal}       ${qqZZ_powheg}       ${ggZZ}    ${VVV}   ${nonprompt}
 ---------------------------------------------------------------------------------------------------------------------------                                                                                                                                                                                                                
 bkgStat                 lnN          -                  -                  -                 -            -          1.4
@@ -34,9 +34,13 @@ CMS_RecoEff_e           shape         1                  1                 1    
 CMS_eff_m               shape         1                  1                 1                 1            1          0
 CMS_pileup              shape         1                  1                 1                 1            1          0 
 QCDscale_HZZ_signal     shape         0                  1                 0                 0            0           0
+QCDscale_qqZZ_powheg    shape         0                  0                 1                 0            0           0
+QCDscale_ggZZ           lnN           0                  0                 0                1.2           0           0
 QCDscale_VVV            shape         0                  0                 0                 0            1           0
 pdf_HZZ_signal          shape         0                  1                 0                 0               0           0
+pdf_qqZZ_powheg         shape         0                  0                  1                0               0           0
+pdf_ggZZ                lnN           0                  0                  0               1.05            0           0
 pdf_VVV                 shape         0                  0                  0                0               1           0
-theoAcc                 lnN           -                 -                 1.02              1.02          -           -
+
 
 * autoMCStats 1
