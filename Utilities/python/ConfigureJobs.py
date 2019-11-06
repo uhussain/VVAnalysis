@@ -94,9 +94,18 @@ def getListOfEWK():
         #"ggZZ2mu2tau",
     ]
 
+def getListOfzzNLO():
+    return [
+        "zz4l-amcatnlo",
+        ]
 def getListOfaltSig():
     return [
         "zz4l-amcatnlo",
+        "ggZZ4e",
+        "ggZZ4m",
+        "ggZZ4t",
+        "ggZZ2e2mu",
+        "ggZZ2e2tau",
     ]
 def getListOfEWKFilenames(analysis=""):
     if "ZZ4l" in analysis:

@@ -20,8 +20,8 @@ VFloat = Vec('float')
 style = Style()
 ROOT.gStyle.SetLineScalePS(1.8)
 
-#channels = ["eeee","eemm","mmmm"]
-channels = ["eeee"]
+channels = ["eeee","eemm","mmmm"]
+#channels = ["eeee"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--lumi", "-l", type=float,
@@ -75,10 +75,10 @@ def getComLineArgs():
     parser.add_argument('--logy', '--logY', '--log', action='store_true',
                         help='Put vertical axis on a log scale.')
     parser.add_argument('--plotDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/ZZFullRun2/PlottingResults/ZZ4l2018/ZZSelectionsTightLeps/ANPlots/ZZ4l2018/RespMat_LatestMVAand2018MuSF',
+                        default='/afs/cern.ch/user/u/uhussain/www/ZZFullRun2/PlottingResults/ZZ4l2016/ZZSelectionsTightLeps/ANPlots/ZZ4l2016/RespMat_Moriond2019IDMuSF',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--unfoldDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/ZZFullRun2/PlottingResults/ZZ4l2018/ZZSelectionsTightLeps/ANPlots/ZZ4l2018/LogDiffDistributionsWAltSignal_LatestMVAand2018MuSF',
+                        default='/afs/cern.ch/user/u/uhussain/www/ZZFullRun2/PlottingResults/ZZ4l2016/ZZSelectionsTightLeps/ANPlots/ZZ4l2016/LogDiffDistributionsWAltSignal_Moriond2019IDMuSF',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--nIter', type=int, nargs='?', default=4,
                         help='Number of iterations for D\'Agostini method')
@@ -333,7 +333,7 @@ def createRatio(h1, h2):
         Ratio.SetBinContent(i,ratiocontent)
         Ratio.SetBinError(i,error)
 
-    Ratio.GetYaxis().SetRangeUser(0.3,1.8)
+    Ratio.GetYaxis().SetRangeUser(0.4,1.8)
     Ratio.SetStats(0)
     Ratio.GetYaxis().CenterTitle()
     Ratio.SetMarkerStyle(20)
@@ -367,7 +367,7 @@ def createCanvasPads():
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetLegendBorderSize(0)
     # Upper histogram plot is pad1
-    pad1 = ROOT.TPad("pad1", "pad1", 0.01, 0.25, 0.99, 0.99)
+    pad1 = ROOT.TPad("pad1", "pad1", 0.01, 0.33, 0.99, 0.99)
     pad1.Draw()
     pad1.cd()
     if varName!="drz1z2":
@@ -383,42 +383,59 @@ def createCanvasPads():
 def createPad2(canvas):
     # Lower ratio plot is pad2
     canvas.cd()  # returns to main canvas before defining pad2
-    pad2 = ROOT.TPad("pad2", "pad2", 0.01, 0.01, 0.99, 0.25)
+    pad2 = ROOT.TPad("pad2", "pad2", 0.01, 0.20, 0.99, 0.33)
     pad2.Draw()
     pad2.cd()
     pad2.SetFillColor(0)
     pad2.SetFrameBorderMode(0)
-    pad2.SetBorderMode(0)
+    pad2.SetBorderMode(1)#bordermode = -1 box looks as it is behind the screen
+   # bordermode = 0 no special effects
+   # bordermode = 1 box looks as it is in front of the screen
     pad2.SetTopMargin(0)  # joins upper and lower plot
-    pad2.SetBottomMargin(0.2)
+    pad2.SetBottomMargin(0)
     #pad2.SetGridx()
     #pad2.Draw()
     return pad2
 
+def createPad3(canvas):
+    # Lower ratio plot is pad3
+    canvas.cd()  # returns to main canvas before defining pad3
+    pad3 = ROOT.TPad("pad3", "pad3", 0.01, 0.03, 0.99, 0.20)
+    pad3.Draw()
+    pad3.cd()
+    pad3.SetFillColor(0)
+    pad3.SetFrameBorderMode(0)
+    #pad3.SetFrameFillStyle(4000)
+    pad3.SetBorderMode(0)
+    pad3.SetTopMargin(0)  # joins upper and lower plot
+    pad3.SetBottomMargin(0.35)
+    #pad3.SetGridx()
+    #pad3.Draw()
+    return pad3
 def generateAnalysisInputs():    
     #dictionary of SF histograms
     hSF = {}
-    eLowRecoFile = ROOT.TFile.Open('data/Ele_Reco_LowEt_2018.root')
+    eLowRecoFile = ROOT.TFile.Open('data/Ele_Reco_LowEt_2016.root')
     hSF['eLowReco'] = eLowRecoFile.Get('EGamma_SF2D').Clone()
     hSF['eLowReco'].SetDirectory(0)
     eLowRecoFile.Close()
     
-    eRecoFile = ROOT.TFile.Open('data/Ele_Reco_2018.root')
+    eRecoFile = ROOT.TFile.Open('data/Ele_Reco_2016.root')
     hSF['eReco'] = eRecoFile.Get('EGamma_SF2D').Clone()
     hSF['eReco'].SetDirectory(0)
     eRecoFile.Close()
     
-    eIdFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2018_NoGap.root')
+    eIdFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2016_NoGap.root')
     hSF['eSel'] = eIdFile.Get('EGamma_SF2D').Clone() 
     hSF['eSel'].SetDirectory(0)
     eIdFile.Close()
 
-    eIdGapFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2018_Gap.root')
+    eIdGapFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2016_Gap.root')
     hSF['eSelGap'] = eIdGapFile.Get('EGamma_SF2D').Clone() 
     hSF['eSelGap'].SetDirectory(0)
     eIdGapFile.Close()
 
-    mIdFile = ROOT.TFile.Open('data/final_HZZ_muon_SF_2018_IsBDT_0610.root')
+    mIdFile = ROOT.TFile.Open('data/final_HZZ_SF_2016_legacy_mupogsysts_newLoose_noTracking_1610.root')
     hSF['m'] = mIdFile.Get('FINAL').Clone()
     hSF['m'].SetDirectory(0)
 
@@ -428,17 +445,17 @@ def generateAnalysisInputs():
 
     #dictionary of PU weights
     hPU={}
-    pileupFile = ROOT.TFile.Open('data/PileupWeights2018/PU_Central.root')
+    pileupFile = ROOT.TFile.Open('data/PileupWeights2016/PU_Central.root')
     hPU[''] = pileupFile.Get('pileup')
     hPU[''].SetDirectory(0)
     pileupFile.Close()
     
-    pileupFileUp = ROOT.TFile.Open('data/PileupWeights2018/PU_minBiasUP.root')
+    pileupFileUp = ROOT.TFile.Open('data/PileupWeights2016/PU_minBiasUP.root')
     hPU['Up'] = pileupFileUp.Get('pileup')
     hPU['Up'].SetDirectory(0)
     pileupFileUp.Close()
 
-    pileupFileDown = ROOT.TFile.Open('data/PileupWeights2018/PU_minBiasDOWN.root')
+    pileupFileDown = ROOT.TFile.Open('data/PileupWeights2016/PU_minBiasDOWN.root')
     hPU['Down'] = pileupFileDown.Get('pileup')
     hPU['Down'].SetDirectory(0)
     pileupFileDown.Close()
@@ -527,10 +544,8 @@ def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hPUWt,
         responseMakers[sample] = resp
 
     altResponseMakers = {}
-    for sample in sigSamplesPath.keys():
-        #print "sample:", sample #expect zz4l-powheg
-        if sample=="zz4l-powheg":
-            continue
+    for sample in ["zz4l-amcatnlo"]:
+        #we only need to make new responseMatrix for zz4l-amcatnlo, ggZZ responseMatrices are already done above. 
         file_path=sigSamplesPath[sample]
         #print("where are the histos leaking")
         resp = C(channel, varNamesForResponseMaker[varName][channel], vBinning)
@@ -559,10 +574,10 @@ def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hPUWt,
         #del resp
 
     for sample in responseMakers.keys():
-        print "sigSamples: " sample
+        print "sigSamples: " ,sample
     
     for sample in altResponseMakers.keys():
-        print "altsigSamples: " sample
+        print "altsigSamples: " ,sample
 
     for Resp in responseMakers.values()+altResponseMakers.values():
         ROOT.SetOwnership(Resp,False)
@@ -572,7 +587,7 @@ def generateResponseClass(varName, channel,sigSamples,sigSamplesPath,sumW,hPUWt,
 _printCounter = 0
 #Load the RooUnfold library into ROOT
 ROOT.gSystem.Load("RooUnfold/libRooUnfold")
-def unfold(varName,chan,responseMakers,hSigDic,hSigSystDic,hTrueDic,hDataDic,hbkgDic,hbkgMCDic,hbkgMCSystDic,nIter,plotDir=''):
+def unfold(varName,chan,responseMakers,altResponseMakers,hSigDic,hAltSigDic,hSigSystDic,hTrueDic,hAltTrueDic,hDataDic,hbkgDic,hbkgMCDic,hbkgMCSystDic,nIter,plotDir=''):
     global _printCounter
     #get responseMakers from the function above- this is the whole game.
     #responseMakers = generateResponseClass(varName, chan,sigSamples,sumW,hSF)
@@ -580,6 +595,7 @@ def unfold(varName,chan,responseMakers,hSigDic,hSigSystDic,hTrueDic,hDataDic,hbk
     # outputs
     hUnfolded = {}
     hTruth={}
+    hTrueAlt = {}
     hResponseNominal={}
     print "responseMakers: ",responseMakers
     hResponseNominal = {s:resp for s,resp in responseMakers.items()}
@@ -869,14 +885,49 @@ def unfold(varName,chan,responseMakers,hSigDic,hSigSystDic,hTrueDic,hDataDic,hbk
                     del cResSyst
 
     del hResponse 
+    
+    #Alternative signal zz4l-amcatnlo
+    hResponseAltNominal={} 
+    print "AltresponseMakers: ",altResponseMakers
+    hResponseAltNominal = {s:resp for s,resp in altResponseMakers.items()}
+    print "hResponseNominal:",hResponseNominal
+    print "hResponseAltNominal:",hResponseAltNominal
+
+    hResponseSig7 = hResponseAltNominal["zz4l-amcatnlo"].getResponse("pu_Up")
+    #This will pop the amcnlo response matrix from the hResponseAltNominal Dictionary
+    hResponseAltNominalTotal = hResponseAltNominal.pop("zz4l-amcatnlo")
+
+    hAltResponse = hResponseAltNominalTotal.getResponse('nominal')
+    hAltResponse.SetDirectory(0)
+
+    for response in hResponseNominal.values():
+        print "response: ",response
+        respMat = response.getResponse('nominal')
+        hAltResponse.Add(respMat)
+        respMat.SetDirectory(0)
+        del respMat
+
+    hAltSigNominal = hAltSigDic[chan][varNames[varName]]
+
+    hAltTrue = hAltTrueDic[chan]["Gen"+varNames[varName]]
+
+    hAltSigNominal=rebin(hAltSigNominal,varName)
+    hAltTrue=rebin(hAltTrue,varName)
+
+    print "AltTrueHist: ",hAltTrue,", ",hAltTrue.Integral()
+    
+    hTrueAlt['']=hAltTrue
+
+    hUnfolded['generator']  = getUnfolded(hAltSigNominal,hBkgTotal,hTrueAlt[''],hAltResponse,hData, nIter) 
+
     # make everything local (we'll cache copies)
-    for h in hUnfolded.values()+hTruth.values():
+    for h in hUnfolded.values()+hTruth.values()+hTrueAlt.values():
         ROOT.SetOwnership(h,False)
         print("histos: ",h)
         print ("hTruthOut of Unfold: ",h.Integral())
         #h.SetDirectory(0)
 
-    return hUnfolded,hTruth
+    return hUnfolded,hTruth,hTrueAlt
 
 #rebin histos and take care of overflow bins
 def rebin(hist,varName):
@@ -1026,15 +1077,15 @@ def RatioErrorBand(Ratio,hUncUp,hUncDn,hTrueNoErrs,varName):
         ratioGraph.SetFillStyle(3001)
         ratioGraph.GetXaxis().SetLabelSize(0)
         ratioGraph.GetXaxis().SetTitleSize(0)
-        ratioGraph.GetYaxis().SetLabelSize(0)
-        ratioGraph.GetYaxis().SetTitleSize(0)
+        #ratioGraph.GetYaxis().SetLabelSize(0)
+        #ratioGraph.GetYaxis().SetTitleSize(0)
         ratioGraph.GetXaxis().SetLimits(Ratio.GetXaxis().GetXmin(),Ratio.GetXaxis().GetXmax())
         if varName=="drz1z2":
-            ratioGraph.SetMaximum(2.0)
-            ratioGraph.SetMinimum(0.3)
+            ratioGraph.SetMaximum(1.8)
+            ratioGraph.SetMinimum(0.4)
         else:
-            ratioGraph.SetMaximum(2.0)
-            ratioGraph.SetMinimum(0.5)
+            ratioGraph.SetMaximum(1.8)
+            ratioGraph.SetMinimum(0.4)
         return ratioGraph
 
 def MainErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
@@ -1078,12 +1129,14 @@ def MainErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
         MainGraph.GetXaxis().SetLimits(hMain.GetXaxis().GetXmin(),hMain.GetXaxis().GetXmax())
         #MainGraph.SetMaximum(1.5)
 
-        if varName=="drz1z2":
-            MainGraph.SetMinimum(0.0)
-        else:
-            MainGraph.SetMinimum(0.5*(hMain.GetMinimum()))
+        MainGraph.SetMaximum(1.2*(hMain.GetMaximum()))
+        MainGraph.SetMinimum(0.5*(hMain.GetMinimum()))
+        #if varName=="drz1z2":
+        #    MainGraph.SetMinimum(0.0)
+        #else:
+            #MainGraph.SetMinimum(0.5*(hMain.GetMinimum()))
         return MainGraph
-def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfoldDir=''):
+def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,lumi,unfoldDir=''):
     UnfHists=[]
     TrueHists=[]
     # for normalization if needed
@@ -1092,7 +1145,9 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfold
     ### plot
     hUnf = hUnfolded.Clone()
     hTrue = hTruth.Clone()
-    
+    #Alt Signal 
+    hTrueAlt = hTruthAlt.Clone()
+    hTrueLeg = hTruthAlt.Clone()
     #lumi provided already in fb-1
     lumifb = lumi
 
@@ -1114,10 +1169,17 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfold
         hTrue.SetFillColor(ROOT.TColor.GetColor("#99ccff"))
         hTrue.SetLineColor(ROOT.TColor.GetColor('#000099')) 
         hTrue.SetFillStyle(3010)
+        #AltSignal
+        hTrueAlt.SetFillColor(2)
+        hTrueAlt.SetLineStyle(10)#dashes
+        hTrueAlt.SetFillStyle(0)#hollow
+        hTrueAlt.SetLineColor(ROOT.kRed)
         print "Total Truth Integral",hTrue.Integral()
+        print "Total Alt Truth Integral",hTrueAlt.Integral()
         print "Total Unf Data Integral",hUnf.Integral()
         Truthmaximum = hTrue.GetMaximum()
         hTrue.SetLineWidth(2*hTrue.GetLineWidth())
+        hTrueAlt.SetLineWidth(2*hTrueAlt.GetLineWidth())
 
         if not norm and normFb:
             print "Inclusive fiducial cross section = {} fb".format(hUnf.Integral(0,hUnf.GetNbinsX()+1))
@@ -1142,10 +1204,14 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfold
             hTrue.Scale(1.0/trueInt)
             #hTrueUncUp /= trueInt # (trueInt + hTrueUncUp.Integral(0,hTrueUncUp.GetNbinsX()+1))
             #hTrueUncDn /= trueInt # (trueInt - hTrueUncDn.Integral(0,hTrueUncDn.GetNbinsX()+1))
+            #Alt Signal
+            AltTrueInt = hTrueAlt.Integral(0,hTrueAlt.GetNbinsX()+1)
+            hTrueAlt.Scale(1.0/AltTrueInt)
         elif normFb:
             hTrue.Scale(1.0/lumifb)
             #hTrueUncUp /= lumifb
             #hTrueUncDn /= lumifb
+            hTrueAlt.Scale(1.0/lumifb)
         else:
             print "no special normalization"
 
@@ -1153,8 +1219,10 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfold
             normalizeBins(hTrue)
             #normalizeBins(hTrueUncUp)
             #normalizeBins(hTrueUncDn)
+            normalizeBins(hTrueAlt)
 
         hTrue.Draw("HIST")
+        hTrueAlt.Draw("HIST")
         
         if(Unfmaximum > Truthmaximum):
             hTrue.SetMaximum(Unfmaximum*1.2)
@@ -1173,6 +1241,9 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfold
         hTrue.GetXaxis().SetTitleSize(0)
         #hTrue.GetYaxis().SetTitle("Events")
         #hTrue.GetYaxis().SetTitleOffset(1.0)
+        hTrueAlt.GetXaxis().SetLabelSize(0)
+        hTrueAlt.GetXaxis().SetTitleSize(0)
+        hTrueAlt.Draw("HISTSAME")
         hTrue.Draw("HISTSAME")
         #hUnf.Sumw2(False)
         #hUnf.SetBinErrorOption(ROOT.TH1.kPoisson)
@@ -1186,16 +1257,28 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfold
       
         texS,texS1=getLumiTextBox()
         sigLabel = "POWHEG+MCFM+Pythia8" 
+        sigLabelAlt = "MG5_aMC@NLO+MCFM+Pythia8"
         if varName=="dphiz1z2" or varName=="drz1z2":
-            leg = ROOT.TLegend(0.18,0.58,0.18+0.015*len(sigLabel),0.88,"")
+            leg = ROOT.TLegend(0.15,0.60,0.15+0.015*len(sigLabelAlt),0.90,"")
+        elif varName=="leppt":
+            leg = ROOT.TLegend(0.20,0.18,0.20+0.015*len(sigLabelAlt),0.48,"")
         else:
-            leg = ROOT.TLegend(0.68,0.58,0.68+0.015*len(sigLabel),0.88,"")
+            leg = ROOT.TLegend(0.55,0.60,0.55+0.015*len(sigLabelAlt),0.90,"")
         leg.AddEntry(hUnf,"Data + stat. unc.","lep")
         leg.AddEntry(UnfErrBand, "Stat. #oplus syst. unc.","f")
-        leg.AddEntry(hTrue, sigLabel,"f")
+        leg.AddEntry(hTrue, sigLabel,"lf")
+
+        hTrueLeg.SetFillColor(2)
+        hTrueLeg.SetLineStyle(10)#dashes
+        hTrueLeg.SetFillColorAlpha(2,0.4)
+        hTrueLeg.SetFillStyle(3001)#solid
+        hTrueLeg.SetLineColor(ROOT.kRed)
+        #hTrueLeg.SetLineColor(ROOT.TColor.GetColor('#ff9898'))
+        hTrueLeg.SetLineWidth(4*hTrueLeg.GetLineWidth())
+        leg.AddEntry(hTrueLeg, sigLabelAlt,"l")
         leg.SetFillColor(ROOT.kWhite)
         leg.SetBorderSize(1)
-        leg.SetFillStyle(0)
+        leg.SetFillStyle(1001)
         leg.SetTextSize(0.025)
         leg.Draw()
 
@@ -1212,28 +1295,82 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfold
         #Starting the ratio proceedure
         Ratio,line = createRatio(hUnf, hTrueNoErrs)
         ratioErrorBand = RatioErrorBand(Ratio,hUncUp,hUncDn,hTrueNoErrs,varName)
+        
+        
+        #ratioErrorBand.GetYaxis().SetTitle("Data/Theo")
+        #ratioErrorBand.GetYaxis().SetNdivisions(328,True)
+        #ratioErrorBand.GetYaxis().SetLabelFont(42)
+        #ratioErrorBand.GetYaxis().SetLabelOffset(0.01)
+        #ratioErrorBand.GetYaxis().SetLabelSize(0.14)
+        #ratioErrorBand.GetYaxis().SetTitleFont(42)
+        #ratioErrorBand.GetYaxis().SetTitleSize(0.14)
+        #ratioErrorBand.GetYaxis().SetTitleOffset(0.30)
+        
+        ratioErrorBand.GetYaxis().SetLabelSize(0)
+        ratioErrorBand.GetYaxis().SetTitleSize(0)
         ratioErrorBand.Draw("a2")
+        
+        sigTex = getSigTextBox(0.15,0.8,sigLabel,0.12)
         Ratio.Draw("PE1SAME")
         #ratioErrorBand.Draw("p")
         line.SetLineColor(ROOT.kBlack)
         line.Draw("same")
 
+        Altyaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMaximum(),ratioErrorBand.GetMinimum(),ratioErrorBand.GetMaximum())
+        Altyaxis.SetNdivisions(003)
+        Altyaxis.SetTitle("Data/Theo")
+        Altyaxis.SetLabelFont(42)
+        Altyaxis.SetLabelOffset(0.01)
+        Altyaxis.SetLabelSize(0.14)
+        Altyaxis.SetTitleFont(42)
+        Altyaxis.SetTitleSize(0.14)
+        Altyaxis.SetTitleOffset(0.30)
+        Altyaxis.Draw("SAME")
+        
+        #ThirdPad
+        pad3 = createPad3(c)
+
+
+        hTrueAltNoErrs = hTrueAlt.Clone() # need central value only to keep ratio uncertainties consistent
+        #nbins=hTrueNoErrs.GetNbinsX()
+        #print("trueNbins: ",nbins)
+
+        #Unfbins=hUnf.GetNbinsX()
+        #print("UnfNbins: ",Unfbins)
+
+        #hTrueNoErrs.SetError(array.array('d',[0.]*nbins))
+        #Starting the ratio proceedure
+        AltRatio,Altline = createRatio(hUnf, hTrueAltNoErrs)
+        AltRatioErrorBand = RatioErrorBand(AltRatio,hUncUp,hUncDn,hTrueAltNoErrs,varName) 
+        AltRatioErrorBand.GetYaxis().SetLabelSize(0)
+        AltRatioErrorBand.GetYaxis().SetTitleSize(0)
+        AltRatioErrorBand.Draw("a2")
+        AltRatio.Draw("PE1SAME")
+        #ratioErrorBand.Draw("p")
+        Altline.SetLineColor(ROOT.kRed)
+        Altline.Draw("same")
+        
+        AltTex = getSigTextBox(0.15,0.8,sigLabelAlt,0.10)
         #redraw axis
-        xaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),0.5,hUnf.GetXaxis().GetXmax(),0.5,hUnf.GetXaxis().GetXmin(),hUnf.GetXaxis().GetXmax(),510)
+        xaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmax(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmin(),hUnf.GetXaxis().GetXmax(),510)
         xaxis.SetTitle(prettyVars[varName]+''+units[varName])
+        #labelTex = getSigTextBox(0.9,0.8,prettyVars[varName]+''+units[varName]) 
         xaxis.SetLabelFont(42)
-        xaxis.SetLabelSize(0.10)
+        xaxis.SetLabelOffset(0.03)
+        xaxis.SetLabelSize(0.12)
         xaxis.SetTitleFont(42)
-        xaxis.SetTitleSize(0.12)
-        xaxis.SetTitleOffset(0.70)
+        xaxis.SetTitleSize(0.18)
+        xaxis.SetTitleOffset(0.80)
         xaxis.Draw("SAME")
 
-        yaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),0.5,hUnf.GetXaxis().GetXmin(),1.5,0.5,1.5,6,"")
+        yaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMaximum(),ratioErrorBand.GetMinimum(),ratioErrorBand.GetMaximum())
+        yaxis.SetNdivisions(003)
         yaxis.SetTitle("Data/Theo")
         yaxis.SetLabelFont(42)
-        yaxis.SetLabelSize(0.10)
+        yaxis.SetLabelOffset(0.01)
+        yaxis.SetLabelSize(0.11)
         yaxis.SetTitleFont(42)
-        yaxis.SetTitleSize(0.12)
+        yaxis.SetTitleSize(0.11)
         yaxis.SetTitleOffset(0.35)
         yaxis.Draw("SAME")
         #style.setCMSStyle(c, '', dataType='  Preliminary', intLumi=35900.)
@@ -1244,7 +1381,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,varName,norm,normFb,lumi,unfold
         del c
 
 def getLumiTextBox():
-    texS = ROOT.TLatex(0.76,0.955, str(args['lumi'])+" fb^{-1} (13 TeV)")
+    texS = ROOT.TLatex(0.8,0.955, str(args['lumi'])+" fb^{-1} (13 TeV)")
     texS.SetNDC()
     texS.SetTextFont(42)
     texS.SetTextSize(0.040)
@@ -1255,6 +1392,13 @@ def getLumiTextBox():
     texS1.SetTextSize(0.040)
     texS1.Draw()
     return texS,texS1
+
+def getSigTextBox(x,y,sigLabel,size):
+    texS = ROOT.TLatex(x,y, str(sigLabel))
+    texS.SetNDC()
+    texS.SetTextFont(42)
+    texS.SetTextSize(size)
+    texS.Draw()
 
 def _generateUncertainties(hDict,norm):
 
@@ -1390,7 +1534,7 @@ sigSampleDic=ConfigureJobs.getListOfFilesWithXSec(ConfigureJobs.getListOfEWK())
 sigSampleList=[str(i) for i in sigSampleDic.keys()]
 print "sigSamples: ",sigSampleList
 
-AltsigSampleDic=ConfigureJobs.getListOfFilesWithXSec(ConfigureJobs.getListOfaltSig())
+AltsigSampleDic=ConfigureJobs.getListOfFilesWithXSec(["zz4l-amcatnlo",])
 AltsigSampleList=[str(i) for i in AltsigSampleDic.keys()]
 print "AltsigSamples: ",AltsigSampleList
 
@@ -1400,7 +1544,7 @@ sigSampleDic.update(AltsigSampleDic)
 #Replace fOut with fUse once you have run all the data samples and the backgrounds - right now unfolded data looking really big- subtract backgrounds
 if args['test']:
     sigSamplesPath={}
-    fUse = ROOT.TFile("SystGenFiles/Hists15Oct2019-ZZ4l2018_MVA.root","update")
+    fUse = ROOT.TFile("SystGenFiles/Hists17Oct2019-ZZ4l2016_Moriond.root","update")
     fOut=fUse
     for dataset in TotSigSampleList:
         file_path = ConfigureJobs.getInputFilesPath(dataset,selection, analysis)
@@ -1432,6 +1576,13 @@ ewkmc,ewkSumW = HistTools.makeCompositeHists(fOut,"AllEWK", ConfigureJobs.getLis
     ConfigureJobs.getListOfEWK(), manager_path), args['lumi'],
     underflow=False, overflow=False)
 
+altSigmc,altSigSumW = HistTools.makeCompositeHists(fOut,"AltSig", ConfigureJobs.getListOfFilesWithXSec(
+    ConfigureJobs.getListOfaltSig(), manager_path), args['lumi'],
+    underflow=False, overflow=False)
+
+#Update ewkSumW dictionary with sumWeights value of zz4l-amcatnlo from altSigSumW, the common keys should not be duplicated
+ewkSumW.update(altSigSumW)
+
 #all mcbkg that needs to be subtracted
 allVVVmc,VVVSumW = HistTools.makeCompositeHists(fOut,"AllVVV", ConfigureJobs.getListOfFilesWithXSec(
     ConfigureJobs.getListOfVVV(), manager_path), args['lumi'],
@@ -1443,7 +1594,7 @@ ewkcorr = HistTools.getDifference(fOut, "DataEWKCorrected", "AllData", "AllEWK")
 #print the sum for a sample (zz4l-powheg)
 #zzSumWeights = zzSumW["zz4l-powheg"]  
 
-print ewkSumW
+print "Signals: ",ewkSumW
 #print the sum for a sample (zz4l-powheg)
 zzSumWeights = ewkSumW["zz4l-powheg"]  
 #print "sumW (zz4l-powheg): ",zzSumWeights
@@ -1454,11 +1605,19 @@ hDataDic=OutputTools.getHistsInDic(alldata,varList,channels)
 
 #SigHists dictionary
 #hSigDic=OutputTools.getHistsInDic(allzzPowheg,varList,channels)
+
 hSigDic=OutputTools.getHistsInDic(ewkmc,varList,channels)
+
+#Alt signals containing zzl4-amcatnlo instead of zz4l-powheg
+hAltSigDic=OutputTools.getHistsInDic(altSigmc,varList,channels)
 
 #TrueHists dictionary
 #hTrueDic=OutputTools.getHistsInDic(allzzPowheg,["Gen"+s for s in varList],channels)
 hTrueDic=OutputTools.getHistsInDic(ewkmc,["Gen"+s for s in varList],channels)
+
+#Alt signals containing zzl4-amcatnlo instead of zz4l-powheg
+hAltTrueDic=OutputTools.getHistsInDic(altSigmc,["Gen"+s for s in varList],channels)
+
 #print "hTrueDic: ",hTrueDic["GenZZPt_eeee"].Integral()
 #ewkmcDic=OutputTools.getHistsInDic(ewkmc,varList,channels)
 
@@ -1523,6 +1682,7 @@ for varName in runVariables:
     # save unfolded distributions by channel, then systematic
     hUnfolded = {}
     hTrue = {}
+    hTrueAlt = {}
     hErr = {}
     hErrTrue = {}
     for chan in channels:
@@ -1544,7 +1704,7 @@ for varName in runVariables:
         #ewkSig = ewkmcDic[chan][varNames[varName]]
         #print "TotSigHist: ", ewkSig,", ",ewkSig.Integral()
         responseMakers,altResponseMakers = generateResponseClass(varName, chan,sigSampleDic,sigSamplesPath,ewkSumW,PUhistos,SFhistos)
-        hUnfolded[chan], hTrue[chan],hTrueAltChan = unfold(varName,chan,responseMakers,hSigDic,hSigSystDic,hTrueDic,hDataDic,hbkgDic,hbkgMCDic,hbkgMCSystDic,nIterations,OutputDir)
+        hUnfolded[chan], hTrue[chan],hTrueAlt[chan] = unfold(varName,chan,responseMakers,altResponseMakers,hSigDic,hAltSigDic,hSigSystDic,hTrueDic,hAltTrueDic,hDataDic,hbkgDic,hbkgMCDic,hbkgMCSystDic,nIterations,OutputDir)
         print("returning unfolded? ",hUnfolded[chan])
         print("returning truth? ",hTrue[chan])
         #print ("UnfoldOutDir: ",UnfoldOutDir)
@@ -1556,16 +1716,18 @@ for varName in runVariables:
         #hErrTrue[chan] = _generateUncertainties(hTrue[chan],norm)
         #(hTrueUncUp, hTrueUncDn) = _sumUncertainties(hErrTrue[chan],varName)
         
-            generatePlots(hUnfolded[chan][''],hUncUp,hUncDn,hTrue[chan][''],varName,norm,normFb,args['lumi'],UnfoldOutDir)
+            generatePlots(hUnfolded[chan][''],hUncUp,hUncDn,hTrue[chan][''],hTrueAlt[chan][''],varName,norm,normFb,args['lumi'],UnfoldOutDir)
     if args['makeTotals']:
         if "eeee" in channels:
             hTot = hUnfolded["eeee"]['']
             hTrueTot = hTrue["eeee"]['']
+            hTrueAltTot = hTrueAlt["eeee"]['']
             #channels.remove("eeee")
         print("channels before adding histos: ",channels)
         for c in ["eemm","mmmm"]:
             hTot.Add(hUnfolded[c][''])
             hTrueTot.Add(hTrue[c][''])
+            hTrueAltTot.Add(hTrueAlt[c][''])
         #Make OutputDir for total (4e+2e2m+4m) unfolded plots
         UnfoldOutDir=UnfoldDir+"/"+"tot"+"/plots"
         if "tot" not in UnfoldOutDirs:
@@ -1575,7 +1737,7 @@ for varName in runVariables:
         print "hErr.values(): ",hErr.values()
         hErrTot = _combineChannelUncertainties(*hErr.values())
         hTotUncUp, hTotUncDn = _sumUncertainties(hErrTot,varName)
-        generatePlots(hTot,hTotUncUp,hTotUncDn,hTrueTot,varName,norm,normFb,args['lumi'],UnfoldOutDir)
+        generatePlots(hTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,varName,norm,normFb,args['lumi'],UnfoldOutDir)
 
 #print(OutputDirs)
 #print(UnfoldOutDirs)
