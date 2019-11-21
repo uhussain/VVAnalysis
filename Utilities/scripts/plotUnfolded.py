@@ -6,17 +6,20 @@ from python import ConfigureJobs
 from python import UserInput
 import makeSimpleHtml
 import os
+import subprocess
 import sys
 import datetime
 import array
 from ROOT import vector as Vec
 
 VFloat = Vec('float')
+from PlotTools import PlotStyle as Style, pdfViaTex
 
-ROOT.gStyle.SetLineScalePS(1.8)
-
+style = Style()
+#ROOT.gStyle.SetLineScalePS(1.8)
+ROOT.gStyle.SetOptDate(False)
 channels = ["eeee","eemm","mmmm"]
-
+#channels = ["eeee"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--lumi", "-l", type=float,
@@ -33,8 +36,10 @@ def getComLineArgs():
                         help='Normalize differential cross sections to the luminosity')
     parser.add_argument('--logy', '--logY', '--log', action='store_true',
                         help='Put vertical axis on a log scale.')
+    parser.add_argument('--makeTotals', action='store_true',
+                        help='plot total unfolded with uncertainities.')
     parser.add_argument('--unfoldDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/ZZFullRun2/PlottingResults/ZZ4l2016/ZZSelectionsTightLeps/ANPlots/ZZ4l2016/LogDiffDistributionsWAltSignal_Moriond2019IDMuSF',
+                        default='/afs/cern.ch/user/u/uhussain/www/ZZFullRun2/PlottingResults/ZZ4l2018/ZZSelectionsTightLeps/ANPlots/ZZ4l2018/DiffDist_FullRun2PreApproval_09Nov2019/',
                         help='Directory to put response and covariance plots in')
     return vars(parser.parse_args())
 
@@ -155,15 +160,34 @@ legDefaults = {
     'rightmargin' : 0.03,
     }
 legParams = {v.lower():legDefaults.copy() for v in varList}
+legParams['z1mass'] = {
+    'textsize' : .026,
+    'leftmargin' : .03,
+    'rightmargin' : .46,
+    'entryheight' : .034,#23
+    'entrysep' : .007,
+    }
 legParams['pt'] = legParams['zzpt'].copy()
+legParams['zmass'] = legParams['z1mass'].copy()
+legParams['z2mass'] = legParams['z1mass'].copy()
+legParams['deltaEtajj'] = legParams['z1mass'].copy()
+legParams['deltaEtajj']['leftmargin'] = .5
+legParams['deltaEtajj']['rightmargin'] = .03
+legParams['deltaEtajj']['topmargin'] = .05
 legParams['eta'] = legParams['deltaEtajj'].copy()
+#legParams['massFull']['leftmargin'] = 0.25
 
 legParamsLogy = {v:p.copy() for v,p in legParams.iteritems()}
+#legParamsLogy['l1Pt']['topmargin'] = 0.65
+#legParamsLogy['l1Pt']['leftmargin'] = 0.2
+#legParamsLogy['l1Pt']['rightmargin'] = 0.18
 legParamsLogy['mass']['topmargin'] = 0.075
 legParamsLogy['mass']['leftmargin'] = 0.35
 legParamsLogy['mass']['rightmargin'] = 0.025
 legParamsLogy['mass']['textsize'] = 0.033
 legParamsLogy['leppt']['topmargin'] = 0.05
+#legParamsLogy['zHigherPt']['topmargin'] = 0.045
+#legParamsLogy['massFull']['topmargin'] = 0.035
 
 def normalizeBins(h):
     binUnit = 1 # min(h.GetBinWidth(b) for b in range(1,len(h)+1))
@@ -237,7 +261,7 @@ def createRatio(h1, h2):
 
     return Ratio,line
 
-def createCanvasPads():
+def createCanvasPads(varName):
     c = ROOT.TCanvas("c", "canvas")
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetLegendBorderSize(0)
@@ -303,17 +327,24 @@ def rebin(hist,varName):
     return hist
 
 def getLumiTextBox():
-    texS = ROOT.TLatex(0.70,0.955, str(args['lumi'])+" fb^{-1} (13 TeV)")
+    texS = ROOT.TLatex(0.77,0.955, str(args['lumi'])+" fb^{-1} (13 TeV)")
     texS.SetNDC()
     texS.SetTextFont(42)
     texS.SetTextSize(0.040)
     texS.Draw()
-    texS1 = ROOT.TLatex(0.12,0.955,"#bf{CMS} #it{Preliminary}")
+    texS1 = ROOT.TLatex(0.15,0.955,"#bf{CMS} #it{Preliminary}")
     texS1.SetNDC()
     texS1.SetTextFont(42)
     texS1.SetTextSize(0.040)
     texS1.Draw()
     return texS,texS1
+
+def getSigTextBox(x,y,sigLabel,size):
+    texS = ROOT.TLatex(x,y, str(sigLabel))
+    texS.SetNDC()
+    texS.SetTextFont(42)
+    texS.SetTextSize(size)
+    texS.Draw()
 
 def RatioErrorBand(Ratio,hUncUp,hUncDn,hTrueNoErrs,varName):
         ratioGraph=ROOT.TGraphAsymmErrors(Ratio)
@@ -400,7 +431,7 @@ def MainErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
             #MainGraph.SetMinimum(0.5*(hMain.GetMinimum()))
         return MainGraph
 
-def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,lumi,unfoldDir=''):
+def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,lumi,unfoldDir):
     UnfHists=[]
     TrueHists=[]
     # for normalization if needed
@@ -423,12 +454,12 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         print "no special normalization"
 
     print ("hTrue histo here: ",hTrue)
-    #print ("unfoldDir: ",unfoldDir)
+    print ("unfoldDir: ",unfoldDir)
     xaxisSize = hUnf.GetXaxis().GetTitleSize()
     yaxisSize = hTrue.GetXaxis().GetTitleSize()
     if unfoldDir:
         #Create a ratio plot
-        c,pad1 = createCanvasPads()
+        c,pad1 = createCanvasPads(varName)
         Unfmaximum = hUnf.GetMaximum()
         hTrue.SetFillColor(ROOT.TColor.GetColor("#99ccff"))
         hTrue.SetLineColor(ROOT.TColor.GetColor('#000099')) 
@@ -620,10 +651,15 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         yaxis.SetTitleSize(0.11)
         yaxis.SetTitleOffset(0.35)
         yaxis.Draw("SAME")
-        c.Print("%s/Ratio_%s.png" % (unfoldDir,varName))
-        c.Print("%s/Ratio_%s.pdf" % (unfoldDir,varName))
         c.Update()
-
+        plotName="Ratio_%s" % (varName)
+        output_name="/".join([unfoldDir,plotName])
+        #c.Print("%s/Ratio_%s.png" % (unfoldDir,varName))
+        #c.Print("%s/Ratio_%s.eps" % (unfoldDir,varName))
+        c.Print(output_name+".eps")
+        c.Print(output_name+".png")
+        subprocess.call(["epstopdf", "--outfile=%s" % output_name+".pdf", output_name+".eps"],env={})
+        os.remove(output_name+".eps")
         del c
 def mkdir(plotDir):
     for outdir in [plotDir]:
@@ -633,61 +669,69 @@ def mkdir(plotDir):
             print e
             pass
 
+varNames={'mass': 'Mass','pt':'ZZPt','zpt':'ZPt','leppt':'LepPt','dphiz1z2':'dPhiZ1Z2','drz1z2':'dRZ1Z2'}
 UnfoldDir=args['unfoldDir']
 UnfoldOutDirs={}
 #Make differential cross sections normalizing to unity area.')
 norm = not args['noNorm']
 #normalize with the luminosity instead of area under the curve
 normFb = args['NormFb']
-def main():
-    runVariables=[]
-    runVariables.append(args['variable'])
-    print "runVariables: ",runVariables
-    #Save histograms from makResponseMatrix.py in this root file
-    #fUse = ROOT.TFile("UnfoldFiles/UnfoldedHists25Sep2019-ZZ4l2018.root","update")
-    for varName in runVariables:
-        print "varName:", varNames[varName]
-        # save unfolded distributions by channel, then systematic
-        hUnfolded = {}
-        hTrue = {}
-        hTrueAlt = {}
-        hErr = {}
-        hErrTrue = {}
-        for chan in channels:
-            print "channel: ",chan
-            print "hUnfolded: ",hUnfolded
-            print "hTrue: ",hTrue
-            UnfoldOutDir=UnfoldDir+"/"+chan+"/plots"
-            if chan not in UnfoldOutDirs:
-                UnfoldOutDirs[chan]=UnfoldOutDir
-            if not os.path.exists(UnfoldOutDir):
-                mkdir(UnfoldOutDir)
-            hUnfolded[chan] = fUse.Get(chan+"/"+varName+"_unf")
-            hTrue[chan] = fUse.Get(chan+"/"+varName+"_true")
-            hTrueAlt[chan] = fUse.Get(chan+"/"+varName+"_trueAlt")
-            print("returning unfolded? ",hUnfolded[chan])
-            print("returning truth? ",hTrue[chan])
-            print("returning Alt truth? ",hTrueAlt[chan])
-            #Get the total UncUp and total UncDown histograms from the file as well
-            hUncUp = fUse.Get(chan+"/"+varName+"_totUncUp") 
-            hUncDn = fUse.Get(chan+"/"+varName+"_totUncDown") 
-            generatePlots(hUnfolded[chan][''],hUncUp,hUncDn,hTrue[chan][''],hTrueAlt[chan][''],varName,norm,normFb,UnfoldOutDir)
+#def main():
+runVariables=[]
+runVariables.append(args['variable'])
+print "runVariables: ",runVariables
+#Save histograms from makResponseMatrix.py in this root file
+fUse = ROOT.TFile.Open("UnfHistsFull09Nov2019-ZZ4l2018.root","update")
+for varName in runVariables:
+    print "varName:", varNames[varName]
+    # save unfolded distributions by channel, then systematic
+    hUnfolded = {}
+    hTrue = {}
+    hTrueAlt = {}
+    hErr = {}
+    hErrTrue = {}
+    for chan in channels:
+        print "channel: ",chan
+        print "hUnfolded: ",hUnfolded
+        print "hTrue: ",hTrue
+        UnfoldOutDir=UnfoldDir+"/"+chan+"/plots"
+        if chan not in UnfoldOutDirs:
+            UnfoldOutDirs[chan]=UnfoldOutDir
+        if not os.path.exists(UnfoldOutDir):
+            mkdir(UnfoldOutDir)
+        hUnfolded[chan] = fUse.Get(chan+"_"+varName+"_unf")
+        hTrue[chan] = fUse.Get(chan+"_"+varName+"_true")
+        hTrueAlt[chan] = fUse.Get(chan+"_"+varName+"_trueAlt")
+        print("returning unfolded? ",hUnfolded[chan])
+        print("returning truth? ",hTrue[chan])
+        print("returning Alt truth? ",hTrueAlt[chan])
+        #Get the total UncUp and total UncDown histograms from the file as well
+        hUncUp = fUse.Get(chan+"_"+varName+"_totUncUp") 
+        hUncDn = fUse.Get(chan+"_"+varName+"_totUncDown")
+        print "UnfoldOutDir:",UnfoldOutDir
+        generatePlots(hUnfolded[chan],hUncUp,hUncDn,hTrue[chan],hTrueAlt[chan],varName,norm,normFb,args['lumi'],UnfoldOutDir)
+    
+    if args['makeTotals']:
         #Now access the histograms for all channels combined together
         #While saving in makeResponseMatrix.py, make a "total" category as wel
-        hUnfTot = fUse.Get("tot/"+varName+"_unf") 
-        hTrueTot = fUse.Get("tot/"+varName+"_true")
-        hTrueAltTot = fUse.Get("tot/"+varName+"_trueAlt") 
-        hTotUncUp = fUse.Get("tot/"+varName+"_totUncUp")
-        hTotUncDn = fUse.Get("tot/"+varName+"_totUncDown") 
+        hUnfTot = fUse.Get("tot_"+varName+"_unf") 
+        hTrueTot = fUse.Get("tot_"+varName+"_true")
+        hTrueAltTot = fUse.Get("tot_"+varName+"_trueAlt") 
+        hTotUncUp = fUse.Get("tot_"+varName+"_totUncUp")
+        hTotUncDn = fUse.Get("tot_"+varName+"_totUncDown") 
         UnfoldOutDir=UnfoldDir+"/"+"tot"+"/plots"
         if "tot" not in UnfoldOutDirs:
             UnfoldOutDirs["tot"]=UnfoldOutDir
         if not os.path.exists(UnfoldOutDir):
             mkdir(UnfoldOutDir)
-        generatePlots(hUnfTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,varName,norm,normFb,UnfoldOutDir)
-    #Show plots nicely on my webpages
-    for cat in ["eeee","eemm","mmmm","tot"]:   
-        #This is where we put all the plots in html format for quick access/debugging
-        makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")), "Unfolded Distributions (from MC)")
-    fUse.Close()
-    exit(0)
+        generatePlots(hUnfTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,varName,norm,normFb,args['lumi'],UnfoldOutDir)
+#Show plots nicely on my webpages
+#for cat in ["eeee"]:   
+for cat in ["eeee","eemm","mmmm","tot"]:   
+    #This is where we put all the plots in html format for quick access/debugging
+    makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")), "Unfolded Distributions (from MC)")
+fUse.Close()
+#exit(0)
+
+#if __name__ == "__main__":
+#    main()
