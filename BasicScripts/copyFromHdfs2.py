@@ -35,7 +35,7 @@ for directory in glob.glob(args.path):
     print "dir_name: ",dir_name
     #new_dir = "/data/%s/ZZAnalysis_2018-03-14/%s/%s" % (os.getlogin(), args.selection.strip("/"), dir_name)
     #new_dir = "/data/%s/SkimmedZZNtuples_mc_2018-03-06_hadd/%s/%s" % (os.getlogin(), args.selection.strip("/"), dir_name)
-    new_dir = "/data/%s/ZZRun2SkimmedFiles/ZZ4l2017AnalysisJobs_2019-08-18/%s/%s"%(os.getlogin(), args.selection.strip("/"), dir_name)
+    new_dir = "/data/%s/ZZRun2SkimmedFiles/ZplusL2016AnalysisJobs_2019-09-12/%s/%s"%(os.getlogin(), args.selection.strip("/"), dir_name)
     if args.eos:
         new_dir = "/".join(["/eos/user", os.getlogin()[0], os.getlogin(), args.selection, dir_name])
     if os.path.isdir(new_dir):

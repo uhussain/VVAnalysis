@@ -1,11 +1,11 @@
 #!/bin/bash
-Date=2019-08-18
+Date=2019-09-12
 
 echo "Copying leftover ZZ2016Analysis jobs"
 
 
-for dir in /hdfs/store/user/uhussain/ZZ4l2017AnalysisJobs_${Date}/*/ ; do
+for dir in /hdfs/store/user/uhussain/ZplusL2016AnalysisJobs_${Date}/*/ ; do
   echo "=====================" $dir "========================"
-  python copyFromHdfs2.py -s LooseLeptons $dir
+  python copyFromHdfs2.py -s ZplusLSkim $dir
 done
 #done

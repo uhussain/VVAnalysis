@@ -34,7 +34,13 @@ for subDir in subdir:
             dir_name = "_".join(dirs[6:8])
         else:
             dir_name = "_".join(dirs[5:7])
-    new_dir = "/data/%s/ZZRun2SkimmedFiles/ZZ4l2017AnalysisJobs_{:%Y-%m-%d}/%s/%s".format(datetime.date.today())%(os.getlogin(), args.selection.strip("/"), dir_name)
+    if "Tight" in dir_name:
+        continue
+        new_dir = "/data/%s/ZZRun2SkimmedFiles/ZZ4l2017AnalysisJobs_2019-09-11/TightLeptons/%s" %(os.getlogin(), dir_name)
+    elif "ZplusLBase" in dir_name: 
+        new_dir = "/data/%s/ZZRun2SkimmedFiles/ZplusL2016AnalysisJobs_2019-09-12/%s/%s" %(os.getlogin(), args.selection.strip("/"),dir_name)
+    else:        
+        new_dir = "/data/%s/ZZRun2SkimmedFiles/ZZ4l2016AnalysisJobs_2019-09-11/%s/%s" %(os.getlogin(), args.selection.strip("/"), dir_name)
     #new_dir = "/data/%s/ZZ2019AnalysisJobs_2019-01-28/%s/%s"%(os.getlogin(), args.selection.strip("/"), dir_name)
     if args.eos:
         new_dir = "/".join(["/eos/user", os.getlogin()[0], os.getlogin(), args.selection, dir_name])
