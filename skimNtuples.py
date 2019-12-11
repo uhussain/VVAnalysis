@@ -26,6 +26,8 @@ def getComLineArgs():
                         " in selection the cut json")
     parser.add_argument("-o", "--output_file_name", type=str,
                         required=True, help="Name of output file")
+    parser.add_argument("-gen", "--save_genTrees", action='store_true',
+                        help="Save genTrees in the skim as well")
     parser.add_argument("-d", "--no_deduplicate", action='store_true',
                         help="Don't remove duplicated events from ntuple")
     return vars(parser.parse_args())
@@ -118,7 +120,19 @@ def writeMetaTreeToFile(output_file, metaTree):
     meta_dir.cd()
     save_mt = metaTree.CopyTree("")
     save_mt.Write()
-def skimNtuple(selections, analysis, trigger, filelist, output_file_name, deduplicate):
+#Write Gen Trees to File
+def writeGenTreeToFile(output_file, state,GenTree):
+    Genstate=state+"Gen"
+    Genstate_dir = output_file.Get(Genstate)
+    if not Genstate_dir:
+        Genstate_dir = output_file.mkdir(Genstate)
+    Genstate_dir.cd()
+    save_gt = GenTree.CopyTree("")
+    save_gt.Write()
+    # Remove AutoSaved trees
+    output_file.Purge()
+    ROOT.gROOT.cd()
+def skimNtuple(selections, analysis, trigger, filelist, output_file_name,saveGenTrees, deduplicate):
     ROOT.gROOT.SetBatch(True)
     output_file = ROOT.TFile(output_file_name, "RECREATE")
     ROOT.gROOT.cd()
@@ -141,6 +155,18 @@ def skimNtuple(selections, analysis, trigger, filelist, output_file_name, dedupl
     selection_groups = selections.split(";")
     tmpfile = 0
     for state in states:
+        if saveGenTrees:
+            print "Saving GenTrees in the skimmed files"
+            if len(input_files) > 1:
+                Gentree = ROOT.TChain("%sGen/ntuple" % state)
+                for file_path in input_files:
+                    Gentree.Add(file_path)
+            else: 
+                input_file = ROOT.TFile.Open(input_files[0])
+                Gentree = input_file.Get("%sGen/ntuple" % state)
+            writeGenTreeToFile(output_file,state,Gentree)
+        else:
+            print "Skipping GenTrees in making skim"
         if len(input_files) > 1:
             tree = ROOT.TChain("%s/ntuple" % state)
             for file_path in input_files:
@@ -205,7 +231,7 @@ def main():
     args = getComLineArgs()
     print args['filelist']
     skimNtuple(args['selections'], args['analysis'], args['trigger'], args['filelist'], 
-        args['output_file_name'], not args['no_deduplicate'])
+        args['output_file_name'], args['save_genTrees'], not args['no_deduplicate'])
     exit(0)
 if __name__ == "__main__":
     main()
