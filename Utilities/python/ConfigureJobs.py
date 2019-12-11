@@ -86,14 +86,26 @@ def getListOfFiles(filelist, manager_path):
         if (zz4l in name) or (Zl in name):
             if (zz4l in name):
                 if "ZZ4l2016" in name:
-                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                        "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2016/%s.json" % "ntuples"
+                    if "Tight" in name:
+                        dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                            "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2016/%s.json" % "LooseNtuples"
+                    else:                        
+                        dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                            "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2016/%s.json" % "ntuples"
                 elif "ZZ4l2017" in name:
-                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                        "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2017/%s.json" % "ntuples"
+                    if "Tight" in name:
+                        dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                            "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2017/%s.json" % "LooseNtuples"
+                    else:                        
+                        dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                            "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2017/%s.json" % "ntuples"
                 elif "ZZ4l2018" in name:
-                    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
-                        "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2018/%s.json" % "ntuples"
+                    if "Tight" in name:
+                        dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                            "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2018/%s.json" % "LooseNtuples"
+                    else:                        
+                        dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
+                            "ZZ4lRun2DatasetManager/FileInfo/ZZ4l2018/%s.json" % "ntuples"
             elif(Zl in name):
                 #if "Skim" in name:
                 #    dataset_file = "/afs/cern.ch/user/u/uhussain/work/" + \
@@ -150,18 +162,23 @@ def getPreviousStep(selection, analysis):
         selection_map = { "ntuples": "ntuples",
                 "loosePreselection" : "ntuples",
                 "preselection" : "ntuples",
+                #We need to make Tight Signal samples from the Loose skims for the ResponseClass in makeResponseMatrix.py
+                #If you make Tight skims directly, due to disambiguation step, events go out of sync.
+                "TightZZ" : "LooseNtuples",
                 "4lCRBase" : "ntuples"
         }
     elif analysis == "ZZ4l2017":
         selection_map = { "ntuples": "ntuples",
                 "loosePreselection" : "ntuples",
                 "preselection" : "ntuples",
+                "TightZZ" : "LooseNtuples",
                 "4lCRBase" : "ntuples"
         }
     elif analysis == "ZZ4l2018":
         selection_map = { "ntuples": "ntuples",
                 "loosePreselection" : "ntuples",
                 "preselection" : "ntuples",
+                "TightZZ" : "LooseNtuples",
                 "4lCRBase" : "ntuples"
         }    
     elif analysis == "ZplusL2016":
@@ -193,12 +210,13 @@ def getInputFilesPath(sample_name, manager_path,selection, analysis):
         raise ValueError("Invalid input file %s. Input file must correspond"
                " to a definition in %s" % (sample_name, input_file_name))
     filename = input_files[sample_name]['file_path']
+    #print "filename: ",filename
     return filename
 def getCutsJsonName(selection, analysis):
     return "/".join(["Cuts", analysis, selection + ".json"]) 
 def getTriggerName(sample_name,analysis, selection):
     trigger_names = ["MuonEG", "DoubleMuon", "DoubleEG","EGamma", "SingleMuon", "SingleElectron"]
-    if "Run" in sample_name and getPreviousStep(selection, analysis) == "ntuples":
+    if "Run" in sample_name and (getPreviousStep(selection, analysis) == "ntuples" or getPreviousStep(selection, analysis) == "LooseNtuples"):
         for name in trigger_names:
             if name in sample_name:
                 return "-t " + name
