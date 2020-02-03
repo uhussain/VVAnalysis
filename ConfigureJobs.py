@@ -80,7 +80,7 @@ def getListOfEWK():
         "ggZZ4t",
         "ggZZ2e2mu",
         "ggZZ2e2tau",
-        "ggZZ2mu2tau",
+        #"ggZZ2mu2tau",
     ]
 def getListOfDYFilenames():
     return[
