@@ -97,7 +97,7 @@ namespace
 
     return h.GetBinError(bin);
   }
-};
+} puWt *;
 
 
 template<typename T>
@@ -189,6 +189,7 @@ void ResponseMatrixMakerBase<T>::setup()
   // set up lots of things
   Vec<Str> systs = Vec<Str>({"nominal",
         "pu_Up","pu_Down",
+        //"pdf_Up","pdf_Down",
         });
   //const bool isJetVar = (varName.find("jet") != Str::npos ||
   //                       varName.find("Jet") != Str::npos ||
@@ -382,7 +383,9 @@ void ResponseMatrixMakerBase<T>::setup()
             {
               this->fillResponse(responses["pu_Up"], val, trueVal, scale * puWtUp * lepSF * genWeight);
               this->fillResponse(responses["pu_Down"], val, trueVal, scale * puWtDn * lepSF * genWeight);
-
+              //Already summed all 100 variations and I have a pdfUp and pdfDown histogram
+              //this->fillResponse(responses["pdf_Up"], val, trueVal, scale * puWt * pdfWtUp * lepSF * genWeight);
+              //this->fillResponse(responses["pdf_Down"], val, trueVal, scale * puWt * pdfWtDn * lepSF * genWeight);
               if(hasE)
                 {
                   this->fillResponse(responses["eEff_Up"], val, trueVal, scale * puWt * lepSFEUp * genWeight);
