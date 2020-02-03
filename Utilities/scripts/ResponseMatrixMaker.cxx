@@ -97,7 +97,7 @@ namespace
 
     return h.GetBinError(bin);
   }
-} puWt *;
+};
 
 
 template<typename T>
