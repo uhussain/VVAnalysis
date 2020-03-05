@@ -70,7 +70,7 @@ def getComLineArgs():
     parser.add_argument('--noSyst', action='store_true',
                         help='No Systematics calculations.')
     parser.add_argument('--plotDir', type=str, nargs='?',
-                        default='/afs/cern.ch/user/u/uhussain/www/ZZFullRun2/PlottingResults/ZZ4l2018/ZZSelectionsTightLeps/ANPlots/ZZ4l2018/PowhegRespMat',
+                        default='/afs/cern.ch/user/u/uhussain/www/ZZFullRun2/PlottingResults/ZZ4l2016/ZZSelectionsTightLeps/ANPlots/ZZ4l2016/PowhegRespMat',
                         help='Directory to put response and covariance plots in')
     parser.add_argument('--unfoldDir', type=str, nargs='?',
                         default='/afs/cern.ch/user/u/uhussain/ZZFullRun2Unfolding',
@@ -87,6 +87,7 @@ if selection == "":
     print "Info: Using BasicZZSelections for hist defintions"
 #analysis = "/".join([args['analysis'], selection])
 analysis=args['analysis']
+print "Analyzing: ",analysis
 _binning = {
     'pt' : [25.*i for i in range(4)] + [100., 150., 200., 300.],
     #'mass' : [100.+100.*i for i in range(12)],
@@ -212,27 +213,33 @@ varList=['Mass','ZZPt','ZPt','LepPt','dPhiZ1Z2','dRZ1Z2']
 def generateAnalysisInputs():    
     #dictionary of SF histograms
     hSF = {}
-    eLowRecoFile = ROOT.TFile.Open('data/Ele_Reco_LowEt_2018.root')
+    year = analysis[4:]
+    eLowRecoFile = ROOT.TFile.Open('data/Ele_Reco_LowEt_%s.root' % (year)) 
     hSF['eLowReco'] = eLowRecoFile.Get('EGamma_SF2D').Clone()
     hSF['eLowReco'].SetDirectory(0)
     eLowRecoFile.Close()
     
-    eRecoFile = ROOT.TFile.Open('data/Ele_Reco_2018.root')
+    eRecoFile = ROOT.TFile.Open('data/Ele_Reco_%s.root' % (year))
     hSF['eReco'] = eRecoFile.Get('EGamma_SF2D').Clone()
     hSF['eReco'].SetDirectory(0)
     eRecoFile.Close()
     
-    eIdFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2018_NoGap.root')
+    eIdFile = ROOT.TFile.Open('data/ElectronSF_Legacy_%s_NoGap.root' % (year))
     hSF['eSel'] = eIdFile.Get('EGamma_SF2D').Clone() 
     hSF['eSel'].SetDirectory(0)
     eIdFile.Close()
 
-    eIdGapFile = ROOT.TFile.Open('data/ElectronSF_Legacy_2018_Gap.root')
+    eIdGapFile = ROOT.TFile.Open('data/ElectronSF_Legacy_%s_Gap.root' % (year))
     hSF['eSelGap'] = eIdGapFile.Get('EGamma_SF2D').Clone() 
     hSF['eSelGap'].SetDirectory(0)
     eIdGapFile.Close()
-
-    mIdFile = ROOT.TFile.Open('data/final_HZZ_muon_SF_2018_IsBDT_0610.root')
+    
+    if year=="2016":
+        mIdFile = ROOT.TFile.Open('data/final_HZZ_SF_2016_legacy_mupogsysts_newLoose_noTracking_1610.root')
+    elif year=="2017":
+        mIdFile = ROOT.TFile.Open('data/ScaleFactors_mu_Moriond2018_final.root')
+    elif year=="2018":
+        mIdFile = ROOT.TFile.Open('data/final_HZZ_muon_SF_2018_IsBDT_0610.root')
     hSF['m'] = mIdFile.Get('FINAL').Clone()
     hSF['m'].SetDirectory(0)
 
@@ -242,17 +249,17 @@ def generateAnalysisInputs():
 
     #dictionary of PU weights
     hPU={}
-    pileupFile = ROOT.TFile.Open('data/PileupWeights2018/PU_Central.root')
+    pileupFile = ROOT.TFile.Open('data/PileupWeights%s/PU_Central.root' % (year))
     hPU[''] = pileupFile.Get('pileup')
     hPU[''].SetDirectory(0)
     pileupFile.Close()
     
-    pileupFileUp = ROOT.TFile.Open('data/PileupWeights2018/PU_minBiasUP.root')
+    pileupFileUp = ROOT.TFile.Open('data/PileupWeights%s/PU_minBiasUP.root' % (year))
     hPU['Up'] = pileupFileUp.Get('pileup')
     hPU['Up'].SetDirectory(0)
     pileupFileUp.Close()
 
-    pileupFileDown = ROOT.TFile.Open('data/PileupWeights2018/PU_minBiasDOWN.root')
+    pileupFileDown = ROOT.TFile.Open('data/PileupWeights%s/PU_minBiasDOWN.root' % (year))
     hPU['Down'] = pileupFileDown.Get('pileup')
     hPU['Down'].SetDirectory(0)
     pileupFileDown.Close()
@@ -465,8 +472,10 @@ def unfold(varName,chan,responseMakers,altResponseMakers,hSigDic,hAltSigDic,hSig
 
     #hData = hDataDic[chan][varNames[varName]]
     #Change hData to MadGraph signal which is AltSignal in this case
-    hData = hAltSigDic[chan][varNames[varName]]
+    #hData = hAltSigDic[chan][varNames[varName]]
     
+    #Change hData to Powheg signal which is Signal in this case
+    hData = hSigDic[chan][varNames[varName]]
 
     #print "dataHist: ",hData,", ",hData.Integral()
     #Get the background hists - #Get the histName_Fakes_chan histos
@@ -764,8 +773,9 @@ def rebin(hist,varName):
         hist=hist.Rebin(Nbins,"",bins)
     else:
         Nbins = hist.GetSize() - 2
-    add_overflow = hist.GetBinContent(Nbins) + hist.GetBinContent(Nbins + 1)
-    hist.SetBinContent(Nbins, add_overflow)
+    #add_overflow = hist.GetBinContent(Nbins) + hist.GetBinContent(Nbins + 1)
+    #hist.SetBinContent(Nbins, add_overflow)
+    #hist.SetBinContent(Nbins+1,0)
     return hist
 
 def getUnfolded(hSig, hBkg, hTrue, hResponse, hData, nIter,withRespAndCov=False):
@@ -773,14 +783,16 @@ def getUnfolded(hSig, hBkg, hTrue, hResponse, hData, nIter,withRespAndCov=False)
 
     print "TrueBeforeResponse: ", hTrue,", ",hTrue.Integral()
     print "SigBeforeResponse: ", hSig,", ",hSig.Integral()
-    response = Response(hSig, hTrue.Clone(), hResponse.Clone()) 
+    #response = Response(hSig, hTrue.Clone(), hResponse.Clone())
+    response = Response(0, hTrue.Clone(), hResponse.Clone()) 
     ROOT.SetOwnership(response,False)
     ROOT.SetOwnership(hData,False)
     #Response matrix as a 2D-histogram: (x,y)=(measured,truth)
     hResp = response.Hresponse()
     #hResp = hResponse
     #print "hResp out of response: ",hResp
-
+    print "MeasuredBins: ",response.GetNbinsMeasured()
+    print "TruthBins: ",response.GetNbinsTruth()
     #RooUnfoldIter = getattr(ROOT,"RooUnfoldBayes")
 
     RooUnfoldInv = getattr(ROOT,"RooUnfoldInvert")
@@ -825,12 +837,13 @@ def getUnfolded(hSig, hBkg, hTrue, hResponse, hData, nIter,withRespAndCov=False)
         c.Print("DebugPlots/resp{}.root".format(_printCounter))
         _printCounter += 1
 
-    print "hData: ", hData.Integral()
+    #We don't need to subtract background from MadGraph
+    print "hPowData: ", hData.Integral()
     hDataMinusBkg = hData.Clone()
-    hDataMinusBkg.Reset()
-    print "hBkg: ", hBkg.Integral()
-    hDataMinusBkg.Add(hData,1)
-    hDataMinusBkg.Add(hBkg,-1)
+    #hDataMinusBkg.Reset()
+    #print "hBkg: ", hBkg.Integral()
+    #hDataMinusBkg.Add(hData,1)
+    #hDataMinusBkg.Add(hBkg,-1)
     #hDataMinusBkg.Add(hBkg,-1)
     #HistTools.zeroNegativeBins(hDataMinusBkg)
     print "DataMinusbkgIntegral: ",hDataMinusBkg, ", ",hDataMinusBkg.Integral()
@@ -879,13 +892,11 @@ def getUnfolded(hSig, hBkg, hTrue, hResponse, hData, nIter,withRespAndCov=False)
 
 def _generateUncertainties(hDict,norm):
 
-    nominalArea = hDict['generator'].Integral(0,hDict['generator'].GetNbinsX()+1)
+    nominalArea = hDict[''].Integral(0,hDict[''].GetNbinsX()+1)
     hErr = {'Up':{},'Down':{}}
     for sys, h in hDict.iteritems():
-        if sys=="generator":
+        if not sys:
             continue
-        #if not sys:
-            #continue
 
         he = h.Clone()
 
@@ -894,7 +905,7 @@ def _generateUncertainties(hDict,norm):
 
         #Subtract the nominal histogram from the SysUp or Down histogram
 
-        he.Add(hDict['generator'],-1)
+        he.Add(hDict[''],-1)
         sysName = sys.replace('_Up','').replace('_Down','')
 
         if sysName=='':
@@ -929,7 +940,7 @@ def _sumUncertainties(errDict,varName):
     LumiUp = errDict['Up']['lumi']
     LumiDn = errDict['Down']['lumi']
     #print "LumiUp: ",LumiUp.Integral()
-    #print "LumiDn: ",LumiDn.Integral()
+    #print "LumiDn: ",.Integral()
     for i in range(1,hUncUp.GetNbinsX()+1):
         for h1, h2 in zip(UncUpHistos,UncDnHistos):
             #print "histUp: ",h1,"",h1.Integral()
@@ -1005,7 +1016,12 @@ sigSampleDic.update(AltsigSampleDic)
 #Replace fOut with fUse once you have run all the data samples and the backgrounds - right now unfolded data looking really big- subtract backgrounds
 if args['test']:
     sigSamplesPath={}
-    fUse = ROOT.TFile("SystGenFiles/Hists15Oct2019-ZZ4l2018_MVA.root","update")
+    if analysis=="ZZ4l2016":
+        fUse = ROOT.TFile("SystGenFiles/Hists17Oct2019-ZZ4l2016_Moriond.root","update")
+    elif analysis=="ZZ4l2017":
+        fUse = ROOT.TFile("SystGenFiles/Hists14Oct2019-ZZ4l2017_Moriond.root","update")
+    elif analysis=="ZZ4l2018": 
+        fUse = ROOT.TFile("SystGenFiles/Hists15Oct2019-ZZ4l2018_MVA.root","update")
     fOut=fUse
     for dataset in TotSigSampleList:
         file_path = ConfigureJobs.getInputFilesPath(dataset,selection, analysis)
@@ -1132,7 +1148,7 @@ for varName in runVariables:
             #save histograms instead of plotting them
             #hUnf = hUnfolded[chan][''].Clone()
             #save the MG unfolded with MadGraph
-            hUnf = hUnfolded[chan]['generator'].Clone()
+            hUnf = hUnfolded[chan][''].Clone()
             unfName = chan+"_"+varName+"_unf"
             hUnf.SetName(unfName)
             savehists.append(hUnf)
@@ -1203,7 +1219,7 @@ if args['plotResponse']:
         makeSimpleHtml.writeHTML(os.path.expanduser(OutputDirs[cat].replace("/plots", "")), "2D ResponseMatrices (from MC)")
 
 today = datetime.date.today().strftime("%d%b%Y")
-tmpFileName = "PowMatrix_MGUnfHists-%s-%s.root" % (today, analysis) 
+tmpFileName = "PowMatrix_PowUnfHistsNoOverflow-%s-%s.root" % (today, analysis) 
 fHistOut = ROOT.TFile.Open(tmpFileName, "update")
 #fOut = ROOT.TFile.Open("/".join([outputFolder, outputFile]), "RECREATE")
 fHistOut.cd()
