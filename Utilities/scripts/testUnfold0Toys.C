@@ -75,28 +75,33 @@ int testUnfold0Toys(TString input = "nominal", int nToys = 100)
   //============================================
   // generate MC distribution
   //
-  TFile file("PowResponseMatrix-16Mar2020-ZZ4l2016.root", "READ");
+  TFile file("PowResponseMatrix-16Mar2020-ZZ4l2016_drz1z2.root", "READ");
   
   TH2D *histMdetGenMC = (TH2D*) file.Get(input);
-  TH1D *histMgenMC = histMdetGenMC->ProjectionY();
+  TH1D *histMgenMC = histMdetGenMC->ProjectionX();
   //histMgenMC->Scale(1./histMgenMC->Integral());
-  TH1D *histMdetMC = histMdetGenMC->ProjectionX();
+  TH1D *histMdetMC = histMdetGenMC->ProjectionY();
   //histMdetMC->Scale(1./histMdetMC->Integral());
-  TH1D* histMdetMCsig = histMdetGenMC->ProjectionX("histMdetNonGenMC", 1, -1);
+  TH1D* histMdetMCsig = histMdetGenMC->ProjectionY("histMdetNonGenMC", 1, -1);
   TH2D* histMdetGenMCSig = (TH2D*) histMdetGenMC->Clone("histMdetGenMCSig");
   
+  std::cout<<"GenIntegral: "<<histMgenMC->Integral(0,10)<<std::endl;
+  std::cout<<"RecoIntegral: "<<histMdetMC->Integral(0,10)<<std::endl;
   bool reg = false;
   if (reg) input = input + "_reg";
-  
-  double lumi = 2; // fb^{-1}
+   
+  input = input + "_drz1z2";
+
+  double lumi = 1; // fb^{-1}
   double dataMCSF = lumi;
   histMgenMC->Scale(dataMCSF);
   histMdetMC->Scale(dataMCSF);
   histMdetMCsig->Scale(dataMCSF);
   
   double integral = histMdetGenMC->Integral(0,-1,0,-1);
-  //std::cout << "integral: " << integral << std::endl;
-  double nExpectedEvents = integral*lumi*832.;
+  std::cout << "integral: " << integral << std::endl;
+  //double nExpectedEvents = integral*lumi*832.;
+  double nExpectedEvents = integral*lumi*100;
   std::vector<double> wheel = { 0. };
   for (int i = 0; i < histMdetGenMC->GetNcells()+1; ++i) {
     //std::cout << wheel.back() << std::endl;
@@ -155,8 +160,8 @@ int testUnfold0Toys(TString input = "nominal", int nToys = 100)
     }
     //histMdetGenToy->FillRandom(histMdetGenMC, nExpectedEvents);    
     
-    TH1D *histMdetData = histMdetGenToy->ProjectionX("histMdetData");
-    TH1D *histMgenToy = histMdetGenToy->ProjectionY("histMgenToy");
+    TH1D *histMdetData = histMdetGenToy->ProjectionY("histMdetData");
+    TH1D *histMgenToy = histMdetGenToy->ProjectionX("histMgenToy");
 
     //double dataMCSF = 36500.; //histMdetData->Integral()/histMdetMC->Integral();
     //dataMCSF = histMdetData->Integral()/histMdetMC->Integral()*100;
@@ -175,8 +180,8 @@ int testUnfold0Toys(TString input = "nominal", int nToys = 100)
     // backgrounds
     TH1D *histMdetDataBGSubtracted = (TH1D*) histMdetData->Clone();
 
-    TH1D *histMdetNonGenMCbkg = histMdetGenMC->ProjectionX("histMdetNonGenMCbkg", 0, 0);
-    TH1D *histMdetNonGenMCall = histMdetGenMC->ProjectionX("histMdetNonGenMCall");
+    TH1D *histMdetNonGenMCbkg = histMdetGenMC->ProjectionY("histMdetNonGenMCbkg", 0, 0);
+    TH1D *histMdetNonGenMCall = histMdetGenMC->ProjectionY("histMdetNonGenMCall");
     //double SF = histMdetDataBGSubtracted->Integral(1, -1) * histMdetNonGenMCall->Integral(1,-1);
     //std::cout << "SF=" << SF << std::endl;
     //histMdetDataBGSubtracted->Add(histMdetNonGenMCbkg, -SF*832.);
