@@ -20,7 +20,7 @@ style = Style()
 ROOT.gStyle.SetLineScalePS(1.8)
 
 channels = ["eeee","eemm","mmmm"]
-#channels = ["eeee"]
+#channels = ["mmmm"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--lumi", "-l", type=float,
@@ -89,7 +89,7 @@ if selection == "":
 analysis=args['analysis']
 print "Analyzing: ",analysis
 _binning = {
-    'pt' : [25.*i for i in range(4)] + [100., 150., 200., 300.],
+    'pt' : [25.*i for i in range(4)] + [100., 150., 200., 300.,1200.],
     #'mass' : [100.+100.*i for i in range(12)],
     'mass' : [100.] + [200.+50.*i for i in range(5)] + [500.,600.,800.],
     'massFull' : [80.,100.,120.,130.,150.,180.,200.,240.,300.,400.,1000],
@@ -99,14 +99,19 @@ _binning = {
     'z2mass' : [60., 75., 83.] + [84.+i for i in range(14)] + [105., 120.],#[12, 60., 120.],
     'z1pt' : [i * 25. for i in range(7)] + [200., 300.],
     'z2pt' : [i * 25. for i in range(7)] + [200., 300.],
-    'zpt' : [i * 25. for i in range(7)] + [200., 300.],
+    'zpt' : [i * 25. for i in range(7)] + [200., 300.,600.],
     'zHigherPt' : [i * 25. for i in range(7)] + [200., 300.],
     'zLowerPt' : [i * 25. for i in range(7)] + [200., 300.],
-    'leppt' : [i * 15. for i in range(11)],
+    'leppt' : [i * 15. for i in range(11)]+[2000.],
     'l1Pt' : [0.,15.,30.,40.,50.]+[60.+15.*i for i in range(9)]+[195.,225.],#[14,0.,210.],#[15, 0., 150.],
     'dphiz1z2': [0.,1.5,2.0,2.25,2.5,2.75,3.0,3.25],
-    'drz1z2': [0.,1.0,2.0,3.0,4.0,5.0,6.0]
+    'drz1z2': [0.,1.0,2.0,3.0,4.0,5.0,6.0,10.0]
     }
+_Unfoldbinning = {
+    'pt' : [25.*i for i in range(4)] + [100., 150., 200., 300.],
+    #'mass' : [100.+100.*i for i in range(12)],
+    'mass' : [100.] + [200.+50.*i for i in range(5)] + [500.,600.,800.]
+}
 units = {
     'pt' : '[GeV]',
     'mass' : '[GeV]',
@@ -470,6 +475,9 @@ def unfold(varName,chan,responseMakers,altResponseMakers,hSigDic,hAltSigDic,hSig
     hTrue = hTrueDic[chan]["Gen"+varNames[varName]]
     #histTrue.Scale((1.256*35900*1.0835)/zzSumWeights)
 
+    print "hGenBins before rebin before unfolding: ",hTrue.GetNbinsX()
+    print "trueIntegral before rebin no overflow: ",hTrue,", ",hTrue.Integral()
+    print "trueIntegral before rebin including overflow: ",hTrue,", ",hTrue.Integral(0,hTrue.GetNbinsX()+1)
     #hData = hDataDic[chan][varNames[varName]]
     #Change hData to MadGraph signal which is AltSignal in this case
     #hData = hAltSigDic[chan][varNames[varName]]
@@ -502,10 +510,12 @@ def unfold(varName,chan,responseMakers,altResponseMakers,hSigDic,hAltSigDic,hSig
     hData=rebin(hData,varName)
     hBkgTotal=rebin(hBkgTotal,varName)
     
+    print "hGenBins after rebin before unfolding: ",hTrue.GetNbinsX()
     xaxisSize = hSigNominal.GetXaxis().GetTitleSize()
     yaxisSize = hTrue.GetXaxis().GetTitleSize()
     #print "xaxisSize: ",xaxisSize
-    print "trueHist: ",hTrue,", ",hTrue.Integral()
+    print "trueIntegral after rebin no overflow: ",hTrue,", ",hTrue.Integral()
+    print "trueIntegral after rebin including overflow: ",hTrue,", ",hTrue.Integral(0,hTrue.GetNbinsX()+1)
     #print "TotBkgHist after rebinning: ",hBkgTotal,", ",hBkgTotal.Integral()
     hTruth['']=hTrue
 
@@ -761,7 +771,7 @@ def unfold(varName,chan,responseMakers,altResponseMakers,hSigDic,hAltSigDic,hSig
         #h.SetDirectory(0)
     print "hUnfolded (inside unfold): ",hUnfolded
     print "hTrueAlt (inside unfold): ",hTrueAlt
-    return hUnfolded,hTruth,hTrueAlt
+    return hUnfolded,hTruth,hTrueAlt,hData
 
 #rebin histos and take care of overflow bins
 def rebin(hist,varName):
@@ -773,24 +783,39 @@ def rebin(hist,varName):
         hist=hist.Rebin(Nbins,"",bins)
     else:
         Nbins = hist.GetSize() - 2
-    #add_overflow = hist.GetBinContent(Nbins) + hist.GetBinContent(Nbins + 1)
-    #hist.SetBinContent(Nbins, add_overflow)
-    #hist.SetBinContent(Nbins+1,0)
+    add_overflow = hist.GetBinContent(Nbins) + hist.GetBinContent(Nbins + 1)
+    hist.SetBinContent(Nbins, add_overflow)
+    hist.SetBinContent(Nbins+1,0)
     return hist
+#Not using this and not rebinning after unfolding
+#def UnfoldRebin(hist,varName):
+#    ROOT.SetOwnership(hist, False)
+#    #No need to rebin certain variables but still might need overflow check
+#    if varName not in ['eta']:
+#        bins=array.array('d',_Unfoldbinning[varName])
+#        Nbins=len(bins)-1 
+#        hist=hist.Rebin(Nbins,"",bins)
+#    else:
+#        Nbins = hist.GetSize() - 2
+#    add_overflow = hist.GetBinContent(Nbins) + hist.GetBinContent(Nbins + 1)
+#    hist.SetBinContent(Nbins, add_overflow)
+#    hist.SetBinContent(Nbins+1,0)
+#    return hist
 
 def getUnfolded(hSig, hBkg, hTrue, hResponse, hData, nIter,withRespAndCov=False):
     Response = getattr(ROOT,"RooUnfoldResponse")
 
     print "TrueBeforeResponse: ", hTrue,", ",hTrue.Integral()
     print "SigBeforeResponse: ", hSig,", ",hSig.Integral()
-    #response = Response(hSig, hTrue.Clone(), hResponse.Clone())
-    response = Response(0, hTrue.Clone(), hResponse.Clone()) 
+    response = Response(hSig, hTrue.Clone(), hResponse.Clone())
+    #response = Response(0, hTrue.Clone(), hResponse.Clone()) 
     ROOT.SetOwnership(response,False)
     ROOT.SetOwnership(hData,False)
     #Response matrix as a 2D-histogram: (x,y)=(measured,truth)
     hResp = response.Hresponse()
     #hResp = hResponse
     #print "hResp out of response: ",hResp
+    print "hResponse Last bin: ",hResponse.GetXaxis().GetBinCenter(9)
     print "MeasuredBins: ",response.GetNbinsMeasured()
     print "TruthBins: ",response.GetNbinsTruth()
     #RooUnfoldIter = getattr(ROOT,"RooUnfoldBayes")
@@ -890,7 +915,7 @@ def getUnfolded(hSig, hBkg, hTrue, hResponse, hData, nIter,withRespAndCov=False)
     #print "DataMinusbkgIntegral: ",hDataMinusBkg, ", ",hDataMinusBkg.Integral()
     return hOut
 
-def _generateUncertainties(hDict,norm):
+def _generateUncertainties(hDict,norm,varName):
 
     nominalArea = hDict[''].Integral(0,hDict[''].GetNbinsX()+1)
     hErr = {'Up':{},'Down':{}}
@@ -913,12 +938,16 @@ def _generateUncertainties(hDict,norm):
 
         if '_Up' in sys:
             hErr['Up'][sysName] = he
+            #hErr['Up'][sysName] = UnfoldRebin(hErr['Up'][sysName],varName) 
         elif '_Down' in sys:
             hErr['Down'][sysName] = he
+            #hErr['Down'][sysName] = UnfoldRebin(hErr['Down'][sysName],varName) 
         else:
             hErr['Up'][sysName] = he
+            #hErr['Up'][sysName]=UnfoldRebin(hErr['Up'][sysName],varName) 
             he2 = he.Clone()
             hErr['Down'][sysName] = he2
+            #hErr['Down'][sysName] = UnfoldRebin(hErr['Down'][sysName],varName) 
     
     return hErr
 
@@ -980,6 +1009,7 @@ def _combineChannelUncertainties(*errDicts):
             hUncTot[sys][unc] = histTot
             for errDict in errDicts:
                 try:
+                    #errDict[sys][unc] = UnfoldRebin(errDict[sys][unc],varName)
                     hUncTot[sys][unc].Add(errDict[sys][unc])
                 except KeyError:
                     continue
@@ -1017,11 +1047,11 @@ sigSampleDic.update(AltsigSampleDic)
 if args['test']:
     sigSamplesPath={}
     if analysis=="ZZ4l2016":
-        fUse = ROOT.TFile("SystGenFiles/Hists17Oct2019-ZZ4l2016_Moriond.root","update")
+        fUse = ROOT.TFile("SystGenFiles/Hists10Mar2020-ZZ4l2016_Moriond.root","update")
     elif analysis=="ZZ4l2017":
-        fUse = ROOT.TFile("SystGenFiles/Hists14Oct2019-ZZ4l2017_Moriond.root","update")
+        fUse = ROOT.TFile("SystGenFiles/Hists10Mar2020-ZZ4l2017_Moriond.root","update")
     elif analysis=="ZZ4l2018": 
-        fUse = ROOT.TFile("SystGenFiles/Hists15Oct2019-ZZ4l2018_MVA.root","update")
+        fUse = ROOT.TFile("SystGenFiles/Hists11Mar2020-ZZ4l2018_MVA.root","update")
     fOut=fUse
     for dataset in TotSigSampleList:
         file_path = ConfigureJobs.getInputFilesPath(dataset,selection, analysis)
@@ -1115,6 +1145,7 @@ savehists=[]
 for varName in runVariables:
     print "varName:", varNames[varName]
     # save unfolded distributions by channel, then systematic
+    hDataDict = {}
     hUnfolded = {"eeee":{},"eemm":{},"mmmm":{}}
     hTrue = {"eeee":{},"eemm":{},"mmmm":{}}
     hTrueAlt = {"eeee":{},"eemm":{},"mmmm":{}}
@@ -1135,28 +1166,43 @@ for varName in runVariables:
         print "hUnfolded in main: ", hUnfolded
         print "hTrue in main: ", hTrue
         print "hTrue in main: ", hTrueAlt
-        hUnfolded[chan], hTrue[chan],hTrueAlt[chan] = unfold(varName,chan,responseMakers,altResponseMakers,hSigDic,hAltSigDic,hSigSystDic,hTrueDic,hAltTrueDic,hDataDic,hbkgDic,hbkgMCDic,hbkgMCSystDic,nIterations,OutputDir)
+        hUnfolded[chan], hTrue[chan],hTrueAlt[chan],hDataDict[chan] = unfold(varName,chan,responseMakers,altResponseMakers,hSigDic,hAltSigDic,hSigSystDic,hTrueDic,hAltTrueDic,hDataDic,hbkgDic,hbkgMCDic,hbkgMCSystDic,nIterations,OutputDir)
         print("returning unfolded? ",hUnfolded[chan])
         #print("returning truth? ",hTrue[chan])
 
         if not args['noSyst']: 
-            hErr[chan]= _generateUncertainties(hUnfolded[chan],norm)
+            hErr[chan]= _generateUncertainties(hUnfolded[chan],norm,varName)
             print "hErr[",chan,"]: ",hErr[chan]
             (hUncUp, hUncDn) = _sumUncertainties(hErr[chan],varName)
+            #hUnfolded[chan][''] = UnfoldRebin(hUnfolded[chan][''],varName)
+            #hTrue[chan][''] = UnfoldRebin(hTrue[chan][''],varName)
+            #hTrueAlt[chan][''] = UnfoldRebin(hTrueAlt[chan][''],varName)
         #hErrTrue[chan] = _generateUncertainties(hTrue[chan],norm)
         #(hTrueUncUp, hTrueUncDn) = _sumUncertainties(hErrTrue[chan],varName)
+
+            hDataSave = hDataDict[chan].Clone()
+            dataName = chan+"_"+varName+"_data"
+            hDataSave.SetName(dataName)
+            savehists.append(hDataSave)
             #save histograms instead of plotting them
             #hUnf = hUnfolded[chan][''].Clone()
             #save the MG unfolded with MadGraph
             hUnf = hUnfolded[chan][''].Clone()
             unfName = chan+"_"+varName+"_unf"
             hUnf.SetName(unfName)
+            print "hUnf Bins: ",hUnf.GetNbinsX()
+            print "hUnf Last bin(8): ",hUnf.GetXaxis().GetBinCenter(8)
+            print "hUnf Last binContent(8): ",hUnf.GetBinContent(8)
             savehists.append(hUnf)
             #hTrue
             hTheo = hTrue[chan][''].Clone()
             truName = chan+"_"+varName+"_true"
             hTheo.SetName(truName)
             savehists.append(hTheo)
+            print "hGenBins after UnfoldRebin: ",hTheo.GetNbinsX()
+            print "trueIntegral after UnfoldRebin no overflow: ",hTheo.Integral()
+            print "trueIntegral after UnfoldRebin including overflow: ",hTheo.Integral(0,hTrue[chan][''].GetNbinsX()+1)
+            print "hTrue Last binContent(8): ",hTheo.GetBinContent(8)
             #hTrueAlt
             hTheoAlt = hTrueAlt[chan][''].Clone()
             AltTruName = chan+"_"+varName+"_trueAlt"
@@ -1175,12 +1221,14 @@ for varName in runVariables:
     print "savehists: ",savehists
     if args['makeTotals']:
         if "eeee" in channels:
+            hTotData = hDataDict["eeee"]
             hTot = hUnfolded["eeee"]['']
             hTrueTot = hTrue["eeee"]['']
             hTrueAltTot = hTrueAlt["eeee"]['']
             #channels.remove("eeee")
         print("channels before adding histos: ",channels)
         for c in ["eemm","mmmm"]:
+            hTotData.Add(hDataDict[c])
             hTot.Add(hUnfolded[c][''])
             hTrueTot.Add(hTrue[c][''])
             hTrueAltTot.Add(hTrueAlt[c][''])
@@ -1188,6 +1236,10 @@ for varName in runVariables:
         hErrTot = _combineChannelUncertainties(*hErr.values())
         hTotUncUp, hTotUncDn = _sumUncertainties(hErrTot,varName)
         #Saving Total histograms
+        hTotalData = hTotData.Clone()
+        TotDatName = "tot_"+varName+"_data"
+        hTotalData.SetName(TotDatName)
+        savehists.append(hTotalData)
         hTotUnf = hTot.Clone()
         TotName = "tot_"+varName+"_unf"
         hTotUnf.SetName(TotName)
@@ -1219,7 +1271,7 @@ if args['plotResponse']:
         makeSimpleHtml.writeHTML(os.path.expanduser(OutputDirs[cat].replace("/plots", "")), "2D ResponseMatrices (from MC)")
 
 today = datetime.date.today().strftime("%d%b%Y")
-tmpFileName = "PowMatrix_PowUnfHistsNoOverflow-%s-%s.root" % (today, analysis) 
+tmpFileName = "PowMatrix_PowUnfHistsWOverflow-%s-%s.root" % (today, analysis) 
 fHistOut = ROOT.TFile.Open(tmpFileName, "update")
 #fOut = ROOT.TFile.Open("/".join([outputFolder, outputFile]), "RECREATE")
 fHistOut.cd()
