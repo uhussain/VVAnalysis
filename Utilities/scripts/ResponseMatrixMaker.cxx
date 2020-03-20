@@ -319,7 +319,10 @@ void ResponseMatrixMakerBase<T>::setup()
   bool doPUWt = (puWeightHists.find("") != puWeightHists.end());
   bool doPUWtUp = (puWeightHists.find("Up") != puWeightHists.end());
   bool doPUWtDn = (puWeightHists.find("Down") != puWeightHists.end());
-
+  float upperEdge = binning[binning.size()-1];
+  float lowerEdge = binning[binning.size()-2];
+  const T binCenter = (lowerEdge)+((upperEdge - lowerEdge)/2.); 
+  std::cout<<"Last bin center: "<<binCenter<<std::endl;
   // Loop through base reco tree, fill most things
   for(size_t row = 0; row < size_t(std::abs(recoTree->GetEntries())); ++row)
     {
@@ -366,17 +369,24 @@ void ResponseMatrixMakerBase<T>::setup()
       auto iTrue = trueVals->find(evt);
       if(iTrue == trueVals->end())
         continue;
-      const T& trueVal = iTrue->second;
+      //const T& trueVal = iTrue->second;
 
+      T& trueVal = iTrue->second;
       if(this->selectEvent())
         {
           // Nominal value
-          const T val = this->getEventResponse();
+          //const T val = this->getEventResponse();
+          
+          T val = this->getEventResponse();
 
           const float nominalWeight = scale * puWt * lepSF * genWeight;
 
           //const float nominalWeight = scale * lepSF * genWeight;
           // fill histos that use nominal value but with different weights
+          if (val > upperEdge){val=binCenter;}
+          if (trueVal > upperEdge){trueVal=binCenter;}
+          //std::cout<<"val: "<<val<<std::endl;
+          //std::cout<<"trueVal: "<<trueVal<<std::endl;
           this->fillResponse(responses["nominal"], val, trueVal, nominalWeight);
 
           if(!skipSyst)
