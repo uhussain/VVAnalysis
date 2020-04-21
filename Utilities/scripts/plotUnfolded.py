@@ -18,12 +18,26 @@ from PlotTools import PlotStyle as Style, pdfViaTex
 style = Style()
 #ROOT.gStyle.SetLineScalePS(1.8)
 ROOT.gStyle.SetOptDate(False)
-channels = ["eeee","eemm","mmmm"]
-#channels = ["eeee"]
+#channels = ["eeee","eemm","mmmm"]
+channels = ["eemm"]
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--lumi", "-l", type=float,
         default=41.5, help="luminosity value (in fb-1)")
+    parser.add_argument('--thesis', action='store_true',
+                        help='For making CMS thesis plots')
+    parser.add_argument('--preliminary', action='store_true',
+                        help='For making CMS Preliminary plots')
+    parser.add_argument("--legend_left", action="store_true",
+                        help="Put legend left or right")
+    parser.add_argument("--scaleymax", type=float, default=1.0,
+                        help="Scale default ymax by this amount")
+    parser.add_argument("--scaleymin", type=float, default=1.0,
+                        help="Scale default ymin by this amount")
+    parser.add_argument("--scalelegy", type=float, default=1.0,
+                        help="Scale default legend entry size by this amount")
+    parser.add_argument("--scalelegx", type=float, default=1.0,
+                        help="Scale default legend entry wdith by this amount")
     parser.add_argument("--output_file", "-o", type=str,
         default="", help="Output file name")
     parser.add_argument("--test", action='store_true',
@@ -53,7 +67,7 @@ analysis=args['analysis']
 _binning = {
     'pt' : [25.*i for i in range(4)] + [100., 150., 200., 300.],
     #'mass' : [100.+100.*i for i in range(12)],
-    'mass' : [100.] + [200.+50.*i for i in range(5)] + [500.,600.,800.],
+    'mass' : [100.] + [200.+50.*i for i in range(5)] + [500.,600.,800.,1000.],
     'massFull' : [80.,100.,120.,130.,150.,180.,200.,240.,300.,400.,1000],
     'eta' : [6,0.,6.],
     'zmass' : [60., 80., 84., 86.] + [87.+i for i in range(10)] + [98., 102., 120.], #[12, 60., 120.],
@@ -71,7 +85,7 @@ _binning = {
     }
 units = {
     'pt' : '[GeV]',
-    'mass' : '[GeV]',
+    'mass' : '[TeV]',
     'massFull' : '[GeV]',
     'eta' : '',
     'zmass' : '[GeV]',
@@ -226,7 +240,8 @@ def createRatio(h1, h2):
         stackerror = hStackLast.GetBinError(i)
         datacontent = h1.GetBinContent(i)
         dataerror = h1.GetBinError(i)
-        print "stackcontent: ",stackcontent," and data content: ",datacontent
+        #print "bin: ",i
+        #print "stackcontent: ",stackcontent," and data content: ",datacontent
         ratiocontent=0
         if(datacontent!=0):
             ratiocontent = datacontent/stackcontent
@@ -234,8 +249,8 @@ def createRatio(h1, h2):
             error = ratiocontent*(math.sqrt(math.pow((dataerror/datacontent),2) + math.pow((stackerror/stackcontent),2)))
         else:
             error = 2.07
-        print "ratio content: ",ratiocontent
-        print "stat error: ", error
+        #print "ratio content: ",ratiocontent
+        #print "stat error: ", error
         Ratio.SetBinContent(i,ratiocontent)
         Ratio.SetBinError(i,error)
 
@@ -249,7 +264,7 @@ def createRatio(h1, h2):
     line.SetLineStyle(7)
 
     Ratio.GetYaxis().SetLabelSize(0.14)
-    Ratio.GetYaxis().SetTitleSize(0.12)
+    Ratio.GetYaxis().SetTitleSize(0.16)
     Ratio.GetYaxis().SetLabelFont(42)
     Ratio.GetYaxis().SetTitleFont(42)
     Ratio.GetYaxis().SetTitleOffset(0.25)
@@ -261,8 +276,25 @@ def createRatio(h1, h2):
 
     return Ratio,line
 
+def getPrettyLegend(hTrue, data_hist, hAltTrue, error_hist, coords):
+    legend = ROOT.TLegend(coords[0], coords[1], coords[2], coords[3])
+    ROOT.SetOwnership(legend, False)
+    legend.SetName("legend")
+    legend.SetFillStyle(0)
+
+    sigLabel = "POWHEG+MCFM+Pythia8" 
+    sigLabelAlt = "MG5_aMC@NLO+MCFM+Pythia8"
+    if data_hist:
+        legend.AddEntry(data_hist, "Data + stat. unc.", "lep")
+    legend.AddEntry(error_hist, "Stat. #oplus syst. unc.", "f")
+    legend.AddEntry(hTrue, sigLabel,"lf")
+    legend.AddEntry(hAltTrue, sigLabelAlt,"l")
+    return legend
 def createCanvasPads(varName):
-    c = ROOT.TCanvas("c", "canvas")
+    #if matrix included
+   # canvas_dimensions = [1000, 1400]
+    canvas_dimensions = [800, 1040]
+    c = ROOT.TCanvas("c", "canvas",*canvas_dimensions)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetLegendBorderSize(0)
     # Upper histogram plot is pad1
@@ -282,6 +314,7 @@ def createCanvasPads(varName):
 def createPad2(canvas):
     # Lower ratio plot is pad2
     canvas.cd()  # returns to main canvas before defining pad2
+    canvas.GetListOfPrimitives().SetOwner(True)
     pad2 = ROOT.TPad("pad2", "pad2", 0.01, 0.20, 0.99, 0.33)
     pad2.Draw()
     pad2.cd()
@@ -324,6 +357,7 @@ def rebin(hist,varName):
         Nbins = hist.GetSize() - 2
     add_overflow = hist.GetBinContent(Nbins) + hist.GetBinContent(Nbins + 1)
     hist.SetBinContent(Nbins, add_overflow)
+    hist.SetBinContent(Nbins+1,0)
     return hist
 
 def getLumiTextBox():
@@ -361,10 +395,11 @@ def RatioErrorBand(Ratio,hUncUp,hUncDn,hTrueNoErrs,varName):
             errorUp -= Ratio.GetBinContent(i) 
             errorDn = max(tmpData.GetBinContent(i) - math.sqrt(math.pow(tmpData.GetBinError(i),2) + math.pow((eDn/tru),2)),0)
             errorDn = Ratio.GetBinContent(i) - errorDn
-            print "stat. error: ",tmpData.GetBinError(i)
-            print "eUp/tru: ",eUp/tru
-            print "eDn/tru: ",eDn/tru
-            print "errorUp: ",errorUp, "","errorDn: ",errorDn
+            #print "Ratio (bin): ",i
+            #print "stat. error: ",tmpData.GetBinError(i)
+            #print "eUp/tru: ",eUp/tru
+            #print "eDn/tru: ",eDn/tru
+            #print "TotErrorUp: ",errorUp, "","TotErrorDn: ",errorDn
             ratioGraph.SetPointEYhigh(i-1, errorUp)
             ratioGraph.SetPointEYlow(i-1, errorDn)
         ratioGraph.SetFillColorAlpha(1,0.5)
@@ -396,7 +431,11 @@ def MainErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
             errorUp -= hMain.GetBinContent(i) 
             errorDn = max(tmpData.GetBinContent(i) - math.sqrt(math.pow(tmpData.GetBinError(i),2) + math.pow(eDn,2)),0)
             errorDn = hMain.GetBinContent(i) - errorDn
-            print "errorUp: ",errorUp, "","errorDn: ",errorDn
+            #print "Main (bin): ",i
+            #print "stat. error: ",tmpData.GetBinError(i)
+            #print "eUp/tru: ",eUp/tru
+            #print "eDn/tru: ",eDn/tru
+            #print "TotErrorUp: ",errorUp, "","TotErrorDn: ",errorDn
             MainGraph.SetPointEYhigh(i-1, errorUp)
             MainGraph.SetPointEYlow(i-1, errorDn)
         MainGraph.SetFillColorAlpha(1,0.7)
@@ -435,7 +474,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
     UnfHists=[]
     TrueHists=[]
     # for normalization if needed
-    nomArea = hUnfolded.Integral(0,hUnfolded.GetNbinsX()+1)
+    nomArea = hUnfolded.Integral(1,hUnfolded.GetNbinsX())
     # Make uncertainties out of the unfolded histos
     ### plot
     hUnf = hUnfolded.Clone()
@@ -447,7 +486,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
     lumifb = lumi
 
     if norm:
-        hUnf.Scale(1.0/(hUnf.Integral(0,hUnf.GetNbinsX()+1)))
+        hUnf.Scale(1.0/(hUnf.Integral(1,hUnf.GetNbinsX())))
     elif normFb:
         hUnf.Scale(1.0/lumifb)
     else:
@@ -460,30 +499,32 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
     if unfoldDir:
         #Create a ratio plot
         c,pad1 = createCanvasPads(varName)
+        c.SetCanvasSize(800, 1040);
         Unfmaximum = hUnf.GetMaximum()
-        hTrue.SetFillColor(ROOT.TColor.GetColor("#99ccff"))
-        hTrue.SetLineColor(ROOT.TColor.GetColor('#000099')) 
+        #hTrue.SetFillColor(ROOT.TColor.GetColor("#99ccff"))
+        #hTrue.SetLineColor(ROOT.TColor.GetColor('#000099')) 
+        hTrue.SetFillColor(ROOT.TColor.GetColor("#add8e6"))
+        hTrue.SetLineColor(ROOT.TColor.GetColor('#377eb8'))
+        hTrue.SetLineStyle(1)
         hTrue.SetFillStyle(3010)
         #AltSignal
         hTrueAlt.SetFillColor(2)
         hTrueAlt.SetLineStyle(10)#dashes
         hTrueAlt.SetFillStyle(0)#hollow
         hTrueAlt.SetLineColor(ROOT.kRed)
-        print "Total Truth Integral",hTrue.Integral()
-        print "Total Alt Truth Integral",hTrueAlt.Integral()
         print "Total Unf Data Integral",hUnf.Integral()
         Truthmaximum = hTrue.GetMaximum()
         hTrue.SetLineWidth(2*hTrue.GetLineWidth())
         hTrueAlt.SetLineWidth(2*hTrueAlt.GetLineWidth())
 
         if not norm and normFb:
-            print "Inclusive fiducial cross section = {} fb".format(hUnf.Integral(0,hUnf.GetNbinsX()+1))
+            print "Inclusive fiducial cross section = {} fb".format(hUnf.Integral(1,hUnf.GetNbinsX()))
         if norm or normFb:
             normalizeBins(hUnf)
 
         if norm:
-            hUncUp.Scale(1.0/hUnfolded.Integral(0,hUnfolded.GetNbinsX()+1))
-            hUncDn.Scale(1.0/hUnfolded.Integral(0,hUnfolded.GetNbinsX()+1))
+            hUncUp.Scale(1.0/hUnfolded.Integral(1,hUnfolded.GetNbinsX()))
+            hUncDn.Scale(1.0/hUnfolded.Integral(1,hUnfolded.GetNbinsX()))
         elif normFb:
             hUncUp.Scale(1.0/lumifb)
             hUncDn.Scale(1.0/lumifb)
@@ -495,12 +536,12 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
             normalizeBins(hUncDn)
 
         if norm:
-            trueInt = hTrue.Integral(0,hTrue.GetNbinsX()+1)
+            trueInt = hTrue.Integral(1,hTrue.GetNbinsX())
             hTrue.Scale(1.0/trueInt)
             #hTrueUncUp /= trueInt # (trueInt + hTrueUncUp.Integral(0,hTrueUncUp.GetNbinsX()+1))
             #hTrueUncDn /= trueInt # (trueInt - hTrueUncDn.Integral(0,hTrueUncDn.GetNbinsX()+1))
             #Alt Signal
-            AltTrueInt = hTrueAlt.Integral(0,hTrueAlt.GetNbinsX()+1)
+            AltTrueInt = hTrueAlt.Integral(1,hTrueAlt.GetNbinsX())
             hTrueAlt.Scale(1.0/AltTrueInt)
         elif normFb:
             hTrue.Scale(1.0/lumifb)
@@ -510,6 +551,8 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         else:
             print "no special normalization"
 
+        print "Total Truth Integral",hTrue.Integral()
+        print "Total Alt Truth Integral",hTrueAlt.Integral()
         if norm or normFb:
             normalizeBins(hTrue)
             #normalizeBins(hTrueUncUp)
@@ -546,31 +589,57 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         hUnf.GetXaxis().SetTitleSize(0)
         hUnf.Draw("PE1SAME")
       
-        texS,texS1=getLumiTextBox()
+        ROOT.dotrootImport('uhussain/CMSPlotDecorations')
+        scale_label = "Normalized to Unity" if args['lumi'] < 0 else \
+            "%0.1f fb^{-1}" % args['lumi']
+        
+        lumi_text = ""
+        if args['thesis']:
+            lumi_text = "Thesis" 
+        elif args['preliminary']:
+            lumi_text = "Preliminary" 
+        
+        ROOT.CMSlumi(c, 0, 0, "%s (13 TeV)" % scale_label,lumi_text)
+                #"Preliminary Simulation" if args.simulation else "Preliminary")
+        
+        offset = ROOT.gPad.GetLeftMargin() - 0.04 if args['legend_left'] else \
+            ROOT.gPad.GetRightMargin() - 0.04 
+        width = .33
+        width *= args['scalelegx']
+        xdist = 0.1 if args['legend_left'] else 0.91
+        xcoords = [xdist+offset, xdist+width+offset] if args['legend_left'] \
+            else [xdist-width-offset, xdist-offset]
+        unique_entries = min(2, 8)
+        ymax = 0.8 if args['legend_left'] else 0.9
+        ycoords = [ymax, ymax - 0.08*unique_entries*args['scalelegy']]
+        coords = [xcoords[0], ycoords[0], xcoords[1], ycoords[1]]
+        legend = getPrettyLegend(hTrue, hUnf, hTrueAlt, UnfErrBand, coords)
+        legend.Draw()
+        #texS,texS1=getLumiTextBox()
         sigLabel = "POWHEG+MCFM+Pythia8" 
         sigLabelAlt = "MG5_aMC@NLO+MCFM+Pythia8"
-        if varName=="dphiz1z2" or varName=="drz1z2":
-            leg = ROOT.TLegend(0.15,0.60,0.15+0.015*len(sigLabelAlt),0.90,"")
-        elif varName=="leppt":
-            leg = ROOT.TLegend(0.20,0.18,0.20+0.015*len(sigLabelAlt),0.48,"")
-        else:
-            leg = ROOT.TLegend(0.55,0.60,0.55+0.015*len(sigLabelAlt),0.90,"")
-        leg.AddEntry(hUnf,"Data + stat. unc.","lep")
-        leg.AddEntry(UnfErrBand, "Stat. #oplus syst. unc.","f")
-        leg.AddEntry(hTrue, sigLabel,"lf")
+        #if varName=="dphiz1z2" or varName=="drz1z2":
+        #    leg = ROOT.TLegend(0.15,0.60,0.15+0.015*len(sigLabelAlt),0.90,"")
+        #elif varName=="leppt":
+        #    leg = ROOT.TLegend(0.20,0.18,0.20+0.015*len(sigLabelAlt),0.48,"")
+        #else:
+        #    leg = ROOT.TLegend(0.55,0.60,0.55+0.015*len(sigLabelAlt),0.90,"")
+        #leg.AddEntry(hUnf,"Data + stat. unc.","lep")
+        #leg.AddEntry(UnfErrBand, "Stat. #oplus syst. unc.","f")
+        #leg.AddEntry(hTrue, sigLabel,"lf")
 
-        hTrueLeg.SetFillColor(2)
-        hTrueLeg.SetLineStyle(10)#dashes
-        hTrueLeg.SetFillColorAlpha(2,0.4)
-        hTrueLeg.SetFillStyle(3001)#solid
-        hTrueLeg.SetLineColor(ROOT.kRed)
-        hTrueLeg.SetLineWidth(4*hTrueLeg.GetLineWidth())
-        leg.AddEntry(hTrueLeg, sigLabelAlt,"l")
-        leg.SetFillColor(ROOT.kWhite)
-        leg.SetBorderSize(1)
-        leg.SetFillStyle(1001)
-        leg.SetTextSize(0.025)
-        leg.Draw()
+        #hTrueLeg.SetFillColor(2)
+        #hTrueLeg.SetLineStyle(10)#dashes
+        #hTrueLeg.SetFillColorAlpha(2,0.4)
+        #hTrueLeg.SetFillStyle(3001)#solid
+        #hTrueLeg.SetLineColor(ROOT.kRed)
+        #hTrueLeg.SetLineWidth(4*hTrueLeg.GetLineWidth())
+        #leg.AddEntry(hTrueLeg, sigLabelAlt,"l")
+        #leg.SetFillColor(ROOT.kWhite)
+        #leg.SetBorderSize(1)
+        #leg.SetFillStyle(1001)
+        #leg.SetTextSize(0.025)
+        #leg.Draw()
 
         #SecondPad
         pad2 = createPad2(c)
@@ -589,7 +658,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         ratioErrorBand.GetYaxis().SetTitleSize(0)
         ratioErrorBand.Draw("a2")
         
-        sigTex = getSigTextBox(0.15,0.8,sigLabel,0.12)
+        sigTex = getSigTextBox(0.15,0.8,sigLabel,0.16)
         Ratio.Draw("PE1SAME")
         line.SetLineColor(ROOT.kBlack)
         line.Draw("same")
@@ -601,7 +670,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         Altyaxis.SetLabelOffset(0.01)
         Altyaxis.SetLabelSize(0.14)
         Altyaxis.SetTitleFont(42)
-        Altyaxis.SetTitleSize(0.14)
+        Altyaxis.SetTitleSize(0.16)
         Altyaxis.SetTitleOffset(0.30)
         Altyaxis.Draw("SAME")
         
@@ -628,7 +697,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         Altline.SetLineColor(ROOT.kRed)
         Altline.Draw("same")
         
-        AltTex = getSigTextBox(0.15,0.8,sigLabelAlt,0.10)
+        AltTex = getSigTextBox(0.15,0.8,sigLabelAlt,0.16)
         #redraw axis
         xaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmax(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmin(),hUnf.GetXaxis().GetXmax(),510)
         xaxis.SetTitle(prettyVars[varName]+''+units[varName])
@@ -648,10 +717,12 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         yaxis.SetLabelOffset(0.01)
         yaxis.SetLabelSize(0.11)
         yaxis.SetTitleFont(42)
-        yaxis.SetTitleSize(0.11)
+        yaxis.SetTitleSize(0.16)
         yaxis.SetTitleOffset(0.35)
         yaxis.Draw("SAME")
         c.Update()
+        print("CanvasWidth: ", c.GetWw())
+        print("CanvasHeight: ", c.GetWh())
         plotName="Ratio_%s" % (varName)
         output_name="/".join([unfoldDir,plotName])
         #c.Print("%s/Ratio_%s.png" % (unfoldDir,varName))
@@ -680,8 +751,17 @@ normFb = args['NormFb']
 runVariables=[]
 runVariables.append(args['variable'])
 print "runVariables: ",runVariables
-#Save histograms from makResponseMatrix.py in this root file
-fUse = ROOT.TFile.Open("UnfHistsFull09Nov2019-ZZ4l2018.root","update")
+#Plot histograms from these respective root files generated wiht saveUnfolded.py
+if analysis=="ZZ4l2016":
+    fUse = ROOT.TFile("UnfHistsFinal-18Apr2020-ZZ4l2016.root","read")
+elif analysis=="ZZ4l2017":
+    fUse = ROOT.TFile("UnfHistsFinal-18Apr2020-ZZ4l2017.root","read")
+elif analysis=="ZZ4l2018":
+    if args['lumi'] < 100. : 
+        fUse = ROOT.TFile("UnfHistsFinal-18Apr2020-ZZ4l2018.root","read")
+    else:
+        fUse = ROOT.TFile("UnfHistsFinal-18Apr2020-ZZ4lFullRun2.root","read")
+#fUse = ROOT.TFile.Open("UnfHistsFull09Nov2019-ZZ4l2018.root","update")
 for varName in runVariables:
     print "varName:", varNames[varName]
     # save unfolded distributions by channel, then systematic
@@ -692,8 +772,8 @@ for varName in runVariables:
     hErrTrue = {}
     for chan in channels:
         print "channel: ",chan
-        print "hUnfolded: ",hUnfolded
-        print "hTrue: ",hTrue
+        #print "hUnfolded: ",hUnfolded
+        #print "hTrue: ",hTrue
         UnfoldOutDir=UnfoldDir+"/"+chan+"/plots"
         if chan not in UnfoldOutDirs:
             UnfoldOutDirs[chan]=UnfoldOutDir
@@ -702,13 +782,13 @@ for varName in runVariables:
         hUnfolded[chan] = fUse.Get(chan+"_"+varName+"_unf")
         hTrue[chan] = fUse.Get(chan+"_"+varName+"_true")
         hTrueAlt[chan] = fUse.Get(chan+"_"+varName+"_trueAlt")
-        print("returning unfolded? ",hUnfolded[chan])
-        print("returning truth? ",hTrue[chan])
-        print("returning Alt truth? ",hTrueAlt[chan])
+        #print("returning unfolded? ",hUnfolded[chan])
+        #print("returning truth? ",hTrue[chan])
+        #print("returning Alt truth? ",hTrueAlt[chan])
         #Get the total UncUp and total UncDown histograms from the file as well
         hUncUp = fUse.Get(chan+"_"+varName+"_totUncUp") 
         hUncDn = fUse.Get(chan+"_"+varName+"_totUncDown")
-        print "UnfoldOutDir:",UnfoldOutDir
+        #print "UnfoldOutDir:",UnfoldOutDir
         generatePlots(hUnfolded[chan],hUncUp,hUncDn,hTrue[chan],hTrueAlt[chan],varName,norm,normFb,args['lumi'],UnfoldOutDir)
     
     if args['makeTotals']:
@@ -726,8 +806,8 @@ for varName in runVariables:
             mkdir(UnfoldOutDir)
         generatePlots(hUnfTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,varName,norm,normFb,args['lumi'],UnfoldOutDir)
 #Show plots nicely on my webpages
-#for cat in ["eeee"]:   
-for cat in ["eeee","eemm","mmmm","tot"]:   
+for cat in ["eemm"]:   
+#for cat in ["eeee","eemm","mmmm","tot"]:   
     #This is where we put all the plots in html format for quick access/debugging
     makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")), "Unfolded Distributions (from MC)")
 fUse.Close()
