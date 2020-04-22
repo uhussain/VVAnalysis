@@ -2,7 +2,7 @@
 import ROOT
 import glob
 import math
-from python import ConfigureJobs
+#from python import ConfigureJobs
 from python import UserInput
 import makeSimpleHtml
 import os
@@ -13,9 +13,9 @@ import array
 from ROOT import vector as Vec
 
 VFloat = Vec('float')
-from PlotTools import PlotStyle as Style, pdfViaTex
+#from PlotTools import PlotStyle as Style, pdfViaTex
 
-style = Style()
+#style = Style()
 #ROOT.gStyle.SetLineScalePS(1.8)
 ROOT.gStyle.SetOptDate(False)
 #channels = ["eeee","eemm","mmmm"]
@@ -63,7 +63,7 @@ args = getComLineArgs()
 
 today = datetime.date.today().strftime("%d%b%Y")
 
-manager_path = ConfigureJobs.getManagerPath()
+#manager_path = ConfigureJobs.getManagerPath()
 
 analysis=args['analysis']
 _binning = {
@@ -369,17 +369,17 @@ def rebin(hist,varName):
     return hist
 
 def getLumiTextBox():
-    texS = ROOT.TLatex(0.70,0.965, str(int(args['lumi']))+" fb^{-1} (13 TeV)")
+    texS = ROOT.TLatex(0.68,0.965, str(int(args['lumi']))+" fb^{-1} (13 TeV)")
     texS.SetNDC()
     texS.SetTextFont(42)
-    texS.SetTextSize(0.043)
+    texS.SetTextSize(0.045)
     texS.SetTextColor(ROOT.kBlack)
     texS.Draw()
-    texS1 = ROOT.TLatex(0.10,0.965,"#bf{CMS}")
+    texS1 = ROOT.TLatex(0.14,0.965,"#bf{CMS}")
     texS1.SetNDC()
     texS1.SetTextFont(42)
     texS1.SetTextColor(ROOT.kBlack)
-    texS1.SetTextSize(0.043)
+    texS1.SetTextSize(0.045)
     texS1.Draw()
     return texS,texS1
 
@@ -461,7 +461,7 @@ def MainErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
             drawyTitle = "Events"
         MainGraph.GetYaxis().SetTitle(drawyTitle)
         #MainGraph.GetYaxis().CenterTitle()
-        MainGraph.GetYaxis().SetTitleSize(1.1*hMain.GetYaxis().GetTitleSize())
+        MainGraph.GetYaxis().SetTitleSize(1.3*hMain.GetYaxis().GetTitleSize())
         MainGraph.GetYaxis().SetLabelSize(1.3*hMain.GetYaxis().GetLabelSize())
         if varName=="drz1z2":
             MainGraph.GetYaxis().SetTitleOffset(1.0)
@@ -472,8 +472,9 @@ def MainErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
         #MainGraph.GetXaxis().SetTitleSize(0)
         #MainGraph.GetYaxis().SetLabelSize(0)
         #MainGraph.GetYaxis().SetTitleSize(0)
-        #if varName=="mass":
-            #MainGraph.GetYaxis().ChangeLabel(-1,-1,-1,-1,-1,-1,0)
+        if varName=="mass":
+            MainGraph.GetYaxis().ChangeLabel(1,-1,0)
+            MainGraph.GetYaxis().ChangeLabel(4,-1,0)
         MainGraph.GetXaxis().SetLimits(hMain.GetXaxis().GetXmin(),hMain.GetXaxis().GetXmax())
         #MainGraph.SetMaximum(1.5)
 
@@ -585,8 +586,8 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         hTrue.GetXaxis().SetTitle("")
 
         UnfErrBand = MainErrorBand(hUnf,hUncUp,hUncDn,varName,norm,normFb)
-        #if varName=="mass":
-        #    UnfErrBand.SetMaximum(0.008*args['scaleymax'])
+        if varName=="mass":
+            UnfErrBand.SetMaximum(0.01*args['scaleymax'])
         UnfErrBand.Draw("a2")
         hTrue.GetXaxis().SetLabelSize(0)
         hTrue.GetXaxis().SetTitleSize(0)
@@ -724,7 +725,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         xaxis.SetTitle(prettyVars[varName]+''+units[varName])
         #labelTex = getSigTextBox(0.9,0.8,prettyVars[varName]+''+units[varName])
         #if varName=="mass":
-        #    xaxis.ChangeLabel(1,"0.1")
+            #xaxis.ChangeLabel(1,-1,0.1)
             #xaxis.ChangeLabel(2,0.2)
             #xaxis.ChangeLabel(3,0.3)
             #xaxis.ChangeLabel(4,0.4)
@@ -739,7 +740,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         xaxis.SetLabelSize(0.162)
         xaxis.SetTitleFont(42)
         xaxis.SetTitleSize(0.18)
-        xaxis.SetTitleOffset(0.85)
+        xaxis.SetTitleOffset(0.9)
         if varName=="mass":
             xaxis.SetNoExponent(True)
         xaxis.Draw("SAME")
