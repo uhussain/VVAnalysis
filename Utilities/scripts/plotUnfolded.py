@@ -19,7 +19,7 @@ style = Style()
 #ROOT.gStyle.SetLineScalePS(1.8)
 ROOT.gStyle.SetOptDate(False)
 #channels = ["eeee","eemm","mmmm"]
-channels = ["eemm"]
+channels = []
 def getComLineArgs():
     parser = UserInput.getDefaultParser()
     parser.add_argument("--lumi", "-l", type=float,
@@ -30,6 +30,8 @@ def getComLineArgs():
                         help='For making CMS Preliminary plots')
     parser.add_argument("--legend_left", action="store_true",
                         help="Put legend left or right")
+    parser.add_argument("--titleOffset", type=float, default=1.0,
+                        help="Scale default ymax by this amount")
     parser.add_argument("--scaleymax", type=float, default=1.0,
                         help="Scale default ymax by this amount")
     parser.add_argument("--scaleymin", type=float, default=1.0,
@@ -85,7 +87,7 @@ _binning = {
     }
 units = {
     'pt' : '[GeV]',
-    'mass' : '[TeV]',
+    'mass' : '[GeV]',
     'massFull' : '[GeV]',
     'eta' : '',
     'zmass' : '[GeV]',
@@ -280,8 +282,11 @@ def getPrettyLegend(hTrue, data_hist, hAltTrue, error_hist, coords):
     legend = ROOT.TLegend(coords[0], coords[1], coords[2], coords[3])
     ROOT.SetOwnership(legend, False)
     legend.SetName("legend")
-    legend.SetFillStyle(0)
-
+    #legend.SetFillStyle(0)
+    legend.SetFillColor(ROOT.kWhite)
+    legend.SetBorderSize(2)
+    legend.SetTextSize(0.033)
+    legend.SetTextColor(ROOT.kBlack)
     sigLabel = "POWHEG+MCFM+Pythia8" 
     sigLabelAlt = "MG5_aMC@NLO+MCFM+Pythia8"
     if data_hist:
@@ -293,7 +298,7 @@ def getPrettyLegend(hTrue, data_hist, hAltTrue, error_hist, coords):
 def createCanvasPads(varName):
     #if matrix included
    # canvas_dimensions = [1000, 1400]
-    canvas_dimensions = [800, 1040]
+    canvas_dimensions = [1000, 1300]
     c = ROOT.TCanvas("c", "canvas",*canvas_dimensions)
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetLegendBorderSize(0)
@@ -304,6 +309,7 @@ def createCanvasPads(varName):
     if varName!="drz1z2":
         pad1.SetLogy()
     pad1.SetFillColor(0)
+    pad1.SetFrameLineWidth(3)
     pad1.SetFrameBorderMode(0)
     pad1.SetBorderMode(0)
     pad1.SetBottomMargin(0)  # joins upper and lower plot
@@ -319,6 +325,7 @@ def createPad2(canvas):
     pad2.Draw()
     pad2.cd()
     pad2.SetFillColor(0)
+    pad2.SetFrameLineWidth(3)
     pad2.SetFrameBorderMode(0)
     pad2.SetBorderMode(1)#bordermode = -1 box looks as it is behind the screen
    # bordermode = 0 no special effects
@@ -336,6 +343,7 @@ def createPad3(canvas):
     pad3.Draw()
     pad3.cd()
     pad3.SetFillColor(0)
+    pad3.SetFrameLineWidth(3)
     pad3.SetFrameBorderMode(0)
     #pad3.SetFrameFillStyle(4000)
     pad3.SetBorderMode(0)
@@ -361,20 +369,25 @@ def rebin(hist,varName):
     return hist
 
 def getLumiTextBox():
-    texS = ROOT.TLatex(0.77,0.955, str(args['lumi'])+" fb^{-1} (13 TeV)")
+    texS = ROOT.TLatex(0.70,0.965, str(int(args['lumi']))+" fb^{-1} (13 TeV)")
     texS.SetNDC()
     texS.SetTextFont(42)
-    texS.SetTextSize(0.040)
+    texS.SetTextSize(0.043)
+    texS.SetTextColor(ROOT.kBlack)
     texS.Draw()
-    texS1 = ROOT.TLatex(0.15,0.955,"#bf{CMS} #it{Preliminary}")
+    texS1 = ROOT.TLatex(0.10,0.965,"#bf{CMS}")
     texS1.SetNDC()
     texS1.SetTextFont(42)
-    texS1.SetTextSize(0.040)
+    texS1.SetTextColor(ROOT.kBlack)
+    texS1.SetTextSize(0.043)
     texS1.Draw()
     return texS,texS1
 
 def getSigTextBox(x,y,sigLabel,size):
-    texS = ROOT.TLatex(x,y, str(sigLabel))
+    if sigLabel=="POWHEG+MCFM+Pythia8":
+        texS = ROOT.TLatex(x,y, "#bf{POWHEG+MCFM+Pythia8}")
+    else:
+        texS = ROOT.TLatex(x,y, "#bf{MG5_aMC@NLO+MCFM+Pythia8}")
     texS.SetNDC()
     texS.SetTextFont(42)
     texS.SetTextSize(size)
@@ -447,23 +460,25 @@ def MainErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
         else:
             drawyTitle = "Events"
         MainGraph.GetYaxis().SetTitle(drawyTitle)
-
-        #MainGraph.GetYaxis().SetTitleSize(*hMain.GetYaxis().GetTitleSize())
-        MainGraph.GetYaxis().SetLabelSize(0.8*hMain.GetYaxis().GetLabelSize())
+        #MainGraph.GetYaxis().CenterTitle()
+        MainGraph.GetYaxis().SetTitleSize(1.1*hMain.GetYaxis().GetTitleSize())
+        MainGraph.GetYaxis().SetLabelSize(1.3*hMain.GetYaxis().GetLabelSize())
         if varName=="drz1z2":
             MainGraph.GetYaxis().SetTitleOffset(1.0)
         else:
             MainGraph.GetYaxis().SetLabelOffset(0.0)
-            MainGraph.GetYaxis().SetTitleOffset(1.0)
+            MainGraph.GetYaxis().SetTitleOffset(hMain.GetYaxis().GetTitleOffset()*args['titleOffset'])
         #MainGraph.GetXaxis().SetLabelSize(0)
         #MainGraph.GetXaxis().SetTitleSize(0)
         #MainGraph.GetYaxis().SetLabelSize(0)
         #MainGraph.GetYaxis().SetTitleSize(0)
+        #if varName=="mass":
+            #MainGraph.GetYaxis().ChangeLabel(-1,-1,-1,-1,-1,-1,0)
         MainGraph.GetXaxis().SetLimits(hMain.GetXaxis().GetXmin(),hMain.GetXaxis().GetXmax())
         #MainGraph.SetMaximum(1.5)
 
-        MainGraph.SetMaximum(1.2*(hMain.GetMaximum()))
-        MainGraph.SetMinimum(0.5*(hMain.GetMinimum()))
+        #MainGraph.SetMaximum(1.2*(hMain.GetMaximum())*args["scaleymax"])
+        MainGraph.SetMinimum(args['scaleymin']*(hMain.GetMinimum()))
         #if varName=="drz1z2":
         #    MainGraph.SetMinimum(0.0)
         #else:
@@ -499,7 +514,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
     if unfoldDir:
         #Create a ratio plot
         c,pad1 = createCanvasPads(varName)
-        c.SetCanvasSize(800, 1040);
+        c.SetCanvasSize(1000, 1300);
         Unfmaximum = hUnf.GetMaximum()
         #hTrue.SetFillColor(ROOT.TColor.GetColor("#99ccff"))
         #hTrue.SetLineColor(ROOT.TColor.GetColor('#000099')) 
@@ -563,13 +578,15 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         hTrueAlt.Draw("HIST")
         
         if(Unfmaximum > Truthmaximum):
-            hTrue.SetMaximum(Unfmaximum*1.2)
+            hTrue.SetMaximum(Unfmaximum*args["scaleymax"])
         else:
-            hTrue.SetMaximum(Truthmaximum*1.2)
+            hTrue.SetMaximum(Truthmaximum*args["scaleymax"])
 
         hTrue.GetXaxis().SetTitle("")
 
         UnfErrBand = MainErrorBand(hUnf,hUncUp,hUncDn,varName,norm,normFb)
+        #if varName=="mass":
+        #    UnfErrBand.SetMaximum(0.008*args['scaleymax'])
         UnfErrBand.Draw("a2")
         hTrue.GetXaxis().SetLabelSize(0)
         hTrue.GetXaxis().SetTitleSize(0)
@@ -589,33 +606,37 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         hUnf.GetXaxis().SetTitleSize(0)
         hUnf.Draw("PE1SAME")
       
-        ROOT.dotrootImport('uhussain/CMSPlotDecorations')
-        scale_label = "Normalized to Unity" if args['lumi'] < 0 else \
-            "%0.1f fb^{-1}" % args['lumi']
-        
-        lumi_text = ""
-        if args['thesis']:
-            lumi_text = "Thesis" 
-        elif args['preliminary']:
-            lumi_text = "Preliminary" 
-        
-        ROOT.CMSlumi(c, 0, 0, "%s (13 TeV)" % scale_label,lumi_text)
+        #ROOT.dotrootImport('uhussain/CMSPlotDecorations')
+        #scale_label = "Normalized to Unity" if args['lumi'] < 0 else \
+        #    "%0.1f fb^{-1}" % args['lumi']
+        #
+        #lumi_text = ""
+        #if args['thesis']:
+        #    lumi_text = "Thesis" 
+        #elif args['preliminary']:
+        #    lumi_text = "Preliminary" 
+        #
+        #ROOT.CMSlumi(c, 0, 0, "%s (13 TeV)" % scale_label,lumi_text)
                 #"Preliminary Simulation" if args.simulation else "Preliminary")
         
-        offset = ROOT.gPad.GetLeftMargin() - 0.04 if args['legend_left'] else \
-            ROOT.gPad.GetRightMargin() - 0.04 
+        offset = ROOT.gPad.GetLeftMargin() - 0.07 if args['legend_left'] else \
+            ROOT.gPad.GetRightMargin() - 0.07 
         width = .33
         width *= args['scalelegx']
         xdist = 0.1 if args['legend_left'] else 0.91
+        if varName=="leppt":
+            xdist=0.15
+        if varName=="drz1z2":
+            xdist=0.07
         xcoords = [xdist+offset, xdist+width+offset] if args['legend_left'] \
             else [xdist-width-offset, xdist-offset]
         unique_entries = min(2, 8)
-        ymax = 0.8 if args['legend_left'] else 0.9
+        ymax = 0.45 if varName=="leppt" else 0.915
         ycoords = [ymax, ymax - 0.08*unique_entries*args['scalelegy']]
         coords = [xcoords[0], ycoords[0], xcoords[1], ycoords[1]]
         legend = getPrettyLegend(hTrue, hUnf, hTrueAlt, UnfErrBand, coords)
         legend.Draw()
-        #texS,texS1=getLumiTextBox()
+        texS,texS1=getLumiTextBox()
         sigLabel = "POWHEG+MCFM+Pythia8" 
         sigLabelAlt = "MG5_aMC@NLO+MCFM+Pythia8"
         #if varName=="dphiz1z2" or varName=="drz1z2":
@@ -658,20 +679,20 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         ratioErrorBand.GetYaxis().SetTitleSize(0)
         ratioErrorBand.Draw("a2")
         
-        sigTex = getSigTextBox(0.15,0.8,sigLabel,0.16)
+        sigTex = getSigTextBox(0.15,0.8,sigLabel,0.14)
         Ratio.Draw("PE1SAME")
         line.SetLineColor(ROOT.kBlack)
         line.Draw("same")
 
         Altyaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMaximum(),ratioErrorBand.GetMinimum(),ratioErrorBand.GetMaximum())
         Altyaxis.SetNdivisions(003)
-        Altyaxis.SetTitle("Data/Theo")
+        Altyaxis.SetTitle("#scale[1.2]{Data/Theo.}")
         Altyaxis.SetLabelFont(42)
         Altyaxis.SetLabelOffset(0.01)
-        Altyaxis.SetLabelSize(0.14)
+        Altyaxis.SetLabelSize(0.189)
         Altyaxis.SetTitleFont(42)
         Altyaxis.SetTitleSize(0.16)
-        Altyaxis.SetTitleOffset(0.30)
+        Altyaxis.SetTitleOffset(0.29)
         Altyaxis.Draw("SAME")
         
         #ThirdPad
@@ -697,28 +718,42 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,varName,norm,normFb,l
         Altline.SetLineColor(ROOT.kRed)
         Altline.Draw("same")
         
-        AltTex = getSigTextBox(0.15,0.8,sigLabelAlt,0.16)
+        AltTex = getSigTextBox(0.15,0.85,sigLabelAlt,0.11)
         #redraw axis
         xaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmax(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmin(),hUnf.GetXaxis().GetXmax(),510)
         xaxis.SetTitle(prettyVars[varName]+''+units[varName])
-        #labelTex = getSigTextBox(0.9,0.8,prettyVars[varName]+''+units[varName]) 
+        #labelTex = getSigTextBox(0.9,0.8,prettyVars[varName]+''+units[varName])
+        #if varName=="mass":
+        #    xaxis.ChangeLabel(1,"0.1")
+            #xaxis.ChangeLabel(2,0.2)
+            #xaxis.ChangeLabel(3,0.3)
+            #xaxis.ChangeLabel(4,0.4)
+            #xaxis.ChangeLabel(5,0.5)
+            #xaxis.ChangeLabel(6,0.6)
+            #xaxis.ChangeLabel(7,0.7)
+            #xaxis.ChangeLabel(8,0.8)
+            #xaxis.ChangeLabel(9,0.9)
+            #xaxis.ChangeLabel(10,1.0)
         xaxis.SetLabelFont(42)
         xaxis.SetLabelOffset(0.03)
-        xaxis.SetLabelSize(0.12)
+        xaxis.SetLabelSize(0.162)
         xaxis.SetTitleFont(42)
         xaxis.SetTitleSize(0.18)
-        xaxis.SetTitleOffset(0.80)
+        xaxis.SetTitleOffset(0.85)
+        if varName=="mass":
+            xaxis.SetNoExponent(True)
         xaxis.Draw("SAME")
 
         yaxis = ROOT.TGaxis(hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMinimum(),hUnf.GetXaxis().GetXmin(),ratioErrorBand.GetMaximum(),ratioErrorBand.GetMinimum(),ratioErrorBand.GetMaximum())
         yaxis.SetNdivisions(003)
-        yaxis.SetTitle("Data/Theo")
+        yaxis.SetTitle("#scale[1.2]{Data/Theo.}")
+        #yaxis.SetTitle("Data/Theo.")
         yaxis.SetLabelFont(42)
         yaxis.SetLabelOffset(0.01)
-        yaxis.SetLabelSize(0.11)
+        yaxis.SetLabelSize(0.1485)
         yaxis.SetTitleFont(42)
-        yaxis.SetTitleSize(0.16)
-        yaxis.SetTitleOffset(0.35)
+        yaxis.SetTitleSize(0.12)
+        yaxis.SetTitleOffset(0.365)
         yaxis.Draw("SAME")
         c.Update()
         print("CanvasWidth: ", c.GetWw())
@@ -806,7 +841,7 @@ for varName in runVariables:
             mkdir(UnfoldOutDir)
         generatePlots(hUnfTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,varName,norm,normFb,args['lumi'],UnfoldOutDir)
 #Show plots nicely on my webpages
-for cat in ["eemm"]:   
+for cat in ["tot"]:   
 #for cat in ["eeee","eemm","mmmm","tot"]:   
     #This is where we put all the plots in html format for quick access/debugging
     makeSimpleHtml.writeHTML(os.path.expanduser(UnfoldOutDirs[cat].replace("/plots", "")), "Unfolded Distributions (from MC)")
