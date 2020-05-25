@@ -18,6 +18,8 @@ void ZZGenSelector::Init(TTree *tree)
         "GenLepEta",
     };
 
+    hists2D_ = {"GenZ1_Z2_Pt"};
+
     doSystematics_ = true;
 
     weighthists1D_ = {
@@ -307,7 +309,8 @@ bool ZZGenSelector::e1e2IsZ1(){
 }
 
 void ZZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::string> variation) {
-
+    if (!ZZSelection())
+        return; 
     if (isMC_){
         //std::cout<<"does it go into lheWeights"<<std::endl;
         //std::cout << "lheWeights.size() " << lheWeights.size() << std::endl;
@@ -324,8 +327,6 @@ void ZZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::st
             SafeHistFill(weighthistMap1D_, getHistName("GendRZ1Z2", variation.second), GendRZZ, i, lheWeights[i]/lheWeights[0]*Genweight);
         }
       }
-    if (!ZZSelection())
-        return;
     SafeHistFill(histMap1D_, getHistName("Genyield", variation.second), 1, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenMass", variation.second), GenMass,Genweight);
     SafeHistFill(histMap1D_, getHistName("GenZMass", variation.second), GenZ1mass, Genweight);
@@ -336,7 +337,9 @@ void ZZGenSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::st
     SafeHistFill(histMap1D_, getHistName("GenZZEta", variation.second), GenEta, Genweight);
     SafeHistFill(histMap1D_, getHistName("GendPhiZ1Z2", variation.second), GendPhiZZ, Genweight);
     SafeHistFill(histMap1D_, getHistName("GendRZ1Z2", variation.second), GendRZZ, Genweight);
+    SafeHistFill(histMap2D_, getHistName("GenZ1_Z2_Pt",variation.second),GenZ1pt,GenZ2pt,Genweight);
     //Making LeptonPt and Eta plots
+    SafeHistFill(histMap1D_, getHistName("GenL1Pt", variation.second), Genl1Pt, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl1Pt, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl2Pt, Genweight);
     SafeHistFill(histMap1D_, getHistName("GenLepPt", variation.second), Genl3Pt, Genweight);
