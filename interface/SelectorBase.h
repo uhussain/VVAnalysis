@@ -195,11 +195,12 @@ class SelectorBase : public TSelector {
     // Maps to the histogram pointers themselves
     std::map<std::string, TH1D*> histMap1D_ = {};
     //TODO change the name to map and don't break things
-    std::map<std::string, TH2D*> hists2D_ = {};
+    std::map<std::string, TH2D*> histMap2D_ = {};
     std::map<std::string, TH2D*> weighthistMap1D_ = {};
     std::map<std::string, TH3D*> weighthistMap2D_ {};
 
     std::vector<std::string> hists1D_ = {};
+    std::vector<std::string> hists2D_ = {};
     std::vector<std::string> weighthists1D_ = {};
     // The histograms for which you also want systematic variations
     std::vector<std::string> systHists_ = {};
@@ -242,6 +243,19 @@ class SelectorBase : public TSelector {
 	    container[histname]->Fill(args...);
     };
   
+    template<typename T, typename... Args>
+  void HistReset(std::map<std::string, T*> container, 
+            std::string histname) {
+    if (container[histname] != nullptr)
+            container[histname]->Reset();
+        };
+    template<typename T, typename... Args>
+  void HistAdd(std::map<std::string, T*> container, std::string histname, std::map<std::string, T*> container1, 
+                                        std::string histname1) {
+      if (container[histname] != nullptr && container1[histname1] != nullptr)
+              container[histname]->Add(container1[histname1]);
+          };
+
     template<typename T, typename... Args>
 	void HistFullFill(std::map<std::string, T*> container,
 			  std::string histname, std::string var, Args... args) {
