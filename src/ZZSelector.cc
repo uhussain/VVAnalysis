@@ -28,7 +28,9 @@ void ZZSelector::Init(TTree *tree)
         "dPhiZ1Z2",
         "dRZ1Z2",
         "ZPt",
+        "ZPtold",
         "LepPt",
+        "LepPtold",
         "LepEta"
     };
     //hists1D_ = {
@@ -40,7 +42,7 @@ void ZZSelector::Init(TTree *tree)
     //};
 
     hists1D_ = {
-         "yield", "ZMass","ZZPt","ZZEta","dPhiZ1Z2","dRZ1Z2","ZPt","L1Pt","LepPt","LepPtnew","LepPtTMP","LepEta",
+         "yield", "ZMass","ZZPt","ZZEta","dPhiZ1Z2","dRZ1Z2","ZPt","ZPtold","ZPtTMP","L1Pt","LepPt","LepPtold","LepPtTMP","LepEta",
          "Mass","nJets","jetPt[0]","jetPt[1]","jetEta[0]","jetEta[1]","mjj","dEtajj","SIP3D"
     };
 
@@ -56,6 +58,7 @@ void ZZSelector::Init(TTree *tree)
         "dRZ1Z2",
         "ZPt",
         "LepPt",
+        "LepPtold",
         "LepEta"
     };
     ZZSelectorBase::Init(tree);
@@ -715,8 +718,12 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     SafeHistFill(histMap1D_, getHistName("Mass", variation.second), Mass,weight);
     SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), Z1mass, weight);
     SafeHistFill(histMap1D_, getHistName("ZMass", variation.second), Z2mass, weight);
-    SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z1pt, weight);
-    SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z2pt, weight);
+    SafeHistFill(histMap1D_, getHistName("ZPtold", variation.second), Z1pt, weight);
+    SafeHistFill(histMap1D_, getHistName("ZPtold", variation.second), Z2pt, weight);
+
+    SafeHistFill(histMap1D_, getHistName("ZPtTMP", variation.second), Z1pt, weight);
+    SafeHistFill(histMap1D_, getHistName("ZPtTMP", variation.second), Z2pt, weight);
+    
     SafeHistFill(histMap1D_, getHistName("dPhiZ1Z2", variation.second), dPhiZZ, weight);
     SafeHistFill(histMap1D_, getHistName("dRZ1Z2", variation.second), dRZZ, weight);
     SafeHistFill(histMap1D_, getHistName("ZZPt", variation.second), Pt, weight); 
@@ -735,31 +742,37 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
     SafeHistFill(histMap1D_, getHistName("SIP3D", variation.second), l3SIP3D, weight);
     SafeHistFill(histMap1D_, getHistName("SIP3D", variation.second), l4SIP3D, weight);
     //Making LeptonPt and Eta plots
-    SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l1Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l2Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l3Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l4Pt, weight);
+    SafeHistFill(histMap1D_, getHistName("LepPtold", variation.second), l1Pt, weight);
+    SafeHistFill(histMap1D_, getHistName("LepPtold", variation.second), l2Pt, weight);
+    SafeHistFill(histMap1D_, getHistName("LepPtold", variation.second), l3Pt, weight);
+    SafeHistFill(histMap1D_, getHistName("LepPtold", variation.second), l4Pt, weight);
 
-    SafeHistFill(histMap1D_, getHistName("LepPtnew", variation.second), l1Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("LepPtnew", variation.second), l2Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("LepPtnew", variation.second), l3Pt, weight);
-    SafeHistFill(histMap1D_, getHistName("LepPtnew", variation.second), l4Pt, weight);
-    
     SafeHistFill(histMap1D_, getHistName("LepPtTMP", variation.second), l1Pt, weight);
     SafeHistFill(histMap1D_, getHistName("LepPtTMP", variation.second), l2Pt, weight);
     SafeHistFill(histMap1D_, getHistName("LepPtTMP", variation.second), l3Pt, weight);
     SafeHistFill(histMap1D_, getHistName("LepPtTMP", variation.second), l4Pt, weight);
 
-    if(weight == 1){
-    for (int jcntr = 0; jcntr < histMap1D_["LepPtTMP"]->GetNbinsX()+2; ++jcntr) {
-        if(histMap1D_["LepPtTMP"]->GetBinContent(jcntr) > 1){
-          histMap1D_["LepPtTMP"]->SetBinError(jcntr, histMap1D_["LepPtTMP"]->GetBinContent(jcntr));
+    if(!isMC_){
+      //std::cout<<getHistName("LepPtTMP", variation.second)<<std::endl;
+      //std::cout<<<<std::endl;
+    for (int jcntr = 0; jcntr < histMap1D_[getHistName("LepPtTMP", variation.second)]->GetNbinsX()+2; jcntr++) {
+        if(histMap1D_[getHistName("LepPtTMP", variation.second)]->GetBinContent(jcntr) > 1){
+          histMap1D_[getHistName("LepPtTMP", variation.second)]->SetBinError(jcntr, histMap1D_[getHistName("LepPtTMP", variation.second)]->GetBinContent(jcntr));
+          }
+        }
+    //Do the same for ZPt
+    for (int jcntr = 0; jcntr < histMap1D_[getHistName("ZPtTMP", variation.second)]->GetNbinsX()+2; jcntr++) {
+        if(histMap1D_[getHistName("ZPtTMP", variation.second)]->GetBinContent(jcntr) > 1){
+          histMap1D_[getHistName("ZPtTMP", variation.second)]->SetBinError(jcntr, histMap1D_[getHistName("ZPtTMP", variation.second)]->GetBinContent(jcntr));
           }
         }
       }
-    HistAdd(histMap1D_, getHistName("LepPtnew", variation.second), histMap1D_,getHistName("LepPtTMP", variation.second));
+    HistAdd(histMap1D_, getHistName("LepPt", variation.second), histMap1D_,getHistName("LepPtTMP", variation.second));
     HistReset(histMap1D_, getHistName("LepPtTMP", variation.second));
 
+    HistAdd(histMap1D_, getHistName("ZPt", variation.second), histMap1D_,getHistName("ZPtTMP", variation.second));
+    HistReset(histMap1D_, getHistName("ZPtTMP", variation.second));
+    
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l1Eta, weight);
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l2Eta, weight);
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l3Eta, weight);
