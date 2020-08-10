@@ -320,9 +320,11 @@ void ResponseMatrixMakerBase<T>::setup()
   bool doPUWtUp = (puWeightHists.find("Up") != puWeightHists.end());
   bool doPUWtDn = (puWeightHists.find("Down") != puWeightHists.end());
   float upperEdge = binning[binning.size()-1];
+  //std::cout<<"upperEdge: "<<upperEdge<<std::endl;
   float lowerEdge = binning[binning.size()-2];
-  const T binCenter = (lowerEdge)+((upperEdge - lowerEdge)/2.); 
-  std::cout<<"Last bin center: "<<binCenter<<std::endl;
+  //std::cout<<"lowerEdge: "<<lowerEdge<<std::endl;
+  float binCenter = (lowerEdge)+((upperEdge - lowerEdge)/2.); 
+  //std::cout<<"Last bin center: "<<binCenter<<std::endl;
   // Loop through base reco tree, fill most things
   for(size_t row = 0; row < size_t(std::abs(recoTree->GetEntries())); ++row)
     {
@@ -378,15 +380,25 @@ void ResponseMatrixMakerBase<T>::setup()
           //const T val = this->getEventResponse();
           
           T val = this->getEventResponse();
-
           const float nominalWeight = scale * puWt * lepSF * genWeight;
 
           //const float nominalWeight = scale * lepSF * genWeight;
           // fill histos that use nominal value but with different weights
-          if (val > upperEdge){val=binCenter;}
-          if (trueVal > upperEdge){trueVal=binCenter;}
+         
+          //this section is for variables like leppt or all multibranch response matrices
+          for(size_t i = 0; i < val.size(); ++i){
+            if (val[i] > upperEdge){val[i]=binCenter;}
+            //std::cout<<"val: "<<val[i]<<std::endl;
+          }
+
+          for(size_t i = 0; i < trueVal.size(); ++i){
+            if (trueVal[i] > upperEdge){trueVal[i]=binCenter;}
+            //std::cout<<"trueVal: "<<trueVal[i]<<std::endl;
+          } 
+          //this section is for variables like mass or all singlebranch response matrices
+          //if (val > upperEdge){val=binCenter;}
+          //if (trueVal > upperEdge){trueVal=binCenter;}
           //std::cout<<"val: "<<val<<std::endl;
-          //std::cout<<"trueVal: "<<trueVal<<std::endl;
           this->fillResponse(responses["nominal"], val, trueVal, nominalWeight);
 
           if(!skipSyst)
