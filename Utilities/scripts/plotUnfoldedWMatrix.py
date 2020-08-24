@@ -136,7 +136,7 @@ prettyVars = {
     'zpt' : 'p_{T}^{Z}',
     'zHigherPt' : 'p_\\text{T}^{\\text{Z}_{\\text{lead}}}',
     'zLowerPt' : 'p_\\text{T}^{\\text{Z}_{\\text{sublead}}}',
-    'leppt' : 'p_{T}^{\\ell}   ',
+    'leppt' : '\\text{p}_\\text{T}^{\\ell}',
     'l1Pt' : 'p_\\text{T}^{\\ell_1}', 
     'dphiz1z2': '\\Delta\\phi_{Z_{1},Z_{2}}',
     'drz1z2':'\\Delta\\text{R}_{Z_{1},Z_{2}}}',
@@ -147,10 +147,12 @@ _yTitle = {}
 _yTitleNoNorm = {}
 
 _yTitleTemp = '{prefix} \\frac{{d\\sigma_{{\\text{{fid}}}}}}{{d{xvar}}} {units}'
+_xTitleTemp = '\\text{xvar} {units}'
 for var, prettyVar in prettyVars.iteritems():
-    xt = prettyVar
+    #xt = prettyVar
     if yaxisunits[var]:
-        xt += ' \\, \\left(\\text{{{}}}\\right)'.format(yaxisunits[var])
+        xt = _xTitleTemp.format(xvar=prettyVar,units = ' \\, \\left(\\text{{{}}}\\right)'.format(yaxisunits[var]))
+        #xt += ' \\, \\left(\\text{{{}}}\\right)'.format(yaxisunits[var])
         yt = _yTitleTemp.format(xvar=prettyVar,
                                 prefix='\\frac{1}{\\sigma_{\\text{fid}}}',
                                 units='\\, \\left[ \\frac{{1}}{{\\text{{{unit}}}}} \\right]'.format(unit=yaxisunits[var]))
@@ -259,7 +261,7 @@ def createRatio(h1, h2):
     Ratio.SetStats(0)
     Ratio.GetYaxis().CenterTitle()
     Ratio.SetMarkerStyle(20)
-    Ratio.SetMarkerSize(0.7)
+    Ratio.SetMarkerSize(1.5)#0.7
 
     line = ROOT.TLine(h1.GetXaxis().GetXmin(), 1.,h1.GetXaxis().GetXmax(), 1.)
     line.SetLineStyle(7)
@@ -283,7 +285,7 @@ def getPrettyLegend(hTrue, data_hist, hAltTrue,hMat, error_hist, coords):
     legend.SetName("legend")
     #legend.SetFillStyle(0)
     legend.SetFillColor(ROOT.kWhite)
-    legend.SetBorderSize(2)
+    legend.SetBorderSize(0)
     legend.SetTextSize(0.028)
     legend.SetTextFont(62)
     legend.SetTextColor(ROOT.kBlack)
@@ -291,8 +293,8 @@ def getPrettyLegend(hTrue, data_hist, hAltTrue,hMat, error_hist, coords):
     sigLabelAlt = "MG5_aMC@NLO+MCFM+Pyth."
     MatLabel = "MATRIX"
     if data_hist:
-        legend.AddEntry(data_hist, "Data + stat. unc.", "lep")
-    legend.AddEntry(error_hist, "Stat. #oplus syst. unc.", "f")
+        legend.AddEntry(data_hist, "#scale[1.2]{Data + stat. unc.}", "lep")
+    legend.AddEntry(error_hist, "#scale[1.2]{Stat. #oplus syst. unc.}", "f")
     legend.AddEntry(hMat, MatLabel,"l")
     legend.AddEntry(hTrue, sigLabel,"lf")
     legend.AddEntry(hAltTrue, sigLabelAlt,"l")
@@ -304,7 +306,7 @@ def createCanvasPads(varName):
     ROOT.gStyle.SetOptStat(0)
     ROOT.gStyle.SetLegendBorderSize(0)
     # Upper histogram plot is pad1
-    pad1 = ROOT.TPad("pad1", "pad1", 0.01, 0.34, 0.99, 0.99)
+    pad1 = ROOT.TPad("pad1", "pad1", 0.01, 0.34, 0.99, 0.995)
     pad1.Draw()
     pad1.cd()
     if varName!="drz1z2" and not args['noNorm']:
@@ -313,6 +315,7 @@ def createCanvasPads(varName):
     pad1.SetFrameLineWidth(3)
     pad1.SetFrameBorderMode(0)
     pad1.SetBorderMode(0)
+    #pad1.SetTopMargin(0)  # play with this if -1 is out of frame in superscript of 137
     pad1.SetBottomMargin(0)  # joins upper and lower plot
     #pad1.SetGridx()
     #pad1.Draw()
@@ -387,7 +390,7 @@ def rebin(hist,varName):
     return hist
 
 def getLumiTextBox():
-    texS = ROOT.TLatex(0.68,0.965, str(int(args['lumi']))+" fb^{-1} (13 TeV)")
+    texS = ROOT.TLatex(0.68,0.960, str(int(args['lumi']))+" fb^{-1} (13 TeV)")
     texS.SetNDC()
     texS.SetTextFont(62)
     texS.SetTextSize(0.043)
@@ -397,7 +400,7 @@ def getLumiTextBox():
     texS1.SetNDC()
     texS1.SetTextFont(42)
     texS1.SetTextColor(ROOT.kBlack)
-    texS1.SetTextSize(0.045)
+    texS1.SetTextSize(0.050)#0.045
     texS1.Draw()
     return texS,texS1
 
@@ -414,6 +417,19 @@ def getSigTextBox(x,y,sigLabel,size):
     texS.SetTextSize(size)
     texS.Draw()
     return texS
+
+def getAxisTextBox(x,y,axisLabel,size,rotated):
+    texS = ROOT.TLatex(x,y,axisLabel)
+    texS.SetNDC()
+    #rotate for y-axis
+    if rotated:
+        texS.SetTextAngle(90)
+    texS.SetTextFont(42)
+    #texS.SetTextColor(ROOT.kBlack)
+    texS.SetTextSize(size)
+    texS.Draw()
+    return texS
+
 def RatioErrorBand(Ratio,hUncUp,hUncDn,hTrueNoErrs,varName):
         ratioGraph=ROOT.TGraphAsymmErrors(Ratio)
         ROOT.SetOwnership(ratioGraph,False)
@@ -667,7 +683,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
         #hUnf.SetBinErrorOption(ROOT.TH1.kPoisson)
         hUnf.SetLineColor(ROOT.kBlack)
         hUnf.SetMarkerStyle(20)
-        hUnf.SetMarkerSize(1.3)
+        hUnf.SetMarkerSize(2.5)#1.3
         hUnf.GetXaxis().SetTitle("")
         hUnf.GetXaxis().SetLabelSize(0)
         hUnf.GetXaxis().SetTitleSize(0)
@@ -790,7 +806,9 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
         #texTitle.Draw()
         #Altyaxis.SetTitle("")
         Altyaxis.CenterTitle()
-        Altyaxis.SetTitle("#scale[1.3]{Data/Theo.}")
+        #Altyaxis.SetTitle("#scale[1.43]{Data/Theo}")#1.3
+        yaxislabelTex = getAxisTextBox(0.06,0.0,"Data/Theo",0.23,True)
+        Altyaxis.SetTitle("")
         Altyaxis.SetLabelFont(42)
         Altyaxis.SetLabelOffset(0.01)
         Altyaxis.SetLabelSize(0.22)
@@ -832,8 +850,9 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
         #if varName=="leppt":
         #    xaxis.SetTitle(prettyVars[varName]+' '+"[GeV]")
         #else:
-        xaxis.SetTitle(prettyVars[varName]+' '+units[varName])
-        #labelTex = getSigTextBox(0.9,0.8,prettyVars[varName]+''+units[varName])
+        #xaxis.SetTitle(prettyVars[varName]+' '+units[varName])
+        xaxis.SetTitle("")
+        labelTex = getAxisTextBox(0.78,0.08,prettyVars[varName]+' '+units[varName],0.20,False)
         xaxis.SetLabelFont(42)
         xaxis.SetLabelOffset(0.03)
         xaxis.SetLabelSize(0.158)
@@ -855,6 +874,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
         yaxis.SetTitleSize(0.12)
         yaxis.SetTitleOffset(0.438)
         yaxis.Draw("SAME")
+
         c.Update()
         print("CanvasWidth: ", c.GetWw())
         print("CanvasHeight: ", c.GetWh())
