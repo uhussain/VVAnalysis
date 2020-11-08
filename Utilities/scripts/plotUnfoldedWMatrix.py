@@ -138,7 +138,7 @@ prettyVars = {
     'zLowerPt' : 'p_\\text{T}^{\\text{Z}_{\\text{sublead}}}',
     'leppt' : '\\text{p}_\\text{T}^{\\ell}',
     'l1Pt' : 'p_\\text{T}^{\\ell_1}', 
-    'dphiz1z2': '\\Delta\\phi_{Z_{1},Z_{2}}',
+    'dphiz1z2': '\\Delta\\varphi_{Z_{1},Z_{2}}',
     'drz1z2':'\\Delta\\text{R}_{Z_{1},Z_{2}}}',
     }
 
@@ -147,12 +147,12 @@ _yTitle = {}
 _yTitleNoNorm = {}
 
 _yTitleTemp = '{prefix} \\frac{{d\\sigma_{{\\text{{fid}}}}}}{{d{xvar}}} {units}'
-_xTitleTemp = '\\text{xvar} {units}'
+#_xTitleTemp = '\\text{xvar} {units}'
 for var, prettyVar in prettyVars.iteritems():
-    #xt = prettyVar
+    xt = prettyVar
     if yaxisunits[var]:
-        xt = _xTitleTemp.format(xvar=prettyVar,units = ' \\, \\left(\\text{{{}}}\\right)'.format(yaxisunits[var]))
-        #xt += ' \\, \\left(\\text{{{}}}\\right)'.format(yaxisunits[var])
+        #xt = _xTitleTemp.format(xvar=prettyVar,units = ' \\, \\left(\\text{{{}}}\\right)'.format(yaxisunits[var]))
+        xt += ' \\, \\left(\\text{{{}}}\\right)'.format(yaxisunits[var])
         yt = _yTitleTemp.format(xvar=prettyVar,
                                 prefix='\\frac{1}{\\sigma_{\\text{fid}}}',
                                 units='\\, \\left[ \\frac{{1}}{{\\text{{{unit}}}}} \\right]'.format(unit=yaxisunits[var]))
@@ -523,7 +523,63 @@ def MainErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
             #MainGraph.SetMinimum(0.5*(hMain.GetMinimum()))
         return MainGraph
 
-def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,normFb,lumi,unfoldDir):
+def PredErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
+        PredGraph=ROOT.TGraphAsymmErrors(hMain)
+        ROOT.SetOwnership(PredGraph,False)
+        tmpData = hMain.Clone("tmp")
+        for i in range(1, tmpData.GetNbinsX()+1):
+            if hMain.GetBinContent(i)==0:
+                continue
+            eUp=hUncUp.GetBinContent(i)
+            eDn=hUncDn.GetBinContent(i)
+            #print "eUp: ",eUp, "","eDn: ",eDn
+            errorUp = tmpData.GetBinContent(i) + math.sqrt(math.pow(tmpData.GetBinError(i),2) + math.pow(eUp,2))
+            errorUp -= hMain.GetBinContent(i) 
+            errorDn = max(tmpData.GetBinContent(i) - math.sqrt(math.pow(tmpData.GetBinError(i),2) + math.pow(eDn,2)),0)
+            errorDn = hMain.GetBinContent(i) - errorDn
+            #print "errorUp: ",errorUp, "","errorDn: ",errorDn
+            PredGraph.SetPointEYhigh(i-1, errorUp)
+            PredGraph.SetPointEYlow(i-1, errorDn)
+        #PredGraph.SetFillColorAlpha(1,0.7)
+        PredGraph.SetFillStyle(3001)
+        if norm:
+            drawyTitle = _yTitle[varName]
+        elif normFb:
+            drawyTitle = _yTitleNoNorm[varName]
+        else:
+            drawyTitle = "Events"
+        PredGraph.GetYaxis().SetTitle(drawyTitle)
+
+        #PredGraph.GetYaxis().SetTitleSize(1.3*hMain.GetYaxis().GetTitleSize())
+        #PredGraph.GetYaxis().SetLabelSize(1.3*hMain.GetYaxis().GetLabelSize())
+        #if varName=="drz1z2":
+        #    PredGraph.GetYaxis().SetTitleOffset(1.0)
+        #else:
+        #    PredGraph.GetYaxis().SetTitleOffset(hMain.GetYaxis().GetTitleOffset()*args['titleOffset'])
+        #PredGraph.GetYaxis().SetLabelOffset(0.01)
+        ##PredGraph.GetXaxis().SetLabelSize(0)
+        ##PredGraph.GetXaxis().SetTitleSize(0)
+        ##PredGraph.GetYaxis().SetLabelSize(0)
+        ##PredGraph.GetYaxis().SetTitleSize(0)
+        #if varName=="mass":
+        #    PredGraph.GetYaxis().ChangeLabel(1,-1,0)
+        #    PredGraph.GetYaxis().ChangeLabel(4,-1,0)
+        #if varName=="pt" or varName=="zpt" or varName=="leppt" or varName=="dphiz1z2":
+        #    PredGraph.GetYaxis().ChangeLabel(2,-1,0)
+        #if varName=="drz1z2":
+        #    PredGraph.GetYaxis().ChangeLabel(3,-1,0)
+        #PredGraph.GetXaxis().SetLimits(hMain.GetXaxis().GetXmin(),hMain.GetXaxis().GetXmax())
+        #PredGraph.GetXaxis().SetLimits(hMain.GetXaxis().GetXmin(),hMain.GetXaxis().GetXmax())
+        #PredGraph.SetMaximum(1.5)
+
+        #PredGraph.SetMaximum(1.2*(hMain.GetMaximum())*args["scaleymax"])
+        PredGraph.SetMinimum(args['scaleymin']*(hMain.GetMinimum()))
+        #if varName=="drz1z2":
+        #    PredGraph.SetMinimum(0.0)
+        #else:
+            #PredGraph.SetMinimum(0.5*(hMain.GetMinimum()))
+        return PredGraph
+def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,hMatrix_Up,hMatrix_Dn,varName,norm,normFb,lumi,unfoldDir):
     UnfHists=[]
     TrueHists=[]
     # for normalization if needed
@@ -537,6 +593,8 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
     #hTrueLeg = hTruthAlt.Clone()
     #Matrix
     hMatDist = hMatrix.Clone()
+    hMatDistUp = hMatrix_Up.Clone()
+    hMatDistDn = hMatrix_Dn.Clone()
     #hMatLeg = hMatrix.Clone()
     #lumi provided already in fb-1
     lumifb = lumi
@@ -609,30 +667,47 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
             #Matrix
             MatInt = hMatDist.Integral(1,hMatDist.GetNbinsX())
             hMatDist.Scale(1.0/MatInt)
+            MatIntUp = hMatDistUp.Integral(1,hMatDistUp.GetNbinsX())
+            hMatDistUp.Scale(1.0/MatIntUp)
+            MatIntDn = hMatDistDn.Integral(1,hMatDistDn.GetNbinsX())
+            hMatDistDn.Scale(1.0/MatIntDn)
         elif normFb:
             hTrue.Scale(1.0/lumifb)
             #hTrueUncUp /= lumifb
             #hTrueUncDn /= lumifb
             hTrueAlt.Scale(1.0/lumifb)
             hMatDist.Scale(1.0/lumifb)
+            hMatDistUp.Scale(1.0/lumifb)
+            hMatDistDn.Scale(1.0/lumifb)
         else:
             print "no special normalization"
 
         print "Total Alt Truth Integral",hTrueAlt.Integral()
         print "Total MATRIX Integral",hMatDist.Integral()
         print "Total Unf Data Integral",hUnf.Integral()
-        
+       
+        #subtract hMat from Up and Dn
+        #hMatDistUp.Add(hMatDist,-1)
+        #hMatDistDn.Add(hMatDist,-1)
+
+
         if norm or normFb:
             normalizeBins(hTrue)
             #normalizeBins(hTrueUncUp)
             #normalizeBins(hTrueUncDn)
             normalizeBins(hTrueAlt)
             normalizeBins(hMatDist)
+            normalizeBins(hMatDistUp)
+            normalizeBins(hMatDistDn)
 
 
+        print "Total MATRIX Up Integral",hMatDistUp.Integral()
+        print "Total MATRIX Down Integral",hMatDistDn.Integral()
         #hTrue.Draw("HIST")
         #hTrueAlt.Draw("HIST") 
         #hMatDist.Draw("HIST")
+        print "Total UnfUnc Up Integral",hUncUp.Integral()
+        print "Total UnfUnc Down Integral",hUncDn.Integral()
 
         if(Unfmaximum > Truthmaximum):
             hTrue.SetMaximum(Unfmaximum*args["scaleymax"])
@@ -642,6 +717,10 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
         hTrue.GetXaxis().SetTitle("")
 
         UnfErrBand = MainErrorBand(hUnf,hUncUp,hUncDn,varName,norm,normFb)
+
+        MatErrBand = PredErrorBand(hMatDist,hMatDistUp,hMatDistDn,varName,norm,normFb)
+        MatErrBand.SetFillColorAlpha(6,0.7)
+        
         if norm:
             if varName=="mass":
                 UnfErrBand.SetMaximum(0.01*args['scaleymax'])
@@ -656,6 +735,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
             elif varName=="leppt":
                 UnfErrBand.SetMaximum(0.02*args['scaleymax'])
         UnfErrBand.Draw("a2")
+        MatErrBand.Draw("a2SAME")
         hTrue.GetXaxis().SetLabelSize(0)
         hTrue.GetXaxis().SetTitleSize(0)
         #hTrue.GetYaxis().SetTitle("Events")
@@ -886,7 +966,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,
         c.Print(output_name+".png")
         c.SaveAs(output_name+".root")
         subprocess.call(["epstopdf", "--outfile=%s" % output_name+".pdf", output_name+".eps"],env={})
-        os.remove(output_name+".eps")
+        #os.remove(output_name+".eps")
         del c
 def mkdir(plotDir):
     for outdir in [plotDir]:
@@ -962,10 +1042,12 @@ for varName in runVariables:
         hMat = canvas.GetListOfPrimitives().FindObject("%s" %(Matrix[varName]))
         unnormalizeBins(hMat)
         hMat.SetDirectory(0)
-        hMat_Up = canvas.GetListOfPrimitives().FindObject("%s__scaleUp" %(Matrix[varName]))
+        # scaleDown is for the UPPER error, scaleUp is for the LOWER
+        hMat_Up = canvas.GetListOfPrimitives().FindObject("%s__scaleDown" %(Matrix[varName]))
         unnormalizeBins(hMat_Up)
         hMat_Up.SetDirectory(0)
-        hMat_Dn = canvas.GetListOfPrimitives().FindObject("%s__scaleDown" %(Matrix[varName]))
+        # scaleDown is for the UPPER error, scaleUp is for the LOWER
+        hMat_Dn = canvas.GetListOfPrimitives().FindObject("%s__scaleUp" %(Matrix[varName]))
         unnormalizeBins(hMat_Dn)
         hMat_Dn.SetDirectory(0)
         fMat.Close()
@@ -1023,9 +1105,16 @@ for varName in runVariables:
             mkdir(UnfoldOutDir)
         hMatrixTot = hMat.Clone()
         hMatrixTot.Scale(2*args['lumi'])
-        #rebin hMatrix histogram
+        #Up and Down
+        hMatrixTot_Up = hMat_Up.Clone()
+        hMatrixTot_Up.Scale(2*args['lumi'])
+        hMatrixTot_Dn = hMat_Dn.Clone()
+        hMatrixTot_Dn.Scale(2*args['lumi'])
+        #rebin hMatrix histogram and Up,Down
         hMatrixTot=rebin(hMatrixTot,varName)
-        generatePlots(hUnfTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,hMatrixTot,varName,norm,normFb,args['lumi'],UnfoldOutDir)
+        hMatrixTot_Up=rebin(hMatrixTot_Up,varName)
+        hMatrixTot_Dn=rebin(hMatrixTot_Dn,varName)
+        generatePlots(hUnfTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,hMatrixTot,hMatrixTot_Up,hMatrixTot_Dn,varName,norm,normFb,args['lumi'],UnfoldOutDir)
 #Show plots nicely on my webpages
 for cat in ["tot"]:   
 #for cat in ["eeee","eemm","mmmm","tot"]:   

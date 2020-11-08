@@ -10,7 +10,7 @@ import string
 import socket
 import logging
 #try:
-import configparser
+#import configparser
 #except:
     #import ConfigParser as configparser
     #from six.moves import configparser
