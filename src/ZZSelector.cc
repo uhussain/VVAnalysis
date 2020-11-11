@@ -14,7 +14,7 @@ void ZZSelector::Init(TTree *tree)
         {pileupUp, "CMS_pileupUp"},
         {pileupDown, "CMS_pileupDown"},
     }; 
-    doSystematics_ = true;
+    doSystematics_ = false;
     
     //This would be set true inside ZZBackground Selector
     //isNonPrompt_ = false;
@@ -766,13 +766,24 @@ void ZZSelector::FillHistograms(Long64_t entry, std::pair<Systematic, std::strin
           histMap1D_[getHistName("ZPtTMP", variation.second)]->SetBinError(jcntr, histMap1D_[getHistName("ZPtTMP", variation.second)]->GetBinContent(jcntr));
           }
         }
-      }
+
+    //Keep this logic only for data
     HistAdd(histMap1D_, getHistName("LepPt", variation.second), histMap1D_,getHistName("LepPtTMP", variation.second));
     HistReset(histMap1D_, getHistName("LepPtTMP", variation.second));
 
     HistAdd(histMap1D_, getHistName("ZPt", variation.second), histMap1D_,getHistName("ZPtTMP", variation.second));
     HistReset(histMap1D_, getHistName("ZPtTMP", variation.second));
-    
+      }
+
+    if(isMC_){
+            //Fill for MC here
+            SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z1pt, weight);
+            SafeHistFill(histMap1D_, getHistName("ZPt", variation.second), Z2pt, weight);
+            SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l1Pt, weight);
+            SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l2Pt, weight);
+            SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l3Pt, weight);
+            SafeHistFill(histMap1D_, getHistName("LepPt", variation.second), l4Pt, weight);
+    }
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l1Eta, weight);
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l2Eta, weight);
     SafeHistFill(histMap1D_, getHistName("LepEta", variation.second), l3Eta, weight);

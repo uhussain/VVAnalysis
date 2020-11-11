@@ -237,31 +237,31 @@ class SelectorBase : public TSelector {
 
     // Filling Functions
     template<typename T, typename... Args>
-	void SafeHistFill(std::map<std::string, T*> container, 
+	  void SafeHistFill(std::map<std::string, T*> container, 
 			  std::string histname, Args... args) {
-	if (container[histname] != nullptr)
-	    container[histname]->Fill(args...);
+      if (container[histname] != nullptr)
+	          container[histname]->Fill(args...);
     };
   
     template<typename T, typename... Args>
-  void HistReset(std::map<std::string, T*> container, 
-            std::string histname) {
-    if (container[histname] != nullptr)
+    void HistReset(std::map<std::string, T*> container, 
+              std::string histname) {
+      if (container[histname] != nullptr)
             container[histname]->Reset();
         };
     template<typename T, typename... Args>
-  void HistAdd(std::map<std::string, T*> container, std::string histname, std::map<std::string, T*> container1, 
+    void HistAdd(std::map<std::string, T*> container, std::string histname, std::map<std::string, T*> container1, 
                                         std::string histname1) {
       if (container[histname] != nullptr && container1[histname1] != nullptr)
               container[histname]->Add(container1[histname1]);
           };
 
     template<typename T, typename... Args>
-	void HistFullFill(std::map<std::string, T*> container,
+	  void HistFullFill(std::map<std::string, T*> container,
 			  std::string histname, std::string var, Args... args) {
-	SafeHistFill(container, getHistName(histname, var), args...);
-	SafeHistFill(container, getHistName(histname, var, "all"), args...);
-    }
+	  SafeHistFill(container, getHistName(histname, var), args...);
+	  SafeHistFill(container, getHistName(histname, var, "all"), args...);
+    };
   
     
 };

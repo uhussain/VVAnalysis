@@ -198,7 +198,9 @@ void SelectorBase::InitializeHistogramsFromConfig() {
 
     InitializeHistMap(hists1D_, histMap1D_);
     InitializeHistMap(weighthists1D_, weighthistMap1D_);
-
+    
+    InitializeHistMap(hists2D_, histMap2D_);
+    
     for (auto && entry : *histInfo) {  
         TNamed* currentHistInfo = dynamic_cast<TNamed*>(entry);
         std::string name = currentHistInfo->GetName();
@@ -211,7 +213,7 @@ void SelectorBase::InitializeHistogramsFromConfig() {
 
         for (auto& chan : channels) {
             auto histName = getHistName(name, "", chan); 
-            if (hists2D_.find(histName) != hists2D_.end() || histMap1D_.find(histName) != histMap1D_.end()) { 
+            if (histMap2D_.find(histName) != histMap2D_.end() || histMap1D_.find(histName) != histMap1D_.end()) { 
                 InitializeHistogramFromConfig(name, chan, histData);
             }
             //No need to print warning for every channel
@@ -222,7 +224,7 @@ void SelectorBase::InitializeHistogramsFromConfig() {
 }
 
 void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string channel, std::vector<std::string> histData) {
-    if (histData.size() != 4 && histData.size() != 7) {
+    if (histData.size() != 4 && histData.size() != 7 && histData.size() != 2) {
         std::cerr << "Malformed data string for histogram '" << name
                     << ".' Must have form: 'Title; (optional info) $ nbins, xmin, xmax'"
                     << "\n   OR form: 'Title; (optional info) $ nbins, xmin, xmax nbinsy ymin ymax'"
@@ -232,10 +234,12 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
     std::string histName = getHistName(name, "", channel);
     
     int nbins = std::stoi(histData[1]);
-    float xmin = std::stof(histData[2]);
-    float xmax = std::stof(histData[3]);
+    //float xmin = std::stof(histData[2]);
+    //float xmax = std::stof(histData[3]);
 
     if (histData.size() == 4) {
+        float xmin = std::stof(histData[2]);
+        float xmax = std::stof(histData[3]);
         AddObject<TH1D>(histMap1D_[histName], histName.c_str(), histData[0].c_str(),nbins, xmin, xmax);
         //std::cout<<"doSystematics: "<<doSystematics_<<std::endl;
         //std::cout<<systHists_.size()<<std::endl;
@@ -266,17 +270,45 @@ void SelectorBase::InitializeHistogramFromConfig(std::string name, std::string c
                 nbins, xmin, xmax, 1000, 0, 1000);
         }
     }
+    else if (histData.size() == 2) {
+        //if (name=="ZPt" || name=="ZPtTMP")
+        double var_bins[nbins+1]={0.,25.,50.,75.,100.,125.,150.,200.,300.};
+        AddObject<TH1D>(histMap1D_[histName], histName.c_str(), histData[0].c_str(),nbins,var_bins);
+        //std::cout<<"doSystematics: "<<doSystematics_<<std::endl;
+        //std::cout<<systHists_.size()<<std::endl;
+        //std::cout<<"histName: "<<histName<<std::endl;
+        if (doSystematics_ && !isNonPrompt_ && std::find(systHists_.begin(), systHists_.end(), name) != systHists_.end()) {
+            //std::cout<<"are there systHists_"<<std::endl;
+            for (auto& syst : systematics_) {
+                //std::cout<<"systHists getting filled?"<<std::endl;
+                std::string syst_histName = getHistName(name, syst.second, channel);
+                histMap1D_[syst_histName] = {};
+                AddObject<TH1D>(histMap1D_[syst_histName], syst_histName.c_str(), 
+                    histData[0].c_str(),nbins, var_bins);
+            }
+        }
+        // Weight hists must be subset of 1D hists!
+        //std::cout<<"size of weighthistMap1D_: "<<weighthistMap1D_.size()<<std::endl;
+        if (isMC_ && !isNonPrompt_ && (weighthistMap1D_.find(histName) != weighthistMap1D_.end())) { 
+           //std::cout<<"Is weightHists getting filled?"<<std::endl;
+            AddObject<TH2D>(weighthistMap1D_[histName], 
+                (name+"_lheWeights_"+channel).c_str(), histData[0].c_str(),
+                nbins, var_bins, 1000, 0, 1000);
+        }
+    }
     else {
+        float xmin = std::stof(histData[2]);
+        float xmax = std::stof(histData[3]);
         int nbinsy = std::stoi(histData[4]);
         float ymin = std::stof(histData[5]);
         float ymax = std::stof(histData[6]);
-        AddObject<TH2D>(hists2D_[histName], histName.c_str(), histData[0].c_str(),nbins, xmin, xmax,
+        AddObject<TH2D>(histMap2D_[histName], histName.c_str(), histData[0].c_str(),nbins, xmin, xmax,
                 nbinsy, ymin, ymax);
         if (doSystematics_ && !isNonPrompt_ && std::find(systHists2D_.begin(), systHists2D_.end(), histName) != systHists2D_.end()) {
             for (auto& syst : systematics_) {
                 std::string syst_hist_name = name+"_"+syst.second + "_" + channel;
-                hists2D_[syst_hist_name] = {};
-                AddObject<TH2D>(hists2D_[syst_hist_name], syst_hist_name.c_str(), 
+                histMap2D_[syst_hist_name] = {};
+                AddObject<TH2D>(histMap2D_[syst_hist_name], syst_hist_name.c_str(), 
                     histData[0].c_str(),nbins, xmin, xmax, nbinsy, ymin, ymax);
             }
         }
