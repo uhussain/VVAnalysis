@@ -579,7 +579,7 @@ def PredErrorBand(hMain,hUncUp,hUncDn,varName,norm,normFb):
         #else:
             #PredGraph.SetMinimum(0.5*(hMain.GetMinimum()))
         return PredGraph
-def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,hMatrix_Up,hMatrix_Dn,varName,norm,normFb,lumi,unfoldDir):
+def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,varName,norm,normFb,lumi,unfoldDir):
     UnfHists=[]
     TrueHists=[]
     # for normalization if needed
@@ -593,8 +593,9 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,hMatrix_Up,hM
     #hTrueLeg = hTruthAlt.Clone()
     #Matrix
     hMatDist = hMatrix.Clone()
-    hMatDistUp = hMatrix_Up.Clone()
-    hMatDistDn = hMatrix_Dn.Clone()
+    #For Error bands
+    #hMatDistUp = hMatrix_Up.Clone()
+    #hMatDistDn = hMatrix_Dn.Clone()
     #hMatLeg = hMatrix.Clone()
     #lumi provided already in fb-1
     lumifb = lumi
@@ -667,18 +668,18 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,hMatrix_Up,hM
             #Matrix
             MatInt = hMatDist.Integral(1,hMatDist.GetNbinsX())
             hMatDist.Scale(1.0/MatInt)
-            MatIntUp = hMatDistUp.Integral(1,hMatDistUp.GetNbinsX())
-            hMatDistUp.Scale(1.0/MatIntUp)
-            MatIntDn = hMatDistDn.Integral(1,hMatDistDn.GetNbinsX())
-            hMatDistDn.Scale(1.0/MatIntDn)
+            #MatIntUp = hMatDistUp.Integral(1,hMatDistUp.GetNbinsX())
+            #hMatDistUp.Scale(1.0/MatIntUp)
+            #MatIntDn = hMatDistDn.Integral(1,hMatDistDn.GetNbinsX())
+            #hMatDistDn.Scale(1.0/MatIntDn)
         elif normFb:
             hTrue.Scale(1.0/lumifb)
             #hTrueUncUp /= lumifb
             #hTrueUncDn /= lumifb
             hTrueAlt.Scale(1.0/lumifb)
             hMatDist.Scale(1.0/lumifb)
-            hMatDistUp.Scale(1.0/lumifb)
-            hMatDistDn.Scale(1.0/lumifb)
+            #hMatDistUp.Scale(1.0/lumifb)
+            #hMatDistDn.Scale(1.0/lumifb)
         else:
             print "no special normalization"
 
@@ -697,12 +698,12 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,hMatrix_Up,hM
             #normalizeBins(hTrueUncDn)
             normalizeBins(hTrueAlt)
             normalizeBins(hMatDist)
-            normalizeBins(hMatDistUp)
-            normalizeBins(hMatDistDn)
+            #normalizeBins(hMatDistUp)
+            #normalizeBins(hMatDistDn)
 
 
-        print "Total MATRIX Up Integral",hMatDistUp.Integral()
-        print "Total MATRIX Down Integral",hMatDistDn.Integral()
+        #print "Total MATRIX Up Integral",hMatDistUp.Integral()
+        #print "Total MATRIX Down Integral",hMatDistDn.Integral()
         #hTrue.Draw("HIST")
         #hTrueAlt.Draw("HIST") 
         #hMatDist.Draw("HIST")
@@ -718,8 +719,8 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,hMatrix_Up,hM
 
         UnfErrBand = MainErrorBand(hUnf,hUncUp,hUncDn,varName,norm,normFb)
 
-        MatErrBand = PredErrorBand(hMatDist,hMatDistUp,hMatDistDn,varName,norm,normFb)
-        MatErrBand.SetFillColorAlpha(6,0.7)
+        #MatErrBand = PredErrorBand(hMatDist,hMatDistUp,hMatDistDn,varName,norm,normFb)
+        #MatErrBand.SetFillColorAlpha(6,0.7)
         
         if norm:
             if varName=="mass":
@@ -735,7 +736,7 @@ def generatePlots(hUnfolded,hUncUp,hUncDn,hTruth,hTruthAlt,hMatrix,hMatrix_Up,hM
             elif varName=="leppt":
                 UnfErrBand.SetMaximum(0.02*args['scaleymax'])
         UnfErrBand.Draw("a2")
-        MatErrBand.Draw("a2SAME")
+        #MatErrBand.Draw("a2SAME")
         hTrue.GetXaxis().SetLabelSize(0)
         hTrue.GetXaxis().SetTitleSize(0)
         #hTrue.GetYaxis().SetTitle("Events")
@@ -1005,8 +1006,8 @@ elif analysis=="ZZ4l2018":
         fUse = ROOT.TFile("UnfHistsFinal-18Apr2020-ZZ4l2018.root","read")
     else:
         #LepPt,ZPt
-        #fUse = ROOT.TFile("UnfHistsFinal-26Jun2020-ZZ4lFullRun2.root","read")
-        fUse = ROOT.TFile("UnfHistsFinal-18Apr2020-ZZ4lFullRun2.root","read")
+        fUse = ROOT.TFile("UnfHistsFinal-26Jun2020-ZZ4lFullRun2.root","read")
+        #fUse = ROOT.TFile("UnfHistsFinal-18Apr2020-ZZ4lFullRun2.root","read")
 #fUse = ROOT.TFile.Open("UnfHistsFull-09Feb2020-FullRun2.root","read")
 print("file being Used: ",fUse)
 for varName in runVariables:
@@ -1043,9 +1044,9 @@ for varName in runVariables:
         unnormalizeBins(hMat)
         hMat.SetDirectory(0)
         # scaleDown is for the UPPER error, scaleUp is for the LOWER
-        hMat_Up = canvas.GetListOfPrimitives().FindObject("%s__scaleDown" %(Matrix[varName]))
-        unnormalizeBins(hMat_Up)
-        hMat_Up.SetDirectory(0)
+        #hMat_Up = canvas.GetListOfPrimitives().FindObject("%s__scaleDown" %(Matrix[varName]))
+        #unnormalizeBins(hMat_Up)
+        #hMat_Up.SetDirectory(0)
         # scaleDown is for the UPPER error, scaleUp is for the LOWER
         hMat_Dn = canvas.GetListOfPrimitives().FindObject("%s__scaleUp" %(Matrix[varName]))
         unnormalizeBins(hMat_Dn)
@@ -1058,21 +1059,21 @@ for varName in runVariables:
         if chan == "eeee" or chan =="mmmm":
             hMatrix = hMat.Clone()
             hMatrix.Scale(0.5*args['lumi'])
-            hMatrix_Up = hMat_Up.Clone()
-            hMatrix_Up.Scale(0.5*args['lumi'])
-            hMatrix_Dn = hMat_Dn.Clone()
-            hMatrix_Dn.Scale(0.5*args['lumi'])
+            #hMatrix_Up = hMat_Up.Clone()
+            #hMatrix_Up.Scale(0.5*args['lumi'])
+            #hMatrix_Dn = hMat_Dn.Clone()
+            #hMatrix_Dn.Scale(0.5*args['lumi'])
         else:
             hMatrix = hMat.Clone()
             hMatrix.Scale(args['lumi'])
-            hMatrix_Up = hMat_Up.Clone()
-            hMatrix_Up.Scale(args['lumi'])
-            hMatrix_Dn = hMat_Dn.Clone()
-            hMatrix_Dn.Scale(args['lumi'])
+            #hMatrix_Up = hMat_Up.Clone()
+            #hMatrix_Up.Scale(args['lumi'])
+            #hMatrix_Dn = hMat_Dn.Clone()
+            #hMatrix_Dn.Scale(args['lumi'])
         #rebin hMatrix histogram
         hMatrix=rebin(hMatrix,varName)
-        hMatrix_Up=rebin(hMatrix,varName)
-        hMatrix_Dn=rebin(hMatrix,varName)
+        #hMatrix_Up=rebin(hMatrix,varName)
+        #hMatrix_Dn=rebin(hMatrix,varName)
         UnfoldOutDir=UnfoldDir+"/"+chan+"/plots"
         if chan not in UnfoldOutDirs:
             UnfoldOutDirs[chan]=UnfoldOutDir
@@ -1088,7 +1089,7 @@ for varName in runVariables:
         hUncUp = fUse.Get(chan+"_"+varName+"_totUncUp") 
         hUncDn = fUse.Get(chan+"_"+varName+"_totUncDown")
         print "UnfoldOutDir:",UnfoldOutDir
-        generatePlots(hUnfolded[chan],hUncUp,hUncDn,hTrue[chan],hTrueAlt[chan],hMatrix,hMatrix_Up,hMatrix_Dn,varName,norm,normFb,args['lumi'],UnfoldOutDir)
+        generatePlots(hUnfolded[chan],hUncUp,hUncDn,hTrue[chan],hTrueAlt[chan],hMatrix,varName,norm,normFb,args['lumi'],UnfoldOutDir)
     
     if args['makeTotals']:
         #Now access the histograms for all channels combined together
@@ -1106,15 +1107,15 @@ for varName in runVariables:
         hMatrixTot = hMat.Clone()
         hMatrixTot.Scale(2*args['lumi'])
         #Up and Down
-        hMatrixTot_Up = hMat_Up.Clone()
-        hMatrixTot_Up.Scale(2*args['lumi'])
-        hMatrixTot_Dn = hMat_Dn.Clone()
-        hMatrixTot_Dn.Scale(2*args['lumi'])
+        #hMatrixTot_Up = hMat_Up.Clone()
+        #hMatrixTot_Up.Scale(2*args['lumi'])
+        #hMatrixTot_Dn = hMat_Dn.Clone()
+        #hMatrixTot_Dn.Scale(2*args['lumi'])
         #rebin hMatrix histogram and Up,Down
         hMatrixTot=rebin(hMatrixTot,varName)
-        hMatrixTot_Up=rebin(hMatrixTot_Up,varName)
-        hMatrixTot_Dn=rebin(hMatrixTot_Dn,varName)
-        generatePlots(hUnfTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,hMatrixTot,hMatrixTot_Up,hMatrixTot_Dn,varName,norm,normFb,args['lumi'],UnfoldOutDir)
+        #hMatrixTot_Up=rebin(hMatrixTot_Up,varName)
+        #hMatrixTot_Dn=rebin(hMatrixTot_Dn,varName)
+        generatePlots(hUnfTot,hTotUncUp,hTotUncDn,hTrueTot,hTrueAltTot,hMatrixTot,varName,norm,normFb,args['lumi'],UnfoldOutDir)
 #Show plots nicely on my webpages
 for cat in ["tot"]:   
 #for cat in ["eeee","eemm","mmmm","tot"]:   
